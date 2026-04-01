@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>felix drehen</title>
+    <style>
+        body {
+            background-color: black;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0px;
+        }
+
+        img {
+            width: 150px;
+            transform: translateY(16px) translateX(48px);    
+        }
+
+        #wheel {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="tickSound" src="he.mp3" preload="auto"></audio>
+    <button onclick="rotateLeft()">⟲ Links</button>
+    <button onclick="resetRotation()">Reset</button>
+    <input type="number" id="eckenInput" min="3" value="6">
+    <button onclick="generateWheel()">Erstellen</button>
+
+    <div class="container">
+
+        <img src="image.png" alt="wix Bild">
+        <svg id="svg" width="300" height="300" viewBox="0 0 300 300">
+            <g id="wheel"></g>
+        </svg>
+
+
+    </div>
+  
+    <script src="script.js"></script>
+</body>
+</html>

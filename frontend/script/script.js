@@ -39,10 +39,12 @@ function playTick() {
     sound.play();
 }
 function rotateLeft() {
-    let zahl = Math.floor(Math.random() * 720) + 1;
+    let power = 10; //kraft des spielers muss über ui z.b durch regler
+    let wert = Math.floor(Math.random() * 960) + 1; // 960 bestimmt die max anzahl an umdrehungen
+    let zahl = wert * power;
     let i = 0;
     console.log("Rotation:", zahl);
-    const startDelay = 7;
+    const startDelay = 5 / power; //beschleunigt die scheibe in abhängigkeit der spieler kraft
     const endDelay = 75;
     const n = parseInt(document.getElementById("eckenInput").value);
     const stepAngle = 360 / n;

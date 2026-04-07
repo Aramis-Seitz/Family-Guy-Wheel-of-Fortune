@@ -1,5 +1,7 @@
 - initialisierungs Anleitung (kp wie man das schreibt)
 
+    - zwei terminals erstellen
+
 ```shell
 cd Family-Guy-Wheel-of-Fortune
 cd backend

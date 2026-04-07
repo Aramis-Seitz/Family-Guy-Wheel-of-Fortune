@@ -63,10 +63,12 @@ function playTick(): void {
 
 
 function rotateLeft(): void {
-    let zahl: number = Math.floor(Math.random() * 720) + 1;
+    let power: number = 10; //kraft des spielers muss über ui z.b durch regler
+    let wert: number = Math.floor(Math.random() * 960) + 1; // 960 bestimmt die max anzahl an umdrehungen
+    let zahl: number = wert * power;
     let i: number = 0;
     console.log("Rotation:", zahl);
-    const startDelay: number = 7;
+    const startDelay: number = 5/power; //beschleunigt die scheibe in abhängigkeit der spieler kraft
     const endDelay: number = 75;
 
     const n: number = parseInt(

@@ -1,20 +1,28 @@
-Ein Befehl startet ALLES:
+- initialisierungs Anleitung (kp wie man das schreibt)
+
 ```shell
-npm run dev
+cd Family-Guy-Wheel-of-Fortune
+cd backend
 ```
-Backend + Frontend gleichzeitig
+---
+```shell
+npm install
+cd ../frontend
+```
+---
+```shell
+npm install
+npm run build
+```
+---
 
- Installation (wichtig)
+Dieses Terminal offen lassen
+kompiliert automatisch bei Änderungen
 
-In jedem Ordner:
+---
 ```shell
 cd backend
-npm install
-
-cd ../frontend
-npm install
+npm run dev
 ```
-Oder im Root (bei Workspaces):
-```shell
-npm install
-```
+---
+http://localhost:3000

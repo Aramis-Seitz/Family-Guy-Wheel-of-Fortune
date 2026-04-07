@@ -10,6 +10,17 @@ const frontendPath = path.join(__dirname, "../../frontend");
 // Statische Dateien 
 app.use(express.static(frontendPath));
 
+//  API
+app.get("/api/test", (req, res) => {
+    res.json({ message: "Backend läuft!" });
+});
+ 
+ 
+// Fallback: index.html laden
+app.get("*", (req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
+});
+
 app.listen(PORT, () => {
     console.log(`Server läuft auf http://localhost:${PORT}`);
 });

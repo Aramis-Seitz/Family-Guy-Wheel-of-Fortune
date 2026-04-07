@@ -10,3 +10,8 @@ logs/
 # Environment files
 .env
 .env.*
+#d und maps
+*.d.ts
+*.d.ts.map
+*.map
+.gitignore

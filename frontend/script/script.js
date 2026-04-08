@@ -1,70 +1,94 @@
 "use strict";
-let rotation = 0;
-let lastTickAngle = 0;
-const wheel = document.getElementById("wheel");
-function generateWheel() {
-    const n = parseInt(document.getElementById("eckenInput").value);
-    // Mindestwert prüfen
-    if (n < 2)
+const wheelElement = document.getElementById("wheel");
+const segmentCountInput = document.getElementById("eckenInput");
+const tickSoundTemplate = document.getElementById("tickSound");
+let currentRotation = 0;
+let lastTickRotation = 0;
+const WHEEL_CENTER = { x: 150, y: 150 };
+const WHEEL_RADIUS = 100;
+const FULL_CIRCLE_RADIANS = Math.PI * 2;
+const MAX_SPIN_STEPS = 960;
+const SPIN_START_DELAY = 5;
+const SPIN_END_DELAY = 75;
+function getSegmentCount() {
+    if (!segmentCountInput)
+        return 0;
+    const value = parseInt(segmentCountInput.value, 10);
+    return Number.isNaN(value) ? 0 : value;
+}
+function clearWheel() {
+    if (!wheelElement)
         return;
-    if (n == 8) {
+    wheelElement.innerHTML = "";
+}
+function getPointOnCircle(center, radius, angleRadians) {
+    return {
+        x: center.x + radius * Math.cos(angleRadians - Math.PI / 2),
+        y: center.y + radius * Math.sin(angleRadians - Math.PI / 2),
+    };
+}
+function createWheelSegmentPath(segmentIndex, segmentCount) {
+    const angleStep = FULL_CIRCLE_RADIANS / segmentCount;
+    const startAngle = segmentIndex * angleStep;
+    const endAngle = (segmentIndex + 1) * angleStep;
+    const startPoint = getPointOnCircle(WHEEL_CENTER, WHEEL_RADIUS, startAngle);
+    const endPoint = getPointOnCircle(WHEEL_CENTER, WHEEL_RADIUS, endAngle);
+    const largeArcFlag = angleStep > Math.PI ? 1 : 0;
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", `M ${WHEEL_CENTER.x} ${WHEEL_CENTER.y} L ${startPoint.x} ${startPoint.y} A ${WHEEL_RADIUS} ${WHEEL_RADIUS} 0 ${largeArcFlag} 1 ${endPoint.x} ${endPoint.y} Z`);
+    path.setAttribute("fill", `hsl(${(segmentIndex * 360) / segmentCount}, 100%, 50%)`);
+    return path;
+}
+function generateWheel() {
+    const segmentCount = getSegmentCount();
+    if (segmentCount < 2 || !wheelElement)
+        return;
+    if (segmentCount === 8) {
         window.open("https://www.instagram.com/reel/CwxOa6ruvJE/", "_blank");
     }
-    // SVG leeren
-    wheel.innerHTML = "";
-    const cx = 150;
-    const cy = 150;
-    const r = 100;
-    const angleStep = (2 * Math.PI) / n;
-    for (let i = 0; i < n; i++) {
-        const startAngle = i * angleStep;
-        const endAngle = (i + 1) * angleStep;
-        const x1 = cx + r * Math.cos(startAngle - Math.PI / 2);
-        const y1 = cy + r * Math.sin(startAngle - Math.PI / 2);
-        const x2 = cx + r * Math.cos(endAngle - Math.PI / 2);
-        const y2 = cy + r * Math.sin(endAngle - Math.PI / 2);
-        const largeArc = angleStep > Math.PI ? 1 : 0;
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`);
-        // zufällige Farbe
-        path.setAttribute("fill", `hsl(${(i * 360) / n}, 100%, 50%)`);
-        wheel.appendChild(path);
+    clearWheel();
+    for (let index = 0; index < segmentCount; index += 1) {
+        const segmentPath = createWheelSegmentPath(index, segmentCount);
+        wheelElement.appendChild(segmentPath);
     }
 }
-function updateRotation() {
-    wheel.style.transform = `rotate(${rotation}deg)`;
+function updateWheelRotation() {
+    if (!wheelElement)
+        return;
+    wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
-function playTick() {
-    const sound = document.getElementById("tickSound").cloneNode();
-    sound.play();
+function playTickSound() {
+    if (!tickSoundTemplate)
+        return;
+    const tickSound = tickSoundTemplate.cloneNode(true);
+    tickSound.play();
 }
-function rotateLeft() {
-    let power = 10; //kraft des spielers muss über ui z.b durch regler
-    let wert = Math.floor(Math.random() * 960) + 1; // 960 bestimmt die max anzahl an umdrehungen
-    let zahl = wert * power;
-    let i = 0;
-    console.log("Rotation:", zahl);
-    const startDelay = 5 / power; //beschleunigt die scheibe in abhängigkeit der spieler kraft
-    const endDelay = 75;
-    const n = parseInt(document.getElementById("eckenInput").value);
-    const stepAngle = 360 / n;
-    function step() {
-        rotation -= 1;
-        updateRotation();
-        i++;
-        if (Math.abs(rotation - lastTickAngle) >= stepAngle) {
-            playTick();
-            lastTickAngle = rotation;
+function spinWheel() {
+    const segmentCount = getSegmentCount();
+    if (segmentCount < 2)
+        return;
+    const totalSpinSteps = Math.floor(Math.random() * MAX_SPIN_STEPS) + 1;
+    const stepAngle = 360 / segmentCount;
+    let completedSteps = 0;
+    function performSpinStep() {
+        currentRotation -= 1;
+        updateWheelRotation();
+        completedSteps += 1;
+        if (Math.abs(currentRotation - lastTickRotation) >= stepAngle) {
+            playTickSound();
+            lastTickRotation = currentRotation;
         }
-        if (i >= zahl)
+        if (completedSteps >= totalSpinSteps) {
             return;
-        const progress = i / zahl;
-        const delay = startDelay + (endDelay - startDelay) * (progress * progress);
-        setTimeout(step, delay);
+        }
+        const progress = completedSteps / totalSpinSteps;
+        const delay = SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 2);
+        setTimeout(performSpinStep, delay);
     }
-    step();
+    performSpinStep();
 }
-function resetRotation() {
-    rotation = 0;
-    updateRotation();
+function resetWheelRotation() {
+    currentRotation = 0;
+    lastTickRotation = 0;
+    updateWheelRotation();
 }

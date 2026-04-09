@@ -3,29 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>felix drehen</title>
-    <style>
-        body {
-            background-color: black;
-            text-align: center;
-        }
-
-        .container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0px;
-        }
-
-        img {
-            width: 150px;
-            transform: translateY(16px) translateX(48px);    
-        }
-
-        #wheel {
-            transform-box: fill-box;
-            transform-origin: center;
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
@@ -40,11 +18,21 @@
     <div class="container">
 
         <img src="assets/image.png" alt="wix Bild">
-        <svg id="svg" width="300" height="300" viewBox="0 0 300 300">
+        <svg id="svg" width="700" height="700" viewBox="0 0 300 300">
             <g id="wheel"></g>
         </svg>
-
-
+        <div class="panel">
+            <div class="add-row">
+                <input type="text" id="nameInput" placeholder="Name eingeben …" />
+                <button class="btn-add" id="addBtn">+</button>
+            </div>
+            <ul class="name-list" id="nameList">
+                <li class="name-item"><span class="name-text">Lois</span><button class="btn-remove">−</button></li>
+                <li class="name-item"><span class="name-text">Meg</span><button class="btn-remove">−</button></li>
+            </ul>
+            <p class="error-hint hidden" id="errorHint">Mindestens 2 Einträge erforderlich.</p>
+            <p class="empty-hint" id="emptyHint" style="display:none">Noch keine Namen. Füge welche hinzu!</p>
+        </div>
     </div>
   
     <script src="script/script.js"></script>

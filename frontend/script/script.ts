@@ -156,3 +156,87 @@ function resetWheelRotation(): void {
     lastTickRotation = 0;
     updateWheelRotation();
 }
+
+const MIN_ITEMS: number = 2;
+
+const input = document.getElementById("nameInput") as HTMLInputElement;
+const addBtn = document.getElementById("addBtn") as HTMLButtonElement;
+const list = document.getElementById("nameList") as HTMLUListElement;
+const errorHint = document.getElementById("errorHint") as HTMLParagraphElement;
+const emptyHint = document.getElementById("emptyHint") as HTMLParagraphElement;
+
+function getItemCount(): number {
+    return list.querySelectorAll(".name-item").length;
+}
+
+function syncRemoveButtons(): void {
+    const tooFew: boolean = getItemCount() <= MIN_ITEMS;
+    list.querySelectorAll<HTMLButtonElement>(".btn-remove").forEach((btn) => {
+        btn.disabled = tooFew;
+    });
+}
+
+function updateEmptyState(): void {
+    emptyHint.style.display = getItemCount() === 0 ? "block" : "none";
+}
+
+let errorTimer: ReturnType<typeof setTimeout> | null = null;
+
+function showError(): void {
+    errorHint.classList.remove("hidden");
+    if (errorTimer) clearTimeout(errorTimer);
+    errorTimer = setTimeout(() => errorHint.classList.add("hidden"), 2000);
+}
+
+function handleRemove(item: HTMLLIElement): void {
+    if (getItemCount() <= MIN_ITEMS) {
+        item.classList.remove("shake");
+        void item.offsetWidth; // reflow
+        item.classList.add("shake");
+        item.addEventListener("animationend", () => item.classList.remove("shake"), { once: true });
+        showError();
+        return;
+    }
+    item.remove();
+    updateEmptyState();
+    syncRemoveButtons();
+}
+
+function attachRemoveListener(btn: HTMLButtonElement, item: HTMLLIElement): void {
+    btn.addEventListener("click", () => handleRemove(item));
+}
+
+function addName(rawName: string): void {
+    const name = rawName.trim();
+    if (!name) return;
+    const li = document.createElement("li") as HTMLLIElement;
+    li.className = "name-item";
+    const span = document.createElement("span");
+    span.className = "name-text";
+    span.textContent = name;
+    const btn = document.createElement("button") as HTMLButtonElement;
+    btn.className = "btn-remove";
+    btn.textContent = "−";
+    attachRemoveListener(btn, li);
+    li.appendChild(span);
+    li.appendChild(btn);
+    list.appendChild(li);
+    updateEmptyState();
+    syncRemoveButtons();
+    input.value = "";
+    input.focus();
+}
+
+// Bootstrap existing items
+list.querySelectorAll<HTMLLIElement>(".name-item").forEach((item) => {
+    const btn = item.querySelector<HTMLButtonElement>(".btn-remove");
+    if (btn) attachRemoveListener(btn, item);
+});
+
+addBtn.addEventListener("click", () => addName(input.value));
+input.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Enter") addName(input.value);
+});
+
+syncRemoveButtons();
+updateEmptyState();

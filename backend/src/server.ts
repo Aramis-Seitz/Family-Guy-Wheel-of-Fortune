@@ -11,8 +11,10 @@ const frontendPath = path.join(__dirname, "../../frontend");
 app.use(express.static(frontendPath));
 
 //  API
-app.get("/api/test", (req, res) => {
-    res.json({ message: "Backend läuft!" });
+app.get("/api/random", (req, res) => {
+    const ranNum: number = Math.floor(Math.random() * 1800) + 1;
+
+    res.json({ ranNum });
 });
  
  

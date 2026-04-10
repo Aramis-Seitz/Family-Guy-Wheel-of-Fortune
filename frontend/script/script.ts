@@ -27,7 +27,15 @@ const SEGMENT_COLORS: string[] = [ // aus css entfernt und hier eingefügt
     "#f4a96b",
     "#f4a0a0",
     "#a8d8f0",
-    "#c5b8f0"
+    "#c5b8f0",
+    "#ae945d",
+    "#8a78c5",
+    "#745bc6",
+    "#312260",
+    "#1f1542",
+    "#3c287b",
+    "rgb(141, 116, 225)",
+    "#504672"
 ];
 
 function getNames(): string[] {
@@ -40,7 +48,20 @@ function getSegmentCount(): number {
     return getNames().length;
 }
 
+function getSegmentColor(index: number): string {
+    return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+}
 
+function applyItemColor(item: HTMLLIElement, index: number): void {
+    item.style.backgroundColor = getSegmentColor(index);
+}
+
+function updateListColors(): void {
+    const items = list.querySelectorAll<HTMLLIElement>(".name-item");
+    items.forEach((item, index) => {
+        applyItemColor(item, index);
+    });
+}
 
 function clearWheel(): void {
     if (!wheelElement) return;
@@ -75,6 +96,35 @@ function createWheelSegmentPath(segmentIndex: number, segmentCount: number, colo
     return path;
 }
 
+function createWheelLabel(segmentIndex: number, segmentCount: number, name: string): SVGTextElement {
+    const angleStep: number = FULL_CIRCLE_RADIANS / segmentCount;
+    const middleAngle: number = (segmentIndex + 0.5) * angleStep;
+
+    const labelRadius: number = WHEEL_RADIUS * 0.62;
+    const labelPoint: Point = getPointOnCircle(WHEEL_CENTER, labelRadius, middleAngle);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", String(labelPoint.x));
+    text.setAttribute("y", String(labelPoint.y));
+    text.setAttribute("fill", "black");
+    text.setAttribute("font-size", "10");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+
+    const angleInDegrees = (middleAngle * 180) / Math.PI;
+    const readableRotation = angleInDegrees > 180 ? angleInDegrees + 90 : angleInDegrees - 90;
+
+    text.setAttribute(
+        "transform",
+        `rotate(${readableRotation} ${labelPoint.x} ${labelPoint.y})`
+    );
+
+    text.textContent = name;
+
+    return text;
+}
+
 function generateWheel(): void {
     const names = getNames();
     const segmentCount = names.length;
@@ -83,10 +133,19 @@ function generateWheel(): void {
 
     clearWheel();
 
-    for (let index = 0; index < segmentCount; index += 1) {
-        const segmentPath = createWheelSegmentPath(index, segmentCount);
+    names.forEach((name, index) => {
+        const color = getSegmentColor(index);
+        const segmentPath = createWheelSegmentPath(index, segmentCount, color);
+        const label = createWheelLabel(index, segmentCount, name);
+
         wheelElement.appendChild(segmentPath);
-    }
+        wheelElement.appendChild(label);
+    });
+}
+
+function refreshWheel(): void {
+    updateListColors();
+    generateWheel();
 }
 
 function updateWheelRotation(): void {
@@ -130,10 +189,6 @@ function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
 
     performSpinStep();
 }
-(window as any).getRandomNumber = getRandomNumber_left;
-(window as any).getRandomNumber = getRandomNumber_right;
-(window as any).generateWheel = generateWheel;
-(window as any).resetWheelRotation = resetWheelRotation;
 
 async function getRandomNumber_left(): Promise<void> {
     try {
@@ -214,6 +269,7 @@ function handleRemove(item: HTMLLIElement): void {
     item.remove();
     updateEmptyState();
     syncRemoveButtons();
+    refreshWheel();
 }
 
 function attachRemoveListener(btn: HTMLButtonElement, item: HTMLLIElement): void {
@@ -237,19 +293,30 @@ function addName(rawName: string): void {
     list.appendChild(li);
     updateEmptyState();
     syncRemoveButtons();
+    refreshWheel();
     input.value = "";
     input.focus();
 }
 
 list.querySelectorAll<HTMLLIElement>(".name-item").forEach((item) => {
     const btn = item.querySelector<HTMLButtonElement>(".btn-remove");
-    if (btn) attachRemoveListener(btn, item);
+    if (btn) {
+        attachRemoveListener(btn, item);
+        }
 });
 
 addBtn.addEventListener("click", () => addName(input.value));
 input.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key === "Enter") addName(input.value);
+    if (e.key === "Enter") {
+        addName(input.value);
+        }
 });
+
+(window as any).getRandomNumber_left = getRandomNumber_left;
+(window as any).getRandomNumber_right = getRandomNumber_right;
+(window as any).generateWheel = generateWheel;
+(window as any).resetWheelRotation = resetWheelRotation;
 
 syncRemoveButtons();
 updateEmptyState();
+refreshWheel();

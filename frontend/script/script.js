@@ -19,7 +19,15 @@ const SEGMENT_COLORS = [
     "#f4a96b",
     "#f4a0a0",
     "#a8d8f0",
-    "#c5b8f0"
+    "#c5b8f0",
+    "#ae945d",
+    "#8a78c5",
+    "#745bc6",
+    "#312260",
+    "#1f1542",
+    "#3c287b",
+    "rgb(141, 116, 225)",
+    "#504672"
 ];
 function getNames() {
     return Array.from(list.querySelectorAll(".name-text"))
@@ -28,6 +36,18 @@ function getNames() {
 }
 function getSegmentCount() {
     return getNames().length;
+}
+function getSegmentColor(index) {
+    return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+}
+function applyItemColor(item, index) {
+    item.style.backgroundColor = getSegmentColor(index);
+}
+function updateListColors() {
+    const items = list.querySelectorAll(".name-item");
+    items.forEach((item, index) => {
+        applyItemColor(item, index);
+    });
 }
 function clearWheel() {
     if (!wheelElement)
@@ -54,16 +74,42 @@ function createWheelSegmentPath(segmentIndex, segmentCount, color) {
     path.setAttribute("stroke-width", "1");
     return path;
 }
+function createWheelLabel(segmentIndex, segmentCount, name) {
+    const angleStep = FULL_CIRCLE_RADIANS / segmentCount;
+    const middleAngle = (segmentIndex + 0.5) * angleStep;
+    const labelRadius = WHEEL_RADIUS * 0.62;
+    const labelPoint = getPointOnCircle(WHEEL_CENTER, labelRadius, middleAngle);
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", String(labelPoint.x));
+    text.setAttribute("y", String(labelPoint.y));
+    text.setAttribute("fill", "black");
+    text.setAttribute("font-size", "10");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    const angleInDegrees = (middleAngle * 180) / Math.PI;
+    const readableRotation = angleInDegrees > 180 ? angleInDegrees + 90 : angleInDegrees - 90;
+    text.setAttribute("transform", `rotate(${readableRotation} ${labelPoint.x} ${labelPoint.y})`);
+    text.textContent = name;
+    return text;
+}
 function generateWheel() {
     const names = getNames();
     const segmentCount = names.length;
     if (segmentCount < 2 || !wheelElement)
         return;
     clearWheel();
-    for (let index = 0; index < segmentCount; index += 1) {
-        const segmentPath = createWheelSegmentPath(index, segmentCount);
+    names.forEach((name, index) => {
+        const color = getSegmentColor(index);
+        const segmentPath = createWheelSegmentPath(index, segmentCount, color);
+        const label = createWheelLabel(index, segmentCount, name);
         wheelElement.appendChild(segmentPath);
-    }
+        wheelElement.appendChild(label);
+    });
+}
+function refreshWheel() {
+    updateListColors();
+    generateWheel();
 }
 function updateWheelRotation() {
     if (!wheelElement)
@@ -99,10 +145,6 @@ function spinWheel(totalSpinSteps, direction) {
     }
     performSpinStep();
 }
-window.getRandomNumber = getRandomNumber_left;
-window.getRandomNumber = getRandomNumber_right;
-window.generateWheel = generateWheel;
-window.resetWheelRotation = resetWheelRotation;
 async function getRandomNumber_left() {
     try {
         const response = await fetch("/api/random");
@@ -167,6 +209,7 @@ function handleRemove(item) {
     item.remove();
     updateEmptyState();
     syncRemoveButtons();
+    refreshWheel();
 }
 function attachRemoveListener(btn, item) {
     btn.addEventListener("click", () => handleRemove(item));
@@ -189,18 +232,26 @@ function addName(rawName) {
     list.appendChild(li);
     updateEmptyState();
     syncRemoveButtons();
+    refreshWheel();
     input.value = "";
     input.focus();
 }
 list.querySelectorAll(".name-item").forEach((item) => {
     const btn = item.querySelector(".btn-remove");
-    if (btn)
+    if (btn) {
         attachRemoveListener(btn, item);
+    }
 });
 addBtn.addEventListener("click", () => addName(input.value));
 input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter")
+    if (e.key === "Enter") {
         addName(input.value);
+    }
 });
+window.getRandomNumber_left = getRandomNumber_left;
+window.getRandomNumber_right = getRandomNumber_right;
+window.generateWheel = generateWheel;
+window.resetWheelRotation = resetWheelRotation;
 syncRemoveButtons();
 updateEmptyState();
+refreshWheel();

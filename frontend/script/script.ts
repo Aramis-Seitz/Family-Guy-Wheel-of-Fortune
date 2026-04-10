@@ -207,7 +207,32 @@ function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
         setTimeout(performSpinStep, delay);
     }
 
+    if (completedSteps >= totalSpinSteps) {
+        const winnerIndex = getWinningSegmentIndex(segmentCount);
+        displayWinner(winnerIndex);
+        return;
+    }
+
     performSpinStep();
+}
+
+function getWinningSegmentIndex(segmentCount: number): number {
+    const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+    const stepAngle = 360 / segmentCount;
+
+    // +90°, weil Pointer links ist (9 Uhr)
+    const adjustedRotation = (360 - normalizedRotation + 90) % 360;
+
+    const index = Math.floor(adjustedRotation / stepAngle) % segmentCount;
+
+    return index;
+}
+
+function displayWinner(index: number): void {
+    const winnerElement = document.getElementById("winner");
+    if (!winnerElement) return;
+
+    winnerElement.textContent = `Gewinner: Segment ${index + 1}`;
 }
 
 async function getRandomNumber_left(): Promise<void> {

@@ -122,13 +122,17 @@ function playTickSound() {
     const tickSound = tickSoundTemplate.cloneNode(true);
     tickSound.play();
 }
+let spinCancelled = false;
 function spinWheel(totalSpinSteps, direction) {
+    spinCancelled = false;
     const segmentCount = getSegmentCount();
     if (segmentCount < 2)
         return;
     const stepAngle = 360 / segmentCount;
     let completedSteps = 0;
     function performSpinStep() {
+        if (spinCancelled)
+            return;
         currentRotation += direction === "right" ? 1 : -1;
         updateWheelRotation();
         completedSteps += 1;
@@ -189,6 +193,7 @@ async function getRandomNumber_right() {
     }
 }
 function resetWheelRotation() {
+    spinCancelled = true;
     currentRotation = 0;
     lastTickRotation = 0;
     updateWheelRotation();

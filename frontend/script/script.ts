@@ -159,7 +159,11 @@ function playTickSound(): void {
     tickSound.play();
 }
 
+let spinCancelled: boolean = false;
+
 function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
+    spinCancelled = false;
+    
     const segmentCount = getSegmentCount();
     if (segmentCount < 2) return;
 
@@ -167,6 +171,8 @@ function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
     let completedSteps: number = 0;
 
     function performSpinStep(): void {
+        if (spinCancelled) return;
+
         currentRotation += direction === "right" ? 1 : -1;
         updateWheelRotation();
         completedSteps += 1;
@@ -241,6 +247,7 @@ async function getRandomNumber_right(): Promise<void> {
 }
 
 function resetWheelRotation(): void {
+    spinCancelled = true;
     currentRotation = 0;
     lastTickRotation = 0;
     updateWheelRotation();

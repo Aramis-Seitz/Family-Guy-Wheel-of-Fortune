@@ -224,3 +224,10 @@ img {
     font-size: var(--text-sm);
     padding: var(--space-3);
 }
+
+#winner {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}

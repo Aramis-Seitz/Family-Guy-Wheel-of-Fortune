@@ -22,16 +22,42 @@ img {
     transform-origin: center;
 }
 
-#start-button {
+.spin-btn {
     background-color: #ffb800;
     color: black;
     font-weight: bold;
     font-size: 1.2rem;
-    width: 50%;
     padding: 15px;
     border: none;
     border-radius: 100px;
     cursor: pointer;
+}
+
+.spin-btn:hover {
+    background-color: #ffa500;
+}
+
+.spin-btn:active {
+    background-color: #e59400;
+} 
+
+#reset-btn {
+    background-color: #888;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+#reset-btn:hover {
+    background-color: #777;
+} 
+
+#reset-btn:active {
+    background-color: #666;
 }
 
 :root {

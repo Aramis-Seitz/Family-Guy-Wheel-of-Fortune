@@ -3,46 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>felix drehen</title>
-    <style>
-        body {
-            background-color: black;
-            text-align: center;
-        }
-
-        .container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0px;
-        }
-
-        img {
-            width: 150px;
-            transform: translateY(16px) translateX(48px);    
-        }
-
-        #wheel {
-            transform-box: fill-box;
-            transform-origin: center;
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
     <audio id="tickSound" src="assets/he.mp3" preload="auto"></audio>
-    <button onclick="spinWheel()">Drehen</button>
-    <button onclick="resetWheelRotation()">Reset</button>
-    <input type="number" id="eckenInput" min="3" value="6">
-    <button onclick="generateWheel()">Erstellen</button>
+    <button class="spin-btn" id="spin-left-btn" onclick="getRandomNumber_left()">SPIN LEFT</button>
+    <button class="spin-btn" id="spin-right-btn" onclick="getRandomNumber_right()">SPIN RIGHT</button>
+    <button id="reset-btn" onclick="resetWheelRotation()">RESET</button>
+
 
     <div class="container">
 
         <img src="assets/image.png" alt="wix Bild">
-        <svg id="svg" width="300" height="300" viewBox="0 0 300 300">
+        <svg id="svg" width="700" height="700" viewBox="0 0 300 300">
             <g id="wheel"></g>
         </svg>
+        <div class="panel">
+            <div class="add-row">
+                <input type="text" id="nameInput" placeholder="Name eingeben …" />
+                <button class="btn-add" id="addBtn">+</button>
+            </div>
+            <ul class="name-list" id="nameList">
+                <li class="name-item"><span class="name-text">Lois</span><button class="btn-remove">−</button></li>
+                <li class="name-item"><span class="name-text">Meg</span><button class="btn-remove">−</button></li>
+            </ul>
+            <p class="error-hint hidden" id="errorHint">Mindestens 2 Einträge erforderlich.</p>
+            <p class="empty-hint" id="emptyHint" style="display:none">Noch keine Namen. Füge welche hinzu!</p>
+        </div>
+    </div>
 
-
+    <div id="winner" style="margin-top: 20px; font-size: 20px; font-weight: bold; color: white;">
+        Gewinner: -
     </div>
   
     <script src="script/script.js"></script>

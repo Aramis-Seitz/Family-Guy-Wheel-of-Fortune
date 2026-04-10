@@ -140,7 +140,7 @@ function spinWheel(totalSpinSteps, direction) {
             return;
         }
         const progress = completedSteps / totalSpinSteps;
-        const delay = SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 3);
+        const delay = SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
         setTimeout(performSpinStep, delay);
     }
     performSpinStep();

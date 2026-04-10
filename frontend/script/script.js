@@ -183,35 +183,23 @@ function displayWinner(index) {
         return;
     winnerElement.textContent = `Gewinner: Segment ${index + 1}`;
 }
-async function getRandomNumber_left() {
-    try {
-        const response = await fetch("/api/random");
+function spinWheelWithRandomSteps(direction) {
+    const apiEndpoint = direction === "left" ? "/api/random" : "/api/random";
+    fetch(apiEndpoint)
+        .then((response) => {
         if (!response.ok) {
             throw new Error("Server response not ok.");
         }
-        const data = await response.json();
-        console.log("Number from se server:", data.ranNum);
-        spinWheel(data.ranNum, "right");
+        return response.json();
+    })
+        .then((data) => {
+        console.log("Number from server:", data.ranNum);
+        spinWheel(data.ranNum, direction);
         disableSpinButtons();
-    }
-    catch (error) {
-        console.error("error whilst getting random value:", error);
-    }
-}
-async function getRandomNumber_right() {
-    try {
-        const response = await fetch("/api/random");
-        if (!response.ok) {
-            throw new Error("Server response not ok.");
-        }
-        const data = await response.json();
-        console.log("Number from se server:", data.ranNum);
-        spinWheel(data.ranNum, "left");
-        disableSpinButtons();
-    }
-    catch (error) {
-        console.error("error whilst getting random value:", error);
-    }
+    })
+        .catch((error) => {
+        console.error("Error while getting random value:", error);
+    });
 }
 function resetWheelRotation() {
     spinCancelled = true;
@@ -225,19 +213,15 @@ function disableSpinButtons() {
     const rightBtn = document.getElementById("spin-right-btn");
     if (leftBtn) {
         leftBtn.disabled = true;
-        leftBtn?.style.setProperty("opacity", "0.5");
-        leftBtn?.style.setProperty("cursor", "not-allowed");
-        leftBtn?.style.setProperty("pointer-events", "none");
-        leftBtn?.style.setProperty("hover", "none");
-        leftBtn?.style.setProperty("active", "none");
+        leftBtn.style.setProperty("opacity", "0.5");
+        leftBtn.style.setProperty("cursor", "not-allowed");
+        leftBtn.style.setProperty("pointer-events", "none");
     }
     if (rightBtn) {
         rightBtn.disabled = true;
-        rightBtn?.style.setProperty("opacity", "0.5");
-        rightBtn?.style.setProperty("cursor", "not-allowed");
-        rightBtn?.style.setProperty("pointer-events", "none");
-        rightBtn?.style.setProperty("hover", "none");
-        rightBtn?.style.setProperty("active", "none");
+        rightBtn.style.setProperty("opacity", "0.5");
+        rightBtn.style.setProperty("cursor", "not-allowed");
+        rightBtn.style.setProperty("pointer-events", "none");
     }
 }
 function enableSpinButtons() {
@@ -245,19 +229,15 @@ function enableSpinButtons() {
     const rightBtn = document.getElementById("spin-right-btn");
     if (leftBtn) {
         leftBtn.disabled = false;
-        leftBtn?.style.removeProperty("opacity");
-        leftBtn?.style.removeProperty("cursor");
-        leftBtn?.style.removeProperty("pointer-events");
-        leftBtn?.style.removeProperty("hover");
-        leftBtn?.style.removeProperty("active");
+        leftBtn.style.removeProperty("opacity");
+        leftBtn.style.removeProperty("cursor");
+        leftBtn.style.removeProperty("pointer-events");
     }
     if (rightBtn) {
         rightBtn.disabled = false;
-        rightBtn?.style.removeProperty("opacity");
-        rightBtn?.style.removeProperty("cursor");
-        rightBtn?.style.removeProperty("pointer-events");
-        rightBtn?.style.removeProperty("hover");
-        rightBtn?.style.removeProperty("active");
+        rightBtn.style.removeProperty("opacity");
+        rightBtn.style.removeProperty("cursor");
+        rightBtn.style.removeProperty("pointer-events");
     }
 }
 // Helferfunktionen für die Namensliste
@@ -331,6 +311,12 @@ input.addEventListener("keydown", (e) => {
         addName(input.value);
     }
 });
+function getRandomNumber_left() {
+    spinWheelWithRandomSteps("left");
+}
+function getRandomNumber_right() {
+    spinWheelWithRandomSteps("right");
+}
 window.getRandomNumber_left = getRandomNumber_left;
 window.getRandomNumber_right = getRandomNumber_right;
 window.generateWheel = generateWheel;

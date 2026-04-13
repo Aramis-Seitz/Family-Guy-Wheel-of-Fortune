@@ -6,6 +6,8 @@ const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("nameList");
 const errorHint = document.getElementById("errorHint");
 const emptyHint = document.getElementById("emptyHint");
+const drumrollDings = document.getElementById("drumroll");
+let drumrollStarted = false;
 let currentRotation = 0;
 let lastTickRotation = 0;
 const WHEEL_CENTER = { x: 150, y: 150 };
@@ -122,6 +124,20 @@ function playTickSound() {
     const tickSound = tickSoundTemplate.cloneNode(true);
     tickSound.play();
 }
+function playDrumRoll() {
+    if (!drumrollDings || drumrollStarted)
+        return;
+    drumrollStarted = true;
+    drumrollDings.currentTime = 0;
+    drumrollDings.play();
+}
+function stopDrumRoll() {
+    if (!drumrollDings)
+        return;
+    drumrollStarted = false;
+    drumrollDings.currentTime = 0;
+    drumrollDings.play();
+}
 let spinCancelled = false;
 function spinWheel(totalSpinSteps, direction) {
     spinCancelled = false;
@@ -145,24 +161,28 @@ function spinWheel(totalSpinSteps, direction) {
         }
         const progress = completedSteps / totalSpinSteps;
         const delay = SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
+        if (delay > 50) {
+            playDrumRoll();
+        }
         /*
-                function playDrumRoll();
-                    // IF delay >= 200 play
-                    function playTickSound(): void {
-                        if (!tickSoundTemplate) return;
-                        const tickSound = tickSoundTemplate.cloneNode(true) as HTMLAudioElement;
-                        tickSound.play();
-                    }
-            
-                function stopDrumRoll();
-        
-                    if (completedSteps >= totalSpinSteps) {
-                        //stop drumroll;
-                }
-        */
+    function playDrumRoll();
+        // IF delay >= 200 play
+        function playTickSound(): void {
+            if (!tickSoundTemplate) return;
+            const tickSound = tickSoundTemplate.cloneNode(true) as HTMLAudioElement;
+            tickSound.play();
+        }
+ 
+    function stopDrumRoll();
+
+        if (completedSteps >= totalSpinSteps) {
+            //stop drumroll;
+    }
+*/
         setTimeout(performSpinStep, delay);
     }
     if (completedSteps >= totalSpinSteps) {
+        stopDrumRoll;
         const winnerIndex = getWinningSegmentIndex(segmentCount);
         displayWinner(winnerIndex);
         return;
@@ -207,38 +227,31 @@ function resetWheelRotation() {
     lastTickRotation = 0;
     updateWheelRotation();
     enableSpinButtons();
+    stopDrumRoll;
 }
 function disableSpinButtons() {
     const leftBtn = document.getElementById("spin-left-btn");
     const rightBtn = document.getElementById("spin-right-btn");
-    if (leftBtn) {
-        leftBtn.disabled = true;
-        leftBtn.style.setProperty("opacity", "0.5");
-        leftBtn.style.setProperty("cursor", "not-allowed");
-        leftBtn.style.setProperty("pointer-events", "none");
-    }
-    if (rightBtn) {
-        rightBtn.disabled = true;
-        rightBtn.style.setProperty("opacity", "0.5");
-        rightBtn.style.setProperty("cursor", "not-allowed");
-        rightBtn.style.setProperty("pointer-events", "none");
-    }
+    [rightBtn, leftBtn].forEach((button) => {
+        if (button) {
+            button.disabled = true;
+            button.style.setProperty("opacity", "0.5");
+            button.style.setProperty("cursor", "not-allowed");
+            button.style.setProperty("pointer-events", "none");
+        }
+    });
 }
 function enableSpinButtons() {
     const leftBtn = document.getElementById("spin-left-btn");
     const rightBtn = document.getElementById("spin-right-btn");
-    if (leftBtn) {
-        leftBtn.disabled = false;
-        leftBtn.style.removeProperty("opacity");
-        leftBtn.style.removeProperty("cursor");
-        leftBtn.style.removeProperty("pointer-events");
-    }
-    if (rightBtn) {
-        rightBtn.disabled = false;
-        rightBtn.style.removeProperty("opacity");
-        rightBtn.style.removeProperty("cursor");
-        rightBtn.style.removeProperty("pointer-events");
-    }
+    [rightBtn, leftBtn].forEach((button) => {
+        if (button) {
+            button.disabled = false;
+            button.style.removeProperty("opacity");
+            button.style.removeProperty("cursor");
+            button.style.removeProperty("pointer-events");
+        }
+    });
 }
 // Helferfunktionen für die Namensliste
 function getItemCount() {

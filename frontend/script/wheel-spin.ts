@@ -35,30 +35,33 @@ function resetDisplayWinner(): void {
 }
 
 
-function disableSpinButtons(): void {
-  const leftBtn = document.getElementById("spin-left-btn") as HTMLButtonElement | null;
-  const rightBtn = document.getElementById("spin-right-btn") as HTMLButtonElement | null;
+function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | null)[] {
+  return [
+    document.getElementById("spin-left-btn") as HTMLButtonElement | null,
+    document.getElementById("spin-right-btn") as HTMLButtonElement | null,
+    document.getElementById("addBtn") as HTMLButtonElement | null,
+    document.getElementById("nameInput") as HTMLInputElement | null,
+  ];
+}
 
-  [rightBtn, leftBtn].forEach((button) => {
-    if (button) {
-      button.disabled = true;
-      button.style.setProperty("opacity", "0.5");
-      button.style.setProperty("cursor", "not-allowed");
-      button.style.setProperty("pointer-events", "none");
+function disableElements(elements: (HTMLButtonElement | HTMLInputElement | null)[]): void {
+  elements.forEach((element) => {
+    if (element) {
+      element.disabled = true;
+      element.style.setProperty("opacity", "0.5");
+      element.style.setProperty("cursor", "not-allowed");
+      element.style.setProperty("pointer-events", "none");
     }
   });
 }
 
-function enableSpinButtons(): void {
-  const leftBtn = document.getElementById("spin-left-btn") as HTMLButtonElement | null;
-  const rightBtn = document.getElementById("spin-right-btn") as HTMLButtonElement | null;
-
-  [rightBtn, leftBtn].forEach((button) => {
-    if (button) {
-      button.disabled = false;
-      button.style.removeProperty("opacity");
-      button.style.removeProperty("cursor");
-      button.style.removeProperty("pointer-events");
+function enableElements(elements: (HTMLButtonElement | HTMLInputElement | null)[]): void {
+  elements.forEach((element) => {
+    if (element) {
+      element.disabled = false;
+      element.style.removeProperty("opacity");
+      element.style.removeProperty("cursor");
+      element.style.removeProperty("pointer-events");
     }
   });
 }
@@ -111,9 +114,8 @@ function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
 export function spinWheelWithRandomSteps(direction: "left" | "right"): void {
   fetchRandomNumber()
     .then((ranNum) => {
-      console.log("Number from server:", ranNum);
-      spinWheel(ranNum, direction);
-      disableSpinButtons();
+      console.log("Number from server:", ranNum);      spinWheel(ranNum, direction);
+      disableElements(getSpinRelatedElements());
     })
     .catch((error) => {
       console.error("Error while getting random value:", error);
@@ -123,9 +125,8 @@ export function spinWheelWithRandomSteps(direction: "left" | "right"): void {
 export function resetWheelRotation(): void {
     spinCancelled = true;
     currentRotation = 0;
-    lastTickRotation = 0;
-    updateWheelRotation();
-    enableSpinButtons();
+    lastTickRotation = 0;    updateWheelRotation();
+    enableElements(getSpinRelatedElements());
     stopDrumRoll();
     resetDisplayWinner();
 }

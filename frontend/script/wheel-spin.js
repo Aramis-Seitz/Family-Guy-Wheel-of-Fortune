@@ -29,27 +29,31 @@ function resetDisplayWinner() {
         return;
     winnerElement.textContent = "Winner: No result yet";
 }
-function disableSpinButtons() {
-    const leftBtn = document.getElementById("spin-left-btn");
-    const rightBtn = document.getElementById("spin-right-btn");
-    [rightBtn, leftBtn].forEach((button) => {
-        if (button) {
-            button.disabled = true;
-            button.style.setProperty("opacity", "0.5");
-            button.style.setProperty("cursor", "not-allowed");
-            button.style.setProperty("pointer-events", "none");
+function getSpinRelatedElements() {
+    return [
+        document.getElementById("spin-left-btn"),
+        document.getElementById("spin-right-btn"),
+        document.getElementById("addBtn"),
+        document.getElementById("nameInput"),
+    ];
+}
+function disableElements(elements) {
+    elements.forEach((element) => {
+        if (element) {
+            element.disabled = true;
+            element.style.setProperty("opacity", "0.5");
+            element.style.setProperty("cursor", "not-allowed");
+            element.style.setProperty("pointer-events", "none");
         }
     });
 }
-function enableSpinButtons() {
-    const leftBtn = document.getElementById("spin-left-btn");
-    const rightBtn = document.getElementById("spin-right-btn");
-    [rightBtn, leftBtn].forEach((button) => {
-        if (button) {
-            button.disabled = false;
-            button.style.removeProperty("opacity");
-            button.style.removeProperty("cursor");
-            button.style.removeProperty("pointer-events");
+function enableElements(elements) {
+    elements.forEach((element) => {
+        if (element) {
+            element.disabled = false;
+            element.style.removeProperty("opacity");
+            element.style.removeProperty("cursor");
+            element.style.removeProperty("pointer-events");
         }
     });
 }
@@ -92,7 +96,7 @@ export function spinWheelWithRandomSteps(direction) {
         .then((ranNum) => {
         console.log("Number from server:", ranNum);
         spinWheel(ranNum, direction);
-        disableSpinButtons();
+        disableElements(getSpinRelatedElements());
     })
         .catch((error) => {
         console.error("Error while getting random value:", error);
@@ -103,7 +107,7 @@ export function resetWheelRotation() {
     currentRotation = 0;
     lastTickRotation = 0;
     updateWheelRotation();
-    enableSpinButtons();
+    enableElements(getSpinRelatedElements());
     stopDrumRoll();
     resetDisplayWinner();
 }

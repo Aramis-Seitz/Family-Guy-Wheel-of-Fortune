@@ -2,7 +2,7 @@ import { SPIN_START_DELAY, SPIN_END_DELAY } from "./constants.js";
 import { wheelElement } from "./dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll } from "./sound.js";
 import { fetchRandomNumber } from "./api.js";
-import { getSegmentCount } from "./name-list.js";
+import { getSegmentCount, getNames } from "./name-list.js";
 let currentRotation = 0;
 let lastTickRotation = 0;
 let spinCancelled = false;
@@ -14,14 +14,20 @@ function updateWheelRotation() {
 function getWinningSegmentIndex(segmentCount) {
     const normalizedRotation = ((currentRotation % 360) + 360) % 360;
     const stepAngle = 360 / segmentCount;
-    const adjustedRotation = (360 - normalizedRotation + 90) % 360;
+    const adjustedRotation = (360 - normalizedRotation + 270) % 360;
     return Math.floor(adjustedRotation / stepAngle) % segmentCount;
 }
-function displayWinner(index) {
+function displayWinner(winnerName) {
     const winnerElement = document.getElementById("winner");
     if (!winnerElement)
         return;
-    winnerElement.textContent = `Winner: Segment ${index + 1}`;
+    winnerElement.textContent = `Winner: ${winnerName}`;
+}
+function resetDisplayWinner() {
+    const winnerElement = document.getElementById("winner");
+    if (!winnerElement)
+        return;
+    winnerElement.textContent = "Winner: No result yet";
 }
 function disableSpinButtons() {
     const leftBtn = document.getElementById("spin-left-btn");
@@ -67,8 +73,9 @@ function spinWheel(totalSpinSteps, direction) {
         if (completedSteps >= totalSpinSteps) {
             stopDrumRoll();
             const winnerIndex = getWinningSegmentIndex(segmentCount);
-            displayWinner(winnerIndex);
-            enableSpinButtons();
+            const names = getNames();
+            const winnerName = names[winnerIndex];
+            displayWinner(winnerName);
             return;
         }
         const progress = completedSteps / totalSpinSteps;
@@ -98,4 +105,5 @@ export function resetWheelRotation() {
     updateWheelRotation();
     enableSpinButtons();
     stopDrumRoll();
+    resetDisplayWinner();
 }

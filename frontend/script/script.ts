@@ -10,7 +10,9 @@ const addBtn = document.getElementById("addBtn") as HTMLButtonElement;
 const list = document.getElementById("nameList") as HTMLUListElement;
 const errorHint = document.getElementById("errorHint") as HTMLParagraphElement;
 const emptyHint = document.getElementById("emptyHint") as HTMLParagraphElement;
+const drumrollDings = document.getElementById("drumroll") as HTMLAudioElement | null;
 
+let drumrollStarted: boolean = false;
 let currentRotation: number = 0;
 let lastTickRotation: number = 0;
 
@@ -159,11 +161,25 @@ function playTickSound(): void {
     tickSound.play();
 }
 
+
+function playDrumRoll(): void {
+    if (!drumrollDings || drumrollStarted) return;
+    drumrollStarted = true;
+    drumrollDings.currentTime = 0;
+    drumrollDings.play();
+}
+function stopDrumRoll(): void {
+    if (!drumrollDings) return;
+    drumrollStarted = false;
+    drumrollDings.currentTime = 0;
+    drumrollDings.play();
+}
+
 let spinCancelled: boolean = false;
 
 function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
     spinCancelled = false;
-    
+
     const segmentCount = getSegmentCount();
     if (segmentCount < 2) return;
 
@@ -189,25 +205,30 @@ function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
         const progress: number = completedSteps / totalSpinSteps;
         const delay: number =
             SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
-/*
-        function playDrumRoll();
-            // IF delay >= 200 play
-            function playTickSound(): void {
-                if (!tickSoundTemplate) return;
-                const tickSound = tickSoundTemplate.cloneNode(true) as HTMLAudioElement;
-                tickSound.play();
-            }
-    
-        function stopDrumRoll();
-
-            if (completedSteps >= totalSpinSteps) {
-                //stop drumroll;
+        if (delay > 50) {
+            playDrumRoll();
         }
+
+        /*
+    function playDrumRoll();
+        // IF delay >= 200 play
+        function playTickSound(): void {
+            if (!tickSoundTemplate) return;
+            const tickSound = tickSoundTemplate.cloneNode(true) as HTMLAudioElement;
+            tickSound.play();
+        }
+ 
+    function stopDrumRoll();
+
+        if (completedSteps >= totalSpinSteps) {
+            //stop drumroll;
+    }
 */
         setTimeout(performSpinStep, delay);
     }
 
     if (completedSteps >= totalSpinSteps) {
+        stopDrumRoll
         const winnerIndex = getWinningSegmentIndex(segmentCount);
         displayWinner(winnerIndex);
         return;
@@ -261,40 +282,43 @@ function resetWheelRotation(): void {
     lastTickRotation = 0;
     updateWheelRotation();
     enableSpinButtons();
+    stopDrumRoll
 }
 
 function disableSpinButtons() {
     const leftBtn = document.getElementById("spin-left-btn") as HTMLButtonElement | null;
     const rightBtn = document.getElementById("spin-right-btn") as HTMLButtonElement | null;
-    if (leftBtn) {
-        leftBtn.disabled = true;
-        leftBtn.style.setProperty("opacity", "0.5");
-        leftBtn.style.setProperty("cursor", "not-allowed");
-        leftBtn.style.setProperty("pointer-events", "none");
-    }
-    if (rightBtn) {
-        rightBtn.disabled = true;
-        rightBtn.style.setProperty("opacity", "0.5");
-        rightBtn.style.setProperty("cursor", "not-allowed");
-        rightBtn.style.setProperty("pointer-events", "none");     
-    }
+
+
+    [rightBtn, leftBtn].forEach((button) => {
+        if (button) {
+            button.disabled = true;
+            button.style.setProperty("opacity", "0.5");
+            button.style.setProperty("cursor", "not-allowed");
+            button.style.setProperty("pointer-events", "none");
+        }
+    })
+
+
+
+
+
+
+
+
 }
 
 function enableSpinButtons() {
     const leftBtn = document.getElementById("spin-left-btn") as HTMLButtonElement | null;
     const rightBtn = document.getElementById("spin-right-btn") as HTMLButtonElement | null;
-    if (leftBtn) {
-        leftBtn.disabled = false;
-        leftBtn.style.removeProperty("opacity");
-        leftBtn.style.removeProperty("cursor");
-        leftBtn.style.removeProperty("pointer-events");
-    }
-    if (rightBtn) {
-        rightBtn.disabled = false;
-        rightBtn.style.removeProperty("opacity");
-        rightBtn.style.removeProperty("cursor");
-        rightBtn.style.removeProperty("pointer-events");      
-    }   
+    [rightBtn, leftBtn].forEach((button) => {
+        if (button) {
+            button.disabled = false;
+            button.style.removeProperty("opacity");
+            button.style.removeProperty("cursor");
+            button.style.removeProperty("pointer-events");
+        }
+    })
 }
 
 
@@ -367,14 +391,14 @@ list.querySelectorAll<HTMLLIElement>(".name-item").forEach((item) => {
     const btn = item.querySelector<HTMLButtonElement>(".btn-remove");
     if (btn) {
         attachRemoveListener(btn, item);
-        }
+    }
 });
 
 addBtn.addEventListener("click", () => addName(input.value));
 input.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Enter") {
         addName(input.value);
-        }
+    }
 });
 
 function getRandomNumber_left() {

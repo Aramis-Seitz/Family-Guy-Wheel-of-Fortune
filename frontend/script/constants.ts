@@ -4,7 +4,7 @@ export const WHEEL_CENTER: Point = { x: 150, y: 150 };
 export const WHEEL_RADIUS: number = 100;
 export const FULL_CIRCLE_RADIANS: number = Math.PI * 2;
 export const SPIN_START_DELAY: number = 5;
-export const SPIN_END_DELAY: number = 75;
+export const SPIN_END_DELAY: number = 65;
 export const MIN_ITEMS: number = 2;
 
 export const SEGMENT_COLORS: string[] = [

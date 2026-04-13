@@ -2,7 +2,7 @@ export const WHEEL_CENTER = { x: 150, y: 150 };
 export const WHEEL_RADIUS = 100;
 export const FULL_CIRCLE_RADIANS = Math.PI * 2;
 export const SPIN_START_DELAY = 5;
-export const SPIN_END_DELAY = 75;
+export const SPIN_END_DELAY = 65;
 export const MIN_ITEMS = 2;
 export const SEGMENT_COLORS = [
     "#f4d87e",

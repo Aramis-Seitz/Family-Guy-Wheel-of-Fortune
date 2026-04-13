@@ -231,3 +231,21 @@ img {
     font-weight: bold;
     color: white;
 }
+.multiplier-container {
+    position: fixed;
+    top: 20px;
+    left: 10px;
+    z-index: 1000;
+
+    background: rgba(0, 0, 0, 0.6); /* optional für bessere Lesbarkeit */
+    padding: 10px;
+    border-radius: 8px;
+}
+
+
+.multiplier-container label {
+    color: white;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}

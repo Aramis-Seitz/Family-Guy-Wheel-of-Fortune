@@ -1,11 +1,15 @@
 import express from "express";
 import path from "path";
+import { getSecureRandomNumber } from "./utils/random";
+
 
 const app = express();
 const PORT = 3000;
-const MAX_ROTATIONS = 5;
-const FULL_CIRCLE = 360;
-const MIN_ROTATIONAL_DEGREE = 1
+const MIN_ROTATION_DEGREE: number = 70;
+const MAX_ROTATION_DEGREE: number = 900;
+
+
+
 // Pfad zum Frontend
 const frontendPath = path.join(__dirname, "../../frontend");
 
@@ -13,8 +17,9 @@ const frontendPath = path.join(__dirname, "../../frontend");
 app.use(express.static(frontendPath));
 
 //  API
+
 app.get("/api/random", (req, res) => {
-    const ranNum: number = Math.floor(Math.random() * FULL_CIRCLE*MAX_ROTATIONS) + MIN_ROTATIONAL_DEGREE;
+    const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
 
     res.json({ ranNum });
 });

@@ -1,5 +1,5 @@
-import { MIN_ITEMS } from "./constants.js";
-import { list, input, errorHint, emptyHint } from "./dom.js";
+import { MIN_ITEMS, MAX_ITEMS } from "./constants.js";
+import { list, input, errorHint, emptyHint, addBtn } from "./dom.js";
 import { generateWheel, getSegmentColor } from "./wheel-renderer.js";
 
 // --- Getters ---
@@ -43,6 +43,18 @@ export function syncRemoveButtons(): void {
   });
 }
 
+export function syncAddElements(): void {
+  const tooMany = getItemCount() >= MAX_ITEMS;
+
+  addBtn.disabled = tooMany; /* limits the amount of players*/
+  input.disabled = tooMany;
+
+  addBtn.style.opacity = tooMany ? "0.5" : "1";
+  addBtn.style.cursor = tooMany ? "not-allowed" : "pointer";
+  input.style.opacity = tooMany ? "0.5" : "1";
+  input.style.cursor = tooMany ? "not-allowed" : "pointer";
+}
+
 // --- Error Handling ---
 
 let errorTimer: ReturnType<typeof setTimeout> | null = null;
@@ -74,6 +86,7 @@ function handleRemove(item: HTMLLIElement): void {
   item.remove();
   updateEmptyState();
   syncRemoveButtons();
+  syncAddElements();
   refreshWheel();
 }
 
@@ -103,6 +116,7 @@ export function addName(rawName: string): void {
 
   updateEmptyState();
   syncRemoveButtons();
+  syncAddElements();
   refreshWheel();
   input.value = "";
   input.focus();

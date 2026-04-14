@@ -1,6 +1,6 @@
 import { input, addBtn } from "./dom.js";
 import { spinWheelWithRandomSteps, resetWheelRotation } from "./wheel-spin.js";
-import { addName, syncRemoveButtons, updateEmptyState, initExistingItems, refreshWheel, getNames, } from "./name-list.js";
+import { addName, syncRemoveButtons, syncAddElements, updateEmptyState, initExistingItems, refreshWheel, getNames, } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
 // --- Event Listeners ---
 addBtn.addEventListener("click", () => addName(input.value));
@@ -24,3 +24,4 @@ initExistingItems();
 syncRemoveButtons();
 updateEmptyState();
 refreshWheel();
+syncAddElements();

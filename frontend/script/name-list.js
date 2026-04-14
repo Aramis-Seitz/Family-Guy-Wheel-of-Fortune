@@ -1,5 +1,5 @@
-import { MIN_ITEMS } from "./constants.js";
-import { list, input, errorHint, emptyHint } from "./dom.js";
+import { MIN_ITEMS, MAX_ITEMS } from "./constants.js";
+import { list, input, errorHint, emptyHint, addBtn } from "./dom.js";
 import { generateWheel, getSegmentColor } from "./wheel-renderer.js";
 // --- Getters ---
 export function getNames() {
@@ -33,6 +33,15 @@ export function syncRemoveButtons() {
         btn.disabled = tooFew;
     });
 }
+export function syncAddElements() {
+    const tooMany = getItemCount() >= MAX_ITEMS;
+    addBtn.disabled = tooMany; /* limits the amount of players*/
+    input.disabled = tooMany;
+    addBtn.style.opacity = tooMany ? "0.5" : "1";
+    addBtn.style.cursor = tooMany ? "not-allowed" : "pointer";
+    input.style.opacity = tooMany ? "0.5" : "1";
+    input.style.cursor = tooMany ? "not-allowed" : "pointer";
+}
 // --- Error Handling ---
 let errorTimer = null;
 function showError() {
@@ -59,6 +68,7 @@ function handleRemove(item) {
     item.remove();
     updateEmptyState();
     syncRemoveButtons();
+    syncAddElements();
     refreshWheel();
 }
 function attachRemoveListener(btn, item) {
@@ -82,6 +92,7 @@ export function addName(rawName) {
     list.appendChild(li);
     updateEmptyState();
     syncRemoveButtons();
+    syncAddElements();
     refreshWheel();
     input.value = "";
     input.focus();

@@ -21,3 +21,10 @@ export function stopDrumRoll(): void {
   drumrollAudio.pause();
   drumrollAudio.currentTime = 0;
 }
+
+export function playCymbalCrash(): void {
+  const cymbalCrashAudio = document.getElementById("cymbal-crash") as HTMLAudioElement | null;
+  if (!cymbalCrashAudio) return;
+  cymbalCrashAudio.currentTime = 0;
+  cymbalCrashAudio.play();
+}

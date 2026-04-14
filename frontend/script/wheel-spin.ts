@@ -1,9 +1,10 @@
-import { SPIN_START_DELAY, SPIN_END_DELAY } from "./constants.js";
+import { SPIN_START_DELAY, SPIN_END_DELAY, DRUMROLL_DELAY_THRESHOLD } from "./constants.js";
 import { wheelElement, input, addBtn, spinLeftBtn, spinRightBtn, multiplierValue, multiplierSlider } from "./dom.js";
-import { playTickSound, playDrumRoll, stopDrumRoll } from "./sound.js";
+import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "./api.js";
 import { getSegmentCount } from "./name-list.js";
 import { announceWinner, resetDisplayWinner } from "./winner.js";
+import type { SpinConfig, Direction } from "./types.js";
 
 
 export let currentRotation = 0;
@@ -15,11 +16,8 @@ function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-
-
-
 function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | null)[] {
-  return [ input, addBtn, spinLeftBtn, spinRightBtn, multiplierSlider ];
+  return [input, addBtn, spinLeftBtn, spinRightBtn, multiplierSlider];
 }
 
 function disableElements(elements: (HTMLButtonElement | HTMLInputElement | null)[]): void {
@@ -44,89 +42,102 @@ function enableElements(elements: (HTMLButtonElement | HTMLInputElement | null)[
   });
 }
 
-function spinWheel(totalSpinSteps: number, direction: "left" | "right"): void {
-  spinCancelled = false;
+function getSegmentIndex(rotation: number, stepAngle: number): number {
+  const halfStep = stepAngle / 2;
+  const normalizedRotation = (((rotation + halfStep) % 360) + 360) % 360;
+  return Math.floor(normalizedRotation / stepAngle);
+}
 
+function hasEnteredNewSegment(stepAngle: number): boolean {
+  const previous = getSegmentIndex(lastTickRotation, stepAngle);
+  const current = getSegmentIndex(currentRotation, stepAngle);
+  return previous !== current;
+}
+
+function calculateStepDelay(completedSteps: number, totalSteps: number): number {
+  const progress = completedSteps / totalSteps;
+  return SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
+}
+
+function advanceRotation(direction: Direction): void {
+  currentRotation += direction === "right" ? 1 : -1;
+  updateWheelRotation();
+}
+
+function performSpinStep(step: number, config: SpinConfig): void {
+  if (spinCancelled) return;
+  advanceRotation(config.direction);
+  step++;
+
+  if (hasEnteredNewSegment(config.stepAngle)) playTickSound();
+  lastTickRotation = currentRotation;
+  if (step >= config.totalSteps) {
+    playCymbalCrash();
+    announceWinner(config.segmentCount);
+    return;
+  }
+
+  const delay = calculateStepDelay(step, config.totalSteps);
+  if (delay > DRUMROLL_DELAY_THRESHOLD) playDrumRoll();
+  setTimeout(() => performSpinStep(step, config), delay);
+}
+
+export function spinWheel(totalSteps: number, direction: Direction): void {
+  spinCancelled = false;
   const segmentCount = getSegmentCount();
   if (segmentCount < 2) return;
 
-  const stepAngle = 360 / segmentCount;
-  let completedSteps = 0;
+  const config: SpinConfig = {
+    totalSteps,
+    direction,
+    stepAngle: 360 / segmentCount,
+    segmentCount,
+  };
 
-  function performSpinStep(): void {
-    if (spinCancelled) return;
-
-    currentRotation += direction === "right" ? 1 : -1;
-    updateWheelRotation();
-    completedSteps += 1;
-    
-    const halfStep = stepAngle / 2;
-    const previousSegmentIndex = Math.floor((((lastTickRotation + halfStep) % 360) + 360) % 360 / stepAngle);
-    const currentSegmentIndex = Math.floor((((currentRotation + halfStep) % 360) + 360) % 360 / stepAngle);
-    
-    if (previousSegmentIndex !== currentSegmentIndex) {
-      playTickSound();
-    }
-
-    lastTickRotation = currentRotation;
-
-    if (completedSteps >= totalSpinSteps) {
-        announceWinner(segmentCount);
-        return;
-    }
-
-    const progress = completedSteps / totalSpinSteps;
-    const delay = SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
-
-    if (delay > 50) {
-      playDrumRoll();
-    }
-
-    setTimeout(performSpinStep, delay);
-  }
-
-  performSpinStep();
+  performSpinStep(0, config);
 }
 
-export function spinWheelWithRandomSteps(direction: "left" | "right"): void {
-  fetchRandomNumber()
-    .then((ranNum) => {
-      const multiplier = getMultiplier();
-      const boostedRanNum = ranNum * multiplier;
+function logSpinDetails(ranNum: number, multiplier: number, boostedValue: number): void {
+  console.log("Number from fs server:", ranNum);
+  console.log("Multiplier:", multiplier);
+  console.log("Boosted value:", boostedValue);
+}
 
-      console.log("Number from fs server:", ranNum);
-      console.log("Multiplier:", multiplier);
-      console.log("Boosted value:", boostedRanNum);
-
-      spinWheel(boostedRanNum, direction);
-      disableElements(getSpinRelatedElements());
-    })
-    .catch((error) => {
-      console.error("Error while getting random value:", error);
-    });
+export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
+  try {
+    const ranNum = await fetchRandomNumber();
+    const multiplier = getMultiplier();
+    const boostedRanNum = ranNum * multiplier;
+    logSpinDetails(ranNum, multiplier, boostedRanNum);
+    spinWheel(boostedRanNum, direction);
+    disableElements(getSpinRelatedElements());
+  } catch (error) {
+    console.error("Error while getting random value:", error);
+  }
 }
 
 export function resetWheelRotation(): void {
-    spinCancelled = true;
-    currentRotation = 0;
-    lastTickRotation = 0;    
-    updateWheelRotation();
-    enableElements(getSpinRelatedElements());
-    stopDrumRoll();
-    resetDisplayWinner();
+  spinCancelled = true;
+  currentRotation = 0;
+  lastTickRotation = 0;
+  updateWheelRotation();
+  enableElements(getSpinRelatedElements());
+  stopDrumRoll();
+  resetDisplayWinner();
 }
 
 export function updateMultiplierDisplay(): void {
-    if (!multiplierSlider || !multiplierValue) return;
-    multiplierValue.textContent = multiplierSlider.value;
+  if (!multiplierSlider || !multiplierValue) return;
+  multiplierValue.textContent = multiplierSlider.value;
 }
 
-multiplierSlider?.addEventListener("input", updateMultiplierDisplay);
-updateMultiplierDisplay();
+export function initMultiplierSlider(): void {
+  multiplierSlider?.addEventListener("input", updateMultiplierDisplay);
+  updateMultiplierDisplay();
+}
 
 export function getMultiplier(): number {
-    if (!multiplierSlider) return 1;
-
-    const value = parseFloat(multiplierSlider.value);
-    return Number.isNaN(value) ? 1 : value;
+  if (!multiplierSlider) return 1;
+  const value = parseFloat(multiplierSlider.value);
+  return Number.isNaN(value) ? 1 : value;
 }

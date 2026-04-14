@@ -3,6 +3,7 @@ import { spinWheelWithRandomSteps, resetWheelRotation } from "./wheel-spin.js";
 import {
   addName,
   syncRemoveButtons,
+  syncAddElements,
   updateEmptyState,
   initExistingItems,
   refreshWheel,
@@ -39,3 +40,4 @@ initExistingItems();
 syncRemoveButtons();
 updateEmptyState();
 refreshWheel();
+syncAddElements();

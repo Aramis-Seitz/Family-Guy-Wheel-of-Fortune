@@ -1,5 +1,5 @@
 import { input, addBtn } from "./dom.js";
-import { spinWheelWithRandomSteps, resetWheelRotation } from "./wheel-spin.js";
+import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import {
   addName,
   syncRemoveButtons,
@@ -41,3 +41,4 @@ syncRemoveButtons();
 updateEmptyState();
 refreshWheel();
 syncAddElements();
+initMultiplierSlider();

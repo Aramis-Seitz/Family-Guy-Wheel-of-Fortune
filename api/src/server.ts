@@ -5,16 +5,16 @@ import { getSecureRandomNumber } from "./utils/random";
 
 const app = express();
 const PORT = 3000;
-const MIN_ROTATION_DEGREE: number = 70;
+const MIN_ROTATION_DEGREE: number = 140;
 const MAX_ROTATION_DEGREE: number = 900;
 
 
 
-// Pfad zum Frontend
-const frontendPath = path.join(__dirname, "../../frontend");
+// Pfad zum public
+const publicPath = path.join(__dirname, "../../public");
 
 // Statische Dateien 
-app.use(express.static(frontendPath));
+app.use(express.static(publicPath));
 
 //  API
 
@@ -27,7 +27,7 @@ app.get("/api/random", (req, res) => {
  
 // Fallback: index.html laden
 app.get("*", (req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
+    res.sendFile(path.join(publicPath, "index.html"));
 });
 
 app.listen(PORT, () => {

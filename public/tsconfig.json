@@ -3,9 +3,12 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "rootDir": "./script",
+    "outDir": "./dist/script",
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["script/**/*.ts"]
+  "include": ["script/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
 }

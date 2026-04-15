@@ -1,9 +1,9 @@
 {
   "name": "fullstack-project",
   "private": true,
-  "workspaces": ["frontend", "backend"],
+  "workspaces": ["public", "api"],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace backend\" \"npm run build --workspace frontend\""
+    "dev": "concurrently \"npm run dev --workspace api\" \"npm run build --workspace public\""
   },
   "devDependencies": {
     "concurrently": "^8.0.0"

@@ -2,7 +2,7 @@
 | 1            |                                                                                                                                                                                                                                             |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Titel        | Projekt Setup                                                                                                                                                                                                                               |
-| Inhalt       | Git, Typescript, Ordnerstruktur  für Frontend und Backend<br>ExpressJS im Backend, Frontend ohne UI Libraries<br>Ergebnis: Boilerplate Setup ist im GitLab eingecheckt, und Server Funktionalität mit helloworld dummy erfolgreich getestet |
+| Inhalt       | Git, Typescript, Ordnerstruktur  für public und api<br>ExpressJS im api, public ohne UI Libraries<br>Ergebnis: Boilerplate Setup ist im GitLab eingecheckt, und Server Funktionalität mit helloworld dummy erfolgreich getestet |
 | Prioriät     | hoch                                                                                                                                                                                                                                        |
 | Abhängig von | -                                                                                                                                                                                                                                           |
 

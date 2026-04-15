@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "api",
   "version": "1.0.0",
-  "description": "Express Backend mit TypeScript",
+  "description": "Express api mit TypeScript",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",

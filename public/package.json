@@ -1,7 +1,7 @@
 {
-  "name": "frontend",
+  "name": "public",
   "version": "1.0.0",
-  "description": "Frontend mit TypeScript",
+  "description": "public mit TypeScript",
   "scripts": {
     "build": "tsc --watch"
   },

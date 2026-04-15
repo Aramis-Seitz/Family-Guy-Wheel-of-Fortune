@@ -4,12 +4,12 @@
 
 ```shell
 cd Family-Guy-Wheel-of-Fortune
-cd backend
+cd api
 ```
 ---
 ```shell
 npm install
-cd ../frontend
+cd ../public
 ```
 ---
 ```shell
@@ -23,7 +23,7 @@ kompiliert automatisch bei Änderungen
 
 ---
 ```shell
-cd backend
+cd api
 npm run dev
 ```
 ---

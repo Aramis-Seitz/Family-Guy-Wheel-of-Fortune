@@ -7,6 +7,7 @@ export const SPIN_START_DELAY: number = 5;
 export const SPIN_END_DELAY: number = 65;
 export const MIN_ITEMS: number = 2;
 export const MAX_ITEMS: number = 16;
+export const DRUMROLL_DELAY_THRESHOLD = 30;
 
 
 export const SEGMENT_COLORS: string[] = [

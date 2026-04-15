@@ -1,0 +1,12 @@
+export const wheelElement = document.getElementById("wheel");
+export const tickSoundTemplate = document.getElementById("tickSound");
+export const input = document.getElementById("nameInput");
+export const addBtn = document.getElementById("addBtn");
+export const list = document.getElementById("nameList");
+export const errorHint = document.getElementById("errorHint");
+export const emptyHint = document.getElementById("emptyHint");
+export const drumrollAudio = document.getElementById("drumroll");
+export const multiplierSlider = document.getElementById("multiplierSlider");
+export const multiplierValue = document.getElementById("multiplierValue");
+export const spinLeftBtn = document.getElementById("spin-left-btn");
+export const spinRightBtn = document.getElementById("spin-right-btn");

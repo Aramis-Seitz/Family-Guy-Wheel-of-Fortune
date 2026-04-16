@@ -34,9 +34,13 @@ export function loadNamesFromUrl(): void {
 }
 
 export function initShareFeature(): void {
-    shareBtn?.addEventListener("click", async () => {
-        const link = generateShareLink();
+    console.log("initShareFeature loaded");
+    console.log("shareBtn:", shareBtn);
 
+    shareBtn?.addEventListener("click", async () => {
+        console.log("share button clicked");
+
+        const link = generateShareLink();
         console.log("Share link:", link);
 
         try {

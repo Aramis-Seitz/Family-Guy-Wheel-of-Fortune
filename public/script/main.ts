@@ -11,6 +11,8 @@ import {
   getNames,
 } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
+import { setupWinnerModal } from "./winner.js";
+
 
 // --- Event Listeners ---
 
@@ -44,3 +46,4 @@ refreshWheel();
 syncAddElements();
 initMultiplierSlider();
 initShareFeature();
+setupWinnerModal();

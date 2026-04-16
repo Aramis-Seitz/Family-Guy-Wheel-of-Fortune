@@ -10,4 +10,4 @@ export const multiplierSlider = document.getElementById("multiplierSlider") as H
 export const multiplierValue = document.getElementById("multiplierValue") as HTMLSpanElement | null;
 export const spinLeftBtn = document.getElementById("spin-left-btn") as HTMLButtonElement | null;
 export const spinRightBtn = document.getElementById("spin-right-btn") as HTMLButtonElement | null;
-export const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
+export const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement;

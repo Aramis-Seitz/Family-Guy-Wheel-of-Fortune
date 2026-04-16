@@ -1,5 +1,3 @@
-Die winner.ts:
- 
 import { getNames } from "./name-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { currentRotation } from "./wheel-spin.js";

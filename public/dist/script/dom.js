@@ -10,3 +10,4 @@ export const multiplierSlider = document.getElementById("multiplierSlider");
 export const multiplierValue = document.getElementById("multiplierValue");
 export const spinLeftBtn = document.getElementById("spin-left-btn");
 export const spinRightBtn = document.getElementById("spin-right-btn");
+export const shareBtn = document.getElementById("shareBtn");

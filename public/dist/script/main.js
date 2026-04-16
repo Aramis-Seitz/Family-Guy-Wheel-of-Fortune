@@ -1,4 +1,5 @@
 import { input, addBtn } from "./dom.js";
+import { initShareFeature } from "public/script/share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import { addName, syncRemoveButtons, syncAddElements, updateEmptyState, initExistingItems, refreshWheel, getNames, } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
@@ -26,3 +27,4 @@ updateEmptyState();
 refreshWheel();
 syncAddElements();
 initMultiplierSlider();
+initShareFeature();

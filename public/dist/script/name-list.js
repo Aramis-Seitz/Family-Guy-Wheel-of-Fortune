@@ -14,6 +14,9 @@ function getItemCount() {
     return list.querySelectorAll(".name-item").length;
 }
 // --- UI Updates ---
+export function clearNames() {
+    list.innerHTML = "";
+}
 function applyItemColor(item, index) {
     item.style.backgroundColor = getSegmentColor(index);
 }

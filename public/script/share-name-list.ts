@@ -38,6 +38,7 @@ export function initShareFeature(): void {
     console.log("shareBtn:", shareBtn);
 
     shareBtn?.addEventListener("click", async () => {
+        alert("button works");
         console.log("share button clicked");
 
         const link = generateShareLink();

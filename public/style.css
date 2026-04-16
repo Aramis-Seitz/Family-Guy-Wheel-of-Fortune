@@ -41,6 +41,25 @@ img {
     background-color: #e59400;
 } 
 
+.share-btn {
+    background-color: #E20074;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.share-btn:hover {
+    background-color: #E20074;
+}
+
+.share-btn:active {
+        background-color: #E20074;
+} 
+
 #reset-btn {
     background-color: #888;
     color: white;

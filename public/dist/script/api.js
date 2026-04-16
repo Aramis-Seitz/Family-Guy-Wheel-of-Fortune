@@ -1,5 +1,5 @@
 export async function fetchRandomNumber() {
-    const response = await fetch("./dist/api/random");
+    const response = await fetch("./api/random");
     if (!response.ok) {
         throw new Error("Server response not ok.");
     }

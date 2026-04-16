@@ -42,9 +42,16 @@
             <p class="error-hint hidden" id="errorHint">At least 2 entries required.</p>
             <p class="empty-hint" id="emptyHint" style="display:none">No names yet. Add some!</p>
         </div>
-    </div>    <div id="winner">
-        Winner: No result yet
-    </div>
+        <div id="winnerModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>🎉 Winner!</h2>
+                <p id="winnerText">-</p>
+                <button id="closeModal">OK</button>
+            </div>
+        </div>
+
+        <canvas id="confettiCanvas"></canvas>
+
   
     <script type="module" src="dist/script/main.js"></script>
 </body>

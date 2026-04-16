@@ -30,11 +30,11 @@ function startConfetti() {
         return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const pieces = Array.from({ length: 9999 }, () => ({
+    const pieces = Array.from({ length: 999 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height - canvas.height,
         size: Math.random() * 6 + 4,
-        speed: Math.random() * 30 + 2,
+        speed: Math.random() * 20 + 2,
         angle: Math.random() * Math.PI * 2,
         spin: Math.random() * 0.1 - 0.05,
         color: `hsl(${Math.random() * 360}, 100%, 50%)`

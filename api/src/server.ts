@@ -12,3 +12,4 @@ app.get("/dist/api/random.js", (req, res) => {
 });
 
 export default app;
+/*wie kann diese änderung nicht auf dem repo sein hää?*/

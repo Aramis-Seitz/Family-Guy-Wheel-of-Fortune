@@ -1,7 +1,9 @@
 import { input, addBtn } from "./dom.js";
+import { initShareFeature } from "./share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import { addName, syncRemoveButtons, syncAddElements, updateEmptyState, initExistingItems, refreshWheel, getNames, } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
+import { setupWinnerModal } from "./winner.js";
 // --- Event Listeners ---
 addBtn.addEventListener("click", () => addName(input.value));
 input.addEventListener("keydown", (e) => {
@@ -26,3 +28,5 @@ updateEmptyState();
 refreshWheel();
 syncAddElements();
 initMultiplierSlider();
+initShareFeature();
+setupWinnerModal();

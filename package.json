@@ -2,8 +2,10 @@
   "name": "fullstack-project",
   "private": true,
   "workspaces": ["public", "api"],
-  "scripts": {
-    "dev": "concurrently \"npm run dev --workspace api\" \"npm run build --workspace public\""
+"scripts": {
+    "dev": "concurrently \"npm run dev --workspace api\" \"npm run build --workspace public\"",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {
     "concurrently": "^8.0.0"

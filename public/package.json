@@ -4,8 +4,8 @@
   "description": "public mit TypeScript",
   "scripts": {
     "dev": "vite",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {
     "eslint": "^10.2.0",

@@ -1,5 +1,5 @@
 import { SPIN_START_DELAY, SPIN_END_DELAY, DRUMROLL_DELAY_THRESHOLD } from "./constants.js";
-import { wheelElement, input, addBtn, spinLeftBtn, spinRightBtn, multiplierValue, multiplierSlider } from "./dom.js";
+import { wheelElement, input, addBtn, getRemoveBtn, spinLeftBtn, spinRightBtn, multiplierValue, multiplierSlider } from "./dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "./api.js";
 import { getSegmentCount } from "./name-list.js";
@@ -16,13 +16,20 @@ function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | null)[] {
-  return [input, addBtn, spinLeftBtn, spinRightBtn, multiplierSlider];
+function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement> | null)[] {
+  return [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider];
 }
 
-function disableElements(elements: (HTMLButtonElement | HTMLInputElement | null)[]): void {
+function disableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement> | null)[]): void {
   elements.forEach((element) => {
-    if (element) {
+    if (element instanceof NodeList) {
+      element.forEach((item) => {
+        (item as HTMLButtonElement).disabled = true;
+        item.style.setProperty("opacity", "0.5");
+        item.style.setProperty("cursor", "not-allowed");
+        item.style.setProperty("pointer-events", "none");
+      });
+    } else if (element) {
       element.disabled = true;
       element.style.setProperty("opacity", "0.5");
       element.style.setProperty("cursor", "not-allowed");
@@ -31,9 +38,16 @@ function disableElements(elements: (HTMLButtonElement | HTMLInputElement | null)
   });
 }
 
-function enableElements(elements: (HTMLButtonElement | HTMLInputElement | null)[]): void {
+function enableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement> | null)[]): void {
   elements.forEach((element) => {
-    if (element) {
+    if (element instanceof NodeList) {
+      element.forEach((item) => {
+        (item as HTMLButtonElement).disabled = false;
+        item.style.removeProperty("opacity");
+        item.style.removeProperty("cursor");
+        item.style.removeProperty("pointer-events");
+      });
+    } else if (element) {
       element.disabled = false;
       element.style.removeProperty("opacity");
       element.style.removeProperty("cursor");

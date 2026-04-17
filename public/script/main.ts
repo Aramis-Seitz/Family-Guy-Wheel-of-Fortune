@@ -1,4 +1,5 @@
 import { input, addBtn } from "./dom.js";
+import { initShareFeature } from "./share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import {
   addName,
@@ -10,6 +11,8 @@ import {
   getNames,
 } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
+import { setupWinnerModal } from "./winner.js";
+
 
 // --- Event Listeners ---
 
@@ -42,3 +45,5 @@ updateEmptyState();
 refreshWheel();
 syncAddElements();
 initMultiplierSlider();
+initShareFeature();
+setupWinnerModal();

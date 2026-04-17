@@ -19,6 +19,9 @@ function getItemCount(): number {
 }
 
 // --- UI Updates ---
+export function clearNames(): void {
+    list.innerHTML = "";
+}
 
 function applyItemColor(item: HTMLLIElement, index: number): void {
   item.style.backgroundColor = getSegmentColor(index);

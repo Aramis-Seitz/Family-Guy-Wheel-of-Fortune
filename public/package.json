@@ -4,7 +4,7 @@
   "description": "public mit TypeScript",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --project tsconfig.json",
+    "build": "tsc --project tsconfig.json && vite build",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {

@@ -334,6 +334,18 @@ img {
     margin-bottom: 20px;
 }
  
+#removeWinner {
+    background: #ff0000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#removeWinner:hover {
+    background: #c90000
+}
 
 #closeModal {
     background: #ffb800;

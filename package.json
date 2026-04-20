@@ -4,7 +4,7 @@
   "workspaces": ["public", "api"],
 "scripts": {
     "dev": "concurrently \"npm run dev --workspace api\" \"npm run build --workspace public\"",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace api && npm run build --workspace public",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {

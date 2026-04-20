@@ -140,6 +140,10 @@ export function resetWheelRotation(): void {
   resetDisplayWinner();
 }
 
+export function setMultiplierSlider(multiplier: number): void {
+  multiplierSlider.value = `${multiplier}`
+}
+
 export function updateMultiplierDisplay(): void {
   if (!multiplierSlider || !multiplierValue) return;
   multiplierValue.textContent = multiplierSlider.value;

@@ -12,6 +12,21 @@ import {
 } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
 import { setupWinnerModal } from "./winner.js";
+import { createClient } from '@supabase/supabase-js';
+
+
+// const
+const supabaseClient = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+);
+
+// Ganz oben — vor allen anderen Initialisierungen
+const { data: { session } } = await supabaseClient.auth.getSession();
+
+if (!session) {
+  window.location.href = '/login.html';
+}
 
 
 // --- Event Listeners ---

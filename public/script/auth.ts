@@ -40,7 +40,7 @@ if (loginForm) {
             }
 
             showMessage('Login erfolgreich!');
-            window.location.href = '/main.html';
+            window.location.href = '/';
         } catch (err: unknown) {
             console.error('Netzwerkfehler beim Login:', err);
             showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');

@@ -1,19 +1,14 @@
-const SUPABASE_URL: string = 'https://gvzfzrqjrmmzrhnbmozc.supabase.co/userauth';
-const SUPABASE_ANON_KEY: string =
-  '';
+import { createClient } from '@supabase/supabase-js';
 
+const SUPABASE_URL: string = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY: string = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-declare const supabase: {
-    createClient: (url: string, key: string) => any;
-};
-
-const { createClient } = supabase;
-
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
 
+const loginUsernameInput = document.getElementById('loginUser') as HTMLInputElement | null;
 const loginEmailInput = document.getElementById('loginEmail') as HTMLInputElement | null;
 const loginPasswordInput = document.getElementById('loginPassword') as HTMLInputElement | null;
 
@@ -34,7 +29,6 @@ if (loginForm) {
             showMessage('Login-Felder wurden nicht gefunden.', 'error');
             return;
         }
-
         const email: string = loginEmailInput.value;
         const password: string = loginPasswordInput.value;
 

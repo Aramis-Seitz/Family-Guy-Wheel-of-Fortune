@@ -402,3 +402,22 @@ img {
 .authButton:active {
     background-color: #1a1918;
 }
+#userArea {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: white;
+  color: black;
+  padding: 10px 14px;
+  border: 2px solid black;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#authButton {
+  padding: 6px 10px;
+  cursor: pointer;
+}

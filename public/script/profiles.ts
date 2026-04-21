@@ -15,7 +15,7 @@ export async function initProfileUI(): Promise<void> {
     profileNameElement.textContent = 'Nicht eingeloggt';
     authButton.textContent = 'Login';
     authButton.onclick = () => {
-      window.location.href = '/';
+      window.location.href = '/index.html';
     };
     return;
   }
@@ -36,6 +36,6 @@ export async function initProfileUI(): Promise<void> {
   authButton.textContent = 'Logout';
   authButton.onclick = async () => {
     await supabaseClient.auth.signOut();
-    window.location.href = '/';
+    window.location.href = '/index.html';
   };
 }

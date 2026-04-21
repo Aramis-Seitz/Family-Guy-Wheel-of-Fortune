@@ -1,9 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL: string = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY: string = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+import { supabaseClient } from './supabase-client.js';
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
@@ -78,7 +73,7 @@ if (signupForm) {
         }
 
         try {
-            const { error } = await supabaseClient.auth.signUp({
+            const { data, error } = await supabaseClient.auth.signUp({
                 email,
                 password,
                 options: {
@@ -91,6 +86,27 @@ if (signupForm) {
             if (error) {
                 console.error('Signup Error:', error);
                 showMessage(`Registrierung fehlgeschlagen: ${error.message}`);
+                return;
+            }
+
+            if (!data.user) {
+                showMessage('Benutzer konnte nicht erstellt werden.');
+                return;
+            }
+
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .insert([
+                    {
+                        id: data.user.id,
+                        username: username,
+                        email: email,
+                    },
+                ]);
+
+            if (profileError) {
+                console.error('Profile Insert Error:', profileError);
+                showMessage(`Benutzer erstellt, aber Profil konnte nicht gespeichert werden: ${profileError.message}`);
                 return;
             }
 

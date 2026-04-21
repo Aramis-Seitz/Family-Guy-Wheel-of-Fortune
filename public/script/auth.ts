@@ -94,7 +94,7 @@ if (signupForm) {
                 return;
             }
 
-            showMessage('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.');
+            showMessage('Registrierung erfolgreich!');
         } catch (err: unknown) {
             console.error('Netzwerkfehler bei der Registrierung:', err);
             showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');

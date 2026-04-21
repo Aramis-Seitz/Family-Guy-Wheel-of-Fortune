@@ -384,3 +384,21 @@ img {
         opacity: 1;
     }
 }
+.authButton {
+    background-color: #48484883;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+ 
+.authButton:hover {
+    background-color: #2a2929;
+}
+ 
+.authButton:active {
+    background-color: #1a1918;
+}

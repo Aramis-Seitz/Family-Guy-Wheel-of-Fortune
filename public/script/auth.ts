@@ -1,9 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL: string = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY: string = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+import { supabaseClient } from './supabase-client.js';
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
@@ -45,7 +40,7 @@ if (loginForm) {
             }
 
             showMessage('Login erfolgreich!');
-            window.location.href = '/';
+            window.location.href = '/main';
         } catch (err: unknown) {
             console.error('Netzwerkfehler beim Login:', err);
             showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
@@ -78,7 +73,7 @@ if (signupForm) {
         }
 
         try {
-            const { error } = await supabaseClient.auth.signUp({
+            const { data, error } = await supabaseClient.auth.signUp({
                 email,
                 password,
                 options: {
@@ -94,10 +89,31 @@ if (signupForm) {
                 return;
             }
 
-            showMessage('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.');
+            if (!data.user) {
+                showMessage('Benutzer konnte nicht erstellt werden.');
+                return;
+            }
+
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .insert([
+                    {
+                        id: data.user.id,
+                        username: username,
+                        email: email,
+                    },
+                ]);
+
+            if (profileError) {
+                console.error('Profile Insert Error:', profileError);
+                showMessage(`Benutzer erstellt, aber Profil konnte nicht gespeichert werden: ${profileError.message}`);
+                return;
+            }
+
+            showMessage('Registrierung erfolgreich!');
         } catch (err: unknown) {
             console.error('Netzwerkfehler bei der Registrierung:', err);
             showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
         }
     });
-}
+}//

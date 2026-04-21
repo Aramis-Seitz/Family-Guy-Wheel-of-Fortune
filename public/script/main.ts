@@ -1,6 +1,7 @@
 import { input, addBtn } from "./dom.js";
 import { initShareFeature } from "./share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
+import { initProfileUI } from "./profiles.js";
 import {
   addName,
   syncRemoveButtons,
@@ -62,3 +63,4 @@ syncAddElements();
 initMultiplierSlider();
 initShareFeature();
 setupWinnerModal();
+initProfileUI();

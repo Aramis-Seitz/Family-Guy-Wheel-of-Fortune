@@ -384,3 +384,40 @@ img {
         opacity: 1;
     }
 }
+.authButton {
+    background-color: #48484883;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+ 
+.authButton:hover {
+    background-color: #2a2929;
+}
+ 
+.authButton:active {
+    background-color: #1a1918;
+}
+#userArea {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: white;
+  color: black;
+  padding: 10px 14px;
+  border: 2px solid black;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#authButton {
+  padding: 6px 10px;
+  cursor: pointer;
+}

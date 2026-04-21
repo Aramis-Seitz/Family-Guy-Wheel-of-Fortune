@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Family Guy Wheel of Fortune</title>
+    <title>Family Guy Wheel of Fortune!</title>
     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./auth-style.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
@@ -11,37 +12,45 @@
     <audio id="tickSound" src="assets/he.mp3" preload="auto"></audio>
     <audio id="drumroll" src="assets/drumroll.mp3" preload="auto"></audio>
     <audio id="cymbal-crash" src="assets/cymbal-crash.wav" preload="auto"></audio>
-    
+
     <button class="spin-btn" id="spin-left-btn" onclick="getRandomNumber_left()">SPIN LEFT</button>
     <button class="spin-btn" id="spin-right-btn" onclick="getRandomNumber_right()">SPIN RIGHT</button>
     <button id="reset-btn" onclick="resetWheelRotation()">RESET</button>
-    <button class="share-btn"id="shareBtn">Share 🔗</button>
+    <button class="share-btn" id="shareBtn">Share 🔗</button>
 
+    <div id="userArea" style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">
+        <span id="profileName">Nicht eingeloggt</span>
+        <button id="authButton" type="button">Login</button>
+    </div>
 
     <div class="container">
-
         <img src="assets/image.png" alt="pointer image">
         <svg id="svg" width="700" height="700" viewBox="0 0 300 300">
             <g id="wheel"></g>
         </svg>
+
         <div class="multiplier-container">
             <label for="multiplierSlider">
                 Power: <span id="multiplierValue">1</span>x
             </label>
             <input type="range" id="multiplierSlider" min="1" max="2" step="0.1" value="1">
         </div>
+
         <div class="panel">
             <div class="add-row">
                 <input type="text" id="nameInput" placeholder="Enter name …" />
                 <button class="btn-add" id="addBtn">+</button>
             </div>
+
             <ul class="name-list" id="nameList">
                 <li class="name-item"><span class="name-text">Lois</span><button class="btn-remove">−</button></li>
                 <li class="name-item"><span class="name-text">Meg</span><button class="btn-remove">−</button></li>
             </ul>
+
             <p class="error-hint hidden" id="errorHint">At least 2 entries required.</p>
             <p class="empty-hint" id="emptyHint" style="display:none">No names yet. Add some!</p>
         </div>
+
         <div id="winnerModal" class="modal hidden">
             <div class="modal-content">
                 <h2>🎉 Winner!</h2>
@@ -51,8 +60,8 @@
         </div>
 
         <canvas id="confettiCanvas"></canvas>
+    </div>
 
-  
     <script type="module" src="dist/script/main.js"></script>
 </body>
 </html>

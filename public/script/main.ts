@@ -13,16 +13,9 @@ import {
 } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
 import { setupWinnerModal } from "./winner.js";
-import { createClient } from '@supabase/supabase-js';
+import { supabaseClient } from './supabase-client.js';
 
 
-// const
-const supabaseClient = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-);
-
-// Ganz oben — vor allen anderen Initialisierungen
 const { data: { session } } = await supabaseClient.auth.getSession();
 
 if (!session) {
@@ -30,7 +23,6 @@ if (!session) {
 }
 
 
-// --- Event Listeners ---
 
 addBtn.addEventListener("click", () => addName(input.value));
 
@@ -38,7 +30,6 @@ input.addEventListener("keydown", (e: KeyboardEvent) => {
   if (e.key === "Enter") addName(input.value);
 });
 
-// --- Global functions (used by onclick in HTML) ---
 
 function getRandomNumber_left(): void {
   spinWheelWithRandomSteps("left");
@@ -53,7 +44,6 @@ function getRandomNumber_right(): void {
 (window as any).generateWheel = () => generateWheel(getNames());
 (window as any).resetWheelRotation = resetWheelRotation;
 
-// --- Initialization ---
 
 initExistingItems();
 syncRemoveButtons();

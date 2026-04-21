@@ -1,13 +1,16 @@
 import { getNames, addName, clearNames } from "./name-list.js";
 import { shareBtn } from "./dom.js";
+import { getMultiplier, updateMultiplierDisplay, setMultiplierSlider } from "./wheel-spin.js";    
 
 export function generateShareLink(): string {
     const names = getNames();
-    const encoded = encodeURIComponent(JSON.stringify(names));
-    return `${window.location.origin}${window.location.pathname}?names=${encoded}`;
+    const encodedNames = encodeURIComponent(JSON.stringify(names));
+    const sliderValue = getMultiplier()
+    return `${window.location.origin}${window.location.pathname}?names=${encodedNames}&power=${sliderValue}`;
 }
 
-export function loadNamesFromUrl(): void {
+export function loadInformationFromUrl(): void {
+    // --- Names ---
     const params = new URLSearchParams(window.location.search);
     const namesParam = params.get("names");
 
@@ -31,6 +34,12 @@ export function loadNamesFromUrl(): void {
             addName(name);
         }
     });
+    // --- Power ---
+    const powerParam = params.get("power");
+    const powerValue: number = Number(powerParam);
+    if (powerValue < 1 || powerValue > 2) return;
+    setMultiplierSlider(powerValue);
+    updateMultiplierDisplay();
 }
 
 export function initShareFeature(): void {
@@ -52,5 +61,5 @@ export function initShareFeature(): void {
         }
     });
 
-    loadNamesFromUrl();
+    loadInformationFromUrl();
 }

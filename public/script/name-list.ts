@@ -93,7 +93,7 @@ function handleRemove(item: HTMLLIElement): void {
   refreshWheel();
 }
 
-function attachRemoveListener(btn: HTMLButtonElement, item: HTMLLIElement): void {
+export function attachRemoveListener(btn: HTMLButtonElement, item: HTMLLIElement): void {
   btn.addEventListener("click", () => handleRemove(item));
 }
 
@@ -123,6 +123,14 @@ export function addName(rawName: string): void {
   refreshWheel();
   input.value = "";
   input.focus();
+}
+
+export function removeNameByIndex(index: number): void {
+  const items = list.querySelectorAll(".name-item") as NodeListOf<HTMLLIElement>;
+  const item = items[index];
+  if (item) {
+    handleRemove(item);
+  }
 }
 
 export function initExistingItems(): void {

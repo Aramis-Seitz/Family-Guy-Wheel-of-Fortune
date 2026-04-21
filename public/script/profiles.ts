@@ -7,18 +7,20 @@ export async function initProfileUI(): Promise<void> {
   if (!profileNameElement || !authButton) return;
 
   const {
-    data: { user },
-    error: userError,
-  } = await supabaseClient.auth.getUser();
+    data: { session },
+    error: sessionError,
+  } = await supabaseClient.auth.getSession();
 
-  if (userError || !user) {
+  if (sessionError || !session || !session.user) {
     profileNameElement.textContent = 'Nicht eingeloggt';
     authButton.textContent = 'Login';
     authButton.onclick = () => {
-      window.location.href = '/index.html';
+      window.location.href = '/';
     };
     return;
   }
+
+  const user = session.user;
 
   const { data: profile, error: profileError } = await supabaseClient
     .from('profiles')
@@ -36,6 +38,6 @@ export async function initProfileUI(): Promise<void> {
   authButton.textContent = 'Logout';
   authButton.onclick = async () => {
     await supabaseClient.auth.signOut();
-    window.location.href = '/index.html';
+    window.location.href = '/';
   };
 }

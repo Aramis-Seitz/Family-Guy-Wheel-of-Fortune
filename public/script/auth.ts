@@ -116,4 +116,4 @@ if (signupForm) {
             showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
         }
     });
-}
+}//

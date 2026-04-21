@@ -15,7 +15,7 @@ export async function initProfileUI(): Promise<void> {
     profileNameElement.textContent = 'Nicht eingeloggt';
     authButton.textContent = 'Login';
     authButton.onclick = () => {
-      window.location.href = '/index.html';
+      window.location.href = '/';
     };
     return;
   }

@@ -8,7 +8,6 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
 
-const loginUsernameInput = document.getElementById('loginUser') as HTMLInputElement | null;
 const loginEmailInput = document.getElementById('loginEmail') as HTMLInputElement | null;
 const loginPasswordInput = document.getElementById('loginPassword') as HTMLInputElement | null;
 
@@ -17,7 +16,7 @@ const signupEmailInput = document.getElementById('signupEmail') as HTMLInputElem
 const signupPasswordInput = document.getElementById('signupPassword') as HTMLInputElement | null;
 const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword') as HTMLInputElement | null;
 
-function showMessage(message: string, type: string = 'info'): void {
+function showMessage(message: string): void {
     alert(message);
 }
 
@@ -26,29 +25,30 @@ if (loginForm) {
         event.preventDefault();
 
         if (!loginEmailInput || !loginPasswordInput) {
-            showMessage('Login-Felder wurden nicht gefunden.', 'error');
+            showMessage('Login-Felder wurden nicht gefunden.');
             return;
         }
-        const email: string = loginEmailInput.value;
+
+        const email: string = loginEmailInput.value.trim();
         const password: string = loginPasswordInput.value;
 
         try {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
+            const { error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password,
             });
 
             if (error) {
                 console.error('Login Error:', error);
-                showMessage(`Login fehlgeschlagen: ${error.message}`, 'error');
-            } else {
-                console.log('Login erfolgreich:', data);
-                showMessage('Login erfolgreich!', 'success');
-                window.location.href = 'main.html';
+                showMessage(`Login fehlgeschlagen: ${error.message}`);
+                return;
             }
+
+            showMessage('Login erfolgreich!');
+            window.location.href = 'main.html';
         } catch (err: unknown) {
             console.error('Netzwerkfehler beim Login:', err);
-            showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.', 'error');
+            showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
         }
     });
 }
@@ -58,57 +58,46 @@ if (signupForm) {
         event.preventDefault();
 
         if (!signupUserInput || !signupEmailInput || !signupPasswordInput || !signupConfirmPasswordInput) {
-            showMessage('Registrierungs-Felder wurden nicht gefunden.', 'error');
+            showMessage('Registrierungs-Felder wurden nicht gefunden.');
             return;
         }
 
-        const username: string = signupUserInput.value;
-        const email: string = signupEmailInput.value;
+        const username: string = signupUserInput.value.trim();
+        const email: string = signupEmailInput.value.trim();
         const password: string = signupPasswordInput.value;
         const confirmPassword: string = signupConfirmPasswordInput.value;
 
+        if (!username) {
+            showMessage('Bitte Username eingeben.');
+            return;
+        }
+
         if (password !== confirmPassword) {
-            showMessage('Passwörter stimmen nicht überein!', 'error');
+            showMessage('Passwörter stimmen nicht überein!');
             return;
         }
 
         try {
-            const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
+            const { error } = await supabaseClient.auth.signUp({
+                email,
+                password,
                 options: {
                     data: {
-                        username: username,
+                        username,
                     },
                 },
             });
 
             if (error) {
                 console.error('Signup Error:', error);
-                showMessage(`Registrierung fehlgeschlagen: ${error.message}`, 'error');
-            } else {
-                console.log('Registrierung erfolgreich:', data);
-                showMessage(
-                    'Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.',
-                    'success'
-                );
+                showMessage(`Registrierung fehlgeschlagen: ${error.message}`);
+                return;
             }
+
+            showMessage('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails zur Bestätigung.');
         } catch (err: unknown) {
             console.error('Netzwerkfehler bei der Registrierung:', err);
-            showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.', 'error');
+            showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
         }
     });
-}
-
-async function checkAuthStatus(): Promise<void> {
-    const {
-        data: { user },
-    } = await supabaseClient.auth.getUser();
-
-    if (user) {
-        console.log('Benutzer ist angemeldet:', user);
-        console.log('Username:', user.user_metadata?.username);
-    } else {
-        console.log('Kein Benutzer angemeldet.');
-    }
 }

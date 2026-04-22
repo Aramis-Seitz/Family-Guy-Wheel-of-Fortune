@@ -19,7 +19,7 @@ if (loginForm) {
     const password = loginPasswordInput.value;
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('./api/basic-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

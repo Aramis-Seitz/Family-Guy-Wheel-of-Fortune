@@ -21,7 +21,7 @@ import { supabaseClient } from './supabase-client.js';
 const { data: { session } } = await supabaseClient.auth.getSession();
 
 if (!session) {
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
 }
 
 

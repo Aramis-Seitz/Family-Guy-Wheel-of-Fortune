@@ -422,26 +422,29 @@ img {
   cursor: pointer;
 }
 
-.btn-Imp{
+.Rechtliches {
   position: fixed;
   bottom: 20px;
   right: 20px;
   display: flex;
+  flex-direction: row;
   gap: 8px;
   z-index: 9999;
 }
 
-
-.btn-DaS{
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  gap: 8px;
-  z-index: 9999;
+.btn-Imp, .btn-DaS {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.6);
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.btn-DaS:hover {
+.btn-Imp:hover, .btn-DaS:hover {
   border-color: rgba(255,255,255,0.8);
   color: white;
 }

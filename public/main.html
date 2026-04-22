@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Family Guy Wheel of Fortune!</title>
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="./auth_style.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
+
 <body>
 
     <audio id="tickSound" src="assets/he.mp3" preload="auto"></audio>
@@ -18,7 +20,8 @@
     <button id="reset-btn" onclick="resetWheelRotation()">RESET</button>
     <button class="share-btn" id="shareBtn">Share 🔗</button>
 
-    <div id="userArea" style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">
+    <div id="userArea"
+        style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">
         <span id="profileName">Nicht eingeloggt</span>
         <button id="authButton" type="button">Login</button>
     </div>
@@ -62,6 +65,13 @@
         <canvas id="confettiCanvas"></canvas>
     </div>
 
+    <div class="Rechtliches">
+
+        <a href="/impressum.html" class="btn-Imp">Impressum</a>
+        <a href="/datenschutz.html" class="btn-DaS">Datenschutz</a>
+    </div>
+
     <script type="module" src="dist/script/main.js"></script>
 </body>
+
 </html>

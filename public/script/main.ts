@@ -13,6 +13,16 @@ import {
 } from "./name-list.js";
 import { generateWheel } from "./wheel-renderer.js";
 import { setupWinnerModal } from "./winner.js";
+import { supabaseClient } from './supabase-client.js';
+
+
+const { data: { session } } = await supabaseClient.auth.getSession();
+
+if (!session) {
+  window.location.href = 'index/.html';
+}
+
+
 
 addBtn.addEventListener("click", () => addName(input.value));
 

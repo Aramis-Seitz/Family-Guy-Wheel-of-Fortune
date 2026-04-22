@@ -12,3 +12,6 @@ export const multiplierValue = document.getElementById("multiplierValue") as HTM
 export const spinLeftBtn = document.getElementById("spin-left-btn") as HTMLButtonElement | null;
 export const spinRightBtn = document.getElementById("spin-right-btn") as HTMLButtonElement | null;
 export const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
+export const inventoryBtn = document.getElementById("inventoryBtn") as HTMLButtonElement;
+export const inventoryCloseBtn = document.getElementById("inventoryCloseBtn") as HTMLButtonElement;
+export const inventoryModal = document.getElementById("inventoryModal") as HTMLDialogElement;

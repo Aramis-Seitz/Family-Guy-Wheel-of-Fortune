@@ -61,6 +61,42 @@ img {
 
 }
 
+.inventar-btn {
+
+    background-color: #00a2ff;
+
+    color: black;
+
+    font-weight: bold;
+
+    font-size: 1.2rem;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 100px;
+
+    cursor: pointer;
+}
+
+#inventoryCloseBtn {
+    background: none;
+      border: none;
+      cursor: pointer;
+      color: #7a7974;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 0.25rem;
+      border-radius: 0.375rem;
+      transition: color 180ms ease, background 180ms ease;
+}
+
+#inventoryCloseBtn:hover {
+    color: #28251d; 
+    background: #edeae5;
+}
+
 .share-btn:hover {
 
     background-color: #E20074;

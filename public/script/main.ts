@@ -2,6 +2,8 @@ import { input, addBtn } from "./dom.js";
 import { initShareFeature } from "./share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import { initProfileUI } from "./profiles.js";
+import { inventory } from "./inventory.js";
+
 import {
   addName,
   syncRemoveButtons,
@@ -44,6 +46,9 @@ function getRandomNumber_right(): void {
 (window as any).generateWheel = () => generateWheel(getNames());
 (window as any).resetWheelRotation = resetWheelRotation;
 
+if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+  window.location.href = '/';
+}
 
 initExistingItems();
 syncRemoveButtons();
@@ -54,3 +59,4 @@ initMultiplierSlider();
 initShareFeature();
 setupWinnerModal();
 initProfileUI();
+inventory();

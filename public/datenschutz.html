@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datenschutzerklärung – Family Guy Wheel of Fortune</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #e0e0e0;
+      --muted: #888;
+      --accent: #f5a623;
+      --font-head: 'Georgia', serif;
+      --font-body: 'Courier New', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0;
+      text-align: center;
+    }
+
+    header a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    header a:hover { text-decoration: underline; }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    h1 {
+      font-family: var(--font-head);
+      font-size: 2.4rem;
+      font-weight: normal;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 3rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: normal;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p { margin-bottom: 0.75rem; color: var(--text); }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 0.5rem 0 0.75rem 1.5rem;
+      color: var(--text);
+    }
+
+    li { margin-bottom: 0.3rem; }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: block;
+      margin-bottom: 0.3rem;
+      margin-top: 1.2rem;
+    }
+
+    .label:first-child { margin-top: 0; }
+
+    .placeholder {
+      color: var(--accent);
+      background: rgba(245, 166, 35, 0.1);
+      padding: 0 4px;
+      border-radius: 2px;
+    }
+
+    .warning {
+      background: rgba(245, 166, 35, 0.08);
+      border: 1px solid rgba(245, 166, 35, 0.3);
+      border-radius: 4px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(245,166,35,0.12);
+      color: var(--accent);
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-right: 6px;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/">← Zurück zur App</a>
+</header>
+
+<main>
+  <h1>Datenschutzerklärung</h1>
+  <p class="subtitle">Gemäß DSGVO &amp; BDSG</p>
+
+  <!-- 1 -->
+  <section>
+    <h2>1. Verantwortlicher</h2>
+    <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist:</p>
+    <span class="label">XYZ</span>
+    <p><span class="placeholder">[Vorname Nachname]</span></p>
+    <span class="label">Anschrift</span>
+    <p><span class="placeholder">[Straße Hausnummer, PLZ Ort]</span></p>
+    <span class="label">E-Mail</span>
+    <p><span class="placeholder">[deine@email.de]</span></p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2>2. Welche Daten wir speichern</h2>
+    <p>Wir speichern ausschließlich die folgenden personenbezogenen Daten, die ihr beim Registrieren und Nutzen der App aktiv angegeben habt:</p>
+
+    <span class="label">Accountdaten (über Supabase Auth)</span>
+    <span class="tag">E-Mail-Adresse</span>
+    <span class="tag">Passwort (gehashed)</span>
+    <span class="tag">Benutzername</span>
+
+    <span class="label">Nutzungsdaten</span>
+    <span class="tag">Namen-Einträge im Rad</span>
+
+    <p style="margin-top:1rem;">Es werden keine Tracking-Cookies, Werbenetzwerke oder Analyse-Tools eingesetzt.</p>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2>3. Zweck der Verarbeitung</h2>
+    <p>Wir verarbeiten eure Daten ausschließlich zum Betrieb der Anwendung:</p>
+    <ul>
+      <li>Authentifizierung und Account-Verwaltung</li>
+      <li>Speicherung eurer Rad-Einträge pro Nutzer</li>
+      <li>Sicherheit und Missbrauchsprävention</li>
+    </ul>
+    <p>Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).</p>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2>4. Drittanbieter – Supabase</h2>
+    <p>Wir nutzen <strong>Supabase</strong> (Supabase Inc., 970 Trestle Glen Rd, Oakland, CA 94610, USA) als Datenbank- und Authentifizierungsdienst. Eure Accountdaten werden auf Supabase-Servern gespeichert.</p>
+    <p>Supabase ist nach dem EU-US Data Privacy Framework zertifiziert. Weitere Informationen findet ihr in der <a href="https://supabase.com/privacy" target="_blank" style="color:var(--accent)">Supabase Datenschutzerklärung</a>.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2>5. Drittanbieter – Vercel</h2>
+    <p>Diese Website wird über <strong>Vercel</strong> (Vercel Inc., 340 Pine Street Suite 701, San Francisco, CA 94104, USA) gehostet. Beim Aufruf der Website werden technisch bedingt Server-Logs erstellt (IP-Adresse, Zeitstempel, aufgerufene URL). Diese werden von Vercel kurzzeitig gespeichert und nicht von uns ausgewertet.</p>
+    <p>Weitere Informationen: <a href="https://vercel.com/legal/privacy-policy" target="_blank" style="color:var(--accent)">Vercel Datenschutzerklärung</a>.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2>6. Speicherdauer</h2>
+    <p>Eure Daten werden gespeichert solange euer Account aktiv ist. Nach einer Account-Löschung werden alle personenbezogenen Daten innerhalb von <span class="placeholder">[30 Tage – anpassen]</span> gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <h2>7. Eure Rechte (DSGVO Art. 15–21)</h2>
+    <p>Ihr habt jederzeit das Recht auf:</p>
+    <ul>
+      <li><strong>Auskunft</strong> über eure gespeicherten Daten (Art. 15)</li>
+      <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16)</li>
+      <li><strong>Löschung</strong> eurer Daten ("Recht auf Vergessenwerden", Art. 17)</li>
+      <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18)</li>
+      <li><strong>Datenübertragbarkeit</strong> (Art. 20)</li>
+      <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21)</li>
+    </ul>
+    <p>Anfragen bitte an: <span class="placeholder">[deine@email.de]</span></p>
+    <p>Ihr habt außerdem das Recht, euch bei der zuständigen Aufsichtsbehörde zu beschweren. In NRW ist das der <a href="https://www.ldi.nrw.de" target="_blank" style="color:var(--accent)">Landesbeauftragte für Datenschutz und Informationsfreiheit NRW</a>.</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <h2>8. Änderungen</h2>
+    <p>Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen. Die jeweils aktuelle Version findet ihr auf dieser Seite.</p>
+    <span class="label">Stand</span>
+    <p><span class="placeholder">[Datum eintragen]</span></p>
+  </section>
+</main>
+
+<footer>
+  <a href="/impressum.html">Impressum</a> &nbsp;·&nbsp;
+  Family Guy Wheel of Fortune
+</footer>
+
+</body>
+</html>

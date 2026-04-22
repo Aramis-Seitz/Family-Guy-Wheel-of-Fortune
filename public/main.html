@@ -18,6 +18,19 @@
     <button class="spin-btn" id="spin-right-btn" onclick="getRandomNumber_right()">SPIN RIGHT</button>
     <button id="reset-btn" onclick="resetWheelRotation()">RESET</button>
     <button class="share-btn" id="shareBtn">Share >3</button>
+    <button class="inventory-btn" id="inventoryBtn">INVENTORY</button>
+
+    <dialog id="inventoryModal" >
+        <div id="inventoryInner">
+            <div id="inventoryHeader">
+                <h2>Inventory</h2>
+                <button id="inventoryCloseBtn">✕</button>
+            </div>
+            <div id="inventoryBody">
+
+            </div>
+        </div>
+    </dialog>
 
     <div id="userArea"
         style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">
@@ -58,7 +71,7 @@
                 <h2>🎉 Winner!</h2>
                 <p id="winnerText">-</p>
                 <button id="closeModal">OK</button>
-                <button id="removeWinner">Remove Winner</button>
+                <button id="removeWinner">REMOVE</button>
             </div>
         </div>
 

@@ -7,6 +7,8 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         main: resolve(__dirname, 'main.html'),
+        DaS: resolve(__dirname, 'datenschutz.html'),
+        Imp: resolve(__dirname, 'impressum.html')
       },
     },
   },

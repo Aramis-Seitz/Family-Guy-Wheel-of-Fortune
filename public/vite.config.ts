@@ -8,6 +8,8 @@ export default defineConfig({
         index: resolve(__dirname, 'index.html'),
         main: resolve(__dirname, 'main.html'),
         DaS: resolve(__dirname, 'datenschutz.html'),
+        login: resolve(__dirname, 'login.html'),
+        signup: resolve(__dirname, 'signup.html'),
         Imp: resolve(__dirname, 'impressum.html')
       },
     },

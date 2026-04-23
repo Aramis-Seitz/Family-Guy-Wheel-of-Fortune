@@ -18,3 +18,7 @@ export const inventoryModal = document.getElementById("inventoryModal") as HTMLD
 export const inventoryContent = document.getElementById("inventoryContent") as HTMLDivElement;
 export const addItemModal = document.getElementById("addItemModal") as HTMLDialogElement;
 export const inventoryGrid = document.querySelector(".inventory-grid") as HTMLElement;
+export const addItemInput = document.getElementById("addItemInput") as HTMLInputElement;
+export const confirmAddItemBtn = document.getElementById("confirmAddItemBtn") as HTMLButtonElement;
+export const cancelAddItemBtn = document.getElementById("cancelAddItemBtn") as HTMLButtonElement;
+export const closeAddItemBtn = document.getElementById("closeAddItemBtn") as HTMLButtonElement;

@@ -15,7 +15,7 @@ export async function initProfileUI(): Promise<void> {
     profileNameElement.textContent = 'Nicht eingeloggt';
     authButton.textContent = 'Login';
     authButton.onclick = () => {
-      window.location.href = '/';
+      window.location.href = '/login.html';
     };
     return;
   }
@@ -38,6 +38,6 @@ export async function initProfileUI(): Promise<void> {
   authButton.textContent = 'Logout';
   authButton.onclick = async () => {
     await fetch('/api/logout', { method: 'POST' });
-    window.location.href = '/index.html';
+    window.location.href = '/login.html';
   };
 }

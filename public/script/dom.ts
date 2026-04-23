@@ -15,3 +15,6 @@ export const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement
 export const inventoryBtn = document.getElementById("inventoryBtn") as HTMLButtonElement;
 export const inventoryCloseBtn = document.getElementById("inventoryCloseBtn") as HTMLButtonElement;
 export const inventoryModal = document.getElementById("inventoryModal") as HTMLDialogElement;
+export const inventoryContent = document.getElementById("inventoryContent") as HTMLDivElement;
+export const addItemModal = document.getElementById("addItemModal") as HTMLDialogElement;
+export const inventoryGrid = document.querySelector(".inventory-grid") as HTMLElement;

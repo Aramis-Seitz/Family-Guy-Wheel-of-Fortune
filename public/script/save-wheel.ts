@@ -44,8 +44,8 @@ export function saveWheelDB(): void {
             .insert([
                 {
                     user_id: user.id,
-                    item_name: itemName,
-                    share_link: link
+                    link_name: itemName,
+                    url: link
                 }
             ]);
 

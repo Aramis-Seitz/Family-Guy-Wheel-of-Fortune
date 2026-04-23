@@ -46,9 +46,9 @@ function getRandomNumber_right(): void {
 (window as any).generateWheel = () => generateWheel(getNames());
 (window as any).resetWheelRotation = resetWheelRotation;
 
-if (sessionStorage.getItem('isAuthenticated') !== 'true') {
-  window.location.href = '/';
-}
+//if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+//  window.location.href = '/';
+//}
 
 initExistingItems();
 syncRemoveButtons();

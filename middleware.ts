@@ -1,5 +1,5 @@
 export const config = {
-  matcher: ['/main.html'],
+  matcher: ['/login.html'],
 };
 declare const process: {
   env: {

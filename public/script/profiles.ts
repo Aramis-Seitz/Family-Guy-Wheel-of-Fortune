@@ -37,7 +37,7 @@ export async function initProfileUI(): Promise<void> {
 
   authButton.textContent = 'Logout';
   authButton.onclick = async () => {
-    await supabaseClient.auth.signOut();
-    window.location.href = '/';
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.href = '/index.html';
   };
 }

@@ -21,9 +21,7 @@ if (loginForm) {
     try {
       const response = await fetch('/api/basic-auth', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
@@ -34,8 +32,6 @@ if (loginForm) {
         return;
       }
 
-      showMessage('Login erfolgreich!');
-      sessionStorage.setItem('isAuthenticated', 'true');
       window.location.href = '/main.html';
     } catch (error) {
       console.error('Login request failed:', error);

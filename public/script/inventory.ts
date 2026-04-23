@@ -1,4 +1,3 @@
-
 import {
   inventoryBtn,
   inventoryCloseBtn,
@@ -60,6 +59,7 @@ function renderGrid(): void {
 
     if (i === 0) {
       slot.classList.add("add");
+      slot.textContent = "+";
       slot.setAttribute("role", "button");
       slot.setAttribute("tabindex", "0");
       slot.addEventListener("click", () => openAddItemModal());
@@ -85,26 +85,19 @@ export function inventory(): void {
   inventoryCloseBtn.addEventListener("click", () => inventoryModal.close());
 
   inventoryModal.addEventListener("click", (e) => {
-    const rect = inventoryModal.getBoundingClientRect();
-    const outside =
-      e.clientX < rect.left || e.clientX > rect.right ||
-      e.clientY < rect.top  || e.clientY > rect.bottom;
-    if (outside) inventoryModal.close();
+    const inner = inventoryModal.querySelector(".inventory-content");
+    if (inner && !inner.contains(e.target as Node)) inventoryModal.close();
   });
 
   confirmAddItemBtn.addEventListener("click", submitItem);
-  cancelAddItemBtn.addEventListener("click",  closeAddItemModal);
-  closeAddItemBtn.addEventListener("click",   closeAddItemModal);
+  cancelAddItemBtn.addEventListener("click", closeAddItemModal);
+  closeAddItemBtn.addEventListener("click", closeAddItemModal);
 
   addItemInput.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Enter") { e.preventDefault(); submitItem(); }
   });
 
   addItemModal.addEventListener("click", (e) => {
-    const rect = addItemModal.getBoundingClientRect();
-    const outside =
-      e.clientX < rect.left || e.clientX > rect.right ||
-      e.clientY < rect.top  || e.clientY > rect.bottom;
-    if (outside) closeAddItemModal();
+    if (e.target === addItemModal) closeAddItemModal();
   });
 }

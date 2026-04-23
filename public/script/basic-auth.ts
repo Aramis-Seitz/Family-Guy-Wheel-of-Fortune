@@ -31,7 +31,7 @@ if (loginForm) {
         showMessage(result.message ?? 'Login fehlgeschlagen.');
         return;
       }
-      window.location.href = '/login.html';
+      window.location.href = '/main.html';
     } catch (error) {
       console.error('Login request failed:', error);
       showMessage('Netzwerkfehler. Bitte später erneut versuchen.');

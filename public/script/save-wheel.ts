@@ -40,7 +40,7 @@ export function saveWheelDB(): void {
         const link = generateShareLink();
 
         const { error } = await supabaseClient
-            .from("saved_wheels")
+            .from("saved_links")
             .insert([
                 {
                     user_id: user.id,

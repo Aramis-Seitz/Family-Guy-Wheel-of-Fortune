@@ -32,14 +32,6 @@ app.get("/api/random", (req, res) => {
 
 });
 
-
-// Fallback: index.html laden
-
-app.get("*", (req, res) => {
-
-    res.sendFile(path.join(frontendPath, "index.html"));
-
-});
  
 app.listen(PORT, () => {
 

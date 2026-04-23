@@ -1,4 +1,4 @@
-const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
+const addItemBody = document.getElementById('loginForm') as HTMLFormElement | null;
 const loginUserInput = document.getElementById('loginUser') as HTMLInputElement | null;
 const loginPasswordInput = document.getElementById('loginPassword') as HTMLInputElement | null;
 
@@ -6,8 +6,8 @@ function showMessage(message: string): void {
   alert(message);
 }
 
-if (loginForm) {
-  loginForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
+if (addItemBody) {
+  addItemBody.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
     event.preventDefault();
 
     if (!loginUserInput || !loginPasswordInput) {

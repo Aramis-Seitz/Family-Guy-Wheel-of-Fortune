@@ -3,6 +3,8 @@ import { initShareFeature } from "./share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import { initProfileUI } from "./profiles.js";
 import { inventory } from "./inventory.js";
+import { saveWheelDB } from "./save-wheel.js";
+
 
 import {
   addName,
@@ -48,7 +50,7 @@ function getRandomNumber_right(): void {
 
 //if (sessionStorage.getItem('isAuthenticated') !== 'true') {
 //  window.location.href = '/';
-//}
+//} entfernt weil sonst loop
 
 initExistingItems();
 syncRemoveButtons();
@@ -60,3 +62,4 @@ initShareFeature();
 setupWinnerModal();
 initProfileUI();
 inventory();
+saveWheelDB

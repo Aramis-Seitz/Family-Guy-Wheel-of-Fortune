@@ -22,6 +22,7 @@ async function getCurrentUser() {
 }
 
 export function saveWheelDB(): void {
+    console.log("saveWheelDB() wurde aufgerufen");
     confirmAddItemBtn?.addEventListener("click", async () => {
         const user = await getCurrentUser();
 

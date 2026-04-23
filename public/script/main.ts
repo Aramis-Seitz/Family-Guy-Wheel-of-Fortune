@@ -19,7 +19,7 @@ import { generateWheel } from "./wheel-renderer.js";
 import { setupWinnerModal } from "./winner.js";
 import { supabaseClient } from './supabase-client.js';
 
-
+console.log("1main.ts gestartet");
 const { data: { session } } = await supabaseClient.auth.getSession();
 
 if (!session) {
@@ -62,4 +62,5 @@ initShareFeature();
 setupWinnerModal();
 initProfileUI();
 inventory();
-saveWheelDB
+console.log("2main.ts gestartet");
+saveWheelDB();

@@ -3,49 +3,51 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login & Registration!</title>
+    <title>Signup</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/logo.png" />
     <link rel="stylesheet" href="./auth_style.css">
 </head>
 <body>
-<div class="wrapper"> 
-    <input type="checkbox" id="check" class="hidden-checkbox" aria-hidden="true" />
-
+<div class="wrapper">
     <main>
-        <section aria-label="Signup Form" class="form-wrapper signup">
-            <form action="#" id="signupForm">
+        <section aria-label="Signup Form" class="form-wrapper">
+            <form id="signupForm">
                 <h2>Signup</h2>
+
                 <div class="input-field">
                     <label for="signupUser">Username</label>
                     <input type="text" id="signupUser" required />
                 </div>
+
                 <div class="input-field">
                     <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" required aria-required="true" />
+                    <input type="email" id="signupEmail" required />
                 </div>
+
                 <div class="input-field">
                     <label for="signupPassword">Passwort</label>
-                    <input type="password" id="signupPassword" required aria-required="true" />
+                    <input type="password" id="signupPassword" required />
                 </div>
-                <div class="input-field">
-                    <label for="signupConfirmPassword">confirm Passwort</label>
-                    <input type="password" id="signupConfirmPassword" required aria-required="true" />
-                </div>
-                <button type="submit">Log In</button>
-                <div class="register">
-                    <a href="./login.html">Sign Up</a>
-                    <p>Already have an account?</p>
-                </div>
-    <div class="Rechtliches">
 
-        <a href="./impressum.html" class="btn-ImP">Impressum</a>
-        <a href="./datenschutz.html" class="btn-DaS">Datenschutz</a>
-    </div>
+                <div class="input-field">
+                    <label for="signupConfirmPassword">Confirm Passwort</label>
+                    <input type="password" id="signupConfirmPassword" required />
+                </div>
+
+                <button type="submit">Sign Up</button>
+
+                <div class="register">
+                    <p>Already have an account? <a href="/login.html">Login</a></p>
+                </div>
+
+                <div class="Rechtliches">
+                    <a href="/impressum.html" class="btn-ImP">Impressum</a>
+                    <a href="/datenschutz.html" class="btn-DaS">Datenschutz</a>
+                </div>
             </form>
         </section>
     </main>
 </div>
-
 
 <script type="module" src="dist/script/auth.js"></script>
 </body>

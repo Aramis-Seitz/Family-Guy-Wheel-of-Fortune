@@ -195,6 +195,136 @@ img {
     font-weight: 300;
 }
 
+#addItemModal {
+    border: none;
+    border-radius: 14px;
+    background: #1a1f2e;
+    color: #fff;
+    padding: 0;
+    width: min(380px, 92vw);
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#addItemModal::backdrop {
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(3px);
+}
+
+#addItemInner {
+    display: flex;
+    flex-direction: column;
+}
+
+#addItemHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+#addItemHeader h3 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+#closeAddItemBtn {
+    background: none;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #aaa;
+    padding: 3px 10px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+}
+
+#closeAddItemBtn:hover {
+    color: #fff;
+    border-color: #888;
+}
+
+#addItemBody {
+    padding: 20px;
+}
+
+.add-item-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.add-item-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #888;
+}
+
+#addItemInput {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 15px;
+    color: #fff;
+    width: 100%;
+    outline: none;
+    font-family: 'Segoe UI', sans-serif;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+#addItemInput:focus {
+    border-color: #00a2ff;
+    box-shadow: 0 0 0 3px rgba(0,162,255,.18);
+}
+
+#addItemFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+#cancelAddItemBtn {
+    background: none;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #aaa;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    transition: all .15s;
+}
+
+#cancelAddItemBtn:hover {
+    color: #fff;
+    border-color: #888;
+}
+
+#confirmAddItemBtn {
+    background: #00a2ff;
+    color: #111;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    transition: filter .15s, transform .15s;
+}
+
+#confirmAddItemBtn:hover  { filter: brightness(1.1); transform: translateY(-1px); }
+#confirmAddItemBtn:active { transform: translateY(0); }
+
 .share-btn:hover {
 
     background-color: #E20074;

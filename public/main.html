@@ -45,8 +45,13 @@
             </div>
             <div id="addItemBody">
                 <div class="add-item-form-group">
-                    <input type="text" id="addItemInput" placeholder="z.B. Urlaub">
+                    <label class="add-item-label" for="addItemInput">Name</label>
+                    <input type="text" id="addItemInput" placeholder="z.B. Mathenoten" autocomplete="off">
                 </div>
+            </div>
+            <div id="addItemFooter">
+                <button id="cancelAddItemBtn" type="button">Abbrechen</button>
+                <button id="confirmAddItemBtn" type="button">Hinzufügen</button>
             </div>
         </div>
     </dialog>

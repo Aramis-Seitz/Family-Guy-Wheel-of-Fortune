@@ -62,7 +62,7 @@ async function loadInventory(): Promise<void> {
 
   const { data, error } = await supabaseClient
     .schema("public")
-    .from("save_links")
+    .from("saved_links")
     .select(`
       id,
       title:link_name,

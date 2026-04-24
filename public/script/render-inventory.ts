@@ -3,7 +3,7 @@ import { supabaseClient } from "./supabase-client.js";
 type InventoryItem = {
   id: number;
   title: string;
-  link?: string | null;
+  link: string | null;
 };
 
 const inventoryGrid = document.getElementById("inventoryGrid") as HTMLDivElement | null;
@@ -25,7 +25,7 @@ function renderInventory(items: InventoryItem[]): void {
       continue;
     }
 
-    const hasValidLink = typeof item.link === "string" && item.link.trim() !== "";
+    const hasValidLink = item.link !== null && item.link.trim() !== "";
 
     const card = hasValidLink
       ? document.createElement("a")
@@ -33,7 +33,7 @@ function renderInventory(items: InventoryItem[]): void {
 
     card.classList.add("inventory-card");
 
-    if (hasValidLink && card instanceof HTMLAnchorElement) {
+    if (card instanceof HTMLAnchorElement) {
       card.href = item.link!;
       card.target = "_blank";
       card.rel = "noopener noreferrer";
@@ -50,7 +50,13 @@ function renderInventory(items: InventoryItem[]): void {
 }
 
 async function loadInventory(): Promise<void> {
-  const { data: userData } = await supabaseClient.auth.getUser();
+  const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+  if (userError) {
+    console.error("Fehler beim User laden:", userError);
+    renderInventory([]);
+    return;
+  }
 
   const user = userData.user;
 
@@ -61,7 +67,6 @@ async function loadInventory(): Promise<void> {
   }
 
   const { data, error } = await supabaseClient
-    .schema("public")
     .from("saved_links")
     .select(`
       id,
@@ -74,8 +79,11 @@ async function loadInventory(): Promise<void> {
 
   if (error) {
     console.error("Fehler beim Laden:", error);
+    renderInventory([]);
     return;
   }
+
+  console.log("Geladene Links:", data);
 
   renderInventory(data ?? []);
 }

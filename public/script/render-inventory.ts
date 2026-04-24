@@ -1,7 +1,7 @@
 import { supabaseClient } from "./supabase-client.js";
 
 type InventoryItem = {
-  id: number;
+  id: string;
   title: string;
   link: string | null;
 };
@@ -24,11 +24,6 @@ function renderInventory(items: InventoryItem[]): void {
       inventoryGrid.appendChild(emptyCard);
       continue;
     }
-    const addCard = document.createElement("div");
-    addCard.className = "inventory-card add";
-    addCard.id = "addCardBtn";
-    addCard.textContent = "+";
-    inventoryGrid.appendChild(addCard);
 
     const hasValidLink = item.link !== null && item.link.trim() !== "";
 
@@ -52,6 +47,12 @@ function renderInventory(items: InventoryItem[]): void {
 
     inventoryGrid.appendChild(card);
   }
+
+  const addCard = document.createElement("div");
+  addCard.className = "inventory-card add";
+  addCard.id = "addCardBtn";
+  addCard.textContent = "+";
+  inventoryGrid.appendChild(addCard);
 }
 
 async function loadInventory(): Promise<void> {
@@ -79,7 +80,7 @@ async function loadInventory(): Promise<void> {
       link:url
     `)
     .eq("user_id", user.id)
-    .order("id", { ascending: true })
+    .order("created_at", { ascending: true })
     .limit(12);
 
   if (error) {

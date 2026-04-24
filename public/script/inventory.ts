@@ -66,7 +66,7 @@ function renderInventory(items: InventoryItem[]): void {
       } else {
         const emptyCard = document.createElement("div");
         emptyCard.className = "inventory-card empty";
-        emptyCard.textContent = "Leer";
+        emptyCard.textContent = "";
         inventoryGrid.appendChild(emptyCard);
       }
 

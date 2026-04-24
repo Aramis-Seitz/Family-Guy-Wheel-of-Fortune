@@ -82,6 +82,7 @@ function startConfetti(): void {
 }
 
 async function awardCoins(spinToken: string, winnerName: string): Promise<void> {
+  if (!spinToken) return;
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
 

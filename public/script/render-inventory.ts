@@ -61,7 +61,7 @@ async function loadInventory(): Promise<void> {
   }
 
   const { data, error } = await supabaseClient
-    .schema("profiles")
+    .schema("public")
     .from("save_links")
     .select(`
       id,

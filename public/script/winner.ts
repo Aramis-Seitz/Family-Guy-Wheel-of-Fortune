@@ -1,6 +1,7 @@
 import { getNames, removeNameByIndex } from "./name-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { currentRotation, resetWheelRotation } from "./wheel-spin.js";
+import { supabaseClient } from "./supabase-client.js";
 
 export function getWinningSegmentIndex(segmentCount: number): number {
   const normalizedRotation = ((currentRotation % 360) + 360) % 360;
@@ -80,9 +81,27 @@ function startConfetti(): void {
   }, 3000);
 }
 
+async function awardCoins(spinToken: string, winnerName: string): Promise<void> {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+
+  try {
+    await fetch('/api/award-coins', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ spinToken, winnerName }),
+    });
+  } catch (err) {
+    console.error('Failed to award coins:', err);
+  }
+}
+
 let lastWinnerIndex: number = -1;
 
-export function announceWinner(segmentCount: number): void {
+export function announceWinner(segmentCount: number, spinToken: string): void {
   stopDrumRoll();
 
   lastWinnerIndex = getWinningSegmentIndex(segmentCount);
@@ -91,6 +110,7 @@ export function announceWinner(segmentCount: number): void {
 
   displayWinner(winnerName);
   startConfetti();
+  awardCoins(spinToken, winnerName);
 }
 
 export function setupWinnerModal(): void {

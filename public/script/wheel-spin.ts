@@ -87,7 +87,7 @@ function performSpinStep(step: number, config: SpinConfig): void {
   lastTickRotation = currentRotation;
   if (step >= config.totalSteps) {
     playCymbalCrash();
-    announceWinner(config.segmentCount);
+    announceWinner(config.segmentCount, config.spinToken);
     return;
   }
 
@@ -96,7 +96,7 @@ function performSpinStep(step: number, config: SpinConfig): void {
   setTimeout(() => performSpinStep(step, config), delay);
 }
 
-export function spinWheel(totalSteps: number, direction: Direction): void {
+export function spinWheel(totalSteps: number, direction: Direction, spinToken: string): void {
   spinCancelled = false;
   const segmentCount = getSegmentCount();
   if (segmentCount < 2) return;
@@ -106,6 +106,7 @@ export function spinWheel(totalSteps: number, direction: Direction): void {
     direction,
     stepAngle: 360 / segmentCount,
     segmentCount,
+    spinToken,
   };
 
   performSpinStep(0, config);
@@ -119,11 +120,11 @@ function logSpinDetails(ranNum: number, multiplier: number, boostedValue: number
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
   try {
-    const ranNum = await fetchRandomNumber();
+    const { ranNum, spinToken } = await fetchRandomNumber();
     const multiplier = getMultiplier();
     const boostedRanNum = ranNum * multiplier;
     logSpinDetails(ranNum, multiplier, boostedRanNum);
-    spinWheel(boostedRanNum, direction);
+    spinWheel(boostedRanNum, direction, spinToken);
     disableElements(getSpinRelatedElements());
   } catch (error) {
     console.error("Error while getting random value:", error);

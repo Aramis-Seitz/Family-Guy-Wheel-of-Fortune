@@ -9,6 +9,13 @@ function createServiceClient() {
 }
 
 export default async function handler(req, res) {
+    const ranNum = getSecureRandomNumber(360, 900);
+ 
+  // Wenn Env-Vars nicht gesetzt: Rad funktioniert, aber keine Coins
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return res.status(200).json({ ranNum, spinToken: '' });
+  }
+  
   const authHeader = req.headers['authorization'] ?? '';
   const jwt = authHeader.replace(/^Bearer\s+/, '');
 

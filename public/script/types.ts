@@ -7,6 +7,7 @@ export interface Point {
 
 export interface RandomResponse {
   ranNum: number;
+  spinToken: string;
 }
 
 export interface SpinConfig {
@@ -14,4 +15,5 @@ export interface SpinConfig {
   direction: Direction;
   stepAngle: number;
   segmentCount: number;
+  spinToken: string;
 }

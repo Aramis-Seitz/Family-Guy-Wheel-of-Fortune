@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getSecureRandomNumber } from "./utils/random";
 
 const app = express();
@@ -22,7 +22,7 @@ function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-async function addCoins(supabase: ReturnType<typeof createClient>, userId: string, amount: number): Promise<void> {
+async function addCoins(supabase: SupabaseClient, userId: string, amount: number): Promise<void> {
   const { data: profile } = await supabase
     .from('profiles')
     .select('coins')

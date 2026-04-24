@@ -24,6 +24,11 @@ function renderInventory(items: InventoryItem[]): void {
       inventoryGrid.appendChild(emptyCard);
       continue;
     }
+    const addCard = document.createElement("div");
+    addCard.className = "inventory-card add";
+    addCard.id = "addCardBtn";
+    addCard.textContent = "+";
+    inventoryGrid.appendChild(addCard);
 
     const hasValidLink = item.link !== null && item.link.trim() !== "";
 

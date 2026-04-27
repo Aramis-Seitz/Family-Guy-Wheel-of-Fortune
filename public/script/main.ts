@@ -3,8 +3,6 @@ import { initShareFeature } from "./share-name-list.js";
 import { spinWheelWithRandomSteps, resetWheelRotation, initMultiplierSlider } from "./wheel-spin.js";
 import { initProfileUI } from "./profiles.js";
 import { inventory } from "./inventory.js";
-import { saveWheelDB } from "./save-wheel.js";
-
 
 import {
   addName,
@@ -63,4 +61,3 @@ setupWinnerModal();
 initProfileUI();
 inventory();
 console.log("2main.ts gestartet");
-saveWheelDB();

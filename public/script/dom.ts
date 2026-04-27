@@ -23,3 +23,7 @@ export const addItemBody = document.getElementById('addItemBody') as HTMLFormEle
 export const confirmAddItemBtn = document.getElementById("confirmAddItemBtn") as HTMLButtonElement;
 export const cancelAddItemBtn = document.getElementById("cancelAddItemBtn") as HTMLButtonElement;
 export const closeAddItemBtn = document.getElementById("closeAddItemBtn") as HTMLButtonElement;
+export const confirmDeleteModal = document.getElementById("confirmDeleteModal") as HTMLDialogElement;
+export const confirmDeleteName = document.getElementById("confirmDeleteName") as HTMLElement;
+export const confirmDeleteBtn = document.getElementById("confirmDeleteBtn") as HTMLButtonElement;
+export const cancelDeleteBtn = document.getElementById("cancelDeleteBtn") as HTMLButtonElement;

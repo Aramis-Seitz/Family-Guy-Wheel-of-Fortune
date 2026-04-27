@@ -9,7 +9,11 @@ import {
   addItemInput,
   confirmAddItemBtn,
   cancelAddItemBtn,
-  closeAddItemBtn
+  closeAddItemBtn,
+  confirmDeleteModal,
+  confirmDeleteName,
+  confirmDeleteBtn,
+  cancelDeleteBtn
 } from "./dom.js";
 
 type InventoryItem = {
@@ -21,6 +25,27 @@ type InventoryItem = {
 const level: number = 12;
 
 let loadedItems: InventoryItem[] = [];
+
+let pendingDeleteId: string | null = null;
+
+function askDelete(id: string, title: string): void {
+  pendingDeleteId = id;
+  confirmDeleteName.textContent = title;
+  confirmDeleteModal.showModal();
+}
+
+async function deleteItem(id: string): Promise<void> {
+  const { error } = await supabaseClient
+    .from("saved_links")
+    .delete()
+    .eq("id", id);
+
+  if (error) { 
+    console.error("Fehler beim Löschen:", error);
+    return; 
+  }
+  await loadInventory();
+}
 
 function openAddItemModal(): void {
   if (!inventoryModal.open) return;
@@ -92,6 +117,19 @@ function renderInventory(items: InventoryItem[]): void {
         <h3>${item.title}</h3>
       </div>
     `;
+
+    if (hasValidLink) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "inventory-delete-btn";
+      deleteBtn.setAttribute("aria-label", "Eintrag löschen");
+      deleteBtn.textContent = "🗑️";
+      deleteBtn.addEventListener("click", (e: MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        askDelete(item.id, item.title);
+      });
+      (card as HTMLElement).appendChild(deleteBtn);
+    }
 
     inventoryGrid.appendChild(card);
   }
@@ -187,6 +225,26 @@ export function inventory(): void {
   addItemModal.addEventListener("click", (e) => {
     if (e.target === addItemModal) {
       closeAddItemModal();
+    }
+  });
+
+confirmDeleteBtn.addEventListener("click", async () => {
+    confirmDeleteModal.close();
+    if (pendingDeleteId) {
+      await deleteItem(pendingDeleteId);
+      pendingDeleteId = null;
+    }
+  });
+
+  cancelDeleteBtn.addEventListener("click", () => {
+    confirmDeleteModal.close();
+    pendingDeleteId = null;
+  });
+
+  confirmDeleteModal.addEventListener("click", (e) => {
+    if (e.target === confirmDeleteModal) {
+      confirmDeleteModal.close();
+      pendingDeleteId = null;
     }
   });
 }

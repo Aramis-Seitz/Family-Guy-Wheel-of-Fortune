@@ -184,12 +184,28 @@ async function submitItem(): Promise<void> {
     return;
   }
 
-  console.log("Neues Item:", name);
+  const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+  if (userError || !userData.user) {
+    console.error("Nicht eingeloggt");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("saved_links")
+    .insert({
+      user_id: userData.user.id,
+      link_name: name,
+      url: null
+    });
+
+  if (error) {
+    console.error("Fehler beim Speichern:", error);
+    return;
+  }
 
   closeAddItemModal();
 
-  // Hier später Supabase Insert einbauen
-  // Danach:
   await loadInventory();
 }
 

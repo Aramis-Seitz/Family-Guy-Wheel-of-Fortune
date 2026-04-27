@@ -44,11 +44,16 @@ export default async function handler(req, res) {
   if (authError || !user) {
     return res.status(401).json({ error: 'Invalid session' });
   }
-
-  const { spinToken, winnerName } = req.body ?? {};
+  const { spinToken, winnerName: rawWinnerName } = req.body ?? {};
+  const winnerName = typeof rawWinnerName === 'string' ? rawWinnerName.trim() : '';
 
   if (!spinToken || !winnerName) {
     return res.status(400).json({ error: 'Missing spinToken or winnerName' });
+  }
+
+  // Server-seitige Validierung: winnerName darf nur Buchstaben und Zahlen enthalten
+  if (!/^[A-Za-z0-9]+$/.test(winnerName)) {
+    return res.status(400).json({ error: 'Invalid winnerName: only letters and numbers allowed' });
   }
 
   // Validate token: must exist, belong to this user, and not yet used

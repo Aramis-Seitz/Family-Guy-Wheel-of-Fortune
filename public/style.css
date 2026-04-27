@@ -1,7 +1,7 @@
 body {
     background-color: black;
     text-align: center;
-    font-family: 'Segoe UI', sans-serif;
+     -family: 'Segoe UI', sans-serif;
     font-size: var(--text-base);
 }
  
@@ -175,6 +175,40 @@ img {
     color: #fff;
     font-size: 15px;
     font-weight: 600;
+    position: relative;
+    text-decoration: none;
+}
+
+.inventory-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 160ms ease, background 160ms ease, transform 120ms ease;
+}
+
+.inventory-card:hover .inventory-delete-btn {
+  opacity: 1;
+}
+
+.inventory-delete-btn:hover {
+  background: rgba(220,38,38,0.25);
+  border-color: rgba(220,38,38,0.5);
+  transform: scale(1.1);
+}
+
+.inventory-delete-btn:active {
+  transform: scale(0.95);
 }
 
 .inventory-card:hover {
@@ -806,3 +840,91 @@ img {
     outline: none;
     border-color: #555;
 }
+
+#confirmDeleteModal {
+  border: none;
+  border-radius: 14px;
+  background: #1a1f2e;
+  color: #fff;
+  padding: 0;
+  width: min(360px, 92vw);
+  box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#confirmDeleteModal::backdrop {
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(3px);
+}
+
+#confirmDeleteInner {
+  display: flex;
+  flex-direction: column;
+}
+
+#confirmDeleteHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+#confirmDeleteHeader h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+#confirmDeleteBody {
+  padding: 20px;
+  font-size: 0.9rem;
+  color: #aaa;
+  line-height: 1.5;
+}
+
+#confirmDeleteBody strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+#confirmDeleteFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+#cancelDeleteBtn {
+  background: none;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #aaa;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+#cancelDeleteBtn:hover {
+  color: #fff;
+  border-color: #888;
+}
+
+#confirmDeleteBtn {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: filter .15s, transform .15s;
+}
+
+#confirmDeleteBtn:hover  { filter: brightness(1.15); transform: translateY(-1px); }
+#confirmDeleteBtn:active { transform: translateY(0); }

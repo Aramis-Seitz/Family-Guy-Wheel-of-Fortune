@@ -101,6 +101,29 @@ export function addName(rawName: string): void {
   const name = rawName.trim();
   if (!name) return;
 
+  // Entferne vorherige Validierungs-Markierung
+  if (input) input.classList.remove("invalid");
+
+  // Client-seitige Validierung: nur Buchstaben und Zahlen erlauben
+  const isAlphanumeric = /^[A-Za-z0-9]+$/.test(name);
+  if (!isAlphanumeric) {
+    // Visuelle Rückmeldung am Input
+    if (input) {
+      input.classList.add("invalid");
+      input.focus();
+    }
+
+    // Fehlerhinweis anzeigen
+    if (errorHint) {
+      errorHint.textContent = "Nur Buchstaben und Zahlen erlaubt.";
+      errorHint.classList.remove("hidden");
+      if (errorTimer) clearTimeout(errorTimer);
+      errorTimer = setTimeout(() => errorHint.classList.add("hidden"), 2000);
+    }
+
+    return;
+  }
+
   const li = document.createElement("li") as HTMLLIElement;
   li.className = "name-item";
 

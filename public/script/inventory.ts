@@ -228,7 +228,7 @@ export function inventory(): void {
     }
   });
 
-confirmDeleteBtn.addEventListener("click", async () => {
+  confirmDeleteBtn.addEventListener("click", async () => {
     confirmDeleteModal.close();
     if (pendingDeleteId) {
       await deleteItem(pendingDeleteId);

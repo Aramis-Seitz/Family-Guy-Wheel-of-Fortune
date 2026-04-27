@@ -1,7 +1,7 @@
 body {
     background-color: black;
     text-align: center;
-     -family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     font-size: var(--text-base);
 }
  
@@ -166,8 +166,8 @@ img {
 .inventory-card {
     height: 100%;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 162, 255, 0.18);
+    border: 1px solid rgba(0, 162, 255, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -212,12 +212,12 @@ img {
 }
 
 .inventory-card:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 162, 255, 0.28);
     transform: translateY(-2px);
 }
 
 .inventory-card.add {
-    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border: 2px dashed rgba(0, 162, 255, 0.25);
     color: #aaa;
     font-size: 42px;
     font-weight: 300;
@@ -230,6 +230,16 @@ img {
     color: #00a2ff;
     background: rgba(0, 162, 255, 0.07);
     transform: translateY(-2px);
+}
+
+.inventory-card.empty {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.07);
+}
+
+.inventory-card.empty:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 #addItemModal {

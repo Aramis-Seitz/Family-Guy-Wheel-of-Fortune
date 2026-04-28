@@ -24,7 +24,7 @@ export async function initProfileUI(): Promise<void> {
 
   const { data: profile, error: profileError } = await supabaseClient
     .from('profiles')
-    .select('username')
+    .select('username, coins')
     .eq('id', user.id)
     .single();
 
@@ -33,6 +33,12 @@ export async function initProfileUI(): Promise<void> {
     profileNameElement.textContent = 'Eingeloggt';
   } else {
     profileNameElement.textContent = profile.username;
+
+    const coinDisplay = document.getElementById('coinDisplay') as HTMLSpanElement | null;
+    if (coinDisplay) {
+      coinDisplay.textContent = `🪙 ${profile.coins ?? 0}`;
+      coinDisplay.style.display = 'inline';
+    }
   }
 
   authButton.textContent = 'Logout';

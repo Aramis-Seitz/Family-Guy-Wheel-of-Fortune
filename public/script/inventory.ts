@@ -1,5 +1,5 @@
 import { supabaseClient } from "./supabase-client.js";
-
+import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "./constants.js";
 import {
   inventoryBtn,
   inventoryCloseBtn,
@@ -40,9 +40,9 @@ async function deleteItem(id: string): Promise<void> {
     .delete()
     .eq("id", id);
 
-  if (error) { 
+  if (error) {
     console.error("Fehler beim Löschen:", error);
-    return; 
+    return;
   }
   await loadInventory();
 }
@@ -112,11 +112,20 @@ function renderInventory(items: InventoryItem[]): void {
       card.rel = "noopener noreferrer";
     }
 
-    card.innerHTML = `
-      <div class="inventory-card-content">
-        <h3>${item.title}</h3>
-      </div>
-    `;
+    const content = document.createElement("div");
+    content.className = "inventory-card-content";
+
+    const names = extractNamesFromLink(item.link);
+
+    if (names.length >= 2) {
+      const miniWheel = createMiniWheel(names, 65);
+    }
+    
+    const title = document.createElement("h3");
+    title.textContent = item.title;
+
+    content.appendChild(title);
+    card.appendChild(content);
 
     if (hasValidLink) {
       const deleteBtn = document.createElement("button");
@@ -263,4 +272,83 @@ export function inventory(): void {
       pendingDeleteId = null;
     }
   });
+}
+
+function extractNamesFromLink(link: string | null): string[] {
+  if (!link) return [];
+
+  try {
+    const url = new URL(link);
+    const params = new URLSearchParams(url.search);
+    const namesParam = params.get("names");
+
+    if (!namesParam) return [];
+
+    const names = JSON.parse(decodeURIComponent(namesParam));
+
+    if (!Array.isArray(names)) return [];
+
+    return names.filter(n => typeof n === "string" && n.trim());
+  } catch {
+    return [];
+  }
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+const MINI_CENTER = { x: 100, y: 100 };
+const MINI_RADIUS = 90;
+
+function getMiniPoint(center: { x: number; y: number }, radius: number, angle: number) {
+  return {
+    x: center.x + radius * Math.cos(angle - Math.PI / 2),
+    y: center.y + radius * Math.sin(angle - Math.PI / 2),
+  };
+}
+
+function getMiniColor(index: number): string {
+  return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+}
+
+function createMiniSegment(index: number, count: number): SVGPathElement {
+  const angleStep = FULL_CIRCLE_RADIANS / count;
+  const start = index * angleStep;
+  const end = (index + 1) * angleStep;
+
+  const p1 = getMiniPoint(MINI_CENTER, MINI_RADIUS, start);
+  const p2 = getMiniPoint(MINI_CENTER, MINI_RADIUS, end);
+
+  const largeArc = angleStep > Math.PI ? 1 : 0;
+
+  const path = document.createElementNS(SVG_NS, "path");
+
+  path.setAttribute(
+    "d",
+    `M ${MINI_CENTER.x} ${MINI_CENTER.y}
+     L ${p1.x} ${p1.y}
+     A ${MINI_RADIUS} ${MINI_RADIUS} 0 ${largeArc} 1 ${p2.x} ${p2.y}
+     Z`
+  );
+
+  path.setAttribute("fill", getMiniColor(index));
+  path.setAttribute("stroke", "black");
+  path.setAttribute("stroke-width", "0.5");
+
+  return path;
+}
+
+function createMiniWheel(names: string[], size = 70): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, "svg");
+
+  svg.setAttribute("width", String(size));
+  svg.setAttribute("height", String(size));
+  svg.setAttribute("viewBox", "0 0 200 200");
+
+  if (names.length < 2) return svg;
+
+  names.forEach((_, i) => {
+    svg.appendChild(createMiniSegment(i, names.length));
+  });
+
+  return svg;
 }

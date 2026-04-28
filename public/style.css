@@ -242,6 +242,25 @@ img {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.inventory-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-card-content svg {
+  width: 65px;
+  height: 65px;
+  margin-bottom: 6px;
+}
+
+.inventory-card h3 {
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+}
+
 #addItemModal {
     border: none;
     border-radius: 14px;

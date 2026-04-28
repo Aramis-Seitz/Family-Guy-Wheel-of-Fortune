@@ -10,7 +10,7 @@ const MIN_ROTATION_DEGREE = 140;
 const MAX_ROTATION_DEGREE = 900;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../../public")));
+app.use(express.static(path.join(__dirname, "../../public/dist")));
 
 function createServiceClient() {
   return createClient(

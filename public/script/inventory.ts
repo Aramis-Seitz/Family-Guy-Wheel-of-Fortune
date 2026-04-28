@@ -15,6 +15,7 @@ import {
   confirmDeleteBtn,
   cancelDeleteBtn
 } from "./dom.js";
+import { generateShareLink } from "./share-name-list.js";
 
 type InventoryItem = {
   id: string;
@@ -27,6 +28,20 @@ const level: number = 12;
 let loadedItems: InventoryItem[] = [];
 
 let pendingDeleteId: string | null = null;
+
+async function getCurrentUser() {
+  const {
+    data: { user },
+    error,
+  } = await supabaseClient.auth.getUser();
+
+  if (error) {
+    console.error("Fehler beim Laden des Users:", error.message);
+    return null;
+  }
+
+  return user;
+}
 
 function askDelete(id: string, title: string): void {
   pendingDeleteId = id;
@@ -76,9 +91,7 @@ function renderInventory(items: InventoryItem[]): void {
         addCard.textContent = "+";
         addCard.setAttribute("role", "button");
         addCard.setAttribute("tabindex", "0");
-
         addCard.addEventListener("click", openAddItemModal);
-
         addCard.addEventListener("keydown", (e: KeyboardEvent) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -136,22 +149,13 @@ function renderInventory(items: InventoryItem[]): void {
 }
 
 async function loadInventory(): Promise<void> {
-  const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (userError) {
-    console.error("Fehler beim User laden:", userError);
+  if(!user) {
     renderInventory([]);
     return;
   }
-
-  const user = userData.user;
-
-  if (!user) {
-    console.error("Kein User eingeloggt");
-    renderInventory([]);
-    return;
-  }
-
+  
   const { data, error } = await supabaseClient
     .from("saved_links")
     .select(`
@@ -163,16 +167,14 @@ async function loadInventory(): Promise<void> {
     .order("created_at", { ascending: true })
     .limit(12);
 
-  if (error) {
-    console.error("Fehler beim Laden:", error);
-    renderInventory([]);
-    return;
+  if (error) { 
+    console.error("Fehler beim Laden:", error); 
+    renderInventory([]); 
+    return; 
   }
 
   loadedItems = data ?? [];
-
   console.log("Geladene Links:", loadedItems);
-
   renderInventory(loadedItems);
 }
 
@@ -183,8 +185,12 @@ async function submitItem(): Promise<void> {
     addItemInput.focus();
     return;
   }
-
+  const user = await getCurrentUser();
+  if (!user) return;
+  
   const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+
+  const link = generateShareLink();
 
   if (userError || !userData.user) {
     console.error("Nicht eingeloggt");
@@ -196,7 +202,7 @@ async function submitItem(): Promise<void> {
     .insert({
       user_id: userData.user.id,
       link_name: name,
-      url: null
+      url: link
     });
 
   if (error) {

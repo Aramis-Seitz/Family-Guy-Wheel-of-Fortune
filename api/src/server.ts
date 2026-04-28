@@ -104,6 +104,7 @@ app.post("/api/award-coins", async (req, res) => {
     .single();
 
   if (tokenError || !tokenData) {
+    console.error('Token validation Failed:', tokenError?.message, '|user:', user.id);
     res.status(403).json({ error: 'Invalid or already used spin token' });
     return;
   }

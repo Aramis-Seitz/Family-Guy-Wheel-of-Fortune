@@ -1,5 +1,22 @@
 import { supabaseClient } from './supabase-client.js';
 
+export async function refreshCoinDisplay(): Promise<void> {
+  const coinDisplay = document.getElementById('coinDisplay') as HTMLSpanElement | null;
+  if (!coinDisplay) return;
+ 
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+ 
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('coins')
+    .eq('id', session.user.id)
+    .single();
+ 
+  coinDisplay.textContent = `🪙 ${(profile as any)?.coins ?? 0}`;
+  coinDisplay.style.display = 'inline';
+}
+
 export async function initProfileUI(): Promise<void> {
   const profileNameElement = document.getElementById('profileName') as HTMLSpanElement | null;
   const authButton = document.getElementById('authButton') as HTMLButtonElement | null;

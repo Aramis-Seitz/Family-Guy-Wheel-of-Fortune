@@ -151,6 +151,11 @@ function renderInventory(items: InventoryItem[]): void {
 async function loadInventory(): Promise<void> {
   const user = await getCurrentUser();
 
+  if(!user) {
+    renderInventory([]);
+    return;
+  }
+  
   const { data, error } = await supabaseClient
     .from("saved_links")
     .select(`

@@ -1,6 +1,6 @@
-import { getNames, addName, clearNames } from "./name-list.js";
-import { shareBtn } from "./dom.js";
-import { getMultiplier, updateMultiplierDisplay, setMultiplierSlider } from "./wheel-spin.js";    
+import { shareBtn } from "../shared/dom.js";
+import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/spin.js";
+import { getNames, replaceNames } from "./name-list.js";
 
 export function generateShareLink(): string {
     const names = getNames();
@@ -27,17 +27,12 @@ export function loadInformationFromUrl(): void {
 
     if (!Array.isArray(names)) return;
 
-    clearNames();
+    replaceNames(names.filter((name): name is string => typeof name === "string"));
 
-    names.forEach((name) => {
-        if (typeof name === "string" && name.trim()) {
-            addName(name);
-        }
-    });
     // --- Power ---
     const powerParam = params.get("power");
     const powerValue: number = Number(powerParam);
-    if (powerValue < 1 || powerValue > 2) return;
+    if (!Number.isFinite(powerValue) || powerValue < 1 || powerValue > 2) return;
     setMultiplierSlider(powerValue);
     updateMultiplierDisplay();
 }

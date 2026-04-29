@@ -1,4 +1,4 @@
-import { supabaseClient } from './supabase-client.js';
+import { supabaseClient } from "../shared/supabase-client.js";
 
 export async function initProfileUI(): Promise<void> {
   const profileNameElement = document.getElementById('profileName') as HTMLSpanElement | null;
@@ -14,9 +14,9 @@ export async function initProfileUI(): Promise<void> {
   if (sessionError || !session || !session.user) {
     profileNameElement.textContent = 'Nicht eingeloggt';
     authButton.textContent = 'Login';
-    authButton.onclick = () => {
+    authButton.addEventListener('click', () => {
       window.location.href = '/login.html';
-    };
+    });
     return;
   }
 
@@ -42,8 +42,8 @@ export async function initProfileUI(): Promise<void> {
   }
 
   authButton.textContent = 'Logout';
-  authButton.onclick = async () => {
+  authButton.addEventListener('click', async () => {
     await fetch('/api/logout', { method: 'POST' });
     window.location.href = '/login.html';
-  };
+  });
 }

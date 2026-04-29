@@ -1,4 +1,4 @@
-import { tickSoundTemplate, drumrollAudio } from "./dom.js";
+import { cymbalCrashAudio, drumrollAudio, tickSoundTemplate } from "../shared/dom.js";
 
 let drumrollStarted = false;
 
@@ -23,7 +23,6 @@ export function stopDrumRoll(): void {
 }
 
 export function playCymbalCrash(): void {
-  const cymbalCrashAudio = document.getElementById("cymbal-crash") as HTMLAudioElement | null;
   if (!cymbalCrashAudio) return;
   cymbalCrashAudio.currentTime = 0;
   cymbalCrashAudio.play();

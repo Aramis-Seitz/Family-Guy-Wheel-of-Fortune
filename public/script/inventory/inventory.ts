@@ -1,21 +1,21 @@
-import { supabaseClient } from "./supabase-client.js";
-import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "./constants.js";
+import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "../shared/constants.js";
 import {
-  inventoryBtn,
-  inventoryCloseBtn,
-  inventoryModal,
-  inventoryGrid,
   addItemModal,
   addItemInput,
-  confirmAddItemBtn,
   cancelAddItemBtn,
   closeAddItemBtn,
+  confirmAddItemBtn,
+  confirmDeleteBtn,
   confirmDeleteModal,
   confirmDeleteName,
-  confirmDeleteBtn,
+  inventoryBtn,
+  inventoryCloseBtn,
+  inventoryGrid,
+  inventoryModal,
   cancelDeleteBtn
-} from "./dom.js";
-import { generateShareLink } from "./share-name-list.js";
+} from "../shared/dom.js";
+import { supabaseClient } from "../shared/supabase-client.js";
+import { generateShareLink } from "../names/share-name-list.js";
 
 type InventoryItem = {
   id: string;
@@ -130,6 +130,7 @@ function renderInventory(items: InventoryItem[]): void {
 
     if (names.length >= 2) {
       const miniWheel = createMiniWheel(names, 65);
+      content.appendChild(miniWheel);
     }
     
     const title = document.createElement("h3");
@@ -222,7 +223,7 @@ async function submitItem(): Promise<void> {
   await loadInventory();
 }
 
-export function inventory(): void {
+export function initInventory(): void {
   inventoryBtn.addEventListener("click", async () => {
     await loadInventory();
     inventoryModal.showModal();

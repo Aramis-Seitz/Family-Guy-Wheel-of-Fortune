@@ -10,6 +10,12 @@ export interface RandomResponse {
   spinToken: string;
 }
 
+export interface AwardCoinsResponse {
+  spinnerCoins: number;
+  winnerCoins: number;
+  total?: number;
+}
+
 export interface SpinConfig {
   totalSteps: number;
   direction: Direction;

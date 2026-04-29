@@ -1,26 +1,34 @@
-import { SPIN_START_DELAY, SPIN_END_DELAY, DRUMROLL_DELAY_THRESHOLD } from "./constants.js";
-import { wheelElement, input, addBtn, getRemoveBtn, spinLeftBtn, spinRightBtn, multiplierValue, multiplierSlider } from "./dom.js";
+import { DRUMROLL_DELAY_THRESHOLD, SPIN_END_DELAY, SPIN_START_DELAY } from "../shared/constants.js";
+import {
+  addBtn,
+  getRemoveBtn,
+  input,
+  multiplierSlider,
+  multiplierValue,
+  resetBtn,
+  spinLeftBtn,
+  spinRightBtn,
+  wheelElement,
+} from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
-import { fetchRandomNumber } from "./api.js";
-import { getSegmentCount } from "./name-list.js";
+import { fetchRandomNumber } from "../api/client.js";
+import { getSegmentCount } from "../names/name-list.js";
 import { announceWinner, resetDisplayWinner } from "./winner.js";
-import type { SpinConfig, Direction } from "./types.js";
+import type { Direction, SpinConfig } from "../shared/types.js";
 
-
-export let currentRotation = 0;
+let currentRotation = 0;
 let lastTickRotation = 0;
 let spinCancelled = false;
 
 function updateWheelRotation(): void {
-  if (!wheelElement) return;
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement> | null)[] {
+function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>)[] {
   return [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider];
 }
 
-function disableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement> | null)[]): void {
+function disableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>)[]): void {
   elements.forEach((element) => {
     if (element instanceof NodeList) {
       element.forEach((item) => {
@@ -38,7 +46,7 @@ function disableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeL
   });
 }
 
-function enableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement> | null)[]): void {
+function enableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>)[]): void {
   elements.forEach((element) => {
     if (element instanceof NodeList) {
       element.forEach((item) => {
@@ -119,15 +127,19 @@ function logSpinDetails(ranNum: number, multiplier: number, boostedValue: number
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
+  if (getSegmentCount() < 2) return;
+
+  disableElements(getSpinRelatedElements());
+
   try {
     const { ranNum, spinToken } = await fetchRandomNumber();
     const multiplier = getMultiplier();
     const boostedRanNum = ranNum * multiplier;
     logSpinDetails(ranNum, multiplier, boostedRanNum);
     spinWheel(boostedRanNum, direction, spinToken);
-    disableElements(getSpinRelatedElements());
   } catch (error) {
     console.error("Error while getting random value:", error);
+    enableElements(getSpinRelatedElements());
   }
 }
 
@@ -142,7 +154,7 @@ export function resetWheelRotation(): void {
 }
 
 export function setMultiplierSlider(multiplier: number): void {
-  multiplierSlider.value = `${multiplier}`
+  multiplierSlider.value = `${multiplier}`;
 }
 
 export function updateMultiplierDisplay(): void {
@@ -156,7 +168,22 @@ export function initMultiplierSlider(): void {
 }
 
 export function getMultiplier(): number {
-  if (!multiplierSlider) return 1;
   const value = parseFloat(multiplierSlider.value);
   return Number.isNaN(value) ? 1 : value;
+}
+
+export function getCurrentRotation(): number {
+  return currentRotation;
+}
+
+export function initWheelControls(): void {
+  spinLeftBtn.addEventListener("click", () => {
+    void spinWheelWithRandomSteps("left");
+  });
+
+  spinRightBtn.addEventListener("click", () => {
+    void spinWheelWithRandomSteps("right");
+  });
+
+  resetBtn.addEventListener("click", resetWheelRotation);
 }

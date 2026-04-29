@@ -1,13 +1,17 @@
-import { getNames, removeNameByIndex } from "./name-list.js";
+import { awardCoins } from "../api/client.js";
+import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";
-import { currentRotation, resetWheelRotation } from "./wheel-spin.js";
-import { supabaseClient } from "./supabase-client.js";
+import { getCurrentRotation, resetWheelRotation } from "./spin.js";
 
-export function getWinningSegmentIndex(segmentCount: number): number {
-  const normalizedRotation = ((currentRotation % 360) + 360) % 360;
+export function getWinningSegmentIndexForRotation(rotation: number, segmentCount: number): number {
+  const normalizedRotation = ((rotation % 360) + 360) % 360;
   const stepAngle = 360 / segmentCount;
   const adjustedRotation = (360 - normalizedRotation + 270) % 360;
   return Math.floor(adjustedRotation / stepAngle) % segmentCount;
+}
+
+export function getWinningSegmentIndex(segmentCount: number): number {
+  return getWinningSegmentIndexForRotation(getCurrentRotation(), segmentCount);
 }
 
 export function displayWinner(winnerName: string): void {
@@ -81,25 +85,6 @@ function startConfetti(): void {
   }, 3000);
 }
 
-async function awardCoins(spinToken: string, winnerName: string): Promise<void> {
-  if (!spinToken) return;
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session) return;
-
-  try {
-    await fetch('/api/award-coins', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ spinToken, winnerName }),
-    });
-  } catch (err) {
-    console.error('Failed to award coins:', err);
-  }
-}
-
 let lastWinnerIndex: number = -1;
 
 export function announceWinner(segmentCount: number, spinToken: string): void {
@@ -111,7 +96,9 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
 
   displayWinner(winnerName);
   startConfetti();
-  awardCoins(spinToken, winnerName);
+  awardCoins(spinToken, winnerName).catch((err: unknown) => {
+    console.error("Failed to award coins:", err);
+  });
 }
 
 export function setupWinnerModal(): void {

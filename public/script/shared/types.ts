@@ -23,3 +23,8 @@ export interface SpinConfig {
   segmentCount: number;
   spinToken: string;
 }
+
+export interface ProfileData {
+  username: string;
+  coins: number;
+}

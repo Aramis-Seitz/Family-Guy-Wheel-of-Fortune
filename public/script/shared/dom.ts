@@ -47,3 +47,7 @@ export const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirmDel
 export const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName");
 export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
+
+export const profileName = optionalElement<HTMLSpanElement>("profileName");
+export const authButton = optionalElement<HTMLButtonElement>("authButton");
+export const coinDisplay = optionalElement<HTMLSpanElement>("coinDisplay");

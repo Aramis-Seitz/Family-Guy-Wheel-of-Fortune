@@ -5,12 +5,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'index.html'),
-        main: resolve(__dirname, 'main.html'),
-        DaS: resolve(__dirname, 'datenschutz.html'),
-        login: resolve(__dirname, 'login.html'),
-        signup: resolve(__dirname, 'signup.html'),
-        Imp: resolve(__dirname, 'impressum.html')
+        index: resolve(__dirname, 'public/html/index.html'),
+        main: resolve(__dirname, 'public/html/main.html'),
+        DaS: resolve(__dirname, 'public/html/datenschutz.html'),
+        login: resolve(__dirname, 'public/html/login.html'),
+        signup: resolve(__dirname, 'public/html/signup.html'),
+        Imp: resolve(__dirname, 'public/html/impressum.html')
       },
     },
   },

@@ -2,7 +2,12 @@ import 'dotenv/config';
 import express from "express";
 import path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { getSecureRandomNumber } from "./utils/random";
+
+if (process.env.HTTPS_PROXY) {
+  setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
+}
 
 const app = express();
 const PORT = 3000;
@@ -64,6 +69,7 @@ app.get("/api/random", async (req, res) => {
     .single();
 
   if (tokenError || !tokenData) {
+    console.error('spin_token insert error:', tokenError);
     res.status(500).json({ error: 'Failed to create spin token' });
     return;
   }

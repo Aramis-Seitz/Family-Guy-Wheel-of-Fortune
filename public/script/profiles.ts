@@ -1,5 +1,23 @@
 import { supabaseClient } from './supabase-client.js';
 
+function subscribeToCoinUpdates(userId: string): void {
+  const coinDisplay = document.getElementById('coinDisplay') as HTMLSpanElement | null;
+  if (!coinDisplay) return;
+
+  supabaseClient
+    .channel('coin-updates')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${userId}` },
+      (payload) => {
+        const coins = (payload.new as any)?.coins ?? 0;
+        coinDisplay.textContent = `🪙 ${coins}`;
+        coinDisplay.style.display = 'inline';
+      }
+    )
+    .subscribe();
+}
+
 export async function refreshCoinDisplay(): Promise<void> {
   const coinDisplay = document.getElementById('coinDisplay') as HTMLSpanElement | null;
   if (!coinDisplay) return;
@@ -63,4 +81,6 @@ export async function initProfileUI(): Promise<void> {
     await fetch('/api/logout', { method: 'POST' });
     window.location.href = '/login.html';
   };
+
+  subscribeToCoinUpdates(user.id);
 }

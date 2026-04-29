@@ -1,5 +1,40 @@
 import { supabaseClient } from './supabase-client.js';
 
+function subscribeToCoinUpdates(userId: string): void {
+  const coinDisplay = document.getElementById('coinDisplay') as HTMLSpanElement | null;
+  if (!coinDisplay) return;
+
+  supabaseClient
+    .channel('coin-updates')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${userId}` },
+      (payload) => {
+        const coins = (payload.new as any)?.coins ?? 0;
+        coinDisplay.textContent = `🪙 ${coins}`;
+        coinDisplay.style.display = 'inline';
+      }
+    )
+    .subscribe();
+}
+
+export async function refreshCoinDisplay(): Promise<void> {
+  const coinDisplay = document.getElementById('coinDisplay') as HTMLSpanElement | null;
+  if (!coinDisplay) return;
+ 
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+ 
+  const { data: profile } = await supabaseClient
+    .from('profiles')
+    .select('coins')
+    .eq('id', session.user.id)
+    .single();
+ 
+  coinDisplay.textContent = `🪙 ${(profile as any)?.coins ?? 0}`;
+  coinDisplay.style.display = 'inline';
+}
+
 export async function initProfileUI(): Promise<void> {
   const profileNameElement = document.getElementById('profileName') as HTMLSpanElement | null;
   const authButton = document.getElementById('authButton') as HTMLButtonElement | null;
@@ -46,4 +81,6 @@ export async function initProfileUI(): Promise<void> {
     await fetch('/api/logout', { method: 'POST' });
     window.location.href = '/login.html';
   };
+
+  subscribeToCoinUpdates(user.id);
 }

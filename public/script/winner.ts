@@ -2,6 +2,7 @@ import { getNames, removeNameByIndex } from "./name-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { currentRotation, resetWheelRotation } from "./wheel-spin.js";
 import { supabaseClient } from "./supabase-client.js";
+import { refreshCoinDisplay } from "./profiles.js"; 
 
 export function getWinningSegmentIndex(segmentCount: number): number {
   const normalizedRotation = ((currentRotation % 360) + 360) % 360;
@@ -87,7 +88,7 @@ async function awardCoins(spinToken: string, winnerName: string): Promise<void> 
   if (!session) return;
 
   try {
-    await fetch('/api/award-coins', {
+    const res=await fetch('/api/award-coins', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -95,6 +96,11 @@ async function awardCoins(spinToken: string, winnerName: string): Promise<void> 
       },
       body: JSON.stringify({ spinToken, winnerName }),
     });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      console.error('award-coins Fehler:', res.status, body);
+      return;
+    }
   } catch (err) {
     console.error('Failed to award coins:', err);
   }

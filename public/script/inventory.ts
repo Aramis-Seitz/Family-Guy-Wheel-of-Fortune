@@ -121,8 +121,6 @@ function renderInventory(items: InventoryItem[]): void {
 
     if (card instanceof HTMLAnchorElement) {
       card.href = item.link!;
-      card.target = "_blank";
-      card.rel = "noopener noreferrer";
     }
 
     const content = document.createElement("div");

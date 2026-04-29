@@ -70,6 +70,7 @@ app.get("/api/random", async (req, res) => {
     .single();
 
   if (tokenError || !tokenData) {
+    console.error('spin_token insert error:', tokenError);
     res.status(500).json({ error: 'Failed to create spin token' });
     return;
   }

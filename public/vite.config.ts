@@ -7,10 +7,10 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'html/index.html'),
         main: resolve(__dirname, 'html/main.html'),
-        DaS: resolve(__dirname, 'html/privacy.html'),
+        privacy: resolve(__dirname, 'html/privacy.html'),
         login: resolve(__dirname, 'html/login.html'),
         signup: resolve(__dirname, 'html/signup.html'),
-        Imp: resolve(__dirname, 'html/imprint.html')
+        imprint: resolve(__dirname, 'html/imprint.html')
       },
     },
   },

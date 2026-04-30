@@ -128,6 +128,14 @@ app.post("/api/award-coins", async (req, res) => {
 
   const spinnerCoins = randomBetween(1, 3);
 
+  const { data: spinnerProfile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', user.id)
+    .single();
+
+  const spinnerName = (spinnerProfile as any)?.username ?? user.id;
+
   const { data: winnerProfile } = await supabase
     .from('profiles')
     .select('id')
@@ -140,19 +148,23 @@ app.post("/api/award-coins", async (req, res) => {
   if (spinnerIsWinner) {
     const winnerCoins = randomBetween(3, 6);
     await addCoins(supabase, user.id, spinnerCoins + winnerCoins);
+    console.log(`[coins] ${spinnerName} hat selbst gewonnen → +${spinnerCoins + winnerCoins} Coins (${spinnerCoins} Spinner + ${winnerCoins} Winner)`);
     res.json({ spinnerCoins, winnerCoins, total: spinnerCoins + winnerCoins });
     return;
   }
 
   await addCoins(supabase, user.id, spinnerCoins);
+  console.log(`[coins] Spinner: ${spinnerName} → +${spinnerCoins} Coins`);
 
   if (winnerUserId) {
     const winnerCoins = randomBetween(3, 6);
     await addCoins(supabase, winnerUserId, winnerCoins);
+    console.log(`[coins] Winner:  ${winnerName} → +${winnerCoins} Coins`);
     res.json({ spinnerCoins, winnerCoins });
     return;
   }
 
+  console.log(`[coins] Winner:  ${winnerName} → nicht im System, keine Coins`);
   res.json({ spinnerCoins, winnerCoins: 0 });
 });
 

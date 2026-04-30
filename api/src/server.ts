@@ -2,7 +2,12 @@ import 'dotenv/config';
 import express from "express";
 import path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { getSecureRandomNumber } from "./utils/random";
+
+if (process.env.HTTPS_PROXY) {
+  setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
+}
 
 const app = express();
 const PORT = 3000;
@@ -10,6 +15,7 @@ const MIN_ROTATION_DEGREE = 140;
 const MAX_ROTATION_DEGREE = 900;
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "../../public/dist/html")));
 app.use(express.static(path.join(__dirname, "../../public/dist")));
 
 function createServiceClient() {

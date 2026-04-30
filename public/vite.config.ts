@@ -1,7 +1,19 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { resolve } from 'path';
+import { cpSync, mkdirSync } from 'fs';
+
+function copyStaticAssets(): Plugin {
+  return {
+    name: 'copy-static-assets',
+    closeBundle() {
+      mkdirSync('dist/assets', { recursive: true });
+      cpSync('assets', 'dist/assets', { recursive: true });
+    },
+  };
+}
 
 export default defineConfig({
+  plugins: [copyStaticAssets()],
   build: {
     rollupOptions: {
       input: {

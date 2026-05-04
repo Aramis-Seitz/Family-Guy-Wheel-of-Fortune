@@ -1,4 +1,4 @@
-import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "../shared/constants.js";
+import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS } from "../shared/constants.js";
 import {
   addItemModal,
   addItemInput,
@@ -16,20 +16,12 @@ import {
 } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
-
-type InventoryItem = {
-  id: string;
-  title: string;
-  link: string | null;
-};
-
-const level: number = 12;
+import { InventoryItem } from "../shared/types.js";
 
 let loadedItems: InventoryItem[] = [];
-
 let pendingDeleteId: string | null = null;
 
-async function getCurrentUser() {
+async function fetchCurrentUser() {
   const {
     data: { user },
     error,
@@ -80,7 +72,7 @@ function renderInventory(items: InventoryItem[]): void {
 
   let addButtonWasCreated = false;
 
-  for (let i = 0; i < level; i++) {
+  for (let i = 0; i < INVENTORY_LIMIT; i++) {
     const item = items[i];
 
     if (!item) {
@@ -157,7 +149,7 @@ function renderInventory(items: InventoryItem[]): void {
 }
 
 async function loadInventory(): Promise<void> {
-  const user = await getCurrentUser();
+  const user = await fetchCurrentUser();
 
   if(!user) {
     renderInventory([]);
@@ -193,7 +185,7 @@ async function submitItem(): Promise<void> {
     addItemInput.focus();
     return;
   }
-  const user = await getCurrentUser();
+  const user = await fetchCurrentUser();
   if (!user) return;
   
   const { data: userData, error: userError } = await supabaseClient.auth.getUser();
@@ -299,10 +291,7 @@ function extractNamesFromLink(link: string | null): string[] {
   }
 }
 
-const SVG_NS = "http://www.w3.org/2000/svg";
 
-const MINI_CENTER = { x: 100, y: 100 };
-const MINI_RADIUS = 90;
 
 function getMiniPoint(center: { x: number; y: number }, radius: number, angle: number) {
   return {

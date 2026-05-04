@@ -28,3 +28,9 @@ export interface ProfileData {
   username: string;
   coins: number;
 }
+
+export type InventoryItem = {
+  id: string;
+  title: string;
+  link: string | null;
+};

@@ -101,6 +101,7 @@ async function awardCoins(spinToken: string, winnerName: string): Promise<void> 
       console.error('award-coins Fehler:', res.status, body);
       return;
     }
+    await refreshCoinDisplay();
   } catch (err) {
     console.error('Failed to award coins:', err);
   }

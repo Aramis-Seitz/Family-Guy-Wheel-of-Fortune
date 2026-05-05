@@ -12,28 +12,15 @@ import {
   inventoryCloseBtn,
   inventoryGrid,
   inventoryModal,
-  cancelDeleteBtn
+  cancelDeleteBtn,
+  closeOnBackdropClick
 } from "../shared/dom.js";
-import { supabaseClient } from "../shared/supabase-client.js";
+import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
 import { InventoryItem } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 
 let pendingDeleteId: string | null = null;
-
-async function fetchCurrentUser() {
-  const {
-    data: { user },
-    error,
-  } = await supabaseClient.auth.getUser();
-
-  if (error) {
-    console.error("Fehler beim Laden des Users:", error.message);
-    return null;
-  }
-
-  return user;
-}
 
 function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
@@ -59,14 +46,6 @@ async function confirmDelete(): Promise<void> {
 function cancelDelete(): void {
   confirmDeleteModal.close();
   pendingDeleteId = null;
-}
-
-function closeOnBackdropClick(modal: HTMLDialogElement, onClose?: () => void): void {
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      onClose ? onClose() : modal.close();
-    }
-  });
 }
 
 async function deleteItem(id: string): Promise<boolean> {

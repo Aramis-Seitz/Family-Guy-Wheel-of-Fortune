@@ -77,3 +77,21 @@
 | Inhalt       |                                |
 | Prioriät     |                                |
 | Abhängig von |                                |
+
+---
+
+## Lokales Testing
+
+Es gibt zwei Testmodi je nachdem ob Supabase erreichbar ist oder nicht.
+
+### Semi-lokales Testing (mit Test-Supabase-DB)
+
+Verbindung läuft gegen eine echte Supabase-Instanz, aber eine dedizierte Test-DB — kein Produktivdaten-Risiko.
+
+→ Anleitung: [SemiLocal-Anleitung.md](./SemiLocal-Anleitung.md)
+
+### Komplett lokales Testing (kein Supabase, In-Memory-DB)
+
+Kein Netzwerk, kein Supabase nötig. Daten leben nur im Arbeitsspeicher und sind nach Neustart weg.
+
+→ Anleitung: [CompleteLocal.md](./CompleteLocal.md)

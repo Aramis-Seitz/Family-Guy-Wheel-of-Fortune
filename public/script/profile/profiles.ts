@@ -54,6 +54,37 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   });
 }
 
+function subscribeToCoinUpdates(userId: string): void {
+  if (!coinDisplay) return;
+
+  supabaseClient
+    .channel("coin-updates")
+    .on(
+      "postgres_changes",
+      { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
+      (payload) => {
+        const coins = (payload.new as { coins?: number })?.coins ?? 0;
+        applyCoinDisplay(coins);
+      }
+    )
+    .subscribe();
+}
+
+export async function refreshCoinDisplay(): Promise<void> {
+  if (!coinDisplay) return;
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("coins")
+    .eq("id", session.user.id)
+    .single();
+
+  applyCoinDisplay((profile as { coins?: number } | null)?.coins ?? 0);
+}
+
 export async function initProfileUI(): Promise<void> {
   if (!profileName || !authButton) return;
 
@@ -65,4 +96,5 @@ export async function initProfileUI(): Promise<void> {
 
   const profile = await fetchUserProfile(session.user.id);
   applyAuthenticatedState(profile);
+  subscribeToCoinUpdates(session.user.id);
 }

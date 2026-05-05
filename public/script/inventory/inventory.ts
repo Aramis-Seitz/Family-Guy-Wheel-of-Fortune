@@ -141,7 +141,9 @@ function buildCardContent(item: InventoryItem): HTMLDivElement {
 
   const names = extractNamesFromLink(item.link);
   if (names.length >= 2) {
-    content.appendChild(createMiniWheel(names, 65));
+    const miniWheel = createMiniWheel(names, 65);
+    miniWheel.style.transform = `rotate(${Math.random() * 360}deg)`;
+    content.appendChild(miniWheel);
   }
 
   const heading = document.createElement("h3");
@@ -296,9 +298,43 @@ function createMiniWheel(names: string[], size = 70): SVGSVGElement {
 
   if (names.length < 2) return svg;
 
-  names.forEach((_, i) => {
+  names.forEach((name, i) => {
     svg.appendChild(createMiniSegment(i, names.length));
+    svg.appendChild(createMiniLabel(i, names.length, name));
   });
 
   return svg;
+}
+
+function createMiniLabel(
+  index: number,
+  count: number,
+  name: string
+): SVGTextElement {
+  const angleStep = FULL_CIRCLE_RADIANS / count;
+  const middleAngle = (index + 0.5) * angleStep;
+
+  const labelRadius = MINI_RADIUS * 0.6;
+  const point = getPointOnCircle(MINI_CENTER, labelRadius, middleAngle);
+
+  const text = document.createElementNS(SVG_NS, "text");
+
+  text.setAttribute("x", String(point.x));
+  text.setAttribute("y", String(point.y));
+  text.setAttribute("fill", "black");
+  text.setAttribute("font-size", "8");
+  text.setAttribute("text-anchor", "middle");
+  text.setAttribute("dominant-baseline", "middle");
+
+  const angleDeg = (middleAngle * 180) / Math.PI;
+  const rotation = angleDeg > 180 ? angleDeg + 90 : angleDeg - 90;
+
+  text.setAttribute(
+    "transform",
+    `rotate(${rotation} ${point.x} ${point.y})`
+  );
+
+  text.textContent = name;
+
+  return text;
 }

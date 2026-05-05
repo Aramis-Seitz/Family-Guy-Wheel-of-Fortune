@@ -130,8 +130,11 @@ function renderInventory(items: InventoryItem[]): void {
 
     if (names.length >= 2) {
       const miniWheel = createMiniWheel(names, 65);
+      miniWheel.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+      content.appendChild(miniWheel);
     }
-    
+
     const title = document.createElement("h3");
     title.textContent = item.title;
 
@@ -152,17 +155,21 @@ function renderInventory(items: InventoryItem[]): void {
     }
 
     inventoryGrid.appendChild(card);
+
+    console.log("LINK:", item.link);
+    console.log("NAMES:", extractNamesFromLink(item.link));
+
   }
 }
 
 async function loadInventory(): Promise<void> {
   const user = await getCurrentUser();
 
-  if(!user) {
+  if (!user) {
     renderInventory([]);
     return;
   }
-  
+
   const { data, error } = await supabaseClient
     .from("saved_links")
     .select(`
@@ -174,10 +181,10 @@ async function loadInventory(): Promise<void> {
     .order("created_at", { ascending: true })
     .limit(12);
 
-  if (error) { 
-    console.error("Fehler beim Laden:", error); 
-    renderInventory([]); 
-    return; 
+  if (error) {
+    console.error("Fehler beim Laden:", error);
+    renderInventory([]);
+    return;
   }
 
   loadedItems = data ?? [];
@@ -194,7 +201,7 @@ async function submitItem(): Promise<void> {
   }
   const user = await getCurrentUser();
   if (!user) return;
-  
+
   const { data: userData, error: userError } = await supabaseClient.auth.getUser();
 
   const link = generateShareLink();

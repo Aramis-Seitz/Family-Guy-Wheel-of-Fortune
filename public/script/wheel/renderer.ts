@@ -1,11 +1,11 @@
-import type { Point } from "./types.js";
+import type { Point } from "../shared/types.js";
 import {
   WHEEL_CENTER,
   WHEEL_RADIUS,
   FULL_CIRCLE_RADIANS,
   SEGMENT_COLORS,
-} from "./constants.js";
-import { wheelElement } from "./dom.js";
+} from "../shared/constants.js";
+import { wheelElement } from "../shared/dom.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -78,23 +78,21 @@ function createWheelLabel(
 }
 
 export function clearWheel(): void {
-  if (!wheelElement) return;
   wheelElement.innerHTML = "";
 }
 
 export function generateWheel(names: string[]): void {
   const segmentCount = names.length;
-  if (segmentCount < 2 || !wheelElement) return;
-
-  const wheel = wheelElement;
   clearWheel();
+
+  if (segmentCount < 2) return;
 
   names.forEach((name, index) => {
     const color = getSegmentColor(index);
     const segmentPath = createWheelSegmentPath(index, segmentCount, color);
     const label = createWheelLabel(index, segmentCount, name);
 
-    wheel.appendChild(segmentPath);
-    wheel.appendChild(label);
+    wheelElement.appendChild(segmentPath);
+    wheelElement.appendChild(label);
   });
 }

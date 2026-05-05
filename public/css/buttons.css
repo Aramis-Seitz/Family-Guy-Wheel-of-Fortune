@@ -1,0 +1,94 @@
+.spin-btn {
+    background-color: #ffb800;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.spin-btn:hover { background-color: #ffa500; }
+.spin-btn:active { background-color: #e59400; }
+
+.share-btn {
+    background-color: #E20074;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.share-btn:hover { background-color: #E20074; }
+.share-btn:active { background-color: #E20074; }
+
+.inventory-btn {
+    background-color: #00a2ff;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+#reset-btn {
+    background-color: #888;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+#reset-btn:hover { background-color: #777; }
+#reset-btn:active { background-color: #666; }
+
+.btn-add {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: #f0c040;
+    color: #1a1a1a;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+}
+
+.btn-add:hover { background: #e0b030; }
+.btn-add:active { background: #c89a20; }
+
+.btn-remove {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: rgba(0, 0, 0, 0.18);
+    color: #1a1a1a;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: var(--space-2);
+    transition: background var(--transition), opacity var(--transition);
+}
+
+.btn-remove:hover:not(:disabled) { background: rgba(0, 0, 0, 0.32); }
+.btn-remove:active:not(:disabled) { background: rgba(0, 0, 0, 0.45); }
+.btn-remove:disabled { opacity: 0.35; cursor: not-allowed; }

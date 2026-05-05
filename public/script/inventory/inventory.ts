@@ -1,21 +1,21 @@
-import { supabaseClient } from "./supabase-client.js";
-import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "./constants.js";
+import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "../shared/constants.js";
 import {
-  inventoryBtn,
-  inventoryCloseBtn,
-  inventoryModal,
-  inventoryGrid,
   addItemModal,
   addItemInput,
-  confirmAddItemBtn,
   cancelAddItemBtn,
   closeAddItemBtn,
+  confirmAddItemBtn,
+  confirmDeleteBtn,
   confirmDeleteModal,
   confirmDeleteName,
-  confirmDeleteBtn,
+  inventoryBtn,
+  inventoryCloseBtn,
+  inventoryGrid,
+  inventoryModal,
   cancelDeleteBtn
-} from "./dom.js";
-import { generateShareLink } from "./share-name-list.js";
+} from "../shared/dom.js";
+import { supabaseClient } from "../shared/supabase-client.js";
+import { generateShareLink } from "../names/share-name-list.js";
 
 type InventoryItem = {
   id: string;
@@ -229,7 +229,7 @@ async function submitItem(): Promise<void> {
   await loadInventory();
 }
 
-export function inventory(): void {
+export function initInventory(): void {
   inventoryBtn.addEventListener("click", async () => {
     await loadInventory();
     inventoryModal.showModal();
@@ -365,6 +365,7 @@ function createMiniWheel(names: string[], size = 70): SVGSVGElement {
 
   return svg;
 }
+<<<<<<< HEAD:public/script/inventory.ts
 
 function createMiniLabel(
   index: number,
@@ -398,3 +399,5 @@ function createMiniLabel(
 
   return text;
 }
+=======
+>>>>>>> feature/refactoring:public/script/inventory/inventory.ts

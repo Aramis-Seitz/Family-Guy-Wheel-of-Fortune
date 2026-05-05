@@ -4,7 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Family Guy Wheel of Fortune!</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/wheel.css">
+    <link rel="stylesheet" href="../css/buttons.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/inventory.css">
+    <link rel="stylesheet" href="../css/modals.css">
+    <link rel="stylesheet" href="../css/legal-links.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 
@@ -14,9 +21,9 @@
     <audio id="drumroll" src="assets/drumroll.mp3" preload="auto"></audio>
     <audio id="cymbal-crash" src="assets/cymbal-crash.wav" preload="auto"></audio>
 
-    <button class="spin-btn" id="spin-left-btn" onclick="getRandomNumber_left()">SPIN LEFT</button>
-    <button class="spin-btn" id="spin-right-btn" onclick="getRandomNumber_right()">SPIN RIGHT</button>
-    <button id="reset-btn" onclick="resetWheelRotation()">RESET</button>
+    <button class="spin-btn" id="spin-left-btn" type="button">SPIN LEFT</button>
+    <button class="spin-btn" id="spin-right-btn" type="button">SPIN RIGHT</button>
+    <button id="reset-btn" type="button">RESET</button>
     <button class="share-btn" id="shareBtn">Share >3</button>
     <button class="inventory-btn" id="inventoryBtn">INVENTORY</button>
 
@@ -113,8 +120,8 @@
 
     <div class="Rechtliches">
 
-        <a href="./impressum.html" class="btn-Imp">Impressum</a>
-        <a href="./datenschutz.html" class="btn-DaS">Datenschutz</a>
+        <a href="/imprint.html" class="btn-Imp">Impressum</a>
+        <a href="/privacy.html" class="btn-DaS">Datenschutz</a>
     </div>
 
     <script type="module" src="./script/main.ts"></script>

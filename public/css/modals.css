@@ -1,0 +1,64 @@
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #ffffff, #f5f5f5);
+    color: black;
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 0 30px rgba(255, 184, 0, 0.6);
+    animation: popIn 0.4s ease;
+}
+
+.modal-content h2 {
+    margin-bottom: 15px;
+}
+
+#winnerText {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#removeWinner {
+    background: #ff0000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#removeWinner:hover { background: #c90000; }
+
+#closeModal {
+    background: #ffb800;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#closeModal:hover { background: #ffa500; }
+
+#confettiCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3000;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}

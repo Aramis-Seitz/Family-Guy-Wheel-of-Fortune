@@ -17,10 +17,6 @@ if (process.env.HTTPS_PROXY && !USE_MOCK) {
   setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
 }
 
-if (process.env.HTTPS_PROXY) {
-  setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
-}
-
 const app = express();
 const PORT = 3000;
 const MIN_ROTATION_DEGREE = 140;

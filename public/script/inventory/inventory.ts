@@ -365,7 +365,6 @@ function createMiniWheel(names: string[], size = 70): SVGSVGElement {
 
   return svg;
 }
-<<<<<<< HEAD:public/script/inventory.ts
 
 function createMiniLabel(
   index: number,
@@ -399,5 +398,3 @@ function createMiniLabel(
 
   return text;
 }
-=======
->>>>>>> feature/refactoring:public/script/inventory/inventory.ts

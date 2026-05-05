@@ -29,7 +29,7 @@ function applyUnauthenticatedState(): void {
   profileName.textContent = "Nicht eingeloggt";
   authButton.textContent = "Login";
   authButton.addEventListener("click", () => {
-    window.location.href = "/login.html";
+    window.location.href = "login.html";
   });
 }
 
@@ -50,8 +50,15 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {
     await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/login.html";
+    window.location.href = "login.html";
   });
+}
+
+export async function refreshCoinDisplay(): Promise<void> {
+  const session = await fetchCurrentSession();
+  if (!session) return;
+  const profile = await fetchUserProfile(session.user.id);
+  if (profile) applyCoinDisplay(profile.coins ?? 0);
 }
 
 export async function initProfileUI(): Promise<void> {

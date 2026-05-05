@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { createMockClient } from './mock-supabase-client.js';
+import { createMockClient } from '../mock-supabase-client.js';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 

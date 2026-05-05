@@ -51,3 +51,11 @@ export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteB
 export const profileName = optionalElement<HTMLSpanElement>("profileName");
 export const authButton = optionalElement<HTMLButtonElement>("authButton");
 export const coinDisplay = optionalElement<HTMLSpanElement>("coinDisplay");
+
+export function closeOnBackdropClick(modal: HTMLDialogElement, onClose?: () => void): void {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      onClose ? onClose() : modal.close();
+    }
+  });
+}

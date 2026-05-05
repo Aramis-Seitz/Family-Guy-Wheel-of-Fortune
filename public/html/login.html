@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login & Registration!</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/img/logo.png" />
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth-widget.css">
+    <link rel="stylesheet" href="../css/login-page.css">
+    <link rel="stylesheet" href="../css/buttons.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/legal-links.css">
+</head>
+<body>
+<div class="wrapper"> 
+    <input type="checkbox" id="check" class="hidden-checkbox" aria-hidden="true" />
+
+    <main>
+
+        <section aria-label="Login Form" class="form-wrapper login">
+            <form action="#" id="loginForm">
+                <h2>Login</h2>
+                <div class="input-field">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required aria-required="true" />
+                </div>
+                <div class="input-field">
+                    <label for="loginPassword">Passwort</label>
+                    <input type="password" id="loginPassword" required aria-required="true" />
+                </div>
+                <button type="submit">Log In</button>
+                <div class="register">
+                    <a href="/signup.html">Sign Up</a>
+                    <p>Don't have an account?</p>
+                </div>
+                    <div class="Rechtliches">
+        <a href="/imprint.html" class="btn-ImP">Impressum</a>
+        <a href="/privacy.html" class="btn-DaS">Datenschutz</a>
+    </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+
+<script type="module" src="../script/app/auth.ts"></script>
+</body>
+</html>

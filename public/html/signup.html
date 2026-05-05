@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/img/logo.png" />
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth-widget.css">
+    <link rel="stylesheet" href="../css/buttons.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/legal-links.css">
+</head>
+<body>
+<div class="wrapper">
+    <main>
+        <section aria-label="Signup Form" class="form-wrapper">
+            <form id="signupForm">
+                <h2>Signup</h2>
+
+                <div class="input-field">
+                    <label for="signupUser">Username</label>
+                    <input type="text" id="signupUser" required />
+                </div>
+
+                <div class="input-field">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required />
+                </div>
+
+                <div class="input-field">
+                    <label for="signupPassword">Passwort</label>
+                    <input type="password" id="signupPassword" required />
+                </div>
+
+                <div class="input-field">
+                    <label for="signupConfirmPassword">Confirm Passwort</label>
+                    <input type="password" id="signupConfirmPassword" required />
+                </div>
+
+                <button type="submit">Sign Up</button>
+
+                <div class="register">
+                    <p>Already have an account? <a href="/login.html">Login</a></p>
+                </div>
+
+                <div class="Rechtliches">
+                    <a href="/imprint.html" class="btn-ImP">Impressum</a>
+                    <a href="/privacy.html" class="btn-DaS">Datenschutz</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script type="module" src="../script/app/auth.ts"></script>
+</body>
+</html>

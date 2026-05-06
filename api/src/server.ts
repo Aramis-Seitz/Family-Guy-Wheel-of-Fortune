@@ -169,7 +169,10 @@ app.post("/api/award-coins", async (req, res) => {
   res.json({ spinnerCoins, winnerCoins: 0 });
 });
 
-// hier IF
-app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
-});
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Server läuft auf http://localhost:${PORT}`);
+  });
+}
+
+export default app;

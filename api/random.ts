@@ -1,8 +1,8 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
+import { randomInt } from 'crypto';
 
 function getSecureRandomNumber(min: number, max: number): number {
-  return crypto.randomInt(min, max + 1);
+  return randomInt(min, max + 1);
 }
 
 function createServiceClient(): SupabaseClient {

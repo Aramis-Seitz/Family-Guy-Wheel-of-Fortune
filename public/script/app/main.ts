@@ -25,7 +25,7 @@ async function hasActiveSession(): Promise<boolean> {
 
 async function initApp(): Promise<void> {
   if (!(await hasActiveSession())) {
-    window.location.href = "login.html";
+    window.location.href = "/login.html";
     return;
   }
 

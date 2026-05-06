@@ -9,10 +9,10 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/src/server.ts" },
     { "source": "/", "destination": "/html/index.html" },
-    { "source": "/main", "destination": "/html/main.html" },
-    { "source": "/login", "destination": "/html/login.html" },
-    { "source": "/signup", "destination": "/html/signup.html" },
-    { "source": "/privacy", "destination": "/html/privacy.html" },
-    { "source": "/imprint", "destination": "/html/imprint.html" }
+    { "source": "/main.html", "destination": "/html/main.html" },
+    { "source": "/login.html", "destination": "/html/login.html" },
+    { "source": "/signup.html", "destination": "/html/signup.html" },
+    { "source": "/privacy.html", "destination": "/html/privacy.html" },
+    { "source": "/imprint.html", "destination": "/html/imprint.html" }
   ]
 }

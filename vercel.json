@@ -1,7 +1,18 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build --workspace public",
   "outputDirectory": "public/dist",
+  "functions": {
+    "api/src/server.ts": {
+      "includeFiles": "api/src/**"
+    }
+  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/$1" }
+    { "source": "/api/(.*)", "destination": "/api/src/server.ts" },
+    { "source": "/", "destination": "/html/index.html" },
+    { "source": "/main", "destination": "/html/main.html" },
+    { "source": "/login", "destination": "/html/login.html" },
+    { "source": "/signup", "destination": "/html/signup.html" },
+    { "source": "/privacy", "destination": "/html/privacy.html" },
+    { "source": "/imprint", "destination": "/html/imprint.html" }
   ]
 }

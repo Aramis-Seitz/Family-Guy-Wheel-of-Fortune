@@ -1,13 +1,8 @@
 {
   "buildCommand": "npm run build --workspace public",
   "outputDirectory": "public/dist",
-  "functions": {
-    "api/src/server.ts": {
-      "includeFiles": "api/src/**"
-    }
-  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/src/server.ts" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/", "destination": "/html/index.html" },
     { "source": "/main.html", "destination": "/html/main.html" },
     { "source": "/login.html", "destination": "/html/login.html" },

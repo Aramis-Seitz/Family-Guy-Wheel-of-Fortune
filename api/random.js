@@ -1,5 +1,9 @@
-import { getSecureRandomNumber } from "./dist/utils/random.js";
+import { randomInt } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+
+function getSecureRandomNumber(min, max) {
+  return randomInt(min, max + 1);
+}
 
 function createServiceClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -18,30 +22,26 @@ function createServiceClient() {
 }
 
 export default async function handler(req, res) {
-  const ranNum = getSecureRandomNumber(360, 900);
-
-  // Wenn Supabase-Server-Variablen fehlen:
-  // Spin funktioniert trotzdem, aber ohne Token/Coins.
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return res.status(200).json({
-      ranNum,
-      spinToken: "",
-    });
-  }
-
-  const authHeader = req.headers["authorization"] ?? "";
-  const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
-
-  // Wenn User nicht eingeloggt ist:
-  // Spin funktioniert trotzdem, aber ohne Token/Coins.
-  if (!jwt) {
-    return res.status(200).json({
-      ranNum,
-      spinToken: "",
-    });
-  }
-
   try {
+    const ranNum = getSecureRandomNumber(360, 900);
+
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return res.status(200).json({
+        ranNum,
+        spinToken: "",
+      });
+    }
+
+    const authHeader = req.headers["authorization"] ?? "";
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+
+    if (!jwt) {
+      return res.status(200).json({
+        ranNum,
+        spinToken: "",
+      });
+    }
+
     const supabase = createServiceClient();
 
     const {
@@ -50,8 +50,11 @@ export default async function handler(req, res) {
     } = await supabase.auth.getUser(jwt);
 
     if (authError || !user) {
+      console.error("Invalid Supabase session:", authError);
+
       return res.status(401).json({
         error: "Invalid session",
+        message: authError?.message,
       });
     }
 
@@ -63,12 +66,20 @@ export default async function handler(req, res) {
       .select("token")
       .single();
 
-
-// fortite
     if (tokenError || !tokenData) {
-      console.error("Failed to create spin token:", tokenError);
+      console.error("Failed to create spin token:", {
+        message: tokenError?.message,
+        details: tokenError?.details,
+        hint: tokenError?.hint,
+        code: tokenError?.code,
+      });
+
       return res.status(500).json({
         error: "Failed to create spin token",
+        message: tokenError?.message,
+        details: tokenError?.details,
+        hint: tokenError?.hint,
+        code: tokenError?.code,
       });
     }
 
@@ -77,9 +88,14 @@ export default async function handler(req, res) {
       spinToken: tokenData.token,
     });
   } catch (error) {
-    console.error("Random API failed:", error);
+    console.error("Random API failed:", {
+      message: error?.message,
+      stack: error?.stack,
+    });
+
     return res.status(500).json({
       error: "Failed to generate number",
+      message: error?.message,
     });
   }
 }

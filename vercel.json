@@ -2,7 +2,6 @@
   "buildCommand": "npm run build --workspace public",
   "outputDirectory": "public/dist",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/", "destination": "/html/index.html" },
     { "source": "/main.html", "destination": "/html/main.html" },
     { "source": "/login.html", "destination": "/html/login.html" },

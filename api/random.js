@@ -63,6 +63,8 @@ export default async function handler(req, res) {
       .select("token")
       .single();
 
+
+// fortite
     if (tokenError || !tokenData) {
       console.error("Failed to create spin token:", tokenError);
       return res.status(500).json({

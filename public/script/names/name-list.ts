@@ -2,6 +2,11 @@ import { MAX_ITEMS, MIN_ITEMS } from "../shared/constants.js";
 import { addBtn, emptyHint, errorHint, input, list } from "../shared/dom.js";
 import { validateName } from "../shared/validation.js";
 import { generateWheel, getSegmentColor } from "../wheel/renderer.js";
+import {
+  clearNameInputError,
+  initNameInputValidation,
+  validateNameInput,
+} from "./name-input-validation.js";
 import { nameState } from "./name-state.js";
 
 let errorTimer: ReturnType<typeof setTimeout> | null = null;
@@ -107,14 +112,10 @@ function handleRemove(index: number, item: HTMLLIElement): void {
 }
 
 export function addName(rawName: string): void {
-  input.classList.remove("invalid");
-
-  const validation = validateName(rawName);
+  const validation = validateNameInput(rawName);
 
   if (!validation.valid) {
-    input.classList.add("invalid");
     input.focus();
-    showError(validation.message);
     return;
   }
 
@@ -124,6 +125,7 @@ export function addName(rawName: string): void {
   }
 
   input.value = "";
+  clearNameInputError();
   input.focus();
 }
 
@@ -149,6 +151,7 @@ export function initNameList(): void {
 
   nameState.subscribe(renderNames);
   nameState.setNames(initialNames);
+  initNameInputValidation();
 }
 
 export function initExistingItems(): void {

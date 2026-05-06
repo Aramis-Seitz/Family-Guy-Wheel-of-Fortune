@@ -1,13 +1,7 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build --workspace public",
   "outputDirectory": "public/dist",
-  "functions": {
-    "api/dist/random.js": { "maxDuration": 10 },
-    "api/dist/award-coins.js": { "maxDuration": 10 }
-  },
   "rewrites": [
-    { "source": "/api/random", "destination": "/api/dist/random" },
-    { "source": "/api/award-coins", "destination": "/api/dist/award-coins" },
     { "source": "/", "destination": "/html/index.html" },
     { "source": "/main.html", "destination": "/html/main.html" },
     { "source": "/login.html", "destination": "/html/login.html" },

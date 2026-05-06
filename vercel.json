@@ -1,7 +1,13 @@
 {
-  "buildCommand": "npm run build --workspace public",
+  "buildCommand": "npm run build",
   "outputDirectory": "public/dist",
+  "functions": {
+    "api/dist/random.js": {},
+    "api/dist/award-coins.js": {}
+  },
   "rewrites": [
+    { "source": "/api/random", "destination": "/api/dist/random" },
+    { "source": "/api/award-coins", "destination": "/api/dist/award-coins" },
     { "source": "/", "destination": "/html/index.html" },
     { "source": "/main.html", "destination": "/html/main.html" },
     { "source": "/login.html", "destination": "/html/login.html" },

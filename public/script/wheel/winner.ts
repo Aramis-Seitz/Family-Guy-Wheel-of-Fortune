@@ -2,6 +2,7 @@ import { awardCoins } from "../api/client.js";
 import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { getCurrentRotation, resetWheelRotation } from "./spin.js";
+import { refreshCoinDisplay } from "../profile/profiles.js";
 
 export function getWinningSegmentIndexForRotation(rotation: number, segmentCount: number): number {
   const normalizedRotation = ((rotation % 360) + 360) % 360;
@@ -23,6 +24,7 @@ export function displayWinner(winnerName: string): void {
   text.textContent = `${winnerName}`;
   modal.classList.remove("hidden");
 }
+
 export function resetDisplayWinner(): void {
   const modal = document.getElementById("winnerModal");
   if (!modal) return;
@@ -96,9 +98,11 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
 
   displayWinner(winnerName);
   startConfetti();
-  awardCoins(spinToken, winnerName).catch((err: unknown) => {
-    console.error("Failed to award coins:", err);
-  });
+  awardCoins(spinToken, winnerName)
+    .then(() => refreshCoinDisplay())
+    .catch((err: unknown) => {
+      console.error("Failed to award coins:", err);
+    });
 }
 
 export function setupWinnerModal(): void {

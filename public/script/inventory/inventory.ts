@@ -88,6 +88,7 @@ function renderInventory(items: InventoryItem[]): void {
     }
 
     inventoryGrid.appendChild(createItemCard(item));
+
   }
 }
 

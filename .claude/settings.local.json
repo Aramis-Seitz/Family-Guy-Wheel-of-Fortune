@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Onsite\\\\Wheel\\\\Family-Guy-Wheel-of-Fortune\" -Recurse -Force)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Onsite\\\\Wheel\\\\Family-Guy-Wheel-of-Fortune\\\\public\" -Recurse -File)",
+      "Bash(Select-Object FullName)"
+    ]
+  }
+}

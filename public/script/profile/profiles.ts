@@ -1,7 +1,7 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { profileName, authButton, coinDisplay } from "../shared/dom.js";
 import { ProfileData } from "../shared/types.js";
-import type { Session } from "@supabase/supabase-js";
+import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -49,7 +49,7 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
 
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {
-    await fetch("/api/logout", { method: "POST" });
+    await supabaseClient.auth.signOut();
     window.location.href = "/login.html";
   });
 }
@@ -62,7 +62,7 @@ function subscribeToCoinUpdates(userId: string): void {
     .on(
       "postgres_changes",
       { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
-      (payload) => {
+      (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
         const coins = (payload.new as { coins?: number })?.coins ?? 0;
         applyCoinDisplay(coins);
       }

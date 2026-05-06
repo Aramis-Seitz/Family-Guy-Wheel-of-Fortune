@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { randomInt } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 
 function getSecureRandomNumber(min: number, max: number): number {
   return randomInt(min, max + 1);
@@ -35,10 +35,11 @@ export default async function handler(req: any, res: any): Promise<void> {
   }
 
   const ranNum = getSecureRandomNumber(140, 900);
+  const spinToken = randomUUID();
 
   const { data: tokenData, error: tokenError } = await supabase
     .from('spin_tokens')
-    .insert({ user_id: user.id })
+    .insert({ token: spinToken, user_id: user.id, used: false })
     .select('token')
     .single();
 
@@ -48,5 +49,5 @@ export default async function handler(req: any, res: any): Promise<void> {
     return;
   }
 
-  res.json({ ranNum, spinToken: (tokenData as any).token });
+  res.json({ ranNum, spinToken: (tokenData as any).token ?? spinToken });
 }

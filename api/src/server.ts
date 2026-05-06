@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { existsSync } from 'fs';
+import { randomUUID } from 'crypto';
 if (existsSync('.env.local')) dotenv.config({ path: '.env.local', override: true });
 dotenv.config();
 
@@ -25,6 +26,10 @@ const MAX_ROTATION_DEGREE = 900;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../../public/dist/html")));
 app.use(express.static(path.join(__dirname, "../../public/dist")));
+
+if (USE_MOCK) {
+  app.use('/api/mock', mockRouter);
+}
 
 function createServiceClient() {
   if (USE_MOCK) return createMockServiceClient();
@@ -71,10 +76,11 @@ app.get("/api/random", async (req, res) => {
   }
 
   const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
+  const spinToken = randomUUID();
 
   const { data: tokenData, error: tokenError } = await supabase
     .from('spin_tokens')
-    .insert({ user_id: user.id })
+    .insert({ token: spinToken, user_id: user.id, used: false })
     .select('token')
     .single();
 
@@ -84,7 +90,7 @@ app.get("/api/random", async (req, res) => {
     return;
   }
 
-  res.json({ ranNum, spinToken: (tokenData as any).token });
+  res.json({ ranNum, spinToken: (tokenData as any).token ?? spinToken });
 });
 
 app.post("/api/award-coins", async (req, res) => {

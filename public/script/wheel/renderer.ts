@@ -13,7 +13,7 @@ export function getSegmentColor(index: number): string {
   return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
 }
 
-function getPointOnCircle(center: Point, radius: number, angleRadians: number): Point {
+export function getPointOnCircle(center: Point, radius: number, angleRadians: number): Point {
   return {
     x: center.x + radius * Math.cos(angleRadians - Math.PI / 2),
     y: center.y + radius * Math.sin(angleRadians - Math.PI / 2),

@@ -8,7 +8,10 @@ export const SPIN_END_DELAY: number = 65;
 export const MIN_ITEMS: number = 2;
 export const MAX_ITEMS: number = 16;
 export const DRUMROLL_DELAY_THRESHOLD = 30;
-
+export const INVENTORY_LIMIT: number = 12;
+export const SVG_NS = "http://www.w3.org/2000/svg";
+export const MINI_CENTER = { x: 100, y: 100 };
+export const MINI_RADIUS = 90;
 
 export const SEGMENT_COLORS: string[] = [
   "#f4d87e",

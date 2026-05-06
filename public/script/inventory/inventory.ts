@@ -1,4 +1,4 @@
-import { FULL_CIRCLE_RADIANS, SEGMENT_COLORS } from "../shared/constants.js";
+import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS } from "../shared/constants.js";
 import {
   addItemModal,
   addItemInput,
@@ -12,44 +12,43 @@ import {
   inventoryCloseBtn,
   inventoryGrid,
   inventoryModal,
-  cancelDeleteBtn
+  cancelDeleteBtn,
+  closeOnBackdropClick
 } from "../shared/dom.js";
-import { supabaseClient } from "../shared/supabase-client.js";
+import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
-
-type InventoryItem = {
-  id: string;
-  title: string;
-  link: string | null;
-};
-
-const level: number = 12;
-
-let loadedItems: InventoryItem[] = [];
+import { InventoryItem } from "../shared/types.js";
+import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 
 let pendingDeleteId: string | null = null;
 
-async function getCurrentUser() {
-  const {
-    data: { user },
-    error,
-  } = await supabaseClient.auth.getUser();
-
-  if (error) {
-    console.error("Fehler beim Laden des Users:", error.message);
-    return null;
-  }
-
-  return user;
-}
-
-function askDelete(id: string, title: string): void {
+function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
   confirmDeleteName.textContent = title;
   confirmDeleteModal.showModal();
 }
 
-async function deleteItem(id: string): Promise<void> {
+async function openInventoryModal(): Promise<void> {
+  await loadInventory();
+  inventoryModal.showModal();
+}
+
+async function confirmDelete(): Promise<void> {
+  confirmDeleteModal.close();
+  if (!pendingDeleteId) return;
+
+  const success = await deleteItem(pendingDeleteId);
+  pendingDeleteId = null;
+
+  if (success) await loadInventory();
+}
+
+function cancelDelete(): void {
+  confirmDeleteModal.close();
+  pendingDeleteId = null;
+}
+
+async function deleteItem(id: string): Promise<boolean> {
   const { error } = await supabaseClient
     .from("saved_links")
     .delete()
@@ -57,9 +56,9 @@ async function deleteItem(id: string): Promise<void> {
 
   if (error) {
     console.error("Fehler beim Löschen:", error);
-    return;
+    return false;
   }
-  await loadInventory();
+  return true;
 }
 
 function openAddItemModal(): void {
@@ -77,98 +76,100 @@ function closeAddItemModal(): void {
 
 function renderInventory(items: InventoryItem[]): void {
   inventoryGrid.innerHTML = "";
+  let addCardPlaced = false;
 
-  let addButtonWasCreated = false;
-
-  for (let i = 0; i < level; i++) {
+  for (let i = 0; i < INVENTORY_LIMIT; i++) {
     const item = items[i];
 
     if (!item) {
-      if (!addButtonWasCreated) {
-        const addCard = document.createElement("div");
-        addCard.className = "inventory-card add";
-        addCard.id = "addCardBtn";
-        addCard.textContent = "+";
-        addCard.setAttribute("role", "button");
-        addCard.setAttribute("tabindex", "0");
-        addCard.addEventListener("click", openAddItemModal);
-        addCard.addEventListener("keydown", (e: KeyboardEvent) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            openAddItemModal();
-          }
-        });
-
-        inventoryGrid.appendChild(addCard);
-        addButtonWasCreated = true;
-      } else {
-        const emptyCard = document.createElement("div");
-        emptyCard.className = "inventory-card empty";
-        emptyCard.textContent = "";
-        inventoryGrid.appendChild(emptyCard);
-      }
-
+      inventoryGrid.appendChild(addCardPlaced ? createEmptyCard() : createAddCard());
+      addCardPlaced = true;
       continue;
     }
 
-    const hasValidLink = item.link !== null && item.link.trim() !== "";
-
-    const card = hasValidLink
-      ? document.createElement("a")
-      : document.createElement("div");
-
-    card.classList.add("inventory-card");
-
-    if (card instanceof HTMLAnchorElement) {
-      card.href = item.link!;
-    }
-
-    const content = document.createElement("div");
-    content.className = "inventory-card-content";
-
-    const names = extractNamesFromLink(item.link);
-
-    if (names.length >= 2) {
-      const miniWheel = createMiniWheel(names, 65);
-      miniWheel.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-      content.appendChild(miniWheel);
-    }
-
-    const title = document.createElement("h3");
-    title.textContent = item.title;
-
-    content.appendChild(title);
-    card.appendChild(content);
-
-    if (hasValidLink) {
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "inventory-delete-btn";
-      deleteBtn.setAttribute("aria-label", "Eintrag löschen");
-      deleteBtn.textContent = "🗑️";
-      deleteBtn.addEventListener("click", (e: MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        askDelete(item.id, item.title);
-      });
-      (card as HTMLElement).appendChild(deleteBtn);
-    }
-
-    inventoryGrid.appendChild(card);
-
-    console.log("LINK:", item.link);
-    console.log("NAMES:", extractNamesFromLink(item.link));
+    inventoryGrid.appendChild(createItemCard(item));
 
   }
 }
 
-async function loadInventory(): Promise<void> {
-  const user = await getCurrentUser();
+function createAddCard(): HTMLDivElement {
+  const card = document.createElement("div");
+  card.className = "inventory-card add";
+  card.id = "addCardBtn";
+  card.textContent = "+";
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  card.addEventListener("click", openAddItemModal);
+  card.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openAddItemModal();
+    }
+  });
+  return card;
+}
 
-  if (!user) {
-    renderInventory([]);
-    return;
+function createEmptyCard(): HTMLDivElement {
+  const card = document.createElement("div");
+  card.className = "inventory-card empty";
+  return card;
+}
+
+function createItemCard(item: InventoryItem): HTMLElement {
+  const hasValidLink = (item.link ?? "").trim() !== "";
+  const card = hasValidLink
+    ? document.createElement("a")
+    : document.createElement("div");
+
+  card.classList.add("inventory-card");
+
+  if (card instanceof HTMLAnchorElement) {
+    card.href = item.link!;
   }
+
+  card.appendChild(buildCardContent(item));
+
+  if (hasValidLink) {
+    card.appendChild(createDeleteButton(item));
+  }
+
+  return card;
+}
+
+function buildCardContent(item: InventoryItem): HTMLDivElement {
+  const content = document.createElement("div");
+  content.className = "inventory-card-content";
+
+  const names = extractNamesFromLink(item.link);
+  if (names.length >= 2) {
+    const miniWheel = createMiniWheel(names, 65);
+    miniWheel.style.transform = `rotate(${Math.random() * 360}deg)`;
+    content.appendChild(miniWheel);
+  }
+
+  const heading = document.createElement("h3");
+  heading.textContent = item.title;
+  content.appendChild(heading);
+
+  return content;
+}
+
+function createDeleteButton(item: InventoryItem): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.className = "inventory-delete-btn";
+  btn.setAttribute("aria-label", "Eintrag löschen");
+  btn.textContent = "🗑️";
+  btn.addEventListener("click", (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openDeleteModal(item.id, item.title);
+  });
+  return btn;
+}
+
+async function fetchInventoryItems(): Promise<InventoryItem[]> {
+  const user = await fetchCurrentUser();
+  if (!user) return [];
 
   const { data, error } = await supabaseClient
     .from("saved_links")
@@ -179,44 +180,36 @@ async function loadInventory(): Promise<void> {
     `)
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
-    .limit(12);
+    .limit(INVENTORY_LIMIT);
 
   if (error) {
     console.error("Fehler beim Laden:", error);
-    renderInventory([]);
-    return;
+    return [];
   }
 
-  loadedItems = data ?? [];
-  console.log("Geladene Links:", loadedItems);
-  renderInventory(loadedItems);
+  return data ?? [];
+}
+
+async function loadInventory(): Promise<void> {
+  renderInventory(await fetchInventoryItems());
 }
 
 async function submitItem(): Promise<void> {
   const name = addItemInput.value.trim();
-
   if (!name) {
     addItemInput.focus();
     return;
   }
-  const user = await getCurrentUser();
+
+  const user = await fetchCurrentUser();
   if (!user) return;
-
-  const { data: userData, error: userError } = await supabaseClient.auth.getUser();
-
-  const link = generateShareLink();
-
-  if (userError || !userData.user) {
-    console.error("Nicht eingeloggt");
-    return;
-  }
 
   const { error } = await supabaseClient
     .from("saved_links")
     .insert({
-      user_id: userData.user.id,
+      user_id: user.id,
       link_name: name,
-      url: link
+      url: generateShareLink()
     });
 
   if (error) {
@@ -225,23 +218,14 @@ async function submitItem(): Promise<void> {
   }
 
   closeAddItemModal();
-
   await loadInventory();
 }
 
 export function initInventory(): void {
-  inventoryBtn.addEventListener("click", async () => {
-    await loadInventory();
-    inventoryModal.showModal();
-  });
-
-  inventoryCloseBtn.addEventListener("click", () => {
-    inventoryModal.close();
-  });
-
+  inventoryBtn.addEventListener("click", openInventoryModal);
+  inventoryCloseBtn.addEventListener("click", () => inventoryModal.close());
   inventoryModal.addEventListener("click", (e) => {
     const inner = inventoryModal.querySelector(".inventory-content");
-
     if (inner && !inner.contains(e.target as Node)) {
       inventoryModal.close();
     }
@@ -250,75 +234,33 @@ export function initInventory(): void {
   confirmAddItemBtn.addEventListener("click", submitItem);
   cancelAddItemBtn.addEventListener("click", closeAddItemModal);
   closeAddItemBtn.addEventListener("click", closeAddItemModal);
-
   addItemInput.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
       submitItem();
     }
   });
+  closeOnBackdropClick(addItemModal, closeAddItemModal);
 
-  addItemModal.addEventListener("click", (e) => {
-    if (e.target === addItemModal) {
-      closeAddItemModal();
-    }
-  });
-
-  confirmDeleteBtn.addEventListener("click", async () => {
-    confirmDeleteModal.close();
-    if (pendingDeleteId) {
-      await deleteItem(pendingDeleteId);
-      pendingDeleteId = null;
-    }
-  });
-
-  cancelDeleteBtn.addEventListener("click", () => {
-    confirmDeleteModal.close();
-    pendingDeleteId = null;
-  });
-
-  confirmDeleteModal.addEventListener("click", (e) => {
-    if (e.target === confirmDeleteModal) {
-      confirmDeleteModal.close();
-      pendingDeleteId = null;
-    }
-  });
+  confirmDeleteBtn.addEventListener("click", confirmDelete);
+  cancelDeleteBtn.addEventListener("click", cancelDelete);
+  closeOnBackdropClick(confirmDeleteModal, cancelDelete);
 }
 
 function extractNamesFromLink(link: string | null): string[] {
   if (!link) return [];
 
   try {
-    const url = new URL(link);
-    const params = new URLSearchParams(url.search);
-    const namesParam = params.get("names");
-
+    const namesParam = new URL(link).searchParams.get("names");
     if (!namesParam) return [];
 
     const names = JSON.parse(decodeURIComponent(namesParam));
-
-    if (!Array.isArray(names)) return [];
-
-    return names.filter(n => typeof n === "string" && n.trim());
+    return Array.isArray(names)
+      ? names.filter((n) => typeof n === "string" && n.trim())
+      : [];
   } catch {
     return [];
   }
-}
-
-const SVG_NS = "http://www.w3.org/2000/svg";
-
-const MINI_CENTER = { x: 100, y: 100 };
-const MINI_RADIUS = 90;
-
-function getMiniPoint(center: { x: number; y: number }, radius: number, angle: number) {
-  return {
-    x: center.x + radius * Math.cos(angle - Math.PI / 2),
-    y: center.y + radius * Math.sin(angle - Math.PI / 2),
-  };
-}
-
-function getMiniColor(index: number): string {
-  return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
 }
 
 function createMiniSegment(index: number, count: number): SVGPathElement {
@@ -326,8 +268,8 @@ function createMiniSegment(index: number, count: number): SVGPathElement {
   const start = index * angleStep;
   const end = (index + 1) * angleStep;
 
-  const p1 = getMiniPoint(MINI_CENTER, MINI_RADIUS, start);
-  const p2 = getMiniPoint(MINI_CENTER, MINI_RADIUS, end);
+  const p1 = getPointOnCircle(MINI_CENTER, MINI_RADIUS, start);
+  const p2 = getPointOnCircle(MINI_CENTER, MINI_RADIUS, end);
 
   const largeArc = angleStep > Math.PI ? 1 : 0;
 
@@ -341,7 +283,7 @@ function createMiniSegment(index: number, count: number): SVGPathElement {
      Z`
   );
 
-  path.setAttribute("fill", getMiniColor(index));
+  path.setAttribute("fill", getSegmentColor(index));
   path.setAttribute("stroke", "black");
   path.setAttribute("stroke-width", "0.5");
 
@@ -357,10 +299,9 @@ function createMiniWheel(names: string[], size = 70): SVGSVGElement {
 
   if (names.length < 2) return svg;
 
-  names.forEach((_, i) => {
+  names.forEach((name, i) => {
     svg.appendChild(createMiniSegment(i, names.length));
-
-    svg.appendChild(createMiniLabel(i, names.length, names[i]));
+    svg.appendChild(createMiniLabel(i, names.length, name));
   });
 
   return svg;
@@ -375,14 +316,14 @@ function createMiniLabel(
   const middleAngle = (index + 0.5) * angleStep;
 
   const labelRadius = MINI_RADIUS * 0.6;
-  const point = getMiniPoint(MINI_CENTER, labelRadius, middleAngle);
+  const point = getPointOnCircle(MINI_CENTER, labelRadius, middleAngle);
 
   const text = document.createElementNS(SVG_NS, "text");
 
   text.setAttribute("x", String(point.x));
   text.setAttribute("y", String(point.y));
   text.setAttribute("fill", "black");
-  text.setAttribute("font-size", "8"); // 👈 wichtig: klein!
+  text.setAttribute("font-size", "8");
   text.setAttribute("text-anchor", "middle");
   text.setAttribute("dominant-baseline", "middle");
 

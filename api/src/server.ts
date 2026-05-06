@@ -169,11 +169,7 @@ app.post("/api/award-coins", async (req, res) => {
   res.json({ spinnerCoins, winnerCoins: 0 });
 });
 
-if (USE_MOCK) {
-  app.use('/api/mock', mockRouter);
-  console.log('[mock] In-Memory-Datenbank aktiv');
-}
-
+// hier IF
 app.listen(PORT, () => {
   console.log(`Server läuft auf http://localhost:${PORT}`);
 });

@@ -1,7 +1,7 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { profileName, authButton, coinDisplay } from "../shared/dom.js";
 import { ProfileData } from "../shared/types.js";
-import type { Session } from "@supabase/supabase-js";
+import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -29,7 +29,7 @@ function applyUnauthenticatedState(): void {
   profileName.textContent = "Nicht eingeloggt";
   authButton.textContent = "Login";
   authButton.addEventListener("click", () => {
-    window.location.href = "login.html";
+    window.location.href = "/login.html";
   });
 }
 
@@ -49,16 +49,40 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
 
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "login.html";
+    await supabaseClient.auth.signOut();
+    window.location.href = "/login.html";
   });
 }
 
+function subscribeToCoinUpdates(userId: string): void {
+  if (!coinDisplay) return;
+
+  supabaseClient
+    .channel("coin-updates")
+    .on(
+      "postgres_changes",
+      { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
+      (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
+        const coins = (payload.new as { coins?: number })?.coins ?? 0;
+        applyCoinDisplay(coins);
+      }
+    )
+    .subscribe();
+}
+
 export async function refreshCoinDisplay(): Promise<void> {
-  const session = await fetchCurrentSession();
+  if (!coinDisplay) return;
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
-  const profile = await fetchUserProfile(session.user.id);
-  if (profile) applyCoinDisplay(profile.coins ?? 0);
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("coins")
+    .eq("id", session.user.id)
+    .single();
+
+  applyCoinDisplay((profile as { coins?: number } | null)?.coins ?? 0);
 }
 
 export async function initProfileUI(): Promise<void> {
@@ -72,4 +96,5 @@ export async function initProfileUI(): Promise<void> {
 
   const profile = await fetchUserProfile(session.user.id);
   applyAuthenticatedState(profile);
+  subscribeToCoinUpdates(session.user.id);
 }

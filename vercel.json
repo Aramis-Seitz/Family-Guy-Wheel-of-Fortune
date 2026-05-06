@@ -2,8 +2,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "public/dist",
   "functions": {
-    "api/dist/random.js": {},
-    "api/dist/award-coins.js": {}
+    "api/dist/random.js": { "maxDuration": 10 },
+    "api/dist/award-coins.js": { "maxDuration": 10 }
   },
   "rewrites": [
     { "source": "/api/random", "destination": "/api/dist/random" },

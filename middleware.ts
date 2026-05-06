@@ -15,7 +15,7 @@ export default function middleware(request: Request) {
   const cookieValue = match?.[1];
 
   if (cookieValue !== expected) {
-    return Response.redirect(new URL('/index.html', url), 302);
+    return Response.redirect(new URL('/', url), 302);
   }
 
   return;

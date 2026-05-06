@@ -2,6 +2,7 @@
   "name": "public",
   "version": "1.0.0",
   "description": "public mit TypeScript",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --project tsconfig.json && vite build && node -e \"require('fs').cpSync('assets','dist/assets',{recursive:true})\"",

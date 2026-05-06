@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 function createServiceClient() {
   return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+    process.env.VITE_SUPABASE_URL,
+    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY
   );
 }
 
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const ranNum = getSecureRandomNumber(360, 900);
  
   // Wenn Env-Vars nicht gesetzt: Rad funktioniert, aber keine Coins
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (!process.env.VITE_SUPABASE_URL || !process.env.VITE_SUPABASE_SERVICE_ROLE_KEY) {
     return res.status(200).json({ ranNum, spinToken: '' });
   }
   

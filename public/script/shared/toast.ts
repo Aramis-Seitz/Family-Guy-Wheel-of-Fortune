@@ -5,7 +5,7 @@ const toastAnimationMs = 300;
 
 function getOrCreateToastContainer(): HTMLDivElement {
   const existing = document.getElementById("toast-container");
-  if (existing instanceof HTMLDivElement) return existing;
+  if (existing instanceof HTMLDivElement) existing.remove();
 
   const container = document.createElement("div");
   container.id = "toast-container";

@@ -100,7 +100,7 @@ if (signupForm) {
             if (error) {
                 console.error('Signup Error:', error);
                 showToast({
-                    message: `Registrierungs fehlgeschlagen: ${error.message}`,
+                    message: `Registrierung fehlgeschlagen: ${error.message}`,
                     type: "error"
                 });
                 return;

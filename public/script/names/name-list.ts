@@ -1,5 +1,6 @@
 import { MAX_ITEMS, MIN_ITEMS } from "../shared/constants.js";
 import { addBtn, emptyHint, errorHint, input, list } from "../shared/dom.js";
+import { showToast } from "../shared/toast.js";
 import { validateName } from "../shared/validation.js";
 import { generateWheel, getSegmentColor } from "../wheel/renderer.js";
 import {
@@ -82,9 +83,14 @@ export function syncAddElements(): void {
   input.style.cursor = tooMany ? "not-allowed" : "text";
 }
 
-function showError(message = "At least 2 entries required."): void {
+function showError(message: string): void {
   errorHint.textContent = message;
   errorHint.classList.remove("hidden");
+
+  showToast({
+    message: `${message}`,
+    type: "error"
+  });
 
   if (errorTimer) clearTimeout(errorTimer);
   errorTimer = setTimeout(() => errorHint.classList.add("hidden"), 2000);
@@ -104,7 +110,7 @@ function shakeItem(item: HTMLLIElement): void {
 function handleRemove(index: number, item: HTMLLIElement): void {
   if (getSegmentCount() <= MIN_ITEMS) {
     shakeItem(item);
-    showError();
+    showError("Mindestens 2 Namen müssen im Rad verbleiben.");
     return;
   }
 
@@ -120,7 +126,7 @@ export function addName(rawName: string): void {
   }
 
   if (!nameState.addName(validation.value)) {
-    showError(`Maximal ${MAX_ITEMS} Eintraege erlaubt.`);
+    showError(`Maximal ${MAX_ITEMS} Einträge erlaubt.`);
     return;
   }
 

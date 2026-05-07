@@ -34,3 +34,11 @@ export type InventoryItem = {
   title: string;
   link: string | null;
 };
+
+export type ToastType = "success" | "error";
+
+export interface ToastOptions {
+  message: string;
+  type: ToastType;
+  durationMs?: number;
+}

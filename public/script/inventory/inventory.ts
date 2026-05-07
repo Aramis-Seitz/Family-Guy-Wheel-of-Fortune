@@ -19,6 +19,7 @@ import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
 import { InventoryItem } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
+import { showToast } from "../shared/toast.js";
 
 let pendingDeleteId: string | null = null;
 
@@ -56,8 +57,17 @@ async function deleteItem(id: string): Promise<boolean> {
 
   if (error) {
     console.error("Fehler beim Löschen:", error);
+    showToast({
+      message: "Löschen fehlgeschlagen. Bitte versuche es erneut.",
+      type: "error"
+    });
     return false;
   }
+
+  showToast({
+    message: "Eintrag erfolreich gelöscht.",
+    type: "success"
+  });
   return true;
 }
 
@@ -214,11 +224,19 @@ async function submitItem(): Promise<void> {
 
   if (error) {
     console.error("Fehler beim Speichern:", error);
+    showToast({
+      message: "Speichern fehlgeschlagen. Bitte verusche es erneut.",
+      type: "error"
+    });
     return;
   }
 
   closeAddItemModal();
   await loadInventory();
+  showToast({
+    message: `"${name}" wurde erfolgreich gespeichert.`,
+    type: "success"
+  });
 }
 
 export function initInventory(): void {

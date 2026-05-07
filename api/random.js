@@ -1,4 +1,4 @@
-import { randomInt } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
 function getSecureRandomNumber(min, max) {
@@ -58,10 +58,14 @@ export default async function handler(req, res) {
       });
     }
 
+    const spinToken = randomUUID();
+
     const { data: tokenData, error: tokenError } = await supabase
       .from("spin_tokens")
       .insert({
+        token: spinToken,
         user_id: user.id,
+        used: false,
       })
       .select("token")
       .single();

@@ -15,7 +15,7 @@ export async function fetchRandomNumber(): Promise<{ ranNum: number; spinToken: 
   console.log("[SPIN] fetchRandomNumber: Anfrage an /api/random wird gesendet…");
   const accessToken = await getAccessToken();
 
-  const response = await fetch("./api/random", {
+  const response = await fetch("/api/random", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 

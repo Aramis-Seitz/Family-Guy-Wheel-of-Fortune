@@ -96,12 +96,21 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
   const names = getNames();
   const winnerName = names[lastWinnerIndex];
 
+  console.log("[SPIN] 🏆 Gewinner ermittelt:", { winnerName, spinToken: spinToken || "LEER" });
+
   displayWinner(winnerName);
   startConfetti();
   awardCoins(spinToken, winnerName)
-    .then(() => refreshCoinDisplay())
+    .then((result) => {
+      if (result) {
+        console.log("[SPIN] ✅ Coins erfolgreich vergeben:", result);
+      } else {
+        console.warn("[SPIN] ⚠️ awardCoins hat null zurückgegeben – keine Coins vergeben");
+      }
+      return refreshCoinDisplay();
+    })
     .catch((err: unknown) => {
-      console.error("Failed to award coins:", err);
+      console.error("[SPIN] ❌ Fehler beim Vergeben von Coins:", err);
     });
 }
 

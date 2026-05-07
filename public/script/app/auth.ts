@@ -1,4 +1,5 @@
 import { supabaseClient } from "../shared/supabase-client.js";
+import { showToast } from "../shared/toast.js";
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
@@ -11,16 +12,15 @@ const signupEmailInput = document.getElementById('signupEmail') as HTMLInputElem
 const signupPasswordInput = document.getElementById('signupPassword') as HTMLInputElement | null;
 const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword') as HTMLInputElement | null;
 
-function showMessage(message: string): void {
-    alert(message);
-}
-
 if (loginForm) {
     loginForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
         event.preventDefault();
 
         if (!loginEmailInput || !loginPasswordInput) {
-            showMessage('Login-Felder wurden nicht gefunden.');
+            showToast({
+                message: "Login-Felder wurden nicht gefunden.",
+                type: "error"
+            });
             return;
         }
 
@@ -35,15 +35,20 @@ if (loginForm) {
 
             if (error) {
                 console.error('Login Error:', error);
-                showMessage(`Login fehlgeschlagen: ${error.message}`);
+                showToast({
+                    message: `Login fehlgeschlagen: ${error.message}`,
+                    type: "error"
+                });
                 return;
             }
 
-            showMessage('Login erfolgreich!');
             window.location.href = 'main.html';
         } catch (err: unknown) {
             console.error('Netzwerkfehler beim Login:', err);
-            showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
+            showToast({
+                message: "Netzwerkfehler. Bitte versuchen Sie es später erneut.",
+                type: "error"
+            });
         }
     });
 }
@@ -53,7 +58,10 @@ if (signupForm) {
         event.preventDefault();
 
         if (!signupUserInput || !signupEmailInput || !signupPasswordInput || !signupConfirmPasswordInput) {
-            showMessage('Registrierungs-Felder wurden nicht gefunden.');
+            showToast({
+                message: "Registrierungs-Felder wurden nicht gefunden.",
+                type: "error"
+            });
             return;
         }
 
@@ -63,12 +71,18 @@ if (signupForm) {
         const confirmPassword: string = signupConfirmPasswordInput.value;
 
         if (!username) {
-            showMessage('Bitte Username eingeben.');
+            showToast({
+                message: "Bitte Username eingeben",
+                type: "error"
+            });
             return;
         }
 
         if (password !== confirmPassword) {
-            showMessage('Passwörter stimmen nicht überein!');
+            showToast({
+                message: "Passwörter stimmen nicht überein!",
+                type: "error"
+            });
             return;
         }
 
@@ -85,12 +99,18 @@ if (signupForm) {
 
             if (error) {
                 console.error('Signup Error:', error);
-                showMessage(`Registrierung fehlgeschlagen: ${error.message}`);
+                showToast({
+                    message: `Registrierung fehlgeschlagen: ${error.message}`,
+                    type: "error"
+                });
                 return;
             }
 
             if (!data.user) {
-                showMessage('Benutzer konnte nicht erstellt werden.');
+                showToast({
+                    message: "Benutzer konnte nicht erstellt werden.",
+                    type: "error"
+                });
                 return;
             }
 
@@ -106,14 +126,21 @@ if (signupForm) {
 
             if (profileError) {
                 console.error('Profile Insert Error:', profileError);
-                showMessage(`Benutzer erstellt, aber Profil konnte nicht gespeichert werden: ${profileError.message}`);
+                showToast({
+                    message: `Benutzer erstellt, aber Profil konnte nicht gespeichert werden: ${profileError.message}`,
+                    type: "error"
+                });
                 return;
             }
 
-            showMessage('Registrierung erfolgreich!');
+            window.location.href = "login.html"
+
         } catch (err: unknown) {
             console.error('Netzwerkfehler bei der Registrierung:', err);
-            showMessage('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
+            showToast({
+                    message: "Netzwerkfehler. Bitte versuchen Sie es später erneut.",
+                    type: "error"
+                });
         }
     });
 }//

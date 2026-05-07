@@ -58,14 +58,14 @@ async function deleteItem(id: string): Promise<boolean> {
   if (error) {
     console.error("Fehler beim Löschen:", error);
     showToast({
-      message: "Löschen fehlgeschlagen. Bitte versuche es erneut.",
+      message: "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut.",
       type: "error"
     });
     return false;
   }
 
   showToast({
-    message: "Eintrag erfolreich gelöscht.",
+    message: "Eintrag erfolgreich gelöscht.",
     type: "success"
   });
   return true;
@@ -225,7 +225,7 @@ async function submitItem(): Promise<void> {
   if (error) {
     console.error("Fehler beim Speichern:", error);
     showToast({
-      message: "Speichern fehlgeschlagen. Bitte verusche es erneut.",
+      message: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
       type: "error"
     });
     return;

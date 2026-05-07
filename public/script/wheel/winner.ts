@@ -126,10 +126,10 @@ export function setupWinnerModal(): void {
   });
 
   removeBtn.addEventListener("click", () => {
-    if (lastWinnerIndex >= 0) {
-      removeNameByIndex(lastWinnerIndex);
-      modal.classList.add("hidden");
-      resetWheelRotation();
-    }
+    if (lastWinnerIndex < 0) return;
+
+    removeNameByIndex(lastWinnerIndex);
+    modal.classList.add("hidden");
+    resetWheelRotation();
   });
 }

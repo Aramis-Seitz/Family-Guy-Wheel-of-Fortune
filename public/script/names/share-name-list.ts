@@ -1,6 +1,7 @@
 import { shareBtn } from "../shared/dom.js";
 import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/spin.js";
 import { getNames, replaceNames } from "./name-list.js";
+import { showToast } from "../shared/toast.js";
 
 export function generateShareLink(): string {
     const names = getNames();
@@ -49,10 +50,16 @@ export function initShareFeature(): void {
 
         try {
             await navigator.clipboard.writeText(link);
-            alert("Link copied!");
+            showToast({
+                message: "Link copied!",
+                type: "success"
+            });
         } catch (error) {
             console.error("Could not copy link:", error);
-            alert(link);
+            showToast({
+                message: `Could not copy link: ${error}`,
+                type: "error"
+            });
         }
     });
 

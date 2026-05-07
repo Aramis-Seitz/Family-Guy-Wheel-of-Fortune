@@ -129,16 +129,18 @@ function logSpinDetails(ranNum: number, multiplier: number, boostedValue: number
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
   if (getSegmentCount() < 2) return;
 
+  console.log(`[SPIN] 🎡 Spin-Button geklickt – Richtung: ${direction}`);
   disableElements(getSpinRelatedElements());
 
   try {
     const { ranNum, spinToken } = await fetchRandomNumber();
+    console.log("[SPIN] Token empfangen:", spinToken ? `"${spinToken}"` : "LEER!");
     const multiplier = getMultiplier();
     const boostedRanNum = ranNum * multiplier;
     logSpinDetails(ranNum, multiplier, boostedRanNum);
     spinWheel(boostedRanNum, direction, spinToken);
   } catch (error) {
-    console.error("Error while getting random value:", error);
+    console.error("[SPIN] ❌ Fehler beim Spin:", error);
     enableElements(getSpinRelatedElements());
   }
 }

@@ -1,0 +1,45 @@
+.add-row.name-input-validation-host {
+    position: relative;
+    overflow: visible;
+}
+
+.name-input-field-error {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 10px);
+    z-index: 1;
+    pointer-events: none;
+    margin: 0;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid rgba(231, 76, 60, 0.28);
+    border-radius: calc(var(--radius-md) + 2px);
+    background: rgba(255, 244, 242, 0.96);
+    box-shadow: 0 12px 28px rgba(138, 28, 17, 0.12);
+    color: var(--color-error, #e74c3c);
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    text-align: left;
+}
+
+.name-input-field-error::before {
+    content: "Invalid input";
+    display: block;
+    margin-bottom: 0.2rem;
+    color: rgba(138, 28, 17, 0.82);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.name-input-field-error[hidden] {
+    display: none;
+}
+
+#nameInput.name-input-invalid {
+    border: 1px solid var(--color-error, #e74c3c);
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.14);
+}

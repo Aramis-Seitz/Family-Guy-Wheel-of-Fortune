@@ -1,5 +1,6 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { showToast } from "../shared/toast.js";
+
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
 
@@ -41,10 +42,6 @@ if (loginForm) {
                 return;
             }
 
-            showToast({
-                message: "Login erfolreich!",
-                type: "success"
-            });
             window.location.href = 'main.html';
         } catch (err: unknown) {
             console.error('Netzwerkfehler beim Login:', err);
@@ -136,10 +133,8 @@ if (signupForm) {
                 return;
             }
 
-            showToast({
-                    message: "Registrierung erfolgreich!",
-                    type: "success"
-                });
+            window.location.href = "login.html"
+
         } catch (err: unknown) {
             console.error('Netzwerkfehler bei der Registrierung:', err);
             showToast({

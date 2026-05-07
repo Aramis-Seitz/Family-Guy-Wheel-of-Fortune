@@ -9,6 +9,7 @@ function getOrCreateToastContainer(): HTMLDivElement {
 
   const container = document.createElement("div");
   container.id = "toast-container";
+  container.setAttribute("popover", "manual"); 
   document.body.appendChild(container);
   container.showPopover();
   return container;

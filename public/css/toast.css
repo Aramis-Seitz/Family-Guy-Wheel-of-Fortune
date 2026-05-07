@@ -1,4 +1,4 @@
-#toast-container {
+#toast-container:popover-open {
   position: fixed !important;
   bottom: 32px !important;
   left: 50% !important;

@@ -106,7 +106,7 @@ export function createMockServiceClient() {
         const profile = findProfile(decoded.id);
         if (!profile) return { data: { user: null }, error: { message: 'User not found' } };
         return {
-          data: { user: { id: decoded.id, email: decoded.email, user_metadata: { username: decoded.username } } },
+          data: { user: { id: decoded.id, email: decoded.email, user_metadata: { username: decoded.username, date_of_birth: profile.date_of_birth } } },
           error: null,
         };
       },

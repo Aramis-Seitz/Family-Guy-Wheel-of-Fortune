@@ -1,60 +1,24 @@
 import { input } from "../shared/dom.js";
-import { validateName } from "../shared/validation.js";
+import { showToast } from "../shared/toast.js";
+import {
+  NAME_VALIDATION_ERROR,
+  type NameValidationErrorCode,
+  validateName,
+} from "../shared/validation.js";
 
 type NameValidationResult = ReturnType<typeof validateName>;
 
-const ERROR_ELEMENT_ID = "nameInputFieldError";
-const ERROR_ELEMENT_CLASS = "name-input-field-error";
-const HOST_ELEMENT_CLASS = "name-input-validation-host";
 const INVALID_INPUT_CLASS = "name-input-invalid";
 
-function getInputRow(): HTMLDivElement {
-  const row = input.closest<HTMLDivElement>(".add-row");
-
-  if (!row) {
-    throw new Error("Missing .add-row container for #nameInput.");
+function getNameValidationMessage(code: NameValidationErrorCode): string {
+  switch (code) {
+    case NAME_VALIDATION_ERROR.REQUIRED:
+      return "Bitte einen Namen eingeben.";
+    case NAME_VALIDATION_ERROR.INVALID_CHARACTERS:
+      return "Nur Buchstaben, Zahlen und Apostrophe erlaubt.";
+    default:
+      return "Ungültige Eingabe.";
   }
-
-  return row;
-}
-
-function getExistingErrorElement(): HTMLParagraphElement | null {
-  return document.getElementById(ERROR_ELEMENT_ID) as HTMLParagraphElement | null;
-}
-
-function createErrorElement(): HTMLParagraphElement {
-  const inputRow = getInputRow();
-  const errorElement = document.createElement("p");
-
-  inputRow.classList.add(HOST_ELEMENT_CLASS);
-
-  errorElement.id = ERROR_ELEMENT_ID;
-  errorElement.className = ERROR_ELEMENT_CLASS;
-  errorElement.setAttribute("role", "alert");
-  errorElement.setAttribute("aria-live", "polite");
-  errorElement.hidden = true;
-
-  inputRow.appendChild(errorElement);
-  input.setAttribute("aria-describedby", ERROR_ELEMENT_ID);
-
-  return errorElement;
-}
-
-function getErrorElement(): HTMLParagraphElement {
-  const existingElement = getExistingErrorElement();
-
-  if (existingElement) {
-    return existingElement;
-  }
-
-  return createErrorElement();
-}
-
-function updateErrorMessage(message: string): void {
-  const errorElement = getErrorElement();
-
-  errorElement.textContent = message;
-  errorElement.hidden = message.length === 0;
 }
 
 function setInputInvalidState(isInvalid: boolean): void {
@@ -70,12 +34,14 @@ function setInputInvalidState(isInvalid: boolean): void {
 }
 
 export function showNameInputError(message: string): void {
-  updateErrorMessage(message);
   setInputInvalidState(true);
+  showToast({
+    message,
+    type: "error"
+  });
 }
 
 export function clearNameInputError(): void {
-  updateErrorMessage("");
   setInputInvalidState(false);
 }
 
@@ -87,13 +53,11 @@ export function validateNameInput(rawName: string): NameValidationResult {
     return result;
   }
 
-  showNameInputError(result.message);
+  showNameInputError(getNameValidationMessage(result.code));
   return result;
 }
 
 export function initNameInputValidation(): void {
-  getErrorElement();
-
   input.addEventListener("input", () => {
     const currentValue = input.value.trim();
 
@@ -102,6 +66,7 @@ export function initNameInputValidation(): void {
       return;
     }
 
-    validateNameInput(currentValue);
+    const result = validateName(currentValue);
+    setInputInvalidState(!result.valid);
   });
 }

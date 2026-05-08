@@ -9,6 +9,7 @@ const loginPasswordInput = document.getElementById('loginPassword') as HTMLInput
 
 const signupUserInput = document.getElementById('signupUser') as HTMLInputElement | null;
 const signupEmailInput = document.getElementById('signupEmail') as HTMLInputElement | null;
+const signupDateOfBirthInput = document.getElementById('signupDateOfBirth') as HTMLInputElement | null;
 const signupPasswordInput = document.getElementById('signupPassword') as HTMLInputElement | null;
 const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword') as HTMLInputElement | null;
 
@@ -57,7 +58,7 @@ if (signupForm) {
     signupForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
         event.preventDefault();
 
-        if (!signupUserInput || !signupEmailInput || !signupPasswordInput || !signupConfirmPasswordInput) {
+        if (!signupUserInput || !signupEmailInput || !signupDateOfBirthInput || !signupPasswordInput || !signupConfirmPasswordInput) {
             showToast({
                 message: "Registrierungs-Felder wurden nicht gefunden.",
                 type: "error"
@@ -67,12 +68,30 @@ if (signupForm) {
 
         const username: string = signupUserInput.value.trim();
         const email: string = signupEmailInput.value.trim();
+        const dateOfBirth: string = signupDateOfBirthInput.value;
         const password: string = signupPasswordInput.value;
         const confirmPassword: string = signupConfirmPasswordInput.value;
 
         if (!username) {
             showToast({
                 message: "Bitte Username eingeben",
+                type: "error"
+            });
+            return;
+        }
+
+        if (!dateOfBirth) {
+            showToast({
+                message: "Bitte Geburtsdatum eingeben.",
+                type: "error"
+            });
+            return;
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+        if (dateOfBirth > today) {
+            showToast({
+                message: "Geburtsdatum darf nicht in der Zukunft liegen.",
                 type: "error"
             });
             return;
@@ -93,6 +112,7 @@ if (signupForm) {
                 options: {
                     data: {
                         username,
+                        date_of_birth: dateOfBirth,
                     },
                 },
             });
@@ -121,6 +141,7 @@ if (signupForm) {
                         id: data.user.id,
                         username: username,
                         email: email,
+                        date_of_birth: dateOfBirth,
                     },
                 ]);
 

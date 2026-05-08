@@ -2,7 +2,7 @@ const SESSION_KEY = 'mock_session';
 
 interface MockSession {
   access_token: string;
-  user: { id: string; email: string; user_metadata: { username: string } };
+  user: { id: string; email: string; user_metadata: { username: string; date_of_birth?: string | null } };
 }
 
 function loadSession(): MockSession | null {
@@ -172,12 +172,13 @@ export function createMockClient() {
         return { data: body, error: null };
       },
 
-      async signUp({ email, password, options }: { email: string; password: string; options?: { data?: { username?: string } } }) {
+      async signUp({ email, password, options }: { email: string; password: string; options?: { data?: { username?: string; date_of_birth?: string } } }) {
         const username = options?.data?.username ?? '';
+        const date_of_birth = options?.data?.date_of_birth ?? null;
         const res = await fetch('/api/mock/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, username }),
+          body: JSON.stringify({ email, password, username, date_of_birth }),
         });
         const body = await res.json();
         if (!res.ok) return { data: { user: null }, error: { message: body.error } };

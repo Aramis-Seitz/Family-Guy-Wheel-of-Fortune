@@ -11,7 +11,7 @@ import {
   deleteSavedLink,
 } from './mock-store';
 
-export function decodeMockJwt(jwt: string): { id: string; email: string; username: string } | null {
+export function decodeMockJwt(jwt: string): { id: string; email: string; username: string; date_of_birth?: string | null } | null {
   if (!jwt.startsWith('mock_')) return null;
   try {
     return JSON.parse(Buffer.from(jwt.slice(5), 'base64').toString('utf8'));
@@ -23,7 +23,7 @@ export function decodeMockJwt(jwt: string): { id: string; email: string; usernam
 export const mockRouter = Router();
 
 mockRouter.post('/auth/signup', (req, res) => {
-  const { email, password, username } = req.body ?? {};
+  const { email, password, username, date_of_birth } = req.body ?? {};
 
   if (!email || !password || !username) {
     res.status(400).json({ error: 'email, password und username erforderlich' });
@@ -36,10 +36,10 @@ mockRouter.post('/auth/signup', (req, res) => {
   }
 
   const id = randomUUID();
-  createProfile({ id, email, username, password });
+  createProfile({ id, email, username, date_of_birth: date_of_birth ?? null, password });
 
-  const payload = Buffer.from(JSON.stringify({ id, email, username })).toString('base64');
-  res.json({ token: `mock_${payload}`, user: { id, email, user_metadata: { username } } });
+  const payload = Buffer.from(JSON.stringify({ id, email, username, date_of_birth: date_of_birth ?? null })).toString('base64');
+  res.json({ token: `mock_${payload}`, user: { id, email, user_metadata: { username, date_of_birth: date_of_birth ?? null } } });
 });
 
 mockRouter.post('/auth/login', (req, res) => {
@@ -52,30 +52,30 @@ mockRouter.post('/auth/login', (req, res) => {
   }
 
   const { id, username } = profile;
-  const payload = Buffer.from(JSON.stringify({ id, email: profile.email, username })).toString('base64');
-  res.json({ token: `mock_${payload}`, user: { id, email: profile.email, user_metadata: { username } } });
+  const payload = Buffer.from(JSON.stringify({ id, email: profile.email, username, date_of_birth: profile.date_of_birth })).toString('base64');
+  res.json({ token: `mock_${payload}`, user: { id, email: profile.email, user_metadata: { username, date_of_birth: profile.date_of_birth } } });
 });
 
 mockRouter.get('/profile/by-username/:username', (req, res) => {
   const profile = findProfileByUsername(req.params.username);
   if (!profile) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json({ id: profile.id, username: profile.username, email: profile.email, coins: profile.coins });
+  res.json({ id: profile.id, username: profile.username, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
 });
 
 mockRouter.get('/profile/:userId', (req, res) => {
   const profile = findProfile(req.params.userId);
   if (!profile) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json({ id: profile.id, username: profile.username, email: profile.email, coins: profile.coins });
+  res.json({ id: profile.id, username: profile.username, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
 });
 
 mockRouter.post('/profile', (req, res) => {
-  const { id, username, email } = req.body ?? {};
+  const { id, username, email, date_of_birth } = req.body ?? {};
   if (findProfile(id)) {
     // already created during signup – silent no-op
     res.status(409).json({ error: 'Already exists' });
     return;
   }
-  const profile = createProfile({ id, username, email, password: '' });
+  const profile = createProfile({ id, username, email, date_of_birth: date_of_birth ?? null, password: '' });
   res.json(profile);
 });
 

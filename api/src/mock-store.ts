@@ -4,6 +4,7 @@ export interface Profile {
   id: string;
   username: string;
   email: string;
+  date_of_birth: string | null;
   password: string;
   coins: number;
 }
@@ -29,6 +30,7 @@ export const store = {
       id: '00000000-0000-0000-0000-000000000001',
       username: 'admin',
       email: 'admin@admin.de',
+      date_of_birth: null,
       password: 'admin',
       coins: 0,
     },

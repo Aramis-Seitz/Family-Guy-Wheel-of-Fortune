@@ -1,5 +1,5 @@
 import { MAX_ITEMS, MIN_ITEMS } from "../shared/constants.js";
-import { addBtn, emptyHint, errorHint, input, list } from "../shared/dom.js";
+import { addBtn, emptyHint, input, list } from "../shared/dom.js";
 import { showToast } from "../shared/toast.js";
 import { validateName } from "../shared/validation.js";
 import { generateWheel, getSegmentColor } from "../wheel/renderer.js";
@@ -9,8 +9,6 @@ import {
   validateNameInput,
 } from "./name-input-validation.js";
 import { nameState } from "./name-state.js";
-
-let errorTimer: ReturnType<typeof setTimeout> | null = null;
 
 export function getNames(): string[] {
   return nameState.getNames();
@@ -63,11 +61,10 @@ export function updateEmptyState(): void {
 }
 
 export function syncRemoveButtons(): void {
-  const tooFew = getSegmentCount() <= MIN_ITEMS;
   const buttons = list.querySelectorAll(".btn-remove") as NodeListOf<HTMLButtonElement>;
 
   buttons.forEach((btn) => {
-    btn.disabled = tooFew;
+    btn.disabled = false;
   });
 }
 
@@ -83,17 +80,11 @@ export function syncAddElements(): void {
   input.style.cursor = tooMany ? "not-allowed" : "text";
 }
 
-function showError(message: string): void {
-  errorHint.textContent = message;
-  errorHint.classList.remove("hidden");
-
+function showErrorToast(message: string): void {
   showToast({
     message: `${message}`,
     type: "error"
   });
-
-  if (errorTimer) clearTimeout(errorTimer);
-  errorTimer = setTimeout(() => errorHint.classList.add("hidden"), 2000);
 }
 
 export function refreshWheel(): void {
@@ -110,7 +101,7 @@ function shakeItem(item: HTMLLIElement): void {
 function handleRemove(index: number, item: HTMLLIElement): void {
   if (getSegmentCount() <= MIN_ITEMS) {
     shakeItem(item);
-    showError("Mindestens 2 Namen müssen im Rad verbleiben.");
+    showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
     return;
   }
 
@@ -126,11 +117,11 @@ export function addName(rawName: string): void {
   }
 
   if (!nameState.addName(validation.value)) {
-    showError(`Maximal ${MAX_ITEMS} Einträge erlaubt.`);
+    showErrorToast(`Maximal ${MAX_ITEMS} Einträge erlaubt.`);
     return;
   }
 
-  input.value = "";
+ input.value = "";
   clearNameInputError();
   input.focus();
 }

@@ -3,6 +3,7 @@ import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { getCurrentRotation, resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
+import { showToast } from "../shared/toast.js";
 
 export function getWinningSegmentIndexForRotation(rotation: number, segmentCount: number): number {
   const normalizedRotation = ((rotation % 360) + 360) % 360;
@@ -88,6 +89,7 @@ function startConfetti(): void {
 }
 
 let lastWinnerIndex: number = -1;
+let lastWinnerName: string = "";
 
 export function announceWinner(segmentCount: number, spinToken: string): void {
   stopDrumRoll();
@@ -95,6 +97,7 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
   lastWinnerIndex = getWinningSegmentIndex(segmentCount);
   const names = getNames();
   const winnerName = names[lastWinnerIndex];
+  lastWinnerName = winnerName;
 
   console.log("[SPIN] 🏆 Gewinner ermittelt:", { winnerName, spinToken: spinToken || "LEER" });
 
@@ -124,12 +127,18 @@ export function setupWinnerModal(): void {
     modal.classList.add("hidden");
     resetWheelRotation();
   });
-
+  
   removeBtn.addEventListener("click", () => {
     if (lastWinnerIndex < 0) return;
 
+    const removedName = lastWinnerName;
     removeNameByIndex(lastWinnerIndex);
     modal.classList.add("hidden");
     resetWheelRotation();
+
+    showToast({
+      message: `"${removedName}" wurde erfolgreich aus dem Rad entfernt.`,
+      type: "success"
+    })
   });
 }

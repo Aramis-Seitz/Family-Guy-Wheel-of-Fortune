@@ -4,6 +4,7 @@ import { stopDrumRoll } from "./sound.js";
 import { getCurrentRotation, resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
 import { showToast } from "../shared/toast.js";
+import { winnerModal, closeWinnerModalBtn, removeWinnerBtn, winnerText, confettiCanvas } from "../shared/dom.js";
 
 export function getWinningSegmentIndexForRotation(rotation: number, segmentCount: number): number {
   const normalizedRotation = ((rotation % 360) + 360) % 360;
@@ -16,36 +17,31 @@ export function getWinningSegmentIndex(segmentCount: number): number {
   return getWinningSegmentIndexForRotation(getCurrentRotation(), segmentCount);
 }
 
-export function displayWinner(winnerName: string): void {
-  const modal = document.getElementById("winnerModal");
-  const text = document.getElementById("winnerText");
+export function displayWinnerModal(winnerName: string): void {
 
-  if (!modal || !text) return;
+  if (!winnerModal || !winnerText) return;
 
-  text.textContent = `${winnerName}`;
-  modal.classList.remove("hidden");
+  winnerText.textContent = `${winnerName}`;
+  winnerModal.classList.remove("hidden");
 }
 
-export function resetDisplayWinner(): void {
-  const modal = document.getElementById("winnerModal");
-  if (!modal) return;
-
-  modal.classList.add("hidden");
+export function hideWinnerModal(): void {
+  if (!winnerModal) return;
+  winnerModal.classList.add("hidden");
 }
 
 function startConfetti(): void {
-  const canvas = document.getElementById("confettiCanvas") as HTMLCanvasElement;
-  if (!canvas) return;
+  if (!confettiCanvas) return;
 
-  const ctx = canvas.getContext("2d");
+  const ctx = confettiCanvas.getContext("2d");
   if (!ctx) return;
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
 
   const pieces = Array.from({ length: 999 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height - canvas.height,
+    x: Math.random() * confettiCanvas.width,
+    y: Math.random() * confettiCanvas.height - confettiCanvas.height,
     size: Math.random() * 6 + 4,
     speed: Math.random() * 20 + 2,
     angle: Math.random() * Math.PI * 2,
@@ -58,10 +54,10 @@ function startConfetti(): void {
   function update() {
     if (!running) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = confettiCanvas.getContext("2d");
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 
     pieces.forEach(p => {
       p.y += p.speed;
@@ -71,9 +67,9 @@ function startConfetti(): void {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x, p.y, p.size, p.size);
 
-      if (p.y > canvas.height) {
+      if (p.y > confettiCanvas.height) {
         p.y = -10;
-        p.x = Math.random() * canvas.width;
+        p.x = Math.random() * confettiCanvas.width;
       }
     });
 
@@ -84,7 +80,7 @@ function startConfetti(): void {
 
   setTimeout(() => {
     running = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
   }, 3000);
 }
 
@@ -101,7 +97,7 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
 
   console.log("[SPIN] 🏆 Gewinner ermittelt:", { winnerName, spinToken: spinToken || "LEER" });
 
-  displayWinner(winnerName);
+  displayWinnerModal(winnerName);
   startConfetti();
   awardCoins(spinToken, winnerName)
     .then((result) => {
@@ -117,28 +113,28 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
     });
 }
 
-export function setupWinnerModal(): void {
-  const modal = document.getElementById("winnerModal");
-  const closeBtn = document.getElementById("closeModal");
-  const removeBtn = document.getElementById("removeWinner") as HTMLButtonElement;
-  if (!modal || !closeBtn) return;
-
-  closeBtn.addEventListener("click", () => {
-    modal.classList.add("hidden");
-    resetWheelRotation();
-  });
-  
-  removeBtn.addEventListener("click", () => {
-    if (lastWinnerIndex < 0) return;
-
-    const removedName = lastWinnerName;
-    removeNameByIndex(lastWinnerIndex);
-    modal.classList.add("hidden");
-    resetWheelRotation();
-
+function removeWinner(): void {
+  if (lastWinnerIndex < 0) return;
+  const removedName = lastWinnerName;
+  if (getNames().length > 2) {
     showToast({
       message: `"${removedName}" wurde erfolgreich aus dem Rad entfernt.`,
       type: "success"
-    })
+    });
+  }
+
+  removeNameByIndex(lastWinnerIndex);
+  hideWinnerModal();
+  resetWheelRotation();
+}
+
+export function initWinnerModal(): void {
+  if (!winnerModal || !closeWinnerModalBtn) return;
+
+  closeWinnerModalBtn.addEventListener("click", () => {
+    hideWinnerModal();
+    resetWheelRotation();
   });
+
+  removeWinnerBtn.addEventListener("click", removeWinner);
 }

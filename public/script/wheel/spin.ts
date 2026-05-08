@@ -13,7 +13,7 @@ import {
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client.js";
 import { getSegmentCount } from "../names/name-list.js";
-import { announceWinner, resetDisplayWinner } from "./winner.js";
+import { announceWinner, hideWinnerModal } from "./winner.js";
 import type { Direction, SpinConfig } from "../shared/types.js";
 
 let currentRotation = 0;
@@ -152,7 +152,6 @@ export function resetWheelRotation(): void {
   updateWheelRotation();
   enableElements(getSpinRelatedElements());
   stopDrumRoll();
-  resetDisplayWinner();
 }
 
 export function setMultiplierSlider(multiplier: number): void {

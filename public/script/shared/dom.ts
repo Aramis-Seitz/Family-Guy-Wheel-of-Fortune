@@ -48,6 +48,12 @@ export const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName
 export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
 
+export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
+export const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");
+export const removeWinnerBtn = requiredElement<HTMLButtonElement>("removeWinner");
+export const winnerText = requiredElement<HTMLParagraphElement>("winnerText");
+export const confettiCanvas = requiredElement<HTMLCanvasElement>("confettiCanvas");
+
 export const profileName = optionalElement<HTMLSpanElement>("profileName");
 export const authButton = optionalElement<HTMLButtonElement>("authButton");
 export const coinDisplay = optionalElement<HTMLSpanElement>("coinDisplay");

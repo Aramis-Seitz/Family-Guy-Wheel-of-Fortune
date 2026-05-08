@@ -5,7 +5,7 @@ import { addName, initNameList } from "../names/name-list.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import { initMultiplierSlider, initWheelControls } from "../wheel/spin.js";
-import { setupWinnerModal } from "../wheel/winner.js";
+import { initWinnerModal } from "../wheel/winner.js";
 
 function initNameControls(): void {
   addBtn.addEventListener("click", () => addName(input.value));
@@ -34,7 +34,7 @@ async function initApp(): Promise<void> {
   initMultiplierSlider();
   initWheelControls();
   initShareFeature();
-  setupWinnerModal();
+  initWinnerModal();
   await initProfileUI();
   initInventory();
 }

@@ -19,15 +19,15 @@
     <main>
 
         <section aria-label="Login Form" class="form-wrapper login">
-            <form id="loginForm">
+            <form id="loginForm" action="/login.html" method="post" autocomplete="on">
             <div class="input-field">
                 <label for="loginUser">Username</label>
-                <input type="text" id="loginUser" required />
+                <input type="text" id="loginUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
             </div>
 
             <div class="input-field">
                 <label for="loginPassword">Passwort</label>
-                <input type="password" id="loginPassword" required />
+                <input type="password" id="loginPassword" name="password" autocomplete="current-password" required />
             </div>
 
             <button type="submit">Log In</button>

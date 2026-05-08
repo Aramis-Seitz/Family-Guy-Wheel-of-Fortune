@@ -32,6 +32,14 @@
     cursor: pointer;
 }
 
+#profileName.is-clickable {
+    cursor: pointer;
+}
+
+#profileName.is-clickable:hover {
+    text-decoration: underline;
+}
+
 #check:checked ~ main .login     { display: none; }
 #check:not(:checked) ~ main .signup { display: none; }
 

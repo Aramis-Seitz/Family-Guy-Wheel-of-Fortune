@@ -2,6 +2,9 @@ import { supabaseClient } from "../shared/supabase-client.js";
 import { profileName, authButton, coinDisplay } from "../shared/dom.js";
 import { ProfileData } from "../shared/types.js";
 import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { nameState } from "../names/name-state.js";
+import { showToast } from "../shared/toast.js";
+import { MAX_ITEMS } from "../shared/constants.js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -41,11 +44,22 @@ function applyCoinDisplay(coins: number): void {
 
 function applyAuthenticatedState(profile: ProfileData | null): void {
   if (!profileName || !authButton) return;
-  profileName.textContent = profile?.username ?? "Eingeloggt";
+  const username = profile?.username ?? "Eingeloggt";
+  profileName.textContent = username;
 
   if (profile) {
     applyCoinDisplay(profile.coins ?? 0);
   }
+
+  profileName.classList.add("is-clickable");
+  profileName.title = "Klick — zum Rad hinzufügen";
+  profileName.addEventListener("click", () => {
+    if (!nameState.addName(username)) {
+      showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: "error" });
+      return;
+    }
+    showToast({ message: `"${username}" wurde zum Rad hinzugefügt.`, type: "success" });
+  });
 
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {

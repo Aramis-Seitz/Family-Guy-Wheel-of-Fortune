@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../css/modals.css">
     <link rel="stylesheet" href="../css/legal-links.css">
     <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/room.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 
@@ -78,6 +79,26 @@
         <span id="coinDisplay" style="display:none; margin-right:8px;">🪙 0</span>
         <span id="profileName">Nicht eingeloggt</span>
         <button id="authButton" type="button">Login</button>
+    </div>
+
+    <div id="roomPanel">
+        <h3>Multiplayer</h3>
+        <div class="room-controls">
+            <button id="createRoomBtn" class="room-btn" type="button">Raum erstellen</button>
+            <div class="room-join">
+                <input type="text" id="roomKeyInput" placeholder="Code" maxlength="6" autocomplete="off">
+                <button id="joinRoomBtn" class="room-btn" type="button">Beitreten</button>
+            </div>
+        </div>
+        <div id="roomInfo" class="hidden">
+            <div class="room-key-row">
+                <span class="room-key-label">Raum:</span>
+                <span id="roomKeyDisplay"></span>
+                <button id="leaveRoomBtn" class="room-btn" type="button">Verlassen</button>
+            </div>
+            <p class="players-label">Mitspieler:</p>
+            <ul id="playersList"></ul>
+        </div>
     </div>
 
     <div class="container">

@@ -42,3 +42,14 @@ export interface ToastOptions {
   type: ToastType;
   durationMs?: number;
 }
+
+export interface RoomSpinResponse {
+  ranNum: number;
+  spinToken: string;
+}
+
+export interface RoomRow {
+  last_spin: number;
+  spun_at: string;
+  players: string[];
+}

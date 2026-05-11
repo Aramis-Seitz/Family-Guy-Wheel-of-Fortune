@@ -5,7 +5,7 @@ import {
 } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { initInventory } from "../inventory/inventory.js";
-import { addName, initNameList } from "../names/name-list.js";
+import { addName, initNameList, getNames, replaceNames } from "../names/name-list.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import {
@@ -19,8 +19,7 @@ import type { Direction } from "../shared/types.js";
 
 let activeRoomKey: string | null = null;
 let isHost = false;
-let pendingSpinToken = '';
-let pendingSpinDirection: Direction = 'right';
+let savedNames: string[] = [];
 
 function initNameControls(): void {
   addBtn.addEventListener("click", () => addName(input.value));
@@ -34,7 +33,7 @@ async function hasActiveSession(): Promise<boolean> {
   return Boolean(session);
 }
 
-function renderPlayers(players: string[]): void {
+function renderPlayersSidebar(players: string[]): void {
   if (!playersList) return;
   const list = playersList;
   list.innerHTML = '';
@@ -43,6 +42,11 @@ function renderPlayers(players: string[]): void {
     li.textContent = name;
     list.appendChild(li);
   });
+}
+
+function syncRoomPlayers(players: string[]): void {
+  replaceNames(players);
+  renderPlayersSidebar(players);
 }
 
 function setRoomActive(roomKey: string, host: boolean): void {
@@ -62,30 +66,30 @@ function clearRoom(): void {
   setSpinOverride(null);
   activeRoomKey = null;
   isHost = false;
-  pendingSpinToken = '';
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
   spinLeftBtn.classList.remove('room-guest');
   spinRightBtn.classList.remove('room-guest');
-  renderPlayers([]);
+  renderPlayersSidebar([]);
+  replaceNames(savedNames);
 }
 
+// Non-host only: realtime fires → spin wheel visually (no coins)
 function handleRoomSpinEvent(lastSpin: number): void {
+  if (isHost) return; // host already spun directly from POST response
   lockSpinButtons();
-  const token = pendingSpinToken;
-  pendingSpinToken = '';
   const totalSteps = Math.round(lastSpin * getMultiplier());
-  spinWheel(totalSteps, pendingSpinDirection, token);
+  spinWheel(totalSteps, 'right', '');
 }
 
+// Host only: POST → spin directly (token guaranteed, no race condition)
 async function handleRoomSpinClick(direction: Direction): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  pendingSpinDirection = direction;
   lockSpinButtons();
   try {
-    const { spinToken } = await spinRoom(activeRoomKey);
-    pendingSpinToken = spinToken;
-    // Realtime callback triggers the actual spin for all players including host
+    const { ranNum, spinToken } = await spinRoom(activeRoomKey);
+    const totalSteps = Math.round(ranNum * getMultiplier());
+    spinWheel(totalSteps, direction, spinToken);
   } catch (error) {
     console.error('[ROOM] Spin fehlgeschlagen:', error);
     unlockSpinButtons();
@@ -97,10 +101,12 @@ function initRoomControls(): void {
   createRoomBtn?.addEventListener('click', () => {
     void (async () => {
       try {
-        const roomKey = await createRoom();
+        savedNames = getNames();
+        const { roomKey, players } = await createRoom();
         setRoomActive(roomKey, true);
         setSpinOverride(handleRoomSpinClick);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, renderPlayers);
+        syncRoomPlayers(players);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers);
         showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Erstellen fehlgeschlagen:', error);
@@ -114,11 +120,12 @@ function initRoomControls(): void {
       const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
       if (!roomKey) return;
       try {
+        savedNames = getNames();
         const players = await joinRoom(roomKey);
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, renderPlayers);
-        renderPlayers(players);
+        syncRoomPlayers(players);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers);
         showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Beitreten fehlgeschlagen:', error);

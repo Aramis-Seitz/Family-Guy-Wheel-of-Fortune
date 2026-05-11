@@ -200,9 +200,17 @@ app.post("/api/room/create", async (req, res) => {
 
   const roomKey = generateRoomKey();
 
+  const { data: hostProfile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', user.id)
+    .single();
+
+  const hostUsername: string = (hostProfile as { username?: string } | null)?.username ?? user.id;
+
   const { error: insertError } = await supabase
     .from('rooms')
-    .insert({ room_key: roomKey, host_id: user.id, players: [] });
+    .insert({ room_key: roomKey, host_id: user.id, players: [hostUsername] });
 
   if (insertError) {
     console.error('[room/create] insert error:', insertError);
@@ -210,7 +218,7 @@ app.post("/api/room/create", async (req, res) => {
     return;
   }
 
-  res.json({ roomKey });
+  res.json({ roomKey, players: [hostUsername] });
 });
 
 app.post("/api/room/join", async (req, res) => {

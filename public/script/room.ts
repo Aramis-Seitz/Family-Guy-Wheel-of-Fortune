@@ -27,9 +27,8 @@ async function postJson<T>(path: string, body?: Record<string, unknown>): Promis
   return response.json() as Promise<T>;
 }
 
-export async function createRoom(): Promise<string> {
-  const { roomKey } = await postJson<{ roomKey: string }>('/api/room/create');
-  return roomKey;
+export async function createRoom(): Promise<{ roomKey: string; players: string[] }> {
+  return postJson<{ roomKey: string; players: string[] }>('/api/room/create');
 }
 
 export async function joinRoom(roomKey: string): Promise<string[]> {

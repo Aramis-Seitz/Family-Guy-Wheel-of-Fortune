@@ -1,0 +1,379 @@
+.shop-mockup-shell {
+  background: #000;
+  border-radius: 12px;
+  padding: 24px;
+  min-height: 720px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.mockup-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mockup-pill-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.mockup-pill-btn.spin-left {
+  background: #f5c542;
+  color: #111;
+}
+
+.mockup-pill-btn.spin-right {
+  background: #f5a623;
+  color: #111;
+}
+
+.mockup-pill-btn.reset {
+  background: #555;
+  color: #ccc;
+}
+
+.mockup-pill-btn.share {
+  background: #d63384;
+  color: #fff;
+}
+
+.mockup-pill-btn.inventory {
+  background: #00a2ff;
+  color: #111;
+}
+
+.mockup-pill-btn.shop {
+  background: #22c55e;
+  color: #111;
+}
+
+.mockup-pill-btn.is-current {
+  outline: 2px solid #fff;
+}
+
+.mockup-modal {
+  background: rgba(20, 25, 35, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.mockup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.mockup-header-spacer {
+  width: 40px;
+}
+
+.mockup-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.mockup-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mockup-currency-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 197, 66, 0.15);
+  border: 1px solid rgba(245, 197, 66, 0.4);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+.mockup-currency-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f5c542;
+}
+
+.mockup-currency-text {
+  color: #f5c542;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.mockup-close-btn {
+  background: none;
+  border: 1px solid #444;
+  color: #aaa;
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.mockup-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.mockup-tab {
+  background: transparent;
+  color: #aaa;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+}
+
+.mockup-tab.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mockup-tab.is-active {
+  background: rgba(0, 162, 255, 0.18);
+  color: #fff;
+  border: 1px solid rgba(0, 162, 255, 0.45);
+  font-weight: 500;
+}
+
+.mockup-icon-tab {
+  font-size: 14px;
+}
+
+.mockup-helper-text {
+  color: #888;
+  font-size: 12px;
+  margin: 0 0 14px;
+}
+
+.mockup-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.mockup-item {
+  background: rgba(0, 162, 255, 0.18);
+  border: 1px solid rgba(0, 162, 255, 0.3);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mockup-item.is-relative {
+  position: relative;
+}
+
+.mockup-item.is-green {
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+}
+
+.mockup-item.is-selected {
+  border: 2px solid #22c55e;
+}
+
+.mockup-item.is-low-levvis {
+  background: rgba(255, 100, 100, 0.08);
+  border: 1px solid rgba(255, 100, 100, 0.25);
+  opacity: 0.85;
+}
+
+.mockup-status-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #22c55e;
+  color: #111;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.mockup-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00a2ff;
+}
+
+.mockup-thumb.is-green {
+  color: #22c55e;
+}
+
+.mockup-thumb.is-muted {
+  color: #888;
+}
+
+.mockup-icon-volume {
+  font-size: 36px;
+}
+
+.mockup-icon-user {
+  font-size: 38px;
+}
+
+.mockup-icon-bag {
+  font-size: 32px;
+  color: #00a2ff;
+}
+
+.mockup-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.mockup-item-title {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.mockup-preview-btn {
+  background: rgba(0, 162, 255, 0.25);
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.mockup-preview-btn.is-green {
+  background: rgba(34, 197, 94, 0.25);
+}
+
+.mockup-preview-btn.is-muted {
+  background: rgba(255, 255, 255, 0.06);
+  color: #aaa;
+}
+
+.mockup-preview-btn.is-large {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.mockup-icon-play {
+  font-size: 13px;
+}
+
+.mockup-icon-play-large {
+  font-size: 14px;
+  line-height: 1;
+  display: block;
+}
+
+.mockup-action-btn {
+  border-radius: 8px;
+  padding: 7px;
+  font-size: 12px;
+}
+
+.mockup-action-btn.is-buy {
+  background: #00a2ff;
+  color: #111;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.mockup-action-btn.is-owned {
+  background: rgba(255, 255, 255, 0.06);
+  color: #aaa;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 500;
+}
+
+.mockup-action-btn.is-active,
+.mockup-action-btn.is-activated {
+  background: transparent;
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.55);
+  font-weight: 700;
+}
+
+.mockup-action-btn.is-disabled-low {
+  background: rgba(255, 255, 255, 0.04);
+  color: #d97777;
+  border: 1px solid rgba(255, 100, 100, 0.25);
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.mockup-coin-mini {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f5c542;
+}
+
+.mockup-empty-item {
+  background: transparent;
+  border: 1px dashed rgba(0, 162, 255, 0.25);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #aaa;
+  gap: 10px;
+}
+
+.mockup-empty-text {
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.mockup-open-shop-btn {
+  background: transparent;
+  color: #00a2ff;
+  border: 1px solid rgba(0, 162, 255, 0.45);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 500;
+}

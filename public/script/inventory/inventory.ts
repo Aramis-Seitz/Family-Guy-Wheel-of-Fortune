@@ -163,7 +163,7 @@ function buildCardContent(item: InventoryItem): HTMLDivElement {
 
   const date = document.createElement("p");
   date.className = "inventory-date";
-  date.textContent = formatDate(item.createdAt);
+  date.textContent = formatDate(item.created_at);
 
   content.appendChild(date);
 
@@ -193,7 +193,7 @@ async function fetchInventoryItems(): Promise<InventoryItem[]> {
   id,
   title:link_name,
   link:url,
-  createdAt
+  created_at
  `)
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })

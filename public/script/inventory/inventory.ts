@@ -161,6 +161,12 @@ function buildCardContent(item: InventoryItem): HTMLDivElement {
   heading.textContent = item.title;
   content.appendChild(heading);
 
+  const date = document.createElement("p");
+  date.className = "inventory-date";
+  date.textContent = formatDate(item.created_at);
+
+  content.appendChild(date);
+
   return content;
 }
 
@@ -184,10 +190,11 @@ async function fetchInventoryItems(): Promise<InventoryItem[]> {
   const { data, error } = await supabaseClient
     .from("saved_links")
     .select(`
-      id,
-      title:link_name,
-      link:url
-    `)
+  id,
+  title:link_name,
+  link:url,
+  created_at
+ `)
     .eq("user_id", user.id)
     .order("created_at", { ascending: true })
     .limit(INVENTORY_LIMIT);
@@ -279,6 +286,16 @@ function extractNamesFromLink(link: string | null): string[] {
   } catch {
     return [];
   }
+}
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(date);
 }
 
 function createMiniSegment(index: number, count: number): SVGPathElement {

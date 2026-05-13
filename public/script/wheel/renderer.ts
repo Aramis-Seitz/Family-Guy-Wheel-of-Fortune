@@ -85,7 +85,30 @@ export function generateWheel(names: string[]): void {
   const segmentCount = names.length;
   clearWheel();
 
-  if (segmentCount < 2) return;
+  if (segmentCount === 0) return;
+
+  if (segmentCount === 1) {
+    const circle = document.createElementNS(SVG_NS, "circle");
+    circle.setAttribute("cx", String(WHEEL_CENTER.x));
+    circle.setAttribute("cy", String(WHEEL_CENTER.y));
+    circle.setAttribute("r", String(WHEEL_RADIUS));
+    circle.setAttribute("fill", getSegmentColor(0));
+    circle.setAttribute("stroke", "black");
+    circle.setAttribute("stroke-width", "1");
+    wheelElement.appendChild(circle);
+
+    const text = document.createElementNS(SVG_NS, "text");
+    text.setAttribute("x", String(WHEEL_CENTER.x));
+    text.setAttribute("y", String(WHEEL_CENTER.y));
+    text.setAttribute("fill", "black");
+    text.setAttribute("font-size", "10");
+    text.setAttribute("font-weight", "bold");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.textContent = names[0];
+    wheelElement.appendChild(text);
+    return;
+  }
 
   names.forEach((name, index) => {
     const color = getSegmentColor(index);

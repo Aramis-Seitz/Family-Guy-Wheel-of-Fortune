@@ -147,7 +147,8 @@
   border-radius: 100px;
 }
 
-.spin-btn.room-guest {
+.spin-btn.room-guest,
+.spin-btn.room-solo {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;

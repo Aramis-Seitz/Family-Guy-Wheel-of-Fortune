@@ -47,6 +47,14 @@ function renderPlayersSidebar(players: string[]): void {
 function syncRoomPlayers(players: string[]): void {
   replaceNames(players);
   renderPlayersSidebar(players);
+
+  if (players.length < 2) {
+    spinLeftBtn.classList.add('room-solo');
+    spinRightBtn.classList.add('room-solo');
+  } else {
+    spinLeftBtn.classList.remove('room-solo');
+    spinRightBtn.classList.remove('room-solo');
+  }
 }
 
 function setRoomActive(roomKey: string, host: boolean): void {
@@ -68,8 +76,8 @@ function clearRoom(): void {
   isHost = false;
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
-  spinLeftBtn.classList.remove('room-guest');
-  spinRightBtn.classList.remove('room-guest');
+  spinLeftBtn.classList.remove('room-guest', 'room-solo');
+  spinRightBtn.classList.remove('room-guest', 'room-solo');
   renderPlayersSidebar([]);
   replaceNames(savedNames);
 }

@@ -1,7 +1,7 @@
 import { addBtn, input, spinLeftBtn, spinRightBtn } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
-  roomKeyDisplay, roomInfo, playersList,
+  roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
 } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { initInventory } from "../inventory/inventory.js";
@@ -145,6 +145,22 @@ function initRoomControls(): void {
   leaveRoomBtn?.addEventListener('click', () => {
     clearRoom();
     showToast({ message: 'Raum verlassen', type: 'success' });
+  });
+
+  copyRoomKeyBtn?.addEventListener('click', () => {
+    const btn = copyRoomKeyBtn;
+    if (!btn) return;
+    const key = roomKeyDisplay?.textContent ?? '';
+    if (!key) return;
+    void navigator.clipboard.writeText(key).then(() => {
+      btn.classList.add('copied');
+      btn.textContent = '✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '&#128203;';
+      }, 1500);
+      showToast({ message: 'Code in die Zwischenablage kopiert', type: 'success' });
+    });
   });
 }
 

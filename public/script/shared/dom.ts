@@ -62,6 +62,7 @@ export const createRoomBtn = optionalElement<HTMLButtonElement>("createRoomBtn")
 export const roomKeyInput = optionalElement<HTMLInputElement>("roomKeyInput");
 export const joinRoomBtn = optionalElement<HTMLButtonElement>("joinRoomBtn");
 export const leaveRoomBtn = optionalElement<HTMLButtonElement>("leaveRoomBtn");
+export const copyRoomKeyBtn = optionalElement<HTMLButtonElement>("copyRoomKeyBtn");
 export const roomKeyDisplay = optionalElement<HTMLSpanElement>("roomKeyDisplay");
 export const roomInfo = optionalElement<HTMLDivElement>("roomInfo");
 export const playersList = optionalElement<HTMLUListElement>("playersList");

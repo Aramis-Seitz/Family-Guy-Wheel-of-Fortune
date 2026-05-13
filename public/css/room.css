@@ -88,6 +88,21 @@
 
 #leaveRoomBtn:hover { background: #c8c8c8; }
 
+.room-btn--copy {
+  padding: 5px 8px;
+  font-size: 0.85rem;
+  background: #f0f0f0;
+  color: #333;
+  line-height: 1;
+}
+
+.room-btn--copy:hover { background: #ddd; }
+
+.room-btn--copy.copied {
+  background: #d4edda;
+  color: #155724;
+}
+
 #roomInfo {
   margin-top: 10px;
   border-top: 1.5px solid #f0f0f0;

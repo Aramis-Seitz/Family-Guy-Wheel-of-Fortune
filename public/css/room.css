@@ -5,49 +5,64 @@
   z-index: 9000;
   background: white;
   color: black;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border: 2px solid black;
-  min-width: 200px;
+  border-radius: 16px;
+  min-width: 210px;
   font-family: inherit;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 #roomPanel h3 {
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
+  margin: 0 0 10px 0;
+  font-size: 0.85rem;
   font-weight: bold;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #333;
 }
 
 .room-controls {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .room-join {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 #roomKeyInput {
   flex: 1;
-  padding: 6px 8px;
+  padding: 7px 10px;
   font-size: 0.85rem;
   text-transform: uppercase;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1.5px solid #ddd;
+  border-radius: 100px;
   font-family: monospace;
   letter-spacing: 0.15em;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+#roomKeyInput:focus {
+  border-color: #00a2ff;
 }
 
 .room-btn {
-  padding: 6px 12px;
+  padding: 7px 14px;
   font-size: 0.85rem;
   font-weight: bold;
   border: none;
-  border-radius: 4px;
+  border-radius: 100px;
   cursor: pointer;
   white-space: nowrap;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.room-btn:active {
+  transform: scale(0.96);
 }
 
 #createRoomBtn {
@@ -65,18 +80,18 @@
 #joinRoomBtn:hover { background: #0090e0; }
 
 #leaveRoomBtn {
-  background: #888;
-  color: white;
-  font-size: 0.75rem;
-  padding: 4px 8px;
+  background: #e0e0e0;
+  color: #333;
+  font-size: 0.78rem;
+  padding: 5px 10px;
 }
 
-#leaveRoomBtn:hover { background: #666; }
+#leaveRoomBtn:hover { background: #c8c8c8; }
 
 #roomInfo {
   margin-top: 10px;
-  border-top: 1px solid #ddd;
-  padding-top: 8px;
+  border-top: 1.5px solid #f0f0f0;
+  padding-top: 10px;
 }
 
 #roomInfo.hidden { display: none; }
@@ -85,25 +100,33 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .room-key-label {
-  font-size: 0.8rem;
-  color: #555;
+  font-size: 0.78rem;
+  color: #666;
+  flex-shrink: 0;
 }
 
 #roomKeyDisplay {
   font-family: monospace;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: bold;
   letter-spacing: 0.2em;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 100px;
 }
 
 .players-label {
   font-size: 0.75rem;
-  color: #555;
-  margin-bottom: 4px;
+  color: #666;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
 }
 
 #playersList {
@@ -112,12 +135,16 @@
   padding: 0;
   max-height: 120px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 #playersList li {
   font-size: 0.85rem;
-  padding: 2px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 4px 10px;
+  background: #f7f7f7;
+  border-radius: 100px;
 }
 
 .spin-btn.room-guest {

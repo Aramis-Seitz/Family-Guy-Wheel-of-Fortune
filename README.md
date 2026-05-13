@@ -24,7 +24,7 @@ npm --version
 
 ```powershell
 git clone <repo-url>
-cd Family-Guy-Wheel-of-Fortune
+cd <repo-name>
 ```
 
 ### 2. Abhängigkeiten installieren

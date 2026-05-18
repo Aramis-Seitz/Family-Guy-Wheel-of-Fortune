@@ -43,3 +43,13 @@ export interface ToastOptions {
   type: ToastType;
   durationMs?: number;
 }
+
+export interface ShopAsset {
+  id: string;
+  name: string;
+  price: number;
+  category: AssetCategory;
+  thumbnailUrl?: string;
+}
+
+export type AssetCategory = "sound" | "companion";

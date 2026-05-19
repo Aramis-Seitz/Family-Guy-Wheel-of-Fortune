@@ -1,5 +1,3 @@
-import { createShopModal } from "../shop/shop.js";
-
 function requiredElement<T extends HTMLElement | SVGElement>(id: string): T {
   const element = document.getElementById(id) as T | null;
 
@@ -51,9 +49,6 @@ export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDelet
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
 
 export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
-export const shopModal = createShopModal();
-export const shopContent = shopModal.querySelector<HTMLDivElement>(".shop-content")!;
-export const shopCloseBtn = shopModal.querySelector<HTMLButtonElement>(".shop-modal__close")!;
 
 export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
 export const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");

@@ -44,12 +44,19 @@ export interface ToastOptions {
   durationMs?: number;
 }
 
-export interface ShopAsset {
+export interface Asset {
   id: string;
   name: string;
-  price: number;
   category: AssetCategory;
-  thumbnailUrl?: string;
+  price: number;
+  assetUrl: string;
+  isOwned: boolean;
+  isActive: boolean;
+}
+
+export interface ShopData {
+  asset: Asset[];
+  userCoins: number;
 }
 
 export type AssetCategory = "sound" | "companion";

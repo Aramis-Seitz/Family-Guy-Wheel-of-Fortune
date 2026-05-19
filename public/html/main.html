@@ -40,7 +40,7 @@
             <div class="inventory-grid" id="inventoryGrid"></div>
         </div>
     </dialog>
-    
+
     <dialog id="addItemModal">
         <div id="addItemInner">
             <div id="addItemHeader">
@@ -74,6 +74,26 @@
             </div>
         </div>
     </dialog>
+
+    <template>
+        <dialog id="shop-modal" aria-labelledby="shop-modal-title">
+            <div class="shop-modal__container">
+
+                <header class="shop-modal__header">
+                    <h2 class="shop-modal__title" id="shop-modal-title">Shop</h2>
+                    <div class="shop-modal__coin-balance" id="shop-coin-balance"></div>
+                    <button class="shop-modal__close-btn" id="shop-modal-close-btn" aria-label="Shop schließen">✕</button>
+                </header>
+
+                <nav class="shop-modal__tabs" id="shop-modal-tabs" aria-label="Asset-Kategorien"></nav>
+
+                <div class="shop-modal__divider"></div>
+
+                <div class="shop-modal__grid" id="shop-modal-grid" role="list" aria-live="polite"></div>
+
+            </div>
+        </dialog>
+    </template>
 
     <div id="userArea"
         style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">

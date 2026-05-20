@@ -48,6 +48,10 @@ export const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName
 export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
 
+export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
+export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
+export const shopModal = requiredElement<HTMLDialogElement>("shopModal");
+
 export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
 export const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");
 export const removeWinnerBtn = requiredElement<HTMLButtonElement>("removeWinner");

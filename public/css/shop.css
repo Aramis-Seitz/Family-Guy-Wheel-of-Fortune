@@ -1,0 +1,54 @@
+.shop-modal__container {
+    display: none;
+}
+
+.shop-modal[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shop-modal[open] .shop-modal__container {
+    display: flex;
+    flex-direction: column;
+}
+
+.shop-modal__title {
+    color: white;
+}
+
+.shop-modal::backdrop {
+    background: rgba(10, 15, 25, 0.75);
+    backdrop-filter: blur(12px);
+}
+
+.shop-modal__container {
+    width: 90%;
+    max-width: 1100px;
+    max-height: 85vh;
+    background: rgba(20, 25, 35, 0.9);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px;
+    color: white;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    transform: scale(0.95);
+    transition: transform 0.25s ease;
+}
+
+.shop-modal__header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.shop-modal__header button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 20px;
+    cursor: pointer;
+}

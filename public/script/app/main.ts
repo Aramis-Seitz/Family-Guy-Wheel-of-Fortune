@@ -6,6 +6,7 @@ import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import { initMultiplierSlider, initWheelControls } from "../wheel/spin.js";
 import { initWinnerModal } from "../wheel/winner.js";
+import { initShop } from "../shop/shop.js";
 
 function initNameControls(): void {
   addBtn.addEventListener("click", () => addName(input.value));
@@ -37,6 +38,7 @@ async function initApp(): Promise<void> {
   initWinnerModal();
   await initProfileUI();
   initInventory();
+  initShop();
 }
 
 void initApp();

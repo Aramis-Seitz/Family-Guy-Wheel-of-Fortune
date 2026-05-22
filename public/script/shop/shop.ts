@@ -32,7 +32,7 @@ export function initShop(): void {
 }
 
 async function fetchCoinBalance(userId: string): Promise<number> { // erstmal nur MockFunktion ---> Später Anbindung zur Datenbank
-    return 67;
+    return MOCK_USER.coins;
 }
 
 function renderCoinBalance(balance: number) {

@@ -27,6 +27,17 @@ async function fetchUserProfile(userId: string): Promise<ProfileData | null> {
   return data;
 }
 
+export async function fetchUserCoins(userId: string): Promise<number> {
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("coins")
+        .eq("id", userId)
+        .single();
+
+    if (error || !data) return 0;
+    return (data as { coins?: number }).coins ?? 0;
+}
+
 function applyUnauthenticatedState(): void {
   if (!profileName || !authButton) return;
   profileName.textContent = "Nicht eingeloggt";
@@ -90,13 +101,8 @@ export async function refreshCoinDisplay(): Promise<void> {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
 
-  const { data: profile } = await supabaseClient
-    .from("profiles")
-    .select("coins")
-    .eq("id", session.user.id)
-    .single();
-
-  applyCoinDisplay((profile as { coins?: number } | null)?.coins ?? 0);
+  const coins = await fetchUserCoins(session.user.id);
+  applyCoinDisplay(coins);
 }
 
 export async function initProfileUI(): Promise<void> {

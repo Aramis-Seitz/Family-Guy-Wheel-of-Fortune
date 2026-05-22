@@ -1,4 +1,5 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance } from "../shared/dom.js";
+import { fetchUserCoins } from "../profile/profiles.js";
 
 interface User {        // wird später entfernt, nur zum Testen!
     id: string;
@@ -8,17 +9,26 @@ interface User {        // wird später entfernt, nur zum Testen!
     date_of_birth: Date;
 }
 
-const MOCK_USER: User = {       // wird später entfernt, nur zum Testen!
-    id: "mock-user-123",
-    username: "TestUser",
-    email: "test@example.com",
-    coins: 67,
-    date_of_birth: new Date("2000-01-01"),
-};
+const MOCK_USERS: User[] = [     // wird später entfernt, nur zum Testen!
+    {
+        id: "mock-user-123",
+        username: "TestUser",
+        email: "test@example.com",
+        coins: 67,
+        date_of_birth: new Date("2000-01-01"),
+    },
+    {
+        id: "mock-user-456",
+        username: "OtherUser",
+        email: "other@example.com",
+        coins: 200,
+        date_of_birth: new Date("1995-05-15"),
+    },
+];
 
 async function openShop(): Promise<void> {
     shopModal.showModal();
-    await loadCoinBalance(MOCK_USER.id);
+    await loadCoinBalance();
 }
 
 function closeShop(): void {
@@ -31,16 +41,12 @@ export function initShop(): void {
     closeOnBackdropClick(shopModal, closeShop);
 }
 
-async function fetchCoinBalance(userId: string): Promise<number> { // erstmal nur MockFunktion ---> Später Anbindung zur Datenbank
-    return MOCK_USER.coins;
-}
-
 function renderCoinBalance(balance: number) {
     if (!shopCoinBalance) return;
     shopCoinBalance.textContent = `🪙 ${balance}`
 }
 
-async function loadCoinBalance(userId: string): Promise<void> {
-    const balance = await fetchCoinBalance(userId);
+async function loadCoinBalance(): Promise<void> {
+    const balance = await fetchUserCoins();
     renderCoinBalance(balance);
 }

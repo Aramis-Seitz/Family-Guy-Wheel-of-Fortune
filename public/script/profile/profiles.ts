@@ -27,15 +27,18 @@ async function fetchUserProfile(userId: string): Promise<ProfileData | null> {
   return data;
 }
 
-export async function fetchUserCoins(userId: string): Promise<number> {
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("coins")
-        .eq("id", userId)
-        .single();
+export async function fetchUserCoins(): Promise<number> {
+  const session = await fetchCurrentSession();
+  if (!session) return 0;
 
-    if (error || !data) return 0;
-    return (data as { coins?: number }).coins ?? 0;
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("coins")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error || !data) return 0;
+  return (data as { coins?: number }).coins ?? 0;
 }
 
 function applyUnauthenticatedState(): void {
@@ -101,7 +104,7 @@ export async function refreshCoinDisplay(): Promise<void> {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
 
-  const coins = await fetchUserCoins(session.user.id);
+  const coins = await fetchUserCoins();
   applyCoinDisplay(coins);
 }
 

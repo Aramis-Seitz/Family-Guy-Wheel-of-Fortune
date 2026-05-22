@@ -52,6 +52,7 @@ export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
 export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
 export const shopModal = requiredElement<HTMLDialogElement>("shopModal");
 export const shopCoinBalance = requiredElement<HTMLDivElement>("shop-coin-balance");
+export const shopTabs = requiredElement<HTMLElement>("shop-modal-tabs");
 
 export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
 export const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");

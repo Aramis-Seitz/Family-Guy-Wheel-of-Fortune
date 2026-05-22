@@ -1,5 +1,6 @@
-import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance } from "../shared/dom.js";
+import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs } from "../shared/dom.js";
 import { fetchUserCoins } from "../profile/profiles.js";
+import { ShopCategory } from "../shared/types.js";
 
 interface User {        // wird später entfernt, nur zum Testen!
     id: string;
@@ -26,9 +27,12 @@ const MOCK_USERS: User[] = [     // wird später entfernt, nur zum Testen!
     },
 ];
 
+const SHOP_CATEGORIES: ShopCategory[] = ["ALL", "SOUND", "COMPANION"];
+
 async function openShop(): Promise<void> {
     shopModal.showModal();
     await loadCoinBalance();
+    await loadShopTabs();
 }
 
 function closeShop(): void {
@@ -49,4 +53,24 @@ function renderCoinBalance(balance: number) {
 async function loadCoinBalance(): Promise<void> {
     const balance = await fetchUserCoins();
     renderCoinBalance(balance);
+}
+async function fetchShopCategories(): Promise<ShopCategory[]> {
+    return SHOP_CATEGORIES;    // MOCK, später aus Datenbank holen!
+}
+
+function renderShopTabs(categories: ShopCategory[]): void {
+    shopTabs.innerHTML = "";
+
+    categories.forEach(category => {
+        const button = document.createElement("button");
+        button.className = "shop-modal__tab";
+        button.dataset.category = category;
+        button.textContent = category;
+        shopTabs.appendChild(button);
+    })
+}
+
+async function loadShopTabs(): Promise<void> {
+    const categories = await fetchShopCategories();
+    renderShopTabs(categories);
 }

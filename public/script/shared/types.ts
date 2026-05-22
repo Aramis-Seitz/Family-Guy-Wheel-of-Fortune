@@ -45,3 +45,13 @@ export interface ToastOptions {
 }
 
 export type ShopCategory = "ALL" | "SOUNDS" | "COMPANIONS";
+
+export type AssetCategory = "SOUND" | "COMPANION";
+
+export type Asset = {
+  id: string;
+  name: string;
+  category: AssetCategory;
+  price_coins: number;
+  asset_url: string;
+};

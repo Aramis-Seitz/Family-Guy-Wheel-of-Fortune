@@ -44,4 +44,4 @@ export interface ToastOptions {
   durationMs?: number;
 }
 
-export type ShopCategory = "ALL" | "SOUND" | "COMPANION";
+export type ShopCategory = "ALL" | "SOUNDS" | "COMPANIONS";

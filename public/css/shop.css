@@ -84,3 +84,27 @@
     color: #ffffff;
     background: rgba(255, 255, 255, 0.08);
 }
+
+.shop-modal__tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.shop-modal__tab {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.shop-modal__tab:hover {
+    color: #ffffff;
+    background: rgba(0, 162, 255, 0.1);
+    border-color: rgba(0, 162, 255, 0.3);
+}

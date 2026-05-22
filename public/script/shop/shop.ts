@@ -27,7 +27,7 @@ const MOCK_USERS: User[] = [     // wird später entfernt, nur zum Testen!
     },
 ];
 
-const SHOP_CATEGORIES: ShopCategory[] = ["ALL", "SOUND", "COMPANION"];
+const SHOP_CATEGORIES: ShopCategory[] = ["ALL", "SOUNDS", "COMPANIONS"];
 
 async function openShop(): Promise<void> {
     shopModal.showModal();

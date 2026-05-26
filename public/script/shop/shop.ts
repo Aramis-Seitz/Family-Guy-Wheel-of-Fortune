@@ -58,17 +58,7 @@ async function loadShopTabs(): Promise<void> {
 
 function loadShopAssets(): void {
     shopGrid.innerHTML = "";
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[0]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[1]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[2]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[3]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[4]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[5]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[6]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[7]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[8]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[9]));
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[10]));
+    MOCK_ASSETS.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
 
 function createAssetCard(asset: Asset): HTMLElement {

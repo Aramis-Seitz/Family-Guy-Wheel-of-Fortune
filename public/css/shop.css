@@ -115,3 +115,14 @@
     background-color: rgba(255, 255, 255, 0.08);
     margin: 1rem 0;
 }
+
+.shop-modal__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 300px);
+    gap: 16px;
+}
+
+.shop-modal__asset-card {
+    background: rgb(121, 121, 255);
+}

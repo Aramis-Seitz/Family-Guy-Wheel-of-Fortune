@@ -168,7 +168,7 @@
     justify-content: space-between;
     gap: 12px;
     margin-top: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 }
 
 .shop-modal__asset-title {
@@ -177,6 +177,8 @@
     word-break: break-word;
     overflow-wrap: anywhere;
     min-width: 0;
+    font-size: medium;
+    font-weight: bolder;
 }
 
 .shop-modal__preview-btn {
@@ -201,4 +203,13 @@
     display: flex;
     flex-direction: column;
     /* optional: padding-top, border-top, etc. */
+}
+
+.shop-modal__asset-header {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    width: 120px;
+    height: 120px;
+    align-self: center;
 }

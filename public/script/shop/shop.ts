@@ -1,50 +1,7 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
 import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, ShopCategory } from "../shared/types.js";
-
-interface User {        // wird später entfernt, nur zum Testen!
-    id: string;
-    username: string;
-    email: string;
-    coins: number;
-    date_of_birth: Date;
-}
-
-const MOCK_USERS: User[] = [     // wird später entfernt, nur zum Testen!
-    {
-        id: "mock-user-123",
-        username: "TestUser",
-        email: "test@example.com",
-        coins: 67,
-        date_of_birth: new Date("2000-01-01"),
-    },
-    {
-        id: "mock-user-456",
-        username: "OtherUser",
-        email: "other@example.com",
-        coins: 200,
-        date_of_birth: new Date("1995-05-15"),
-    },
-];
-
-const MOCK_ASSETS: Asset[] = [     // wird später entfernt, nur zum Testen!
-    {
-        id: "asset-001",
-        name: "Lustige Soundeffekte",
-        category: "SOUND",
-        price_coins: 50,
-        asset_url: "https://example.com/soundpack.jpg",
-    },
-    {
-        id: "asset-002",
-        name: "Stewie",
-        category: "COMPANION",
-        price_coins: 100,
-        asset_url: "https://example.com/companion.jpg",
-    },
-];
-
-const SHOP_CATEGORIES: ShopCategory[] = ["ALL", "SOUNDS", "COMPANIONS"];
+import { MOCK_ASSETS, MOCK_SHOP_CATEGORIES } from "./shop-mock-data.js";
 
 async function openShop(): Promise<void> {
     shopModal.showModal();
@@ -77,7 +34,7 @@ async function loadCoinBalance(): Promise<void> {
     renderCoinBalance(balance);
 }
 function fetchShopCategories(): ShopCategory[] {
-    return SHOP_CATEGORIES;    // MOCK, später aus Datenbank holen!
+    return MOCK_SHOP_CATEGORIES;
 }
 
 function renderShopTabs(categories: ShopCategory[]): void {
@@ -101,7 +58,17 @@ async function loadShopTabs(): Promise<void> {
 
 function loadShopAssets(): void {
     shopGrid.innerHTML = "";
-    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[1]));   // MOCK, später durch echte Daten ersetzen!
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[0]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[1]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[2]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[3]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[4]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[5]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[6]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[7]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[8]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[9]));
+    shopGrid.appendChild(createAssetCard(MOCK_ASSETS[10]));
 }
 
 function createAssetCard(asset: Asset): HTMLElement {

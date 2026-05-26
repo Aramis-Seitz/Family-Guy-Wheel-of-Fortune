@@ -16,9 +16,24 @@ import { getSegmentCount } from "../names/name-list.js";
 import { announceWinner, hideWinnerModal } from "./winner.js";
 import type { Direction, SpinConfig } from "../shared/types.js";
 
+type SpinHandler = (direction: Direction) => Promise<void>;
+
 let currentRotation = 0;
 let lastTickRotation = 0;
 let spinCancelled = false;
+let activeSpinOverride: SpinHandler | null = null;
+
+export function setSpinOverride(handler: SpinHandler | null): void {
+  activeSpinOverride = handler;
+}
+
+export function lockSpinButtons(): void {
+  disableElements(getSpinRelatedElements());
+}
+
+export function unlockSpinButtons(): void {
+  enableElements(getSpinRelatedElements());
+}
 
 function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
@@ -179,11 +194,11 @@ export function getCurrentRotation(): number {
 
 export function initWheelControls(): void {
   spinLeftBtn.addEventListener("click", () => {
-    void spinWheelWithRandomSteps("left");
+    void (activeSpinOverride ? activeSpinOverride("left") : spinWheelWithRandomSteps("left"));
   });
 
   spinRightBtn.addEventListener("click", () => {
-    void spinWheelWithRandomSteps("right");
+    void (activeSpinOverride ? activeSpinOverride("right") : spinWheelWithRandomSteps("right"));
   });
 
   resetBtn.addEventListener("click", resetWheelRotation);

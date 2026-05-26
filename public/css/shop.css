@@ -127,6 +127,8 @@
 }
 
 .shop-modal__asset-card {
+    display: flex;
+    flex-direction: column;
     height: 275px;
     width: 100%;
     border-radius: 14px;
@@ -134,7 +136,7 @@
     padding: 10%;
 }
 
-.shop-modal__buy-button {
+.shop-modal__buy-btn {
     background: rgba(0, 162, 255, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
@@ -145,16 +147,58 @@
     cursor: pointer;
     width: 100%;
     transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+    align-self: flex-end;
 }
 
-.shop-modal__buy-button:hover {
+.shop-modal__buy-btn:hover {
     color: #ffffff;
     background: rgba(0, 162, 255, 0.7);
     border-color: rgba(0, 162, 255, 0.5);
 }
 
-.shop-modal__buy-button:active {
+.shop-modal__buy-btn:active {
     color: #ffffff;
     background: rgba(0, 162, 255, 0.9);
     border-color: rgba(0, 162, 255, 0.7);
+}
+
+.shop-modal__asset-details-row {
+    display: flex;
+    align-items: center; /* Button bleibt vertikal mittig */
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+}
+
+.shop-modal__asset-title {
+    flex: 1 1 0;
+    text-align: left;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
+}
+
+.shop-modal__preview-btn {
+    flex-shrink: 0;
+    align-self: flex-end;
+    border-radius: 50%;
+    display: block;
+    height: 35px;
+    width: 35px;
+    border: none;
+    background: rgba(0, 162, 255, 0.5);
+    color: white;
+    align-content: center;
+}
+
+.shop-modal__preview-btn:hover { background: rgba(0, 162, 255, 0.7); }
+.shop-modal__preview-btn:active { background: rgba(0, 162, 255, 0.9); }
+
+.shop-modal__asset-footer {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* optional: padding-top, border-top, etc. */
 }

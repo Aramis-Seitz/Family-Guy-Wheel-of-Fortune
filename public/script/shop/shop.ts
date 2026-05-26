@@ -87,17 +87,21 @@ function createAssetIcon(asset: Asset): HTMLElement {
 function createAssetFooter(asset: Asset): HTMLElement {
     const assetFooter = document.createElement("div");
     assetFooter.className = "shop-modal__asset-footer";
-    assetFooter.appendChild(createAssetTitle(asset));
+    assetFooter.appendChild(createAssetDetailsRow(asset));
+    assetFooter.appendChild(createAssetBuyButton(asset));
+    return assetFooter;
+}
+
+function createAssetDetailsRow(asset: Asset): HTMLElement {
+    const detailsRow = document.createElement("div");
+    detailsRow.className = "shop-modal__asset-details-row";
+    detailsRow.appendChild(createAssetTitle(asset));
 
     if (asset.category === "SOUND") {
-        assetFooter.appendChild(createPreviewButton());
+        detailsRow.appendChild(createPreviewButton());
     }
 
-    assetFooter.appendChild(createAssetBuyButton(asset));
-
-
-
-    return assetFooter;
+    return detailsRow;
 }
 
 function createAssetTitle(asset: Asset): HTMLElement {
@@ -109,14 +113,14 @@ function createAssetTitle(asset: Asset): HTMLElement {
 
 function createPreviewButton(): HTMLElement {
     const previewButton = document.createElement("button");
-    previewButton.className = "shop-modal__preview-button";
+    previewButton.className = "shop-modal__preview-btn";
     previewButton.textContent = "▷";
     return previewButton;
 }
 
 function createAssetBuyButton(asset: Asset): HTMLElement {
     const assetBuyButton = document.createElement("button");
-    assetBuyButton.className = "shop-modal__buy-button";
+    assetBuyButton.className = "shop-modal__buy-btn";
     assetBuyButton.textContent = `${asset.price_coins} 🪙`;
     return assetBuyButton;
 }

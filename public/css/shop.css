@@ -146,3 +146,15 @@
     width: 100%;
     transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
 }
+
+.shop-modal__buy-button:hover {
+    color: #ffffff;
+    background: rgba(0, 162, 255, 0.7);
+    border-color: rgba(0, 162, 255, 0.5);
+}
+
+.shop-modal__buy-button:active {
+    color: #ffffff;
+    background: rgba(0, 162, 255, 0.9);
+    border-color: rgba(0, 162, 255, 0.7);
+}

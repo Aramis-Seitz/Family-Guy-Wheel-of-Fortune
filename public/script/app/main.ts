@@ -6,6 +6,7 @@ import {
 import { supabaseClient } from "../shared/supabase-client.js";
 import { initInventory } from "../inventory/inventory.js";
 import { addName, initNameList, getNames, replaceNames } from "../names/name-list.js";
+import { nameState } from "../names/name-state.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import {
@@ -13,13 +14,15 @@ import {
   setSpinOverride, lockSpinButtons, unlockSpinButtons, getMultiplier,
 } from "../wheel/spin.js";
 import { initWinnerModal } from "../wheel/winner.js";
-import { createRoom, joinRoom, spinRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
+import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
 
 let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];
+let removedInRoom = new Set<string>();
+let nameStateUnsubscribe: (() => void) | null = null;
 
 function initNameControls(): void {
   addBtn.addEventListener("click", () => addName(input.value));
@@ -44,17 +47,39 @@ function renderPlayersSidebar(players: string[]): void {
   });
 }
 
-function syncRoomPlayers(players: string[]): void {
-  replaceNames(players);
-  renderPlayersSidebar(players);
-
-  if (players.length < 2) {
+function updateSpinButtonState(activeCount: number): void {
+  if (activeCount < 2) {
     spinLeftBtn.classList.add('room-solo');
     spinRightBtn.classList.add('room-solo');
   } else {
     spinLeftBtn.classList.remove('room-solo');
     spinRightBtn.classList.remove('room-solo');
   }
+}
+
+// Called once when creating or joining a room — sets the wheel to exactly the room's player list.
+function initRoomPlayers(players: string[]): void {
+  removedInRoom.clear();
+  replaceNames(players);
+  renderPlayersSidebar(players);
+  updateSpinButtonState(players.length);
+
+  // Track manual removals so syncRoomPlayers can filter them out later.
+  if (nameStateUnsubscribe) nameStateUnsubscribe();
+  let prevNames = [...players];
+  nameStateUnsubscribe = nameState.subscribe((names) => {
+    if (!activeRoomKey) return;
+    prevNames.filter(n => !names.includes(n)).forEach(n => removedInRoom.add(n));
+    prevNames = [...names];
+  });
+}
+
+// Called on Realtime player-list updates — only adds new players, never re-adds removed ones.
+function syncRoomPlayers(players: string[]): void {
+  const toShow = players.filter(p => !removedInRoom.has(p));
+  replaceNames(toShow);
+  renderPlayersSidebar(players);
+  updateSpinButtonState(toShow.length);
 }
 
 function setRoomActive(roomKey: string, host: boolean): void {
@@ -70,6 +95,11 @@ function setRoomActive(roomKey: string, host: boolean): void {
 }
 
 function clearRoom(): void {
+  if (nameStateUnsubscribe) {
+    nameStateUnsubscribe();
+    nameStateUnsubscribe = null;
+  }
+  removedInRoom.clear();
   unsubscribeFromRoom();
   setSpinOverride(null);
   activeRoomKey = null;
@@ -105,6 +135,12 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   }
 }
 
+function onRoomClosed(): void {
+  if (isHost) return; // host handles its own leave flow
+  clearRoom();
+  showToast({ message: 'Der Host hat den Raum geschlossen', type: 'error' });
+}
+
 function initRoomControls(): void {
   createRoomBtn?.addEventListener('click', () => {
     void (async () => {
@@ -113,8 +149,8 @@ function initRoomControls(): void {
         const { roomKey, players } = await createRoom();
         setRoomActive(roomKey, true);
         setSpinOverride(handleRoomSpinClick);
-        syncRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers);
+        initRoomPlayers(players);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
         showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Erstellen fehlgeschlagen:', error);
@@ -132,8 +168,8 @@ function initRoomControls(): void {
         const players = await joinRoom(roomKey);
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
-        syncRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers);
+        initRoomPlayers(players);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
         showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Beitreten fehlgeschlagen:', error);
@@ -143,8 +179,21 @@ function initRoomControls(): void {
   });
 
   leaveRoomBtn?.addEventListener('click', () => {
-    clearRoom();
-    showToast({ message: 'Raum verlassen', type: 'success' });
+    void (async () => {
+      const wasHost = isHost;
+      const roomKey = activeRoomKey;
+      clearRoom(); // unsubscribe first so we don't receive our own close event
+      if (wasHost && roomKey) {
+        try {
+          await closeRoom(roomKey);
+          showToast({ message: 'Raum geschlossen', type: 'success' });
+        } catch {
+          showToast({ message: 'Raum konnte nicht geschlossen werden', type: 'error' });
+        }
+      } else {
+        showToast({ message: 'Raum verlassen', type: 'success' });
+      }
+    })();
   });
 
   copyRoomKeyBtn?.addEventListener('click', () => {

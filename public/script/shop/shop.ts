@@ -29,8 +29,9 @@ function renderCoinBalance(balance: number) {
     shopCoinBalance.textContent = `🪙 ${balance}`
 }
 
+const balance = await fetchUserCoins();
+
 async function loadCoinBalance(): Promise<void> {
-    const balance = await fetchUserCoins();
     renderCoinBalance(balance);
 }
 
@@ -67,6 +68,13 @@ function createAssetCard(asset: Asset): HTMLElement {
     assetCard.className = "shop-modal__asset-card";
     assetCard.appendChild(createAssetHeader(asset));
     assetCard.appendChild(createAssetFooter(asset));
+
+    if (balance < asset.price_coins) {
+        assetCard.classList.add("shop-modal__asset-card__too-expensive");
+    } else {
+        assetCard.classList.remove("shop-modal__asset-card__too-expensive");
+    }
+    
     return assetCard;
 }
 

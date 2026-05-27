@@ -79,8 +79,8 @@ function createAssetHeader(asset: Asset): HTMLElement {
 function createAssetIcon(asset: Asset): HTMLElement {
     const assetIcon = document.createElement("img");
     assetIcon.className = "shop-modal__asset-icon";
-    //assetIcon.src = asset.asset_url;
-    //assetIcon.alt = asset.name;
+    assetIcon.src = asset.asset_url;
+    assetIcon.alt = asset.name;
     return assetIcon;
 }
 

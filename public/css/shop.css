@@ -141,9 +141,9 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
     color: #ffffff;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
-    padding: 10px 16px;
+    padding: 8px 16px;
     cursor: pointer;
     width: 100%;
     transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
@@ -206,10 +206,28 @@
 }
 
 .shop-modal__asset-header {
+    /* Layout-Fluss (Flexbox zur Zentrierung des Icons) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: center;
+    
+    /* Dimensionen & Box-Model */
+    width: 120px;
+    height: 120px;
+    
+    /* Styling */
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
-    width: 120px;
-    height: 120px;
-    align-self: center;
+}
+
+.shop-modal__asset-icon {
+    /* Dimensionen */
+    width: 64px;
+    height: 64px;
+    
+    /* Darstellung des Bildes */
+    object-fit: contain;
 }

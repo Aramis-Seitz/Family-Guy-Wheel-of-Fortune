@@ -4,6 +4,9 @@ import { Asset, AssetCategory } from "../shared/types.js";
 import { MOCK_ASSETS } from "./shop-mock-data.js";
 import { MOCK_ASSET_CATEGORIES } from "../shared/constants.js";
 
+
+// ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
+
 async function openShop(): Promise<void> {
     shopModal.showModal();
     await loadShop();
@@ -25,50 +28,29 @@ async function loadShop(): Promise<void> {
     await loadShopAssets();
 }
 
+
+// ----- COIN BALANCE -----
+
+const balance = await fetchUserCoins();
+
 function renderCoinBalance(balance: number) {
     if (!shopCoinBalance) return;
     shopCoinBalance.textContent = `🪙 ${balance}`
 }
 
-const balance = await fetchUserCoins();
-
 async function loadCoinBalance(): Promise<void> {
     renderCoinBalance(balance);
 }
 
-function fetchAssetCategories(): AssetCategory[] {
-    return MOCK_ASSET_CATEGORIES;
-}
 
-function renderShopTabs(categories: (AssetCategory | "ALL")[]): void {
-    shopTabs.innerHTML = "";
-    //let activeCategory: AssetCategory | "ALL" = "ALL";
-
-    categories.forEach(category => {
-        const button = document.createElement("button");
-        button.className = "shop-modal__tab";
-        button.dataset.category = category;
-
-        if (category === "ALL") {
-            button.textContent = "ALL";
-        } else {
-            button.textContent = `${category}s`.toUpperCase();
-        }
-
-        shopTabs.appendChild(button);
-    })
-}
-
-async function loadShopTabs(): Promise<void> {
-    const categories = ["ALL", ...fetchAssetCategories()];
-    renderShopTabs(categories as AssetCategory[]);
-}
-
-// ----- ASSET-KACHELN UND KAUFEN -----
+// ----- ASSET ERSTELLEN UND LADEN -----
 
 function loadShopAssets(): void {
     shopGrid.innerHTML = "";
-    MOCK_ASSETS.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
+    const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
+    let activeCategory = getClickedCategory(activeTab) || "ALL";
+    let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
+    filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
 
 function createAssetCard(asset: Asset): HTMLElement {
@@ -82,7 +64,7 @@ function createAssetCard(asset: Asset): HTMLElement {
     } else {
         assetCard.classList.remove("shop-modal__asset-card__too-expensive");
     }
-    
+
     return assetCard;
 }
 
@@ -140,4 +122,53 @@ function createAssetBuyButton(asset: Asset): HTMLElement {
     assetBuyButton.className = "shop-modal__buy-btn";
     assetBuyButton.textContent = `${asset.price_coins} 🪙`;
     return assetBuyButton;
+}
+
+// ----- CATEGORY-TABS UND FILTER-FUNKTIONALITÄT -----
+
+function createShopTabButton(category: AssetCategory | "ALL"): HTMLButtonElement {
+    const button = document.createElement("button");
+    button.className = "shop-modal__tab";
+    button.dataset.category = category;
+    button.textContent = category === "ALL" ? "ALL" : `${category}s`.toUpperCase();
+
+    if (category === "ALL") button.classList.add("shop-modal__tab--active");
+
+    button.onclick = () => {
+        shopTabs.querySelectorAll(".shop-modal__tab").forEach(btn => btn.classList.remove("shop-modal__tab--active"));
+        button.classList.add("shop-modal__tab--active");
+        loadShopAssets();
+    };
+    return button;
+}
+
+function renderShopTabs(categories: (AssetCategory | "ALL")[]): void {
+    shopTabs.innerHTML = "";
+    categories.forEach(category => {
+        const button = createShopTabButton(category);
+        shopTabs.appendChild(button);
+    });
+}
+
+async function loadShopTabs(): Promise<void> {
+    const categories = ["ALL", ...fetchAssetCategories()];
+    renderShopTabs(categories as AssetCategory[]);
+}
+
+function fetchAssetCategories(): AssetCategory[] {
+    // Kategorien in Großbuchstaben zurückgeben, damit sie zu den Asset-Kategorien passen
+    return MOCK_ASSET_CATEGORIES.map(category => category.toUpperCase()) as AssetCategory[];
+}
+
+function getClickedCategory(target: HTMLElement): AssetCategory | "ALL" | null {
+    if (target && target.tagName === "BUTTON" && target.dataset.category) {
+        return target.dataset.category as AssetCategory | "ALL";
+    }
+    return null;
+}
+
+function filterAssetsByCategory(category: AssetCategory | "ALL"): Asset[] {
+    return category === "ALL"
+        ? MOCK_ASSETS
+        : MOCK_ASSETS.filter(asset => asset.category === category);
 }

@@ -229,5 +229,5 @@
 
 .shop-modal__asset-card__too-expensive .shop-modal__buy-btn {
     color: red;
-    cursor: not-allowed;
+    pointer-events: none;
 }

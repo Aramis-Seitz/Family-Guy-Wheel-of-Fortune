@@ -3,6 +3,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { RoomSpinResponse, RoomRow } from './shared/types.js';
 
 let activeChannel: RealtimeChannel | null = null;
+let lastKnownPlayersJson = '';
 
 async function getAccessToken(): Promise<string> {
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -40,11 +41,18 @@ export async function spinRoom(roomKey: string): Promise<RoomSpinResponse> {
   return postJson<RoomSpinResponse>('/api/room/spin', { roomKey });
 }
 
+export async function closeRoom(roomKey: string): Promise<void> {
+  await postJson('/api/room/close', { roomKey });
+}
+
 export function subscribeToRoom(
   roomKey: string,
   onSpin: (lastSpin: number) => void,
   onPlayersUpdate?: (players: string[]) => void,
+  onClose?: () => void,
 ): void {
+  lastKnownPlayersJson = '';
+
   activeChannel = supabaseClient
     .channel(`room:${roomKey}`)
     .on(
@@ -58,8 +66,19 @@ export function subscribeToRoom(
       (payload: { new: RoomRow }) => {
         const row = payload.new;
 
-        if (onPlayersUpdate && Array.isArray(row.players)) {
-          onPlayersUpdate(row.players);
+        if (Array.isArray(row.players)) {
+          // players = [] signals the host closed the room
+          if (row.players.length === 0) {
+            onClose?.();
+            return;
+          }
+
+          // Only call onPlayersUpdate when the player list actually changed (not on spin events)
+          const json = JSON.stringify(row.players);
+          if (json !== lastKnownPlayersJson) {
+            lastKnownPlayersJson = json;
+            onPlayersUpdate?.(row.players);
+          }
         }
 
         if (!row.spun_at) return;
@@ -77,4 +96,5 @@ export function unsubscribeFromRoom(): void {
     void supabaseClient.removeChannel(activeChannel);
     activeChannel = null;
   }
+  lastKnownPlayersJson = '';
 }

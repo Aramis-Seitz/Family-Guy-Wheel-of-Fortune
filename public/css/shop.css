@@ -164,7 +164,7 @@
 
 .shop-modal__asset-details-row {
     display: flex;
-    align-items: center; /* Button bleibt vertikal mittig */
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin-top: 12px;
@@ -192,9 +192,12 @@
     background: rgba(0, 162, 255, 0.5);
     color: white;
     align-content: center;
+    cursor: pointer;
 }
 
-.shop-modal__preview-btn:hover { background: rgba(0, 162, 255, 0.7); }
+.shop-modal__preview-btn:hover { 
+    background: rgba(0, 162, 255, 0.7)
+}
 .shop-modal__preview-btn:active { background: rgba(0, 162, 255, 0.9); }
 
 .shop-modal__asset-footer {
@@ -202,32 +205,26 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    /* optional: padding-top, border-top, etc. */
 }
 
 .shop-modal__asset-header {
-    /* Layout-Fluss (Flexbox zur Zentrierung des Icons) */
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     align-self: center;
+    overflow: hidden;
     
-    /* Dimensionen & Box-Model */
     width: 120px;
     height: 120px;
     
-    /* Styling */
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
 }
 
 .shop-modal__asset-icon {
-    /* Dimensionen */
-    width: 64px;
-    height: 64px;
-    
-    /* Darstellung des Bildes */
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }

@@ -33,6 +33,7 @@ async function loadCoinBalance(): Promise<void> {
     const balance = await fetchUserCoins();
     renderCoinBalance(balance);
 }
+
 function fetchShopCategories(): ShopCategory[] {
     return MOCK_SHOP_CATEGORIES;
 }

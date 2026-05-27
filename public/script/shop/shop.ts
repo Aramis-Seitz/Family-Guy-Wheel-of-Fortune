@@ -1,7 +1,8 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
 import { fetchUserCoins } from "../profile/profiles.js";
-import { Asset, ShopCategory } from "../shared/types.js";
-import { MOCK_ASSETS, MOCK_SHOP_CATEGORIES } from "./shop-mock-data.js";
+import { Asset, AssetCategory } from "../shared/types.js";
+import { MOCK_ASSETS } from "./shop-mock-data.js";
+import { MOCK_ASSET_CATEGORIES } from "../shared/constants.js";
 
 async function openShop(): Promise<void> {
     shopModal.showModal();
@@ -35,25 +36,32 @@ async function loadCoinBalance(): Promise<void> {
     renderCoinBalance(balance);
 }
 
-function fetchShopCategories(): ShopCategory[] {
-    return MOCK_SHOP_CATEGORIES;
+function fetchAssetCategories(): AssetCategory[] {
+    return MOCK_ASSET_CATEGORIES;
 }
 
-function renderShopTabs(categories: ShopCategory[]): void {
+function renderShopTabs(categories: (AssetCategory | "ALL")[]): void {
     shopTabs.innerHTML = "";
+    //let activeCategory: AssetCategory | "ALL" = "ALL";
 
     categories.forEach(category => {
         const button = document.createElement("button");
         button.className = "shop-modal__tab";
         button.dataset.category = category;
-        button.textContent = category;
+
+        if (category === "ALL") {
+            button.textContent = "ALL";
+        } else {
+            button.textContent = `${category}s`.toUpperCase();
+        }
+
         shopTabs.appendChild(button);
     })
 }
 
 async function loadShopTabs(): Promise<void> {
-    const categories = await fetchShopCategories();
-    renderShopTabs(categories);
+    const categories = ["ALL", ...fetchAssetCategories()];
+    renderShopTabs(categories as AssetCategory[]);
 }
 
 // ----- ASSET-KACHELN UND KAUFEN -----

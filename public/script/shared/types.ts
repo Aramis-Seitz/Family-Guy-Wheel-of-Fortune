@@ -1,3 +1,5 @@
+import { MOCK_ASSET_CATEGORIES } from "./constants.js";
+
 export type Direction = "left" | "right";
 
 export interface Point {
@@ -44,14 +46,12 @@ export interface ToastOptions {
   durationMs?: number;
 }
 
-export type ShopCategory = "ALL" | "SOUNDS" | "COMPANIONS";
-
-export type AssetCategory = "SOUND" | "COMPANION";
+export type AssetCategory = typeof MOCK_ASSET_CATEGORIES[number];
 
 export type Asset = {
-  id: string;
-  name: string;
-  category: AssetCategory;
-  price_coins: number;
-  asset_url: string;
+  readonly id: string;
+  readonly name: string;
+  readonly category: AssetCategory;
+  readonly price_coins: number;
+  readonly asset_url: string;
 };

@@ -1,4 +1,4 @@
-import type { Point } from "./types.js";
+import { Point } from "./types.js";
 
 export const WHEEL_CENTER: Point = { x: 150, y: 150 };
 export const WHEEL_RADIUS: number = 100;
@@ -28,3 +28,5 @@ export const SEGMENT_COLORS: string[] = [
   "rgb(141, 116, 225)",
   "#504672",
 ];
+
+export const MOCK_ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;

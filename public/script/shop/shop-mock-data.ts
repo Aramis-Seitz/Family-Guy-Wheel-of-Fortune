@@ -1,6 +1,5 @@
-import { Asset, ShopCategory } from "../shared/types.js";
+import { Asset } from "../shared/types.js";
 
-export const MOCK_SHOP_CATEGORIES: ShopCategory[] = ["ALL", "SOUNDS", "COMPANIONS"];
 const EMPTY_STATE_THUMBNAIL_SOUND: string = "../../assets/default-thumbnail-sound-asset.png";
 const EMPTY_STATE_THUMBNAIL_COMPANION: string = "../../assets/default-thumbnail-companion-asset.png";
 

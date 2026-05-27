@@ -103,10 +103,11 @@ export function announceWinner(segmentCount: number, spinToken: string): void {
     .then((result) => {
       if (result) {
         console.log("[SPIN] ✅ Coins erfolgreich vergeben:", result);
-      } else {
-        console.warn("[SPIN] ⚠️ awardCoins hat null zurückgegeben – keine Coins vergeben");
+        return refreshCoinDisplay();
       }
-      return refreshCoinDisplay();
+      // Guest im Raum: Host vergibst Coins async — nach Verzögerung neu laden
+      console.warn("[SPIN] ⚠️ awardCoins hat null zurückgegeben – warte auf Host-Update");
+      setTimeout(() => void refreshCoinDisplay(), 4000);
     })
     .catch((err: unknown) => {
       console.error("[SPIN] ❌ Fehler beim Vergeben von Coins:", err);

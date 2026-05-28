@@ -2,7 +2,7 @@ import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance
 import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, AssetCategory } from "../shared/types.js";
 import { MOCK_ASSETS } from "./shop-mock-data.js";
-import { MOCK_ASSET_CATEGORIES } from "../shared/constants.js";
+import { ASSET_CATEGORIES } from "../shared/constants.js";
 
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
@@ -96,7 +96,7 @@ function createAssetDetailsRow(asset: Asset): HTMLElement {
     detailsRow.className = "shop-modal__asset-details-row";
     detailsRow.appendChild(createAssetTitle(asset));
 
-    if (asset.category === "SOUND") {
+    if (asset.category === "sound") {
         detailsRow.appendChild(createPreviewButton());
     }
 
@@ -126,13 +126,13 @@ function createAssetBuyButton(asset: Asset): HTMLElement {
 
 // ----- CATEGORY-TABS UND FILTER-FUNKTIONALITÄT -----
 
-function createShopTabButton(category: AssetCategory | "ALL"): HTMLButtonElement {
+function createShopTabButton(category: AssetCategory | "all"): HTMLButtonElement {
     const button = document.createElement("button");
     button.className = "shop-modal__tab";
     button.dataset.category = category;
-    button.textContent = category === "ALL" ? "ALL" : `${category}s`.toUpperCase();
+    button.textContent = category === "all" ? "ALL" : `${category}s`.toUpperCase();
 
-    if (category === "ALL") button.classList.add("shop-modal__tab--active");
+    if (category === "all") button.classList.add("shop-modal__tab--active");
 
     button.onclick = () => {
         shopTabs.querySelectorAll(".shop-modal__tab").forEach(btn => btn.classList.remove("shop-modal__tab--active"));
@@ -142,33 +142,33 @@ function createShopTabButton(category: AssetCategory | "ALL"): HTMLButtonElement
     return button;
 }
 
-function renderShopTabs(categories: (AssetCategory | "ALL")[]): void {
+function renderShopTabs(categories: (AssetCategory | "all")[]): void {
     shopTabs.innerHTML = "";
     categories.forEach(category => {
-        const button = createShopTabButton(category);
-        shopTabs.appendChild(button);
+        shopTabs.appendChild(createShopTabButton(category));
     });
 }
 
 async function loadShopTabs(): Promise<void> {
-    const categories = ["ALL", ...fetchAssetCategories()];
+    const categories = ["all", ...fetchAssetCategories()];
     renderShopTabs(categories as AssetCategory[]);
 }
 
 function fetchAssetCategories(): AssetCategory[] {
     // Kategorien in Großbuchstaben zurückgeben, damit sie zu den Asset-Kategorien passen
-    return MOCK_ASSET_CATEGORIES.map(category => category.toUpperCase()) as AssetCategory[];
+    return [...ASSET_CATEGORIES] as AssetCategory[];
 }
 
-function getClickedCategory(target: HTMLElement): AssetCategory | "ALL" | null {
+function getClickedCategory(target: HTMLElement): AssetCategory | "all" | null {
     if (target && target.tagName === "BUTTON" && target.dataset.category) {
-        return target.dataset.category as AssetCategory | "ALL";
+        return target.dataset.category as AssetCategory | "all";
     }
     return null;
 }
 
-function filterAssetsByCategory(category: AssetCategory | "ALL"): Asset[] {
-    return category === "ALL"
+function filterAssetsByCategory(category: AssetCategory | "all"): Asset[] {
+    return category === "all"
         ? MOCK_ASSETS
         : MOCK_ASSETS.filter(asset => asset.category === category);
 }
+

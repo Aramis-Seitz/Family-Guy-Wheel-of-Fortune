@@ -29,4 +29,4 @@ export const SEGMENT_COLORS: string[] = [
   "#504672",
 ];
 
-export const MOCK_ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;
+export const ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;

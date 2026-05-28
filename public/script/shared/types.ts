@@ -1,4 +1,4 @@
-import { MOCK_ASSET_CATEGORIES } from "./constants.js";
+import { ASSET_CATEGORIES } from "./constants.js";
 
 export type Direction = "left" | "right";
 
@@ -46,7 +46,7 @@ export interface ToastOptions {
   durationMs?: number;
 }
 
-export type AssetCategory = typeof MOCK_ASSET_CATEGORIES[number];
+export type AssetCategory = typeof ASSET_CATEGORIES[number];
 
 export type Asset = {
   readonly id: string;

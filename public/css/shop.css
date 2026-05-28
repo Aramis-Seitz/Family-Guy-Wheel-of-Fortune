@@ -109,6 +109,11 @@
     border-color: rgba(0, 162, 255, 0.3);
 }
 
+.shop-modal__tab--active {
+    background: rgba(0, 162, 255, 0.1);
+    border-color: rgba(0, 162, 255, 0.3);
+}
+
 .shop-modal__divider {
     border: none;
     height: 1px;

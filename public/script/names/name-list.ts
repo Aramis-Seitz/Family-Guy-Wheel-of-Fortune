@@ -10,6 +10,24 @@ import {
 } from "./name-input-validation.js";
 import { nameState } from "./name-state.js";
 
+let roomLocked = false;
+
+export function lockNameEditing(): void {
+  roomLocked = true;
+  syncAddElements();
+  syncRemoveButtons();
+}
+
+export function unlockNameEditing(): void {
+  roomLocked = false;
+  syncAddElements();
+  syncRemoveButtons();
+}
+
+export function isNameEditingLocked(): boolean {
+  return roomLocked;
+}
+
 export function getNames(): string[] {
   return nameState.getNames();
 }
@@ -62,22 +80,21 @@ export function updateEmptyState(): void {
 
 export function syncRemoveButtons(): void {
   const buttons = list.querySelectorAll(".btn-remove") as NodeListOf<HTMLButtonElement>;
-
   buttons.forEach((btn) => {
-    btn.disabled = false;
+    btn.disabled = roomLocked;
   });
 }
 
 export function syncAddElements(): void {
-  const tooMany = getSegmentCount() >= MAX_ITEMS;
+  const disabled = roomLocked || getSegmentCount() >= MAX_ITEMS;
 
-  addBtn.disabled = tooMany;
-  input.disabled = tooMany;
+  addBtn.disabled = disabled;
+  input.disabled = disabled;
 
-  addBtn.style.opacity = tooMany ? "0.5" : "1";
-  addBtn.style.cursor = tooMany ? "not-allowed" : "pointer";
-  input.style.opacity = tooMany ? "0.5" : "1";
-  input.style.cursor = tooMany ? "not-allowed" : "text";
+  addBtn.style.opacity = disabled ? "0.5" : "1";
+  addBtn.style.cursor = disabled ? "not-allowed" : "pointer";
+  input.style.opacity = disabled ? "0.5" : "1";
+  input.style.cursor = disabled ? "not-allowed" : "text";
 }
 
 function showErrorToast(message: string): void {
@@ -99,6 +116,7 @@ function shakeItem(item: HTMLLIElement): void {
 }
 
 function handleRemove(index: number, item: HTMLLIElement): void {
+  if (roomLocked) return;
   if (getSegmentCount() <= MIN_ITEMS) {
     shakeItem(item);
     showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
@@ -109,6 +127,7 @@ function handleRemove(index: number, item: HTMLLIElement): void {
 }
 
 export function addName(rawName: string): void {
+  if (roomLocked) return;
   const validation = validateNameInput(rawName);
 
   if (!validation.valid) {

@@ -3,6 +3,7 @@ import { profileName, authButton, coinDisplay } from "../shared/dom.js";
 import { ProfileData } from "../shared/types.js";
 import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { nameState } from "../names/name-state.js";
+import { isNameEditingLocked } from "../names/name-list.js";
 import { showToast } from "../shared/toast.js";
 import { MAX_ITEMS } from "../shared/constants.js";
 
@@ -54,6 +55,7 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   profileName.classList.add("is-clickable");
   profileName.title = "Klick — zum Rad hinzufügen";
   profileName.addEventListener("click", () => {
+    if (isNameEditingLocked()) return;
     if (!nameState.addName(username)) {
       showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: "error" });
       return;

@@ -5,7 +5,7 @@ import {
 } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { initInventory } from "../inventory/inventory.js";
-import { addName, initNameList, getNames, replaceNames } from "../names/name-list.js";
+import { addName, initNameList, getNames, replaceNames, lockNameEditing, unlockNameEditing } from "../names/name-list.js";
 import { nameState } from "../names/name-state.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
@@ -85,6 +85,7 @@ function syncRoomPlayers(players: string[]): void {
 function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
   isHost = host;
+  lockNameEditing();
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
   if (roomInfo) roomInfo.classList.remove('hidden');
 
@@ -100,6 +101,7 @@ function clearRoom(): void {
     nameStateUnsubscribe = null;
   }
   removedInRoom.clear();
+  unlockNameEditing();
   unsubscribeFromRoom();
   setSpinOverride(null);
   activeRoomKey = null;

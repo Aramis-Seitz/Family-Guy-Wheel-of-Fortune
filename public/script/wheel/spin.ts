@@ -155,7 +155,7 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
     logSpinDetails(ranNum, multiplier, boostedRanNum);
     spinWheel(boostedRanNum, direction, spinToken);
   } catch (error) {
-    console.error("[SPIN] ❌ Fehler beim Spin:", error);
+    console.error("[SPIN] ❌ Fehler beim Spin :", error);
     enableElements(getSpinRelatedElements());
   }
 }

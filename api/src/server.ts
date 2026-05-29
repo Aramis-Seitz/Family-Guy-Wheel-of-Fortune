@@ -8,7 +8,7 @@ import express from "express";
 import path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
-import { getSecureRandomNumber } from "./utils/random";
+import { getSecureRandomNumber } from "./lib/random";
 import { createMockServiceClient } from "./mock-service";
 import { mockRouter } from "./mock-routes";
 

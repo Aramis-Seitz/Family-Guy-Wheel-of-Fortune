@@ -11,6 +11,7 @@ import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { getSecureRandomNumber } from "./lib/random";
 import { createMockServiceClient } from "./mock-service";
 import { mockRouter } from "./mock-routes";
+import { apiRoutes } from "./routes";
 
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
@@ -26,6 +27,7 @@ const MAX_ROTATION_DEGREE = 900;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../../public/dist/html")));
 app.use(express.static(path.join(__dirname, "../../public/dist")));
+app.use('/api', apiRoutes);
 
 if (USE_MOCK) {
   app.use('/api/mock', mockRouter);

@@ -1,8 +1,8 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
 import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, AssetCategory } from "../shared/types.js";
-import { MOCK_ASSETS } from "./shop-mock-data.js";
 import { ASSET_CATEGORIES } from "../shared/constants.js";
+import { getShopAssets } from "../api/shop.js";
 
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
@@ -44,6 +44,8 @@ async function loadCoinBalance(): Promise<void> {
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
+
+let currentAssets: Asset[] = await getShopAssets();
 
 function loadShopAssets(): void {
     shopGrid.innerHTML = "";
@@ -168,7 +170,7 @@ function getClickedCategory(target: HTMLElement): AssetCategory | "all" | null {
 
 function filterAssetsByCategory(category: AssetCategory | "all"): Asset[] {
     return category === "all"
-        ? MOCK_ASSETS
-        : MOCK_ASSETS.filter(asset => asset.category === category);
+        ? currentAssets
+        : currentAssets.filter(asset => asset.category === category);
 }
 

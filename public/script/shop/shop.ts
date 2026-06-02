@@ -2,8 +2,10 @@ import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance
 import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, AssetCategory } from "../shared/types.js";
 import { ASSET_CATEGORIES } from "../shared/constants.js";
-import { getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
+import { getOwnedAssets, getOwnedAssetIds, getShopAssets, getAssetCategories, purchaseAsset } from "../api/shop.js";
 import { showToast } from "../shared/toast.js";
+//import { get } from "node:http";
+//import { getAsset } from "node:sea";
 
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
@@ -26,7 +28,7 @@ export function initShop(): void {
 async function loadShop(): Promise<void> {
     await loadCoinBalance();
     await loadShopTabs();
-    await loadOwnedAssets();
+    //await loadOwnedAssets();
     await loadShopAssets();
 }
 
@@ -49,14 +51,10 @@ async function loadCoinBalance(): Promise<void> {
 // ----- ASSET ERSTELLEN UND LADEN -----
 
 let currentAssets: Asset[] = await getShopAssets();
+// let currentOwnedAssets: Asset[] = await getOwnedAssets();
+let currentOwnedAssetIds: string[] = await getOwnedAssetIds();
+let currentCategories: AssetCategory[] = await getAssetCategories();
 
-let currentOwnedAssetIds: string[] = [];
-
-/**
- * Checks if an asset is owned by the user
- * @param assetId - The ID of the asset to check
- * @returns true if owned, false otherwise
- */
 function isAssetOwned(assetId: string): boolean {
     return currentOwnedAssetIds.includes(assetId);
 }
@@ -69,9 +67,11 @@ function loadShopAssets(): void {
     filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
 
+//L:    Diese Funktion heißt loadOwnedAssets, lädt aber dessen IDs statt die Assets selbst.
+//      Und dann wird sie oben in loadShop() aufgerufen, obwohl dies hier eher Inventory-Logik ist.
+//      Da is noch bissel was durcheinander ?
 async function loadOwnedAssets(): Promise<void> {
     try {
-        currentOwnedAssetIds = await getOwnedAssetIds();
         console.log("✅ Owned asset IDs loaded:", currentOwnedAssetIds.length, "assets", currentOwnedAssetIds);
     } catch (error) {
         console.error("Failed to load owned asset IDs:", error);
@@ -83,19 +83,17 @@ async function loadOwnedAssets(): Promise<void> {
 }
 
 function createAssetCard(asset: Asset): HTMLElement {
-    const assetCard = document.createElement("div");
     const owned = isAssetOwned(asset.id);
     const tooExpensive = balance < asset.price_coins;
 
+    const assetCard = document.createElement("div");
     assetCard.className = "shop-modal__asset-card";
-    assetCard.appendChild(createAssetHeader(asset));
-    assetCard.appendChild(createAssetFooter(asset));
 
-    if (!owned && tooExpensive) {
-        assetCard.classList.add("shop-modal__asset-card__too-expensive");
-    } else {
-        assetCard.classList.remove("shop-modal__asset-card__too-expensive");
-    }
+    if (owned) assetCard.classList.add("shop-modal__asset-card__owned");
+    if (tooExpensive && !owned) assetCard.classList.add("shop-modal__asset-card__too-expensive");
+
+    assetCard.appendChild(createAssetHeader(asset));
+    assetCard.appendChild(createAssetFooter(asset, owned, tooExpensive));
 
     return assetCard;
 }
@@ -115,11 +113,11 @@ function createAssetIcon(asset: Asset): HTMLElement {
     return assetIcon;
 }
 
-function createAssetFooter(asset: Asset): HTMLElement {
+function createAssetFooter(asset: Asset, owned: boolean, tooExpensive: boolean): HTMLElement {
     const assetFooter = document.createElement("div");
     assetFooter.className = "shop-modal__asset-footer";
     assetFooter.appendChild(createAssetDetailsRow(asset));
-    assetFooter.appendChild(createAssetBuyButton(asset));
+    assetFooter.appendChild(createAssetBuyButton(asset, owned, tooExpensive));
     return assetFooter;
 }
 
@@ -149,63 +147,35 @@ function createPreviewButton(): HTMLElement {
     return previewButton;
 }
 
-function createAssetBuyButton(asset: Asset): HTMLElement {
-    const assetBuyButton = document.createElement("button");
-    const owned = isAssetOwned(asset.id);
-    const tooExpensive = balance < asset.price_coins;
+function createAssetBuyButton(asset: Asset, owned: boolean, tooExpensive: boolean): HTMLElement {
+    const btn = document.createElement("button");
+    btn.className = "shop-modal__buy-btn";
+    btn.textContent = owned ? "OWNED" : `${asset.price_coins} 🪙`;
+    btn.disabled = owned || tooExpensive;
 
-    assetBuyButton.className = "shop-modal__buy-btn";
-    assetBuyButton.textContent = owned ? "OWNED" : `${asset.price_coins} 🪙`;
-    assetBuyButton.disabled = owned || tooExpensive;
-
-    if (owned) {
-        console.log(`🔒 Asset ${asset.name} is owned`);
-    }
-
-    if (!owned && !tooExpensive) {
-        assetBuyButton.addEventListener("click", async () => {
-            assetBuyButton.disabled = true;
-            assetBuyButton.textContent = "Buying...";
-
-            try {
-                const result = await purchaseAsset(asset.id);
-
-                if (result.success) {
-                    // Add to owned assets
-                    currentOwnedAssetIds.push(asset.id);
-
-                    // Update balance
-                    if (result.coins !== null) {
-                        renderCoinBalance(result.coins);
-                    }
-
-                    // Show success message
-                    showToast({
-                        message: `${asset.name} gekauft!`,
-                        type: "success"
-                    });
-
-                    // Refresh shop display
-                    loadShopAssets();
-                } else {
-                    throw new Error("Kauf fehlgeschlagen");
-                }
-            } catch (error) {
-                const message = error instanceof Error ? error.message : "Asset konnte nicht gekauft werden";
-                showToast({
-                    message,
-                    type: "error"
-                });
-
-                // Reset button state
-                assetBuyButton.disabled = false;
-                assetBuyButton.textContent = `${asset.price_coins} 🪙`;
-            }
-        });
-    }
-
-    return assetBuyButton;
+    if (!owned && !tooExpensive) btn.addEventListener("click", () => handlePurchaseClick(asset, btn));
+    return btn;
 }
+
+async function handlePurchaseClick(asset: Asset, btn: HTMLButtonElement): Promise<void> {
+    btn.disabled = true;
+    btn.textContent = "Buying...";
+
+    try {
+        const result = await purchaseAsset(asset.id);
+        if (!result.success) throw new Error("Kauf fehlgeschlagen");
+        currentOwnedAssetIds.push(asset.id);
+        if (result.coins !== null) renderCoinBalance(result.coins);
+        showToast({ message: `${asset.name} gekauft!`, type: "success" });
+        loadShopAssets();
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "Asset konnte nicht gekauft werden";
+        showToast({ message, type: "error" });
+        btn.disabled = false;
+        btn.textContent = `${asset.price_coins} 🪙`;
+    }
+}
+
 
 // ----- CATEGORY-TABS UND FILTER-FUNKTIONALITÄT -----
 
@@ -233,13 +203,8 @@ function renderShopTabs(categories: (AssetCategory | "all")[]): void {
 }
 
 async function loadShopTabs(): Promise<void> {
-    const categories = ["all", ...fetchAssetCategories()];
+    const categories = ["all", ...currentCategories];
     renderShopTabs(categories as AssetCategory[]);
-}
-
-function fetchAssetCategories(): AssetCategory[] {
-    // Kategorien in Großbuchstaben zurückgeben, damit sie zu den Asset-Kategorien passen
-    return [...ASSET_CATEGORIES] as AssetCategory[];
 }
 
 function getClickedCategory(target: HTMLElement): AssetCategory | "all" | null {

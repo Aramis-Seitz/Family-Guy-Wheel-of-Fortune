@@ -1,5 +1,5 @@
 import { supabaseClient } from "../shared/supabase-client.js";
-import type { Asset } from "../shared/types.js";
+import type { Asset, AssetCategory } from "../shared/types.js";
 
 type ApiErrorBody = {
     error?: string;
@@ -11,6 +11,10 @@ type AssetsResponseBody = {
 
 type OwnedAssetIdsResponseBody = {
     assetIds?: string[];
+};
+
+type AssetCategoriesResponseBody = {
+    categories?: AssetCategory[];
 };
 
 type PurchaseResponseBody = {
@@ -101,6 +105,26 @@ export async function getOwnedAssetIds(): Promise<string[]> {
 
     const body = await response.json() as OwnedAssetIdsResponseBody;
     return Array.isArray(body.assetIds) ? body.assetIds : [];
+}
+
+export async function getAssetCategories(): Promise<AssetCategory[]> {
+    const headers = await buildAuthHeaders({
+        "Accept": "application/json"
+    });
+
+    const response = await fetch("/api/shop/categories", {
+        method: "GET",
+        headers
+    });
+
+    if (!response.ok) {
+        const message = await readApiError(response, "Kategorien konnten nicht geladen werden");
+        throw new Error(message);
+    }
+
+    const body = await response.json() as AssetCategoriesResponseBody;
+    return Array.isArray(body.categories) ? body.categories : [];
+
 }
 
 export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResult> {

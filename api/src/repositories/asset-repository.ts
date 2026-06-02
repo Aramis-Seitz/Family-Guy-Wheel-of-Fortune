@@ -33,7 +33,7 @@ export async function getAssetById(assetId: string): Promise<Asset | null> {
 export async function listOwnedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient
         .from("asset_ownership")
-        .select("*")
+        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
         .eq("user_id", userId);
 
     if (error) throw error;
@@ -45,15 +45,8 @@ export async function listOwnedAssets(userId: string): Promise<Asset[]> {
 }
 
 export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {
-    const { data, error } = await supabaseClient
-        .from("asset_ownership")
-        .select("asset_id")
-        .eq("user_id", userId)
-        .eq("asset_id", assetId)
-        .limit(1);
-
-    if (error) throw error;
-    return Array.isArray(data) && data.length > 0;
+    const ownedAssets = await listOwnedAssets(userId);
+    return ownedAssets.map(asset => asset.id).includes(assetId);
 }
 
 export async function createAssetOwnership(userId: string, assetId: string): Promise<void> {

@@ -2,7 +2,8 @@ import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance
 import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, AssetCategory } from "../shared/types.js";
 import { ASSET_CATEGORIES } from "../shared/constants.js";
-import { getShopAssets } from "../api/shop.js";
+import { getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
+import { showToast } from "../shared/toast.js";
 
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
@@ -25,15 +26,17 @@ export function initShop(): void {
 async function loadShop(): Promise<void> {
     await loadCoinBalance();
     await loadShopTabs();
+    await loadOwnedAssets();
     await loadShopAssets();
 }
 
 
 // ----- COIN BALANCE -----
 
-const balance = await fetchUserCoins();
+let balance = await fetchUserCoins();
 
-function renderCoinBalance(balance: number) {
+function renderCoinBalance(newBalance: number) {
+    balance = newBalance;
     if (!shopCoinBalance) return;
     shopCoinBalance.textContent = `🪙 ${balance}`
 }
@@ -47,6 +50,17 @@ async function loadCoinBalance(): Promise<void> {
 
 let currentAssets: Asset[] = await getShopAssets();
 
+let currentOwnedAssetIds: string[] = [];
+
+/**
+ * Checks if an asset is owned by the user
+ * @param assetId - The ID of the asset to check
+ * @returns true if owned, false otherwise
+ */
+function isAssetOwned(assetId: string): boolean {
+    return currentOwnedAssetIds.includes(assetId);
+}
+
 function loadShopAssets(): void {
     shopGrid.innerHTML = "";
     const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
@@ -55,13 +69,29 @@ function loadShopAssets(): void {
     filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
 
+async function loadOwnedAssets(): Promise<void> {
+    try {
+        currentOwnedAssetIds = await getOwnedAssetIds();
+        console.log("✅ Owned asset IDs loaded:", currentOwnedAssetIds.length, "assets", currentOwnedAssetIds);
+    } catch (error) {
+        console.error("Failed to load owned asset IDs:", error);
+        showToast({
+            message: "Fehler beim Laden des Inventars",
+            type: "error"
+        });
+    }
+}
+
 function createAssetCard(asset: Asset): HTMLElement {
     const assetCard = document.createElement("div");
+    const owned = isAssetOwned(asset.id);
+    const tooExpensive = balance < asset.price_coins;
+
     assetCard.className = "shop-modal__asset-card";
     assetCard.appendChild(createAssetHeader(asset));
     assetCard.appendChild(createAssetFooter(asset));
 
-    if (balance < asset.price_coins) {
+    if (!owned && tooExpensive) {
         assetCard.classList.add("shop-modal__asset-card__too-expensive");
     } else {
         assetCard.classList.remove("shop-modal__asset-card__too-expensive");
@@ -121,8 +151,59 @@ function createPreviewButton(): HTMLElement {
 
 function createAssetBuyButton(asset: Asset): HTMLElement {
     const assetBuyButton = document.createElement("button");
+    const owned = isAssetOwned(asset.id);
+    const tooExpensive = balance < asset.price_coins;
+
     assetBuyButton.className = "shop-modal__buy-btn";
-    assetBuyButton.textContent = `${asset.price_coins} 🪙`;
+    assetBuyButton.textContent = owned ? "OWNED" : `${asset.price_coins} 🪙`;
+    assetBuyButton.disabled = owned || tooExpensive;
+
+    if (owned) {
+        console.log(`🔒 Asset ${asset.name} is owned`);
+    }
+
+    if (!owned && !tooExpensive) {
+        assetBuyButton.addEventListener("click", async () => {
+            assetBuyButton.disabled = true;
+            assetBuyButton.textContent = "Buying...";
+
+            try {
+                const result = await purchaseAsset(asset.id);
+
+                if (result.success) {
+                    // Add to owned assets
+                    currentOwnedAssetIds.push(asset.id);
+
+                    // Update balance
+                    if (result.coins !== null) {
+                        renderCoinBalance(result.coins);
+                    }
+
+                    // Show success message
+                    showToast({
+                        message: `${asset.name} gekauft!`,
+                        type: "success"
+                    });
+
+                    // Refresh shop display
+                    loadShopAssets();
+                } else {
+                    throw new Error("Kauf fehlgeschlagen");
+                }
+            } catch (error) {
+                const message = error instanceof Error ? error.message : "Asset konnte nicht gekauft werden";
+                showToast({
+                    message,
+                    type: "error"
+                });
+
+                // Reset button state
+                assetBuyButton.disabled = false;
+                assetBuyButton.textContent = `${asset.price_coins} 🪙`;
+            }
+        });
+    }
+
     return assetBuyButton;
 }
 

@@ -9,6 +9,10 @@ type AssetsResponseBody = {
     assets?: Asset[];
 };
 
+type OwnedAssetIdsResponseBody = {
+    assetIds?: string[];
+};
+
 type PurchaseResponseBody = {
     success?: boolean;
     coins?: number;
@@ -78,6 +82,25 @@ export async function getOwnedAssets(): Promise<Asset[]> {
 
     const body = await response.json() as AssetsResponseBody;
     return Array.isArray(body.assets) ? body.assets : [];
+}
+
+export async function getOwnedAssetIds(): Promise<string[]> {
+    const headers = await buildAuthHeaders({
+        "Accept": "application/json"
+    });
+
+    const response = await fetch("/api/shop/owned-asset-ids", {
+        method: "GET",
+        headers
+    });
+
+    if (!response.ok) {
+        const message = await readApiError(response, "Asset-IDs konnten nicht geladen werden");
+        throw new Error(message);
+    }
+
+    const body = await response.json() as OwnedAssetIdsResponseBody;
+    return Array.isArray(body.assetIds) ? body.assetIds : [];
 }
 
 export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResult> {

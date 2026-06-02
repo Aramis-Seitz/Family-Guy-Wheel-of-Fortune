@@ -23,6 +23,11 @@ export async function getOwnedAssets(userId: string): Promise<Asset[]> {
     return listOwnedAssets(userId);
 }
 
+export async function getOwnedAssetIds(userId: string): Promise<string[]> {
+    const ownedAssets = await listOwnedAssets(userId);
+    return ownedAssets.map(asset => asset.id);
+}
+
 export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResult> {
     if (!assetId) {
         throw new AppError("assetId is required", 400);

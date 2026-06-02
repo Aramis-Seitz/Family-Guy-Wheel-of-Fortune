@@ -33,9 +33,8 @@ export async function getAssetById(assetId: string): Promise<Asset | null> {
 export async function listOwnedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient
         .from("asset_ownership")
-        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: true });
+        .select("*")
+        .eq("user_id", userId);
 
     if (error) throw error;
 

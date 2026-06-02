@@ -1,5 +1,5 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
-import { getAssets, getOwnedAssets, getOwnedAssetIds, purchaseAsset } from "../services/shop-service";
+import { getAssets, getOwnedAssets, getOwnedAssetIds, getAssetCategories, purchaseAsset } from "../services/shop-service";
 import { sendMethodNotAllowed, sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 
@@ -62,6 +62,26 @@ export async function handleGetOwnedAssetIds(req: HttpRequest, res: HttpResponse
 
         const assetIds = await getOwnedAssetIds(userId);
         res.status(200).json({ assetIds });
+    } catch (error) {
+        sendUnexpectedError(res, error);
+    }
+}
+
+export async function handleGetAssetCategories(req: HttpRequest, res: HttpResponse): Promise<void> {
+    if (req.method !== "GET") {
+        sendMethodNotAllowed(res, "GET");
+        return;
+    }
+
+    try {
+        const userId = await resolveUserIdFromHeaders(req.headers);
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const categories = await getAssetCategories();
+        res.status(200).json({ categories });
     } catch (error) {
         sendUnexpectedError(res, error);
     }

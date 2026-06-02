@@ -1,9 +1,10 @@
-import type { Asset } from "../types/asset";
+import type { Asset, AssetCategory } from "../types/asset";
 import {
     createAssetOwnership,
     getAssetById,
     listAssets,
     listOwnedAssets,
+    listAssetCategories,
     userOwnsAsset
 } from "../repositories/asset-repository";
 import { getCoinsByUserId, updateCoinsByUserId } from "../repositories/profile-repository";
@@ -58,4 +59,8 @@ export async function purchaseAsset(userId: string, assetId: string): Promise<Pu
         coins: remainingCoins,
         assetId
     };
+}
+
+export async function getAssetCategories(): Promise<AssetCategory[]> {
+    return listAssetCategories();
 }

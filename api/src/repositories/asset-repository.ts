@@ -1,5 +1,5 @@
 import { supabaseClient } from "../lib/supabase-client";
-import type { Asset } from "../types/asset";
+import type { Asset, AssetCategory } from "../types/asset";
 
 type AssetOwnershipRow = {
     asset?: Asset | Asset[] | null;
@@ -42,6 +42,16 @@ export async function listOwnedAssets(userId: string): Promise<Asset[]> {
     return rows
         .map((row) => row.asset)
         .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
+}
+
+export async function listAssetCategories(): Promise<AssetCategory[]> {
+    const { data, error } = await supabaseClient
+        .from("asset")
+        .select("category");
+
+    if (error) throw error;
+
+    return [...new Set((data ?? []).map((row) => row.category as AssetCategory))];
 }
 
 export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {

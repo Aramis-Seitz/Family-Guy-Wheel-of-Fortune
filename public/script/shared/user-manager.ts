@@ -1,12 +1,9 @@
+
+
 import { supabaseClient } from "./supabase-client.js";
 import { getUserCoins, getUserProfile, setUserCoins, subtractUserCoins } from "../api/user.js";
 import type { Session } from "@supabase/supabase-js";
 import type { ProfileData } from "./types.js";
-
-/**
- * Central user store for session, profile, coins, and auth logic.
- * All user-related data and logic should be accessed via this module.
- */
 
 class UserManager {
     private session: Session | null = null;
@@ -79,13 +76,6 @@ class UserManager {
         const updatedCoins = await subtractUserCoins(amount);
         this.coins = updatedCoins;
     }
-
-    /*
-    subscribeToCoins(callback: (coins: number) => void): void {
-        supabaseClient.channel("coin-updates").on(...)
-            .subscribe();  // ← liefert nur Daten, kein DOM
-    }
-    */
 }
 
 export const userManager = new UserManager();

@@ -1,8 +1,8 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
 import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, AssetCategory } from "../shared/types.js";
-import { ASSET_CATEGORIES } from "../shared/constants.js";
-import { getOwnedAssets, getOwnedAssetIds, getShopAssets, getAssetCategories, purchaseAsset } from "../api/shop.js";
+import { ASSET_CATEGORIES, EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
+import { getOwnedAssets, getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
 import { showToast } from "../shared/toast.js";
 //import { get } from "node:http";
 //import { getAsset } from "node:sea";
@@ -53,7 +53,6 @@ async function loadCoinBalance(): Promise<void> {
 let currentAssets: Asset[] = await getShopAssets();
 // let currentOwnedAssets: Asset[] = await getOwnedAssets();
 let currentOwnedAssetIds: string[] = await getOwnedAssetIds();
-let currentCategories: AssetCategory[] = await getAssetCategories();
 
 function isAssetOwned(assetId: string): boolean {
     return currentOwnedAssetIds.includes(assetId);
@@ -108,7 +107,7 @@ function createAssetHeader(asset: Asset): HTMLElement {
 function createAssetIcon(asset: Asset): HTMLElement {
     const assetIcon = document.createElement("img");
     assetIcon.className = "shop-modal__asset-icon";
-    assetIcon.src = asset.asset_url;
+    assetIcon.src = EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
     assetIcon.alt = asset.name;
     return assetIcon;
 }
@@ -203,7 +202,7 @@ function renderShopTabs(categories: (AssetCategory | "all")[]): void {
 }
 
 async function loadShopTabs(): Promise<void> {
-    const categories = ["all", ...currentCategories];
+    const categories = ["all", ...ASSET_CATEGORIES];
     renderShopTabs(categories as AssetCategory[]);
 }
 

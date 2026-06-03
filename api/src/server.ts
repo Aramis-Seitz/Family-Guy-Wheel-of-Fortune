@@ -6,7 +6,7 @@ dotenv.config();
 
 import express from "express";
 import path from "path";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import type { Request, Response, NextFunction } from "express";
 import cors from "cors";

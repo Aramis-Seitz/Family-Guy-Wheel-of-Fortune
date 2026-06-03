@@ -1,7 +1,8 @@
 import { randomInt, randomUUID } from 'node:crypto';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-function createServiceClient() {
+function createServiceClient(): SupabaseClient {
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceRoleKey) throw new Error('Missing Supabase env vars');
@@ -10,21 +11,31 @@ function createServiceClient() {
   });
 }
 
-export default async function handler(req, res) {
+export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
-  const authHeader = req.headers['authorization'] ?? '';
+  const authHeader = (req.headers['authorization'] ?? '') as string;
   const jwt = authHeader.replace(/^Bearer\s+/i, '').trim();
-  if (!jwt) return res.status(401).json({ error: 'Unauthorized' });
+  if (!jwt) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
 
   const supabase = createServiceClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
-  if (authError || !user) return res.status(401).json({ error: 'Invalid session' });
+  if (authError || !user) {
+    res.status(401).json({ error: 'Invalid session' });
+    return;
+  }
 
-  const { roomKey, names } = req.body ?? {};
-  if (!roomKey) return res.status(400).json({ error: 'Missing roomKey' });
+  const { roomKey, names } = (req.body ?? {}) as { roomKey?: string; names?: unknown };
+  if (!roomKey) {
+    res.status(400).json({ error: 'Missing roomKey' });
+    return;
+  }
 
   const { data: room, error: roomError } = await supabase
     .from('rooms')
@@ -32,13 +43,20 @@ export default async function handler(req, res) {
     .eq('room_key', roomKey)
     .single();
 
-  if (roomError || !room) return res.status(404).json({ error: 'Room not found' });
-  if (room.host_id !== user.id) return res.status(403).json({ error: 'Only the host may spin' });
+  if (roomError || !room) {
+    res.status(404).json({ error: 'Room not found' });
+    return;
+  }
+
+  if ((room as { host_id: string }).host_id !== user.id) {
+    res.status(403).json({ error: 'Only the host may spin' });
+    return;
+  }
 
   const ranNum = randomInt(140, 901);
   const spunAt = new Date().toISOString();
 
-  const nameList = Array.isArray(names) && names.length > 0 ? names : [];
+  const nameList: string[] = Array.isArray(names) && names.length > 0 ? (names as string[]) : [];
   const winnerName = nameList.length > 0 ? nameList[ranNum % nameList.length] : '';
 
   const { error: updateError } = await supabase
@@ -48,7 +66,8 @@ export default async function handler(req, res) {
 
   if (updateError) {
     console.error('[room/spin] update error:', updateError);
-    return res.status(500).json({ error: 'Failed to update room spin' });
+    res.status(500).json({ error: 'Failed to update room spin' });
+    return;
   }
 
   const spinToken = randomUUID();
@@ -61,8 +80,9 @@ export default async function handler(req, res) {
 
   if (tokenError || !tokenData) {
     console.error('[room/spin] spin_token insert error:', tokenError);
-    return res.status(500).json({ error: 'Failed to create spin token' });
+    res.status(500).json({ error: 'Failed to create spin token' });
+    return;
   }
 
-  return res.status(200).json({ ranNum, spinToken: tokenData.token, winnerName });
+  res.status(200).json({ ranNum, spinToken: (tokenData as { token: string }).token, winnerName });
 }

@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
   if (authError || !user) return res.status(401).json({ error: 'Invalid session' });
 
-  const { roomKey } = req.body ?? {};
+  const { roomKey, names } = req.body ?? {};
   if (!roomKey) return res.status(400).json({ error: 'Missing roomKey' });
 
   const { data: room, error: roomError } = await supabase
@@ -37,6 +37,9 @@ export default async function handler(req, res) {
 
   const ranNum = randomInt(140, 901);
   const spunAt = new Date().toISOString();
+
+  const nameList = Array.isArray(names) && names.length > 0 ? names : [];
+  const winnerName = nameList.length > 0 ? nameList[ranNum % nameList.length] : '';
 
   const { error: updateError } = await supabase
     .from('rooms')
@@ -52,7 +55,7 @@ export default async function handler(req, res) {
 
   const { data: tokenData, error: tokenError } = await supabase
     .from('spin_tokens')
-    .insert({ token: spinToken, user_id: user.id, used: false })
+    .insert({ token: spinToken, user_id: user.id, used: false, winner_name: winnerName })
     .select('token')
     .single();
 
@@ -61,5 +64,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Failed to create spin token' });
   }
 
-  return res.status(200).json({ ranNum, spinToken: tokenData.token });
+  return res.status(200).json({ ranNum, spinToken: tokenData.token, winnerName });
 }

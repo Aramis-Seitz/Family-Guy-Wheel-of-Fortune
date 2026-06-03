@@ -8,6 +8,7 @@ export interface Point {
 export interface RandomResponse {
   ranNum: number;
   spinToken: string;
+  winnerName: string;
 }
 
 export interface AwardCoinsResponse {
@@ -22,6 +23,7 @@ export interface SpinConfig {
   stepAngle: number;
   segmentCount: number;
   spinToken: string;
+  winnerName: string;
 }
 
 export interface ProfileData {
@@ -46,6 +48,7 @@ export interface ToastOptions {
 export interface RoomSpinResponse {
   ranNum: number;
   spinToken: string;
+  winnerName: string;
 }
 
 export interface RoomRow {

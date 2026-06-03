@@ -48,16 +48,16 @@ export default async function handler(req: any, res: any): Promise<void> {
     return;
   }
 
-  const { spinToken, winnerName } = req.body ?? {};
+  const { spinToken } = req.body ?? {};
 
-  if (!spinToken || !winnerName) {
-    res.status(400).json({ error: 'Missing spinToken or winnerName' });
+  if (!spinToken) {
+    res.status(400).json({ error: 'Missing spinToken' });
     return;
   }
 
   const { data: tokenData, error: tokenError } = await supabase
     .from('spin_tokens')
-    .select('token, user_id, used')
+    .select('token, user_id, used, winner_name')
     .eq('token', spinToken)
     .eq('user_id', user.id)
     .eq('used', false)
@@ -71,6 +71,7 @@ export default async function handler(req: any, res: any): Promise<void> {
 
   await supabase.from('spin_tokens').update({ used: true }).eq('token', spinToken);
 
+  const winnerName: string = (tokenData as any).winner_name ?? '';
   const spinnerCoins = randomBetween(1, 3);
 
   const { data: spinnerProfile } = await supabase

@@ -12,7 +12,7 @@ import {
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client.js";
-import { getSegmentCount } from "../names/name-list.js";
+import { getSegmentCount, getNames } from "../names/name-list.js";
 import { announceWinner, hideWinnerModal } from "./winner.js";
 import type { Direction, SpinConfig } from "../shared/types.js";
 
@@ -110,7 +110,7 @@ function performSpinStep(step: number, config: SpinConfig): void {
   lastTickRotation = currentRotation;
   if (step >= config.totalSteps) {
     playCymbalCrash();
-    announceWinner(config.segmentCount, config.spinToken);
+    announceWinner(config.spinToken, config.winnerName);
     return;
   }
 
@@ -119,7 +119,7 @@ function performSpinStep(step: number, config: SpinConfig): void {
   setTimeout(() => performSpinStep(step, config), delay);
 }
 
-export function spinWheel(totalSteps: number, direction: Direction, spinToken: string): void {
+export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, winnerName: string): void {
   spinCancelled = false;
   const segmentCount = getSegmentCount();
   if (segmentCount < 2) return;
@@ -130,32 +130,24 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
     stepAngle: 360 / segmentCount,
     segmentCount,
     spinToken,
+    winnerName,
   };
 
   performSpinStep(0, config);
 }
 
-function logSpinDetails(ranNum: number, multiplier: number, boostedValue: number): void {
-  console.log("Number from fs server:", ranNum);
-  console.log("Multiplier:", multiplier);
-  console.log("Boosted value:", boostedValue);
-}
-
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
   if (getSegmentCount() < 2) return;
 
-  console.log(`[SPIN] 🎡 Spin-Button geklickt – Richtung: ${direction}`);
   disableElements(getSpinRelatedElements());
 
   try {
-    const { ranNum, spinToken } = await fetchRandomNumber();
-    console.log("[SPIN] Token empfangen:", spinToken ? `"${spinToken}"` : "LEER!");
+    const names = getNames();
+    const { ranNum, spinToken, winnerName } = await fetchRandomNumber(names);
     const multiplier = getMultiplier();
-    const boostedRanNum = ranNum * multiplier;
-    logSpinDetails(ranNum, multiplier, boostedRanNum);
-    spinWheel(boostedRanNum, direction, spinToken);
+    spinWheel(ranNum * multiplier, direction, spinToken, winnerName);
   } catch (error) {
-    console.error("[SPIN] ❌ Fehler beim Spin :", error);
+    console.error("[SPIN] Fehler beim Spin:", error);
     enableElements(getSpinRelatedElements());
   }
 }

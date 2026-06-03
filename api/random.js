@@ -22,24 +22,25 @@ function createServiceClient() {
 }
 
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
     const ranNum = getSecureRandomNumber(360, 900);
+    const { names } = req.body ?? {};
+    const nameList = Array.isArray(names) && names.length > 0 ? names : [];
+    const winnerName = nameList.length > 0 ? nameList[ranNum % nameList.length] : "";
 
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return res.status(200).json({
-        ranNum,
-        spinToken: "",
-      });
+      return res.status(200).json({ ranNum, spinToken: "", winnerName });
     }
 
     const authHeader = req.headers["authorization"] ?? "";
     const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
 
     if (!jwt) {
-      return res.status(200).json({
-        ranNum,
-        spinToken: "",
-      });
+      return res.status(200).json({ ranNum, spinToken: "", winnerName });
     }
 
     const supabase = createServiceClient();
@@ -50,8 +51,6 @@ export default async function handler(req, res) {
     } = await supabase.auth.getUser(jwt);
 
     if (authError || !user) {
-      console.error("Invalid Supabase session:", authError);
-
       return res.status(401).json({
         error: "Invalid session",
         message: authError?.message,
@@ -66,37 +65,20 @@ export default async function handler(req, res) {
         token: spinToken,
         user_id: user.id,
         used: false,
+        winner_name: winnerName,
       })
       .select("token")
       .single();
 
     if (tokenError || !tokenData) {
-      console.error("Failed to create spin token:", {
-        message: tokenError?.message,
-        details: tokenError?.details,
-        hint: tokenError?.hint,
-        code: tokenError?.code,
-      });
-
       return res.status(500).json({
         error: "Failed to create spin token",
         message: tokenError?.message,
-        details: tokenError?.details,
-        hint: tokenError?.hint,
-        code: tokenError?.code,
       });
     }
 
-    return res.status(200).json({
-      ranNum,
-      spinToken: tokenData.token,
-    });
+    return res.status(200).json({ ranNum, spinToken: tokenData.token, winnerName });
   } catch (error) {
-    console.error("Random API failed:", {
-      message: error?.message,
-      stack: error?.stack,
-    });
-
     return res.status(500).json({
       error: "Failed to generate number",
       message: error?.message,

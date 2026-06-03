@@ -2,9 +2,6 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "public/dist",
-  "functions": {
-    "api/index.ts": {}
-  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/login.html", "destination": "/api/index" },

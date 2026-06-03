@@ -36,7 +36,7 @@ export async function getOwnedAssets(): Promise<Asset[]> {
         "Accept": "application/json"
     });
 
-    const response = await fetch(apiUrl("/api/shop/inventory"), {
+    const response = await fetch(apiUrl("/api/inventory/assets"), {
         method: "GET",
         headers
     });

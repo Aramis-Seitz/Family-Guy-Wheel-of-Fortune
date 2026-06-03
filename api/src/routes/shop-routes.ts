@@ -8,7 +8,7 @@ import {
 
 export const shopRoutes = Router();
 
-shopRoutes.get("/assets", handleGetShopAssets);
-shopRoutes.get("/owned-asset-ids", handleGetOwnedAssetIds);
-shopRoutes.get("/categories", handleGetAssetCategories);
-shopRoutes.post("/purchase", handlePurchaseShopAsset);
+shopRoutes.get("/shop/assets", handleGetShopAssets);
+shopRoutes.get("/shop/owned-asset-ids", handleGetOwnedAssetIds);
+shopRoutes.get("/shop/categories", handleGetAssetCategories);
+shopRoutes.post("/shop/purchase", handlePurchaseShopAsset);

@@ -1,14 +1,11 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
 import { Asset, AssetCategory } from "../shared/types.js";
 import { ASSET_CATEGORIES, EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
-import { getOwnedAssets, getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
+import { getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
 import { showToast } from "../shared/toast.js";
 import { getUserCoins } from "../api/user.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-//import { get } from "node:http";
-//import { getAsset } from "node:sea";
-
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
 
@@ -31,7 +28,6 @@ export function initShop(): void {
 async function loadShop(): Promise<void> {
     await loadCoinBalance();
     await loadShopTabs();
-    //await loadOwnedAssets();
     await loadShopAssets();
 }
 
@@ -78,7 +74,6 @@ async function subscribeToCoinUpdates(): Promise<void> {
 // ----- ASSET ERSTELLEN UND LADEN -----
 
 let currentAssets: Asset[] = await getShopAssets();
-// let currentOwnedAssets: Asset[] = await getOwnedAssets();
 let currentOwnedAssetIds: string[] = await getOwnedAssetIds();
 
 function isAssetOwned(assetId: string): boolean {
@@ -91,21 +86,6 @@ function loadShopAssets(): void {
     let activeCategory = getClickedCategory(activeTab) || "all";
     let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
-}
-
-//L:    Diese Funktion heißt loadOwnedAssets, lädt aber dessen IDs statt die Assets selbst.
-//      Und dann wird sie oben in loadShop() aufgerufen, obwohl dies hier eher Inventory-Logik ist.
-//      Da is noch bissel was durcheinander ?
-async function loadOwnedAssets(): Promise<void> {
-    try {
-        console.log("✅ Owned asset IDs loaded:", currentOwnedAssetIds.length, "assets", currentOwnedAssetIds);
-    } catch (error) {
-        console.error("Failed to load owned asset IDs:", error);
-        showToast({
-            message: "Fehler beim Laden des Inventars",
-            type: "error"
-        });
-    }
 }
 
 function createAssetCard(asset: Asset): HTMLElement {

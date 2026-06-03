@@ -14,9 +14,11 @@ type OwnedAssetIdsResponseBody = {
     assetIds?: string[];
 };
 
+/*
 type AssetCategoriesResponseBody = {
     categories?: AssetCategory[];
 };
+*/
 
 type PurchaseResponseBody = {
     success?: boolean;
@@ -108,6 +110,7 @@ export async function getOwnedAssetIds(): Promise<string[]> {
     return Array.isArray(body.assetIds) ? body.assetIds : [];
 }
 
+/*
 export async function getAssetCategories(): Promise<AssetCategory[]> {
     const headers = await buildAuthHeaders({
         "Accept": "application/json"
@@ -127,6 +130,7 @@ export async function getAssetCategories(): Promise<AssetCategory[]> {
     return Array.isArray(body.categories) ? body.categories : [];
 
 }
+*/
 
 export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResult> {
     if (!assetId) {

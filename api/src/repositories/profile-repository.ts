@@ -52,31 +52,3 @@ export async function updateCoinsByUserId(userId: string, coins: number): Promis
 
     if (error) throw error;
 }
-
-export async function getUserIdByUsername(username: string): Promise<string | null> {
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("id")
-        .eq("username", username)
-        .single();
-
-    if (error) {
-        if (error.code === "PGRST116") return null;
-        throw error;
-    }
-
-    const record = data as { id?: string } | null;
-    return typeof record?.id === "string" ? record.id : null;
-}
-
-export async function getUsernameByUserId(userId: string): Promise<string> {
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("username")
-        .eq("id", userId)
-        .single();
-
-    if (error) throw error;
-    const profile = data as { username?: string | null } | null;
-    return typeof profile?.username === "string" ? profile.username : userId;
-}

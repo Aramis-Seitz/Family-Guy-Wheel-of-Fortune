@@ -5,45 +5,13 @@ import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase
 import { nameState } from "../names/name-state.js";
 import { showToast } from "../shared/toast.js";
 import { MAX_ITEMS } from "../shared/constants.js";
-import { getUserCoins } from "../api/user.js";
-// import { get } from "node:http";
+import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user.js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
   if (error || !session?.user) return null;
   return session;
 }
-
-async function fetchUserProfile(userId: string): Promise<ProfileData | null> {
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("username, coins")
-    .eq("id", userId)
-    .single();
-
-  if (error || !data) {
-    console.error("Profil konnte nicht geladen werden:", error);
-    return null;
-  }
-
-  return data;
-}
-
-/*
-export async function fetchUserCoins(): Promise<number> {
-  const session = await fetchCurrentSession();
-  if (!session) return 0;
-
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("coins")
-    .eq("id", session.user.id)
-    .single();
-
-  if (error || !data) return 0;
-  return (data as { coins?: number }).coins ?? 0;
-}
-*/
 
 function applyUnauthenticatedState(): void {
   if (!profileName || !authButton) return;
@@ -108,7 +76,6 @@ export async function refreshCoinDisplay(): Promise<void> {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
 
-  //const coins = await fetchUserCoins();
   const coins = await getUserCoins();
   applyCoinDisplay(coins);
 }
@@ -122,7 +89,7 @@ export async function initProfileUI(): Promise<void> {
     return;
   }
 
-  const profile = await fetchUserProfile(session.user.id);
+  const profile = await fetchUserProfileFromApi();
   applyAuthenticatedState(profile);
   subscribeToCoinUpdates(session.user.id);
 }

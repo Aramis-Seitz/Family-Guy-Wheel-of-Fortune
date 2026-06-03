@@ -45,6 +45,7 @@ npm install
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 USE_MOCK=false
+CORS_ORIGIN=http://localhost:5173
 ```
 
 **`public/.env`** anlegen:
@@ -53,6 +54,7 @@ USE_MOCK=false
 VITE_SUPABASE_URL=https://xxxx.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=eyJ...
 VITE_USE_MOCK=false
+VITE_API_BASE_URL=http://localhost:3000
 ```
 
 > Die Werte findest du im Supabase Dashboard unter **Settings → API**. Frag im Team nach den Zugangsdaten.

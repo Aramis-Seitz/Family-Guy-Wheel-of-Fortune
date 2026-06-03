@@ -1,5 +1,6 @@
 
 import { supabaseClient } from "../shared/supabase-client.js";
+import { apiUrl } from "../shared/api-base.js";
 
 type ApiErrorBody = {
     error?: string;
@@ -42,7 +43,7 @@ export async function getUserCoins(): Promise<number> {
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/user/coins", {
+    const response = await fetch(apiUrl("/api/user/coins"), {
         method: "GET",
         headers
     });
@@ -61,7 +62,7 @@ export async function getUserProfile(): Promise<{ username: string; coins: numbe
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/user/profile", {
+    const response = await fetch(apiUrl("/api/user/profile"), {
         method: "GET",
         headers
     });
@@ -88,7 +89,7 @@ export async function setUserCoins(coins: number): Promise<number> {
         "Content-Type": "application/json"
     });
 
-    const response = await fetch("/api/user/coins", {
+    const response = await fetch(apiUrl("/api/user/coins"), {
         method: "POST",
         headers,
         body: JSON.stringify({ coins })
@@ -108,7 +109,7 @@ export async function subtractUserCoins(amount: number): Promise<number> {
         "Content-Type": "application/json"
     });
 
-    const response = await fetch("/api/user/subtract-coins", {
+    const response = await fetch(apiUrl("/api/user/subtract-coins"), {
         method: "POST",
         headers,
         body: JSON.stringify({ amount })

@@ -1,5 +1,6 @@
 import type { AwardCoinsResponse, RandomResponse } from "../shared/types.js";
 import { supabaseClient } from "../shared/supabase-client.js";
+import { apiUrl } from "../shared/api-base.js";
 
 async function getAccessToken(): Promise<string> {
   const {
@@ -15,7 +16,7 @@ export async function fetchRandomNumber(): Promise<{ ranNum: number; spinToken: 
   console.log("[SPIN] fetchRandomNumber: Anfrage an /api/random wird gesendet…");
   const accessToken = await getAccessToken();
 
-  const response = await fetch("/api/random", {
+  const response = await fetch(apiUrl("/api/random"), {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
@@ -55,7 +56,7 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
 
   console.log("[SPIN] POST /api/award-coins wird gesendet…", { spinToken, winnerName });
 
-  const response = await fetch("/api/award-coins", {
+  const response = await fetch(apiUrl("/api/award-coins"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import type { Asset, AssetCategory } from "../shared/types.js";
+import { apiUrl } from "../shared/api-base.js";
 
 type ApiErrorBody = {
     error?: string;
@@ -55,7 +56,7 @@ export async function getShopAssets(): Promise<Asset[]> {
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/shop/assets", {
+    const response = await fetch(apiUrl("/api/shop/assets"), {
         method: "GET",
         headers
     });
@@ -74,7 +75,7 @@ export async function getOwnedAssets(): Promise<Asset[]> {
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/shop/inventory", {
+    const response = await fetch(apiUrl("/api/shop/inventory"), {
         method: "GET",
         headers
     });
@@ -93,7 +94,7 @@ export async function getOwnedAssetIds(): Promise<string[]> {
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/shop/owned-asset-ids", {
+    const response = await fetch(apiUrl("/api/shop/owned-asset-ids"), {
         method: "GET",
         headers
     });
@@ -112,7 +113,7 @@ export async function getAssetCategories(): Promise<AssetCategory[]> {
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/shop/categories", {
+    const response = await fetch(apiUrl("/api/shop/categories"), {
         method: "GET",
         headers
     });
@@ -137,7 +138,7 @@ export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResul
         "Accept": "application/json"
     });
 
-    const response = await fetch("/api/shop/purchase", {
+    const response = await fetch(apiUrl("/api/shop/purchase"), {
         method: "POST",
         headers,
         body: JSON.stringify({ assetId })

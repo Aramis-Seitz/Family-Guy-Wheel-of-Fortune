@@ -9,6 +9,7 @@ import path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import type { Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { getSecureRandomNumber } from "./lib/random";
 import { createMockServiceClient } from "./mock-service";
 import { mockRouter } from "./mock-routes";
@@ -24,6 +25,15 @@ const app = express();
 const PORT = 3000;
 const MIN_ROTATION_DEGREE = 140;
 const MAX_ROTATION_DEGREE = 900;
+const allowedOrigins = (process.env.CORS_ORIGIN ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+  credentials: true,
+};
 
 function requireBasicAuthCookie(req: Request, res: Response, next: NextFunction): void {
   const expected = process.env.AUTH_SECRET;
@@ -45,6 +55,8 @@ function requireBasicAuthCookie(req: Request, res: Response, next: NextFunction)
 }
 
 app.use(express.json());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthCookie);
 app.use(express.static(path.join(__dirname, "../../public/dist/html")));
 app.use(express.static(path.join(__dirname, "../../public/dist")));

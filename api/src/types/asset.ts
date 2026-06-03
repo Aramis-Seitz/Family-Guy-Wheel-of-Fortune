@@ -1,4 +1,4 @@
-export type AssetCategory = "background" | "wheel_skin" | "pointer" | "sound" | "effect";
+export type AssetCategory = "background" | "wheel_skin" | "pointer" | "sound" | "effect";   //L:    Lol? hahaha
 
 export type Asset = {
     readonly id: string;

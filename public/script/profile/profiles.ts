@@ -5,6 +5,8 @@ import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase
 import { nameState } from "../names/name-state.js";
 import { showToast } from "../shared/toast.js";
 import { MAX_ITEMS } from "../shared/constants.js";
+import { getUserCoins } from "../api/user.js";
+// import { get } from "node:http";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -27,6 +29,7 @@ async function fetchUserProfile(userId: string): Promise<ProfileData | null> {
   return data;
 }
 
+/*
 export async function fetchUserCoins(): Promise<number> {
   const session = await fetchCurrentSession();
   if (!session) return 0;
@@ -40,6 +43,7 @@ export async function fetchUserCoins(): Promise<number> {
   if (error || !data) return 0;
   return (data as { coins?: number }).coins ?? 0;
 }
+*/
 
 function applyUnauthenticatedState(): void {
   if (!profileName || !authButton) return;
@@ -104,7 +108,8 @@ export async function refreshCoinDisplay(): Promise<void> {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
 
-  const coins = await fetchUserCoins();
+  //const coins = await fetchUserCoins();
+  const coins = await getUserCoins();
   applyCoinDisplay(coins);
 }
 

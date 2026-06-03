@@ -29,7 +29,7 @@ export async function fetchRandomNumber(): Promise<{ ranNum: number; spinToken: 
   const data: RandomResponse = await response.json();
   console.log("[SPIN] /api/random Daten:", {
     ranNum: data.ranNum,
-    spinToken: data.spinToken || "LEER ← Env-Variablen auf Vercel fehlen wahrscheinlich!",
+    spinToken: data.spinToken || "LEER ← Backend-Env-Variablen fehlen wahrscheinlich!",
   });
 
   if (!data.spinToken) {

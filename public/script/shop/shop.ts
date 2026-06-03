@@ -1,9 +1,11 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
-import { fetchUserCoins } from "../profile/profiles.js";
 import { Asset, AssetCategory } from "../shared/types.js";
 import { ASSET_CATEGORIES, EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
 import { getOwnedAssets, getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
 import { showToast } from "../shared/toast.js";
+import { getUserCoins } from "../api/user.js";
+import { supabaseClient } from "../shared/supabase-client.js";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 //import { get } from "node:http";
 //import { getAsset } from "node:sea";
 
@@ -23,6 +25,7 @@ export function initShop(): void {
     shopBtn.addEventListener("click", openShop);
     shopCloseBtn.addEventListener("click", closeShop);
     closeOnBackdropClick(shopModal, closeShop);
+    subscribeToCoinUpdates();
 }
 
 async function loadShop(): Promise<void> {
@@ -35,16 +38,40 @@ async function loadShop(): Promise<void> {
 
 // ----- COIN BALANCE -----
 
-let balance = await fetchUserCoins();
+let balance = 0;
 
 function renderCoinBalance(newBalance: number) {
     balance = newBalance;
     if (!shopCoinBalance) return;
-    shopCoinBalance.textContent = `🪙 ${balance}`
+    shopCoinBalance.textContent = `🪙 ${newBalance}`;
 }
 
 async function loadCoinBalance(): Promise<void> {
-    renderCoinBalance(balance);
+    try {
+        const freshBalance = await getUserCoins();
+        renderCoinBalance(freshBalance);
+    } catch (error) {
+        console.error("Coins konnten nicht aktualisiert werden:", error);
+    }
+}
+
+async function subscribeToCoinUpdates(): Promise<void> {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.user?.id) return;
+
+    supabaseClient
+        .channel(`shop-coin-updates-${session.user.id}`)
+        .on(
+            "postgres_changes",
+            { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${session.user.id}` },
+            (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
+                const nextBalance = (payload.new as { coins?: number })?.coins;
+                if (typeof nextBalance !== "number") return;
+                renderCoinBalance(nextBalance);
+                if (shopModal.open) loadShopAssets();
+            }
+        )
+        .subscribe();
 }
 
 
@@ -61,7 +88,7 @@ function isAssetOwned(assetId: string): boolean {
 function loadShopAssets(): void {
     shopGrid.innerHTML = "";
     const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
-    let activeCategory = getClickedCategory(activeTab) || "ALL";
+    let activeCategory = getClickedCategory(activeTab) || "all";
     let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
@@ -164,7 +191,11 @@ async function handlePurchaseClick(asset: Asset, btn: HTMLButtonElement): Promis
         const result = await purchaseAsset(asset.id);
         if (!result.success) throw new Error("Kauf fehlgeschlagen");
         currentOwnedAssetIds.push(asset.id);
-        if (result.coins !== null) renderCoinBalance(result.coins);
+        if (result.coins !== null) {
+            renderCoinBalance(result.coins);
+        } else {
+            await loadCoinBalance();
+        }
         showToast({ message: `${asset.name} gekauft!`, type: "success" });
         loadShopAssets();
     } catch (error) {

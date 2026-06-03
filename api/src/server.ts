@@ -8,6 +8,7 @@ import express from "express";
 import path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
+import type { Request, Response, NextFunction } from "express";
 import { getSecureRandomNumber } from "./lib/random";
 import { createMockServiceClient } from "./mock-service";
 import { mockRouter } from "./mock-routes";
@@ -24,7 +25,27 @@ const PORT = 3000;
 const MIN_ROTATION_DEGREE = 140;
 const MAX_ROTATION_DEGREE = 900;
 
+function requireBasicAuthCookie(req: Request, res: Response, next: NextFunction): void {
+  const expected = process.env.AUTH_SECRET;
+  if (!expected) {
+    next();
+    return;
+  }
+
+  const cookieHeader = req.headers.cookie ?? '';
+  const match = cookieHeader.match(/(?:^|;\s*)basic_auth=([^;]+)/);
+  const cookieValue = match?.[1];
+
+  if (cookieValue !== expected) {
+    res.redirect(302, '/');
+    return;
+  }
+
+  next();
+}
+
 app.use(express.json());
+app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthCookie);
 app.use(express.static(path.join(__dirname, "../../public/dist/html")));
 app.use(express.static(path.join(__dirname, "../../public/dist")));
 app.use('/api', apiRoutes);
@@ -177,10 +198,42 @@ app.post("/api/award-coins", async (req, res) => {
   res.json({ spinnerCoins, winnerCoins: 0 });
 });
 
-if (process.env.VERCEL !== '1') {
-  app.listen(PORT, () => {
-    console.log(`Server läuft auf http://localhost:${PORT}`);
-  });
-}
+app.post('/api/basic-auth', (req, res) => {
+  const { username, password } = req.body ?? {};
+  const validUser = process.env.AUTH_USER;
+  const validPwd = process.env.AUTH_PWD;
+  const authSecret = process.env.AUTH_SECRET;
+
+  if (!username || !password) {
+    res.status(400).json({ success: false, message: 'Benutzername und Passwort erforderlich.' });
+    return;
+  }
+
+  if (!validUser || !validPwd || !authSecret) {
+    res.status(500).json({ success: false, message: 'Auth-Konfiguration fehlt.' });
+    return;
+  }
+
+  if (username !== validUser || password !== validPwd) {
+    res.status(401).json({ success: false, message: 'Ungültige Zugangsdaten.' });
+    return;
+  }
+
+  res.setHeader(
+    'Set-Cookie',
+    `basic_auth=${authSecret}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800`
+  );
+
+  res.status(200).json({ success: true });
+});
+
+app.post('/api/logout', (_req, res) => {
+  res.setHeader('Set-Cookie', 'basic_auth=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
+  res.status(200).json({ success: true });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server läuft auf http://localhost:${PORT}`);
+});
 
 export default app;

@@ -61,7 +61,7 @@ VITE_USE_MOCK=false
 
 Für Code bearbeitung neunen Branche eröffnen.
 ```
-Der Main-Branch Hostet die Produktive version des Codes auf Vercel, wo diese auch direkt deployed wird.
+Der Main-Branch enthaelt die aktuelle produktive Codebasis fuer das Express-Backend und das Vite-Frontend.
 ```
 
 

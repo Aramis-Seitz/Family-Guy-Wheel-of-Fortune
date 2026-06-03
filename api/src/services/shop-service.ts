@@ -20,10 +20,6 @@ export async function getAssets(): Promise<Asset[]> {
     return listAssets();
 }
 
-export async function getOwnedAssets(userId: string): Promise<Asset[]> {
-    return listOwnedAssets(userId);
-}
-
 export async function getOwnedAssetIds(userId: string): Promise<string[]> {
     const ownedAssets = await listOwnedAssets(userId);
     return ownedAssets.map(asset => asset.id);

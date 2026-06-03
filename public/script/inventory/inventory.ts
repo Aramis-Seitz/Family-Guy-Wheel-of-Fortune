@@ -17,9 +17,10 @@ import {
 } from "../shared/dom.js";
 import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
-import { InventoryItem } from "../shared/types.js";
+import { InventoryItem, Asset } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
+import { getOwnedAssets } from "../api/inventory.js";
 
 let pendingDeleteId: string | null = null;
 
@@ -373,4 +374,23 @@ function createMiniLabel(
   text.textContent = name;
 
   return text;
+}
+
+
+/**
+ * Muss noch angepasst werden
+ */
+let currentOwnedAssets: Asset[] = await getOwnedAssets();
+
+async function loadOwnedAssets(): Promise<void> {
+  try {
+    console.log("✅ Owned asset IDs loaded:", currentOwnedAssets.length, "assets", currentOwnedAssets);
+
+  } catch (error) {
+    console.error("Failed to load owned asset IDs:", error);
+    showToast({
+      message: "Fehler beim Laden des Inventars",
+      type: "error"
+    });
+  }
 }

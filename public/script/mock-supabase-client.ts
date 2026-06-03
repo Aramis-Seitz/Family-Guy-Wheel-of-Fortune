@@ -92,8 +92,8 @@ class MockQueryBuilder {
         const url = id
           ? apiUrl(`/api/mock/profile/${id}`)
           : username
-          ? apiUrl(`/api/mock/profile/by-username/${encodeURIComponent(username)}`)
-          : null;
+            ? apiUrl(`/api/mock/profile/by-username/${encodeURIComponent(username)}`)
+            : null;
 
         if (!url) return { data: null, error: { message: 'Missing filter for profiles select' } };
 

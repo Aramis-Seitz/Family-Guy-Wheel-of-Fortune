@@ -32,9 +32,9 @@ if (addItemBody) {
 
       if (!response.ok || !result.success) {
         showToast({
-        message: result.message ?? "Login fehlgeschlagen.",
-        type: "error"
-      });
+          message: result.message ?? "Login fehlgeschlagen.",
+          type: "error"
+        });
         return;
       }
       window.location.href = '/login.html';

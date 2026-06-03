@@ -58,8 +58,8 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthCookie);
-app.use(express.static(path.join(__dirname, "../../public/dist/html")));
-app.use(express.static(path.join(__dirname, "../../public/dist")));
+app.use(express.static(path.resolve(__dirname, "../../public/dist/html")));
+app.use(express.static(path.resolve(__dirname, "../../public/dist")));
 app.use('/api', apiRoutes);
 
 if (USE_MOCK) {
@@ -244,8 +244,10 @@ app.post('/api/logout', (_req, res) => {
   res.status(200).json({ success: true });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server läuft auf http://localhost:${PORT}`);
+  });
+}
 
 export default app;

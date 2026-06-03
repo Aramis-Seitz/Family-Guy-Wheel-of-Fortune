@@ -20,7 +20,7 @@ import { generateShareLink } from "../names/share-name-list.js";
 import { InventoryItem, Asset } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
-import { getOwnedAssets } from "../api/inventory.js";
+import { getOwnedAssets } from "../api/inventory-api.js";
 
 let pendingDeleteId: string | null = null;
 

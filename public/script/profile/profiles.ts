@@ -5,7 +5,7 @@ import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase
 import { nameState } from "../names/name-state.js";
 import { showToast } from "../shared/toast.js";
 import { MAX_ITEMS } from "../shared/constants.js";
-import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user.js";
+import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();

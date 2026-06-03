@@ -1,9 +1,9 @@
 import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs, shopGrid } from "../shared/dom.js";
 import { Asset, AssetCategory } from "../shared/types.js";
 import { ASSET_CATEGORIES, EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
-import { getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop.js";
+import { getOwnedAssetIds, getShopAssets, purchaseAsset } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
-import { getUserCoins } from "../api/user.js";
+import { getUserCoins } from "../api/user-api.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 

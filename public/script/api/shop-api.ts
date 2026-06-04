@@ -72,25 +72,6 @@ export async function getShopAssets(): Promise<Asset[]> {
     return Array.isArray(body.assets) ? body.assets : [];
 }
 
-export async function getOwnedAssets(): Promise<Asset[]> {
-    const headers = await buildAuthHeaders({
-        "Accept": "application/json"
-    });
-
-    const response = await fetch(apiUrl("/api/shop/inventory"), {
-        method: "GET",
-        headers
-    });
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Inventar konnte nicht geladen werden");
-        throw new Error(message);
-    }
-
-    const body = await response.json() as AssetsResponseBody;
-    return Array.isArray(body.assets) ? body.assets : [];
-}
-
 export async function getOwnedAssetIds(): Promise<string[]> {
     const headers = await buildAuthHeaders({
         "Accept": "application/json"

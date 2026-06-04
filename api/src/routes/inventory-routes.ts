@@ -5,4 +5,4 @@ import {
 
 export const inventoryRoutes = Router();
 
-inventoryRoutes.get("/inventory/assets", handleGetOwnedAssets);
+inventoryRoutes.get("/assets", handleGetOwnedAssets);

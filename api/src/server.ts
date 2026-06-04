@@ -97,7 +97,9 @@ app.post("/api/random", async (req, res) => {
     ? safeRotation - totalSteps
     : safeRotation + totalSteps;
 
-  const normalizedFinal = ((finalRotation % 360) + 360) % 360;
+  // Pointer is at 270° (left side of wheel), so the segment under the pointer
+  // is at SVG angle (270 - finalRotation), not (+finalRotation)
+  const normalizedFinal = ((270 - finalRotation) % 360 + 360) % 360;
   const winnerIndex = Math.floor(normalizedFinal / stepAngle) % segmentCount;
   const winnerName = names[winnerIndex] as string;
 

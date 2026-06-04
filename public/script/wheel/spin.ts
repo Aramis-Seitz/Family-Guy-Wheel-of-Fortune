@@ -143,8 +143,8 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
 
   try {
     const names = getNames();
-    const { ranNum, spinToken, winnerName } = await fetchRandomNumber(names);
     const multiplier = getMultiplier();
+    const { ranNum, spinToken, winnerName } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
     spinWheel(ranNum * multiplier, direction, spinToken, winnerName);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);

@@ -1,4 +1,5 @@
 import type { AwardCoinsResponse, RandomResponse } from "../shared/types.js";
+import type { Direction } from "../shared/types.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 
 async function getAccessToken(): Promise<string> {
@@ -9,7 +10,12 @@ async function getAccessToken(): Promise<string> {
   return session?.access_token ?? "";
 }
 
-export async function fetchRandomNumber(names: string[]): Promise<{ ranNum: number; spinToken: string; winnerName: string }> {
+export async function fetchRandomNumber(
+  names: string[],
+  currentRotation: number,
+  direction: Direction,
+  multiplier: number
+): Promise<{ ranNum: number; spinToken: string; winnerName: string }> {
   const accessToken = await getAccessToken();
 
   const response = await fetch("/api/random", {
@@ -18,7 +24,7 @@ export async function fetchRandomNumber(names: string[]): Promise<{ ranNum: numb
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ names }),
+    body: JSON.stringify({ names, currentRotation, direction, multiplier }),
   });
 
   if (!response.ok) {

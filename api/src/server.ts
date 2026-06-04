@@ -58,7 +58,7 @@ async function addCoins(supabase: any, userId: string, amount: number): Promise<
     .eq('id', userId);
 }
 
-app.get("/api/random", async (req, res) => {
+app.post("/api/random", async (req, res) => {
   const authHeader = req.headers['authorization'] ?? '';
   const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
 
@@ -75,7 +75,37 @@ app.get("/api/random", async (req, res) => {
     return;
   }
 
-  const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
+  const { names, currentRotation, direction, multiplier } = req.body ?? {};
+
+  if (!Array.isArray(names) || names.length < 2) {
+    res.status(400).json({ error: 'names must be an array with at least 2 entries' });
+    return;
+  }
+
+  const segmentCount: number = names.length;
+  const stepAngle = 360 / segmentCount;
+
+  // Backend picks winner first, then calculates ranNum to land there
+  const winnerIndex = getSecureRandomNumber(0, segmentCount - 1);
+  const winnerName = names[winnerIndex] as string;
+
+  const targetNorm = (winnerIndex + 0.5) * stepAngle;
+  const safeRotation = typeof currentRotation === 'number' ? currentRotation : 0;
+  const safeMultiplier = typeof multiplier === 'number' && multiplier > 0 ? multiplier : 1;
+  const normalizedCurrent = ((safeRotation % 360) + 360) % 360;
+
+  // Degrees to travel until the winner segment is under the pointer
+  const diff = direction === 'left'
+    ? ((normalizedCurrent - targetNorm) + 360) % 360
+    : ((targetNorm - normalizedCurrent) + 360) % 360;
+
+  // 2–5 extra full rotations for dramatic effect
+  const extraRunden = getSecureRandomNumber(2, 5);
+  const totalSteps = diff + extraRunden * 360;
+
+  // Frontend will multiply by multiplier, so we divide it out here
+  const ranNum = Math.round(totalSteps / safeMultiplier);
+
   const spinToken = randomUUID();
 
   const { data: tokenData, error: tokenError } = await supabase
@@ -90,7 +120,7 @@ app.get("/api/random", async (req, res) => {
     return;
   }
 
-  res.json({ ranNum, spinToken: (tokenData as any).token ?? spinToken });
+  res.json({ ranNum, spinToken: (tokenData as any).token ?? spinToken, winnerName });
 });
 
 app.post("/api/award-coins", async (req, res) => {

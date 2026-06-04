@@ -85,26 +85,21 @@ app.post("/api/random", async (req, res) => {
   const segmentCount: number = names.length;
   const stepAngle = 360 / segmentCount;
 
-  // Backend picks winner first, then calculates ranNum to land there
-  const winnerIndex = getSecureRandomNumber(0, segmentCount - 1);
-  const winnerName = names[winnerIndex] as string;
-
-  const targetNorm = (winnerIndex + 0.5) * stepAngle;
   const safeRotation = typeof currentRotation === 'number' ? currentRotation : 0;
   const safeMultiplier = typeof multiplier === 'number' && multiplier > 0 ? multiplier : 1;
-  const normalizedCurrent = ((safeRotation % 360) + 360) % 360;
 
-  // Degrees to travel until the winner segment is under the pointer
-  const diff = direction === 'left'
-    ? ((normalizedCurrent - targetNorm) + 360) % 360
-    : ((targetNorm - normalizedCurrent) + 360) % 360;
+  // Generate random spin amount as before
+  const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
 
-  // 2–5 extra full rotations for dramatic effect
-  const extraRunden = getSecureRandomNumber(2, 5);
-  const totalSteps = diff + extraRunden * 360;
+  // Compute actual final rotation based on all frontend context
+  const totalSteps = ranNum * safeMultiplier;
+  const finalRotation = direction === 'left'
+    ? safeRotation - totalSteps
+    : safeRotation + totalSteps;
 
-  // Frontend will multiply by multiplier, so we divide it out here
-  const ranNum = Math.round(totalSteps / safeMultiplier);
+  const normalizedFinal = ((finalRotation % 360) + 360) % 360;
+  const winnerIndex = Math.floor(normalizedFinal / stepAngle) % segmentCount;
+  const winnerName = names[winnerIndex] as string;
 
   const spinToken = randomUUID();
 

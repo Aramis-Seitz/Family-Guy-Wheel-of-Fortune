@@ -92,7 +92,7 @@ app.post("/api/random", async (req, res) => {
   const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
 
   // Compute actual final rotation based on all frontend context
-  const totalSteps = ranNum * safeMultiplier;
+  const totalSteps = Math.floor(ranNum * safeMultiplier);
   const finalRotation = direction === 'left'
     ? safeRotation - totalSteps
     : safeRotation + totalSteps;
@@ -102,6 +102,22 @@ app.post("/api/random", async (req, res) => {
   const normalizedFinal = ((270 - finalRotation) % 360 + 360) % 360;
   const winnerIndex = Math.floor(normalizedFinal / stepAngle) % segmentCount;
   const winnerName = names[winnerIndex] as string;
+
+  console.log('[spin] ── INPUT ──────────────────────────────');
+  console.log(`[spin]  names          : [${names.join(', ')}]`);
+  console.log(`[spin]  currentRotation: ${safeRotation}`);
+  console.log(`[spin]  direction      : ${direction}`);
+  console.log(`[spin]  multiplier     : ${safeMultiplier}`);
+  console.log('[spin] ── BERECHNUNG ────────────────────────');
+  console.log(`[spin]  ranNum         : ${ranNum}`);
+  console.log(`[spin]  totalSteps     : ${totalSteps}  (floor(${ranNum} × ${safeMultiplier}))`);
+  console.log(`[spin]  finalRotation  : ${finalRotation}  (${safeRotation} ${direction === 'left' ? '-' : '+'} ${totalSteps})`);
+  console.log(`[spin]  normalizedFinal: ${normalizedFinal}  ((270 - ${finalRotation}) mod 360)`);
+  console.log(`[spin]  stepAngle      : ${stepAngle}  (360 / ${segmentCount})`);
+  console.log('[spin] ── ERGEBNIS ─────────────────────────');
+  console.log(`[spin]  winnerIndex    : ${winnerIndex}`);
+  console.log(`[spin]  winnerName     : "${winnerName}"`);
+  console.log('[spin] ───────────────────────────────────────');
 
   const spinToken = randomUUID();
 

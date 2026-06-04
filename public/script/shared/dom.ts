@@ -47,6 +47,7 @@ export const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirmDel
 export const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName");
 export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
+export const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
 
 export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
 export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");

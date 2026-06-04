@@ -1,4 +1,4 @@
-import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS } from "../shared/constants.js";
+import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS, INVENTORY_CATEGORIES } from "../shared/constants.js";
 import {
   addItemModal,
   addItemInput,
@@ -13,11 +13,12 @@ import {
   inventoryGrid,
   inventoryModal,
   cancelDeleteBtn,
-  closeOnBackdropClick
+  closeOnBackdropClick,
+  inventoryTabs
 } from "../shared/dom.js";
 import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
-import { InventoryItem, Asset } from "../shared/types.js";
+import { InventoryItem, Asset, InventoryCategory } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
 import { getOwnedAssets } from "../api/inventory-api.js";
@@ -210,6 +211,7 @@ async function fetchInventoryItems(): Promise<InventoryItem[]> {
 
 async function loadInventory(): Promise<void> {
   renderInventory(await fetchInventoryItems());
+  loadShopTabs();
 }
 
 async function submitItem(): Promise<void> {
@@ -393,4 +395,32 @@ async function loadOwnedAssets(): Promise<void> {
       type: "error"
     });
   }
+}
+
+function createInventoryTabButton(category: InventoryCategory): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.className = "inventory-modal__tab";
+  button.dataset.category = category;
+  button.textContent = `${category}s`.toUpperCase();
+
+  if (category === "wheel") button.classList.add("inventory-modal__tab--active");
+
+  button.onclick = () => {
+    inventoryTabs.querySelectorAll(".inventory-modal__tab").forEach(btn => btn.classList.remove("inventory-modal__tab--active"));
+    button.classList.add("inventory-modal__tab--active");
+    // loadShopAssets();
+  };
+  return button;
+}
+
+function renderInventoryTabs(categories: (InventoryCategory)[]): void {
+  inventoryTabs.innerHTML = "";
+  categories.forEach(category => {
+    inventoryTabs.appendChild(createInventoryTabButton(category));
+  });
+}
+
+async function loadShopTabs(): Promise<void> {
+  const categories = INVENTORY_CATEGORIES;
+  renderInventoryTabs(categories as InventoryCategory[]);
 }

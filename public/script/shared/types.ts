@@ -1,4 +1,4 @@
-import { ASSET_CATEGORIES } from "./constants.js";
+import { ASSET_CATEGORIES, INVENTORY_CATEGORIES } from "./constants.js";
 
 export type Direction = "left" | "right";
 
@@ -47,6 +47,8 @@ export interface ToastOptions {
 }
 
 export type AssetCategory = typeof ASSET_CATEGORIES[number];
+
+export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
 
 export type Asset = {
   readonly id: string;

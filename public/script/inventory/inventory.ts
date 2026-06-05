@@ -22,7 +22,7 @@ import { generateShareLink } from "../names/share-name-list.js";
 import { InventoryItem, Asset, InventoryCategory } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
-import { loadOwnedAssets } from "./inventory-assets.js"
+import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
 import { getOwnedAssets } from "../api/inventory-api.js";
 
 
@@ -214,8 +214,9 @@ async function fetchInventoryWheels(): Promise<InventoryItem[]> {
 }
 
 async function loadInventory(): Promise<void> {
+  await Promise.all([getOwnedAssets().then(a => { currentOwnedAssets = a; }), refreshSelectedAssetIds()]);
   loadInventoryTabs();
-  loadInventoryByCategory()
+  loadInventoryByCategory();
 }
 
 async function submitItem(): Promise<void> {
@@ -389,9 +390,11 @@ export function loadInventoryByCategory(): void {
   const activeCategory = getClickedInventoryCategory(activeTab);
   if (!activeCategory) return;
 
-  (activeCategory === "wheel")
-    ? loadWheelCards()
-    : loadOwnedAssets(activeCategory);
+  const isWheel = activeCategory === "wheel";
+  inventoryWheelGrid.style.display = isWheel ? "" : "none";
+  inventoryAssetGrid.style.display = isWheel ? "none" : "";
+
+  isWheel ? loadWheelCards() : loadOwnedAssets(activeCategory);
 }
 
 

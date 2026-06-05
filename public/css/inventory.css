@@ -77,8 +77,9 @@
 .inventory-wheel-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 140px);
+    grid-template-rows: repeat(3, 1fr);
     gap: 16px;
+    height: calc(2 * 275px + 1 * 32px);
 }
 
 .inventory-card {

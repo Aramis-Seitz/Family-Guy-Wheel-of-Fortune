@@ -14,7 +14,8 @@ function isAssetOwned(assetId: string): boolean {
     return currentOwnedAssetIds.includes(assetId);
 }
 
-export function loadShopAssets(): void {
+export async function loadShopAssets(): Promise<void> {
+    currentOwnedAssetIds = await getOwnedAssetIds();
     shopGrid.innerHTML = "";
     const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
     let activeCategory = getClickedCategory(activeTab) || "all";

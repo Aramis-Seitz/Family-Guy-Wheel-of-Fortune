@@ -10,6 +10,10 @@ import { showToast } from "../shared/toast.js";
 // ----- ASSET ERSTELLEN UND LADEN -----
 
 let currentSelectedAssetIds: string[] = await getSelectedAssetIds();
+
+export async function refreshSelectedAssetIds(): Promise<void> {
+    currentSelectedAssetIds = await getSelectedAssetIds();
+}
 let currentOwnedAssetIds: string[] = await getOwnedAssetIds();
 let currentOwnedAssets: Asset[] = await getOwnedAssets();
 

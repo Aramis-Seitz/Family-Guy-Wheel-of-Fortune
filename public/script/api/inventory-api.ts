@@ -10,6 +10,16 @@ type AssetsResponseBody = {
     assets?: Asset[];
 };
 
+type SelectResponseBody = {
+    success?: boolean;
+    assetId?: string;
+};
+
+export type SelectAssetResult = {
+    success: boolean;
+    assetId: string;
+};
+
 async function readApiError(response: Response, fallback: string): Promise<string> {
     try {
         const body = await response.json() as ApiErrorBody;
@@ -48,4 +58,51 @@ export async function getOwnedAssets(): Promise<Asset[]> {
 
     const body = await response.json() as AssetsResponseBody;
     return Array.isArray(body.assets) ? body.assets : [];
+}
+
+export async function getSelectedAssetIds(): Promise<Asset[]> {
+    const headers = await buildAuthHeaders({
+        "Accept": "application/json"
+    });
+
+    const response = await fetch(apiUrl("/api/inventory/select"), {
+        method: "GET",
+        headers
+    });
+
+    if (!response.ok) {
+        const message = await readApiError(response, "Asset-Ids konnten nicht geladen werden");
+        throw new Error(message);
+    }
+
+    const body = await response.json() as AssetsResponseBody;
+    return Array.isArray(body.assets) ? body.assets : [];
+}
+
+export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
+    if (!assetId) {
+        throw new Error("assetId is required");
+    }
+
+    const headers = await buildAuthHeaders({
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    });
+
+    const response = await fetch(apiUrl("/api/inventory/select"), {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ assetId })
+    });
+
+    if (!response.ok) {
+        const message = await readApiError(response, "Asset konnte nicht ausgewählt werden");
+        throw new Error(message);
+    }
+
+    const body = await response.json() as SelectResponseBody;
+    return {
+        success: body.success !== false,
+        assetId: typeof body.assetId === "string" && body.assetId ? body.assetId : assetId
+    };
 }

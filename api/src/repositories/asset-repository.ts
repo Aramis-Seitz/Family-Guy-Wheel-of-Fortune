@@ -1,9 +1,14 @@
 import { supabaseClient } from "../lib/supabase-client";
 import type { Asset, AssetCategory } from "../types/asset";
+import { AppError } from "../services/errors";
 
 type AssetOwnershipRow = {
     asset?: Asset | Asset[] | null;
 };
+
+type AssetSelectionRow = {
+    asset?: Asset | Asset[] | null;
+}
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient
@@ -44,6 +49,20 @@ export async function listOwnedAssets(userId: string): Promise<Asset[]> {
         .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
 }
 
+export async function listSelectedAssets(userId: string): Promise<Asset[]> {
+    const { data, error } = await supabaseClient
+        .from("asset_selection")
+        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
+        .eq("user_id", userId);
+
+    if (error) throw error;
+
+    const rows = (data ?? []) as AssetSelectionRow[];
+    return rows
+        .map((row) => row.asset)
+        .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
+}
+
 export async function listAssetCategories(): Promise<AssetCategory[]> {
     const { data, error } = await supabaseClient
         .from("asset")
@@ -65,4 +84,30 @@ export async function createAssetOwnership(userId: string, assetId: string): Pro
         .insert({ user_id: userId, asset_id: assetId });
 
     if (error) throw error;
+}
+
+export async function userSelectedAsset(userId: string, assetId: string): Promise<boolean> {
+    const selectedAssets = await listSelectedAssets(userId);
+    return selectedAssets.map(asset => asset.id).includes(assetId);
+}
+
+export async function createAssetSelection(userId: string, assetId: string): Promise<void> {
+    const asset = await getAssetById(assetId);
+
+    if (!asset) throw new AppError("Asset konnte nicht gefunden werden", 404);
+
+    const { error } = await supabaseClient
+        .from('asset_selection')
+        .upsert(
+            {
+                user_id: userId,
+                asset_id: assetId,
+                category: asset.category,
+            },
+            {
+                onConflict: 'user_id, category',
+            }
+        );
+
+    if (error) throw new AppError(`Asset konnte nicht erfolreich ausgewählt werden: ${error.message}`, 500);
 }

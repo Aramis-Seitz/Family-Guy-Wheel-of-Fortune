@@ -4,7 +4,7 @@ import {
     getAssetById,
     listAssets,
     listOwnedAssets,
-    listSelectedAssets,
+    listSelectedAssetIds,
     listAssetCategories,
     userOwnsAsset
 } from "../repositories/asset-repository";
@@ -27,8 +27,7 @@ export async function getOwnedAssetIds(userId: string): Promise<string[]> {
 }
 
 export async function getSelectedAssetIds(userId: string): Promise<string[]> {
-    const ownedAssets = await listSelectedAssets(userId);
-    return ownedAssets.map(asset => asset.id);
+    return listSelectedAssetIds(userId);
 }
 
 export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResult> {

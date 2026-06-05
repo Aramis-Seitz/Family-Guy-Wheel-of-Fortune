@@ -37,7 +37,7 @@ export const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventoryCl
 export const inventoryModal = requiredElement<HTMLDialogElement>("inventoryModal");
 export const inventoryContent = requiredElement<HTMLDivElement>("inventoryContent");
 export const addItemModal = requiredElement<HTMLDialogElement>("addItemModal");
-export const inventoryGrid = document.querySelector(".inventory-grid") as HTMLElement;
+export const inventoryWheelGrid = requiredElement<HTMLElement>("inventoryWheelGrid");
 export const addItemInput = requiredElement<HTMLInputElement>("addItemInput");
 export const addItemBody = optionalElement<HTMLFormElement>("addItemBody");
 export const confirmAddItemBtn = requiredElement<HTMLButtonElement>("confirmAddItemBtn");
@@ -48,6 +48,7 @@ export const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName
 export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
 export const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
+export const inventoryAssetGrid = requiredElement<HTMLElement>("inventoryAssetGrid");
 
 export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
 export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");

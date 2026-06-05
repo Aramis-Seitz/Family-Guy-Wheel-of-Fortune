@@ -6,9 +6,6 @@ type AssetOwnershipRow = {
     asset?: Asset | Asset[] | null;
 };
 
-type AssetSelectionRow = {
-    asset?: Asset | Asset[] | null;
-}
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient
@@ -49,18 +46,14 @@ export async function listOwnedAssets(userId: string): Promise<Asset[]> {
         .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
 }
 
-export async function listSelectedAssets(userId: string): Promise<Asset[]> {
+export async function listSelectedAssetIds(userId: string): Promise<string[]> {
     const { data, error } = await supabaseClient
         .from("asset_selection")
-        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
+        .select("asset_id")
         .eq("user_id", userId);
 
     if (error) throw error;
-
-    const rows = (data ?? []) as AssetSelectionRow[];
-    return rows
-        .map((row) => row.asset)
-        .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
+    return (data ?? []).map((row) => row.asset_id as string);
 }
 
 export async function listAssetCategories(): Promise<AssetCategory[]> {
@@ -87,8 +80,8 @@ export async function createAssetOwnership(userId: string, assetId: string): Pro
 }
 
 export async function userSelectedAsset(userId: string, assetId: string): Promise<boolean> {
-    const selectedAssets = await listSelectedAssets(userId);
-    return selectedAssets.map(asset => asset.id).includes(assetId);
+    const selectedAssetIds = await listSelectedAssetIds(userId);
+    return selectedAssetIds.includes(assetId);
 }
 
 export async function createAssetSelection(userId: string, assetId: string): Promise<void> {
@@ -105,9 +98,14 @@ export async function createAssetSelection(userId: string, assetId: string): Pro
                 category: asset.category,
             },
             {
-                onConflict: 'user_id, category',
+                onConflict: 'user_id,category'
             }
         );
 
-    if (error) throw new AppError(`Asset konnte nicht erfolreich ausgewählt werden: ${error.message}`, 500);
+    if (error) {
+        console.error('Upsert error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        throw new AppError(`Asset konnte nicht erfolgreich ausgewählt werden: ${error.message}`, 500);
+    }
 }

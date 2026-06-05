@@ -10,6 +10,10 @@ type AssetsResponseBody = {
     assets?: Asset[];
 };
 
+type AssetIdsResponseBody = {
+    assetIds?: string[];
+};
+
 type SelectResponseBody = {
     success?: boolean;
     assetId?: string;
@@ -52,7 +56,7 @@ export async function getOwnedAssets(): Promise<Asset[]> {
     });
 
     if (!response.ok) {
-        const message = await readApiError(response, "Inventar konnte nicht geladen werden");
+        const message = await readApiError(response, "Assets konnten nicht geladen werden");
         throw new Error(message);
     }
 
@@ -60,12 +64,12 @@ export async function getOwnedAssets(): Promise<Asset[]> {
     return Array.isArray(body.assets) ? body.assets : [];
 }
 
-export async function getSelectedAssetIds(): Promise<Asset[]> {
+export async function getSelectedAssetIds(): Promise<string[]> {
     const headers = await buildAuthHeaders({
         "Accept": "application/json"
     });
 
-    const response = await fetch(apiUrl("/api/inventory/select"), {
+    const response = await fetch(apiUrl("/api/inventory/selected-asset-ids"), {
         method: "GET",
         headers
     });
@@ -75,8 +79,8 @@ export async function getSelectedAssetIds(): Promise<Asset[]> {
         throw new Error(message);
     }
 
-    const body = await response.json() as AssetsResponseBody;
-    return Array.isArray(body.assets) ? body.assets : [];
+    const body = await response.json() as AssetIdsResponseBody;
+    return Array.isArray(body.assetIds) ? body.assetIds : [];
 }
 
 export async function selectAsset(assetId: string): Promise<SelectAssetResult> {

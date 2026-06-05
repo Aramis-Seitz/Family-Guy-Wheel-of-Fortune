@@ -30,9 +30,9 @@ export const SEGMENT_COLORS: string[] = [
   "#504672",
 ];
 
-export const ASSET_CATEGORIES: string[] = ["sound", "companion"];
+export const ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;
+export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
 
-export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES]
 export const EMPTY_STATE_THUMBNAIL_SOUND: string = "../../assets/default-thumbnail-sound-asset.png";
 export const EMPTY_STATE_THUMBNAIL_COMPANION: string = "../../assets/default-thumbnail-companion-asset.png";
 

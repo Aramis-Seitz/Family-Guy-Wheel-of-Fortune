@@ -75,7 +75,7 @@ function createServiceClient() {
 }
 
 function randomBetween(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(getSecureRandomNumber(0, 1) * (max - min + 1)) + min;
 }
 
 async function addCoins(supabase: any, userId: string, amount: number): Promise<void> {

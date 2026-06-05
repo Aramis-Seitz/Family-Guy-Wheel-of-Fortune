@@ -8,11 +8,13 @@
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace api\" \"npm run build --workspace public\"",
     "build": "npm run build --workspace api && npm run build --workspace public",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "concurrently": "^8.0.0"
+    "concurrently": "^8.0.0",
+    "vitest": "^4.1.8"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",

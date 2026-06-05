@@ -86,7 +86,7 @@ function closeAddItemModal(): void {
   addItemModal.close();
 }
 
-function renderInventory(items: InventoryItem[]): void {
+function renderInventoryWheels(items: InventoryItem[]): void {
   inventoryGrid.innerHTML = "";
   let addCardPlaced = false;
 
@@ -185,7 +185,7 @@ function createDeleteButton(item: InventoryItem): HTMLButtonElement {
   return btn;
 }
 
-async function fetchInventoryItems(): Promise<InventoryItem[]> {
+async function fetchInventoryWheels(): Promise<InventoryItem[]> {
   const user = await fetchCurrentUser();
   if (!user) return [];
 
@@ -210,7 +210,7 @@ async function fetchInventoryItems(): Promise<InventoryItem[]> {
 }
 
 async function loadInventory(): Promise<void> {
-  renderInventory(await fetchInventoryItems());
+  renderInventoryWheels(await fetchInventoryWheels());
   loadShopTabs();
 }
 

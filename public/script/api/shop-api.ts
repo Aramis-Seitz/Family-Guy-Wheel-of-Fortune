@@ -14,12 +14,6 @@ type OwnedAssetIdsResponseBody = {
     assetIds?: string[];
 };
 
-/*
-type AssetCategoriesResponseBody = {
-    categories?: AssetCategory[];
-};
-*/
-
 type PurchaseResponseBody = {
     success?: boolean;
     coins?: number;
@@ -91,28 +85,6 @@ export async function getOwnedAssetIds(): Promise<string[]> {
     return Array.isArray(body.assetIds) ? body.assetIds : [];
 }
 
-/*
-export async function getAssetCategories(): Promise<AssetCategory[]> {
-    const headers = await buildAuthHeaders({
-        "Accept": "application/json"
-    });
-
-    const response = await fetch(apiUrl("/api/shop/categories"), {
-        method: "GET",
-        headers
-    });
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Kategorien konnten nicht geladen werden");
-        throw new Error(message);
-    }
-
-    const body = await response.json() as AssetCategoriesResponseBody;
-    return Array.isArray(body.categories) ? body.categories : [];
-
-}
-*/
-
 export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResult> {
     if (!assetId) {
         throw new Error("assetId is required");
@@ -136,7 +108,7 @@ export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResul
 
     const body = await response.json() as PurchaseResponseBody;
     return {
-        success: body.success !== false,
+        success: body.success === true,
         coins: typeof body.coins === "number" ? body.coins : null,
         assetId: typeof body.assetId === "string" && body.assetId ? body.assetId : assetId
     };

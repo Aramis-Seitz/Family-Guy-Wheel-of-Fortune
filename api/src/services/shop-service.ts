@@ -30,24 +30,29 @@ export async function getSelectedAssetIds(userId: string): Promise<string[]> {
     return listSelectedAssetIds(userId);
 }
 
+const BAD_REQUEST: number = 400;
+const NOT_FOUND: number = 404;
+const CONFLICT: number = 409;
+const UNPROCESSABLE_ENTITY: number = 422;
+
 export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResult> {
     if (!assetId) {
-        throw new AppError("assetId is required", 400);
+        throw new AppError("assetId is required", BAD_REQUEST);
     }
 
     const asset = await getAssetById(assetId);
     if (!asset) {
-        throw new AppError("Asset not found", 404);
+        throw new AppError("Asset not found", NOT_FOUND);
     }
 
     const alreadyOwned = await userOwnsAsset(userId, assetId);
     if (alreadyOwned) {
-        throw new AppError("Asset already owned", 409);
+        throw new AppError("Asset already owned", CONFLICT);
     }
 
     const currentCoins = await getCoinsByUserId(userId);
     if (currentCoins < asset.price_coins) {
-        throw new AppError("Not enough coins", 422);
+        throw new AppError("Not enough coins", UNPROCESSABLE_ENTITY);
     }
 
     await createAssetOwnership(userId, assetId);

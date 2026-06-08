@@ -106,11 +106,8 @@ async function handlePurchaseClick(asset: Asset, btn: HTMLButtonElement): Promis
         const result = await purchaseAsset(asset.id);
         if (!result.success) throw new Error("Kauf fehlgeschlagen");
         currentOwnedAssetIds.push(asset.id);
-        if (result.coins !== null) {
-            renderCoinBalance(result.coins);
-        } else {
-            await loadCoinBalance();
-        }
+        await loadCoinBalance();
+        renderCoinBalance();
         showToast({ message: `${asset.name} gekauft!`, type: "success" });
         loadShopAssets();
     } catch (error) {

@@ -14,7 +14,7 @@ let currentAssets: Asset[] = await getShopAssets();
 
 async function openShop(): Promise<void> {
     shopModal.showModal();
-    await loadShop();
+    await refreshShop();
 }
 
 function closeShop(): void {
@@ -28,9 +28,10 @@ export function initShop(): void {
     subscribeToCoinUpdates();
 }
 
-async function loadShop(): Promise<void> {
+async function refreshShop(): Promise<void> {
     await loadCoinBalance();
-    await loadShopTabs();
+    renderCoinBalance();
+    renderShopTabs(["all", ...ASSET_CATEGORIES] as (AssetCategory | "all")[]);
     await loadShopAssets();
 }
 
@@ -39,16 +40,14 @@ async function loadShop(): Promise<void> {
 
 export let balance = 0;
 
-export function renderCoinBalance(newBalance: number) {
-    balance = newBalance;
+export function renderCoinBalance(): void {
     if (!shopCoinBalance) return;
-    shopCoinBalance.textContent = `🪙 ${newBalance}`;
+    shopCoinBalance.textContent = `🪙 ${balance}`;
 }
 
 export async function loadCoinBalance(): Promise<void> {
     try {
-        const freshBalance = await getUserCoins();
-        renderCoinBalance(freshBalance);
+        balance = await getUserCoins();
     } catch (error) {
         console.error("Coins konnten nicht aktualisiert werden:", error);
     }
@@ -66,7 +65,8 @@ async function subscribeToCoinUpdates(): Promise<void> {
             (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
                 const nextBalance = (payload.new as { coins?: number })?.coins;
                 if (typeof nextBalance !== "number") return;
-                renderCoinBalance(nextBalance);
+                balance = nextBalance;
+                renderCoinBalance();
                 if (shopModal.open) loadShopAssets();
             }
         )
@@ -97,11 +97,6 @@ function renderShopTabs(categories: (AssetCategory | "all")[]): void {
     categories.forEach(category => {
         shopTabs.appendChild(createShopTabButton(category));
     });
-}
-
-async function loadShopTabs(): Promise<void> {
-    const categories = ["all", ...ASSET_CATEGORIES];
-    renderShopTabs(categories as AssetCategory[]);
 }
 
 export function getClickedCategory(target: HTMLElement): AssetCategory | "all" | null {

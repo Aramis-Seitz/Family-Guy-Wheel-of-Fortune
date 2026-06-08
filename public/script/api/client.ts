@@ -15,7 +15,7 @@ export async function fetchRandomNumber(
   currentRotation: number,
   direction: Direction,
   multiplier: number
-): Promise<{ ranNum: number; spinToken: string; winnerName: string }> {
+): Promise<{ ranNum: number; spinToken: string }> {
   const accessToken = await getAccessToken();
 
   const response = await fetch("/api/random", {
@@ -32,7 +32,7 @@ export async function fetchRandomNumber(
   }
 
   const data: RandomResponse = await response.json();
-  return { ranNum: data.ranNum, spinToken: data.spinToken, winnerName: data.winnerName };
+  return { ranNum: data.ranNum, spinToken: data.spinToken };
 }
 
 export async function awardCoins(spinToken: string): Promise<AwardCoinsResponse | null> {

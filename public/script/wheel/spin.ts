@@ -110,7 +110,11 @@ function performSpinStep(step: number, config: SpinConfig): void {
   lastTickRotation = currentRotation;
   if (step >= config.totalSteps) {
     playCymbalCrash();
-    announceWinner(config.spinToken, config.winnerName);
+    const names = getNames();
+    const normalizedFinal = ((270 - currentRotation) % 360 + 360) % 360;
+    const winnerIndex = Math.floor(normalizedFinal / config.stepAngle) % config.segmentCount;
+    const winner = names[winnerIndex] ?? names[0];
+    announceWinner(config.spinToken, winner);
     return;
   }
 
@@ -119,7 +123,7 @@ function performSpinStep(step: number, config: SpinConfig): void {
   setTimeout(() => performSpinStep(step, config), delay);
 }
 
-export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, winnerName: string): void {
+export function spinWheel(totalSteps: number, direction: Direction, spinToken: string): void {
   spinCancelled = false;
   const segmentCount = getSegmentCount();
   if (segmentCount < 2) return;
@@ -130,7 +134,6 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
     stepAngle: 360 / segmentCount,
     segmentCount,
     spinToken,
-    winnerName,
   };
 
   performSpinStep(0, config);
@@ -144,8 +147,8 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
   try {
     const names = getNames();
     const multiplier = getMultiplier();
-    const { ranNum, spinToken, winnerName } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
-    spinWheel(Math.floor(ranNum * multiplier), direction, spinToken, winnerName);
+    const { ranNum, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
+    spinWheel(Math.floor(ranNum * multiplier), direction, spinToken);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);
     enableElements(getSpinRelatedElements());

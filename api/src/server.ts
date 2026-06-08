@@ -43,14 +43,14 @@ function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-async function addCoins(supabase: any, userId: string, amount: number): Promise<void> {
+async function addCoins(supabase: SupabaseClient, userId: string, amount: number): Promise<void> {
   const { data: profile } = await supabase
     .from('profiles')
     .select('coins')
     .eq('id', userId)
     .single();
 
-  const currentCoins = (profile as any)?.coins ?? 0;
+  const currentCoins = (profile as { coins: number } | null)?.coins ?? 0;
 
   await supabase
     .from('profiles')
@@ -123,7 +123,7 @@ app.post("/api/random", async (req, res) => {
 
   const { data: tokenData, error: tokenError } = await supabase
     .from('spin_tokens')
-    .insert({ token: spinToken, user_id: user.id, used: false })
+    .insert({ token: spinToken, user_id: user.id, used: false, winner_name: winnerName })
     .select('token')
     .single();
 
@@ -133,7 +133,8 @@ app.post("/api/random", async (req, res) => {
     return;
   }
 
-  res.json({ ranNum, spinToken: (tokenData as any).token ?? spinToken, winnerName });
+  // winnerName wird NICHT zurückgeschickt – das Frontend liest es selbst vom Zeiger ab
+  res.json({ ranNum, spinToken: (tokenData as { token: string }).token ?? spinToken });
 });
 
 app.post("/api/award-coins", async (req, res) => {
@@ -162,7 +163,7 @@ app.post("/api/award-coins", async (req, res) => {
 
   const { data: tokenData, error: tokenError } = await supabase
     .from('spin_tokens')
-    .select('token, user_id, used')
+    .select('token, user_id, used, winner_name')
     .eq('token', spinToken)
     .eq('user_id', user.id)
     .eq('used', false)
@@ -172,6 +173,13 @@ app.post("/api/award-coins", async (req, res) => {
     console.error('Token validation Failed:', tokenError?.message, '|user:', user.id);
     res.status(403).json({ error: 'Invalid or already used spin token' });
     return;
+  }
+
+  const storedWinner = (tokenData as { winner_name: string | null }).winner_name;
+  if (storedWinner && storedWinner !== winnerName) {
+    console.warn(`[award-coins] ⚠ Gewinner-Mismatch! DB: "${storedWinner}" | Frontend: "${winnerName}"`);
+  } else {
+    console.log(`[award-coins] ✓ Gewinner bestätigt: "${winnerName}"`);
   }
 
   await supabase.from('spin_tokens').update({ used: true }).eq('token', spinToken);
@@ -184,7 +192,7 @@ app.post("/api/award-coins", async (req, res) => {
     .eq('id', user.id)
     .single();
 
-  const spinnerName = (spinnerProfile as any)?.username ?? user.id;
+  const spinnerName = (spinnerProfile as { username: string } | null)?.username ?? user.id;
 
   const { data: winnerProfile } = await supabase
     .from('profiles')
@@ -192,7 +200,7 @@ app.post("/api/award-coins", async (req, res) => {
     .eq('username', winnerName)
     .single();
 
-  const winnerUserId = (winnerProfile as any)?.id ?? null;
+  const winnerUserId = (winnerProfile as { id: string } | null)?.id ?? null;
   const spinnerIsWinner = winnerUserId === user.id;
 
   if (spinnerIsWinner) {

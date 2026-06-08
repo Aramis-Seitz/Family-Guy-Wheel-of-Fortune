@@ -1,29 +1,29 @@
--- =========================================================
--- FILE: supabase/schemas/06_shop_seed_assets.sql
--- PURPOSE: Initial shop asset seed data
--- STATUS: Already executed in Supabase SQL Editor
--- NOTE: Currently stored in repo for transparency and manual reuse
--- =========================================================
-
 begin;
 
 insert into public.asset (
-    id,
     name,
     category,
     price_coins,
     asset_url
 )
 values
-    ('11111111-1111-1111-1111-111111111101', 'Funny Sound Effects', 'sound', 50, '/assets/sounds/funny-sound-effects.mp3'),
-    ('11111111-1111-1111-1111-111111111102', 'Stewie', 'companion', 100, '/assets/companions/stewie.png'),
-    ('11111111-1111-1111-1111-111111111103', 'Brian', 'companion', 70, '/assets/companions/brian.png'),
-    ('11111111-1111-1111-1111-111111111104', 'Quagmire', 'companion', 80, '/assets/companions/quagmire.png'),
-    ('11111111-1111-1111-1111-111111111105', 'Peter Laugh', 'sound', 30, '/assets/sounds/peter-laugh.mp3'),
-    ('11111111-1111-1111-1111-111111111106', 'Meg Whine', 'sound', 60, '/assets/sounds/meg-whine.mp3'),
-    ('11111111-1111-1111-1111-111111111107', 'Chris Goofy', 'sound', 40, '/assets/sounds/chris-goofy.mp3'),
-    ('11111111-1111-1111-1111-111111111108', 'Lois Scold', 'sound', 45, '/assets/sounds/lois-scold.mp3'),
-    ('11111111-1111-1111-1111-111111111109', 'Cleveland', 'companion', 90, '/assets/companions/cleveland.png'),
-    ('11111111-1111-1111-1111-111111111110', 'Joe', 'companion', 85, '/assets/companions/joe.png');
+    ('Bruh', 'sound', 10, '/assets/sounds/bruh.mp3'),
+    ('Cleveland', 'companion', 40, '/assets/companion/cleveland.png'),
+    ('Dry Fart', 'sound', 20, '/assets/sounds/dry-fart.mp3'),
+    ('Felix', 'companion', 150, '/assets/companions/felix.png'),
+    ('Giggity', 'sound', 15, '/assets/sounds/giggity.mp3'),
+    ('Joe', 'companion', 45, '/assets/companion/joe.png'),
+    ('Meg', 'companion', 40, '/assets/companion/meg.png'),
+    ('Michael Jackson', 'sound', 50, '/assets/sounds/michael-jackson-hee-hee.mp3'),
+    ('Neee', 'sound', 25, '/assets/sounds/neee.mp3'),
+    ('Perfect Fart', 'sound', 25, '/assets/sounds/perfect-fart.mp3'),
+    ('Peter', 'companion', 60, '/assets/companions/peter.png'),
+    ('Peter Laugh', 'sound', 0, '/assets/sounds/peter-griffin-laugh.mp3'),
+    ('Punch', 'sound', 15, '/assets/sounds/punch.mp3'),
+    ('Quagmire', 'companion', 0, '/assets/companions/quagmire.png'),
+    ('Rizz', 'sound', 20, '/assets/sounds/rizz.mp3'),
+    ('Stewie', 'companion', 50, '/assets/companions/stewie.png'),
+    ('Super Mario Bros', 'sound', 20, '/assets/sounds/super-mario-bros.mp3'),
+    ('Whip', 'sound', 10, '/assets/sounds/whip.mp3');
 
 commit;

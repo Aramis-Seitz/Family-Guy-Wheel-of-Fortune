@@ -1,6 +1,10 @@
+#svg {
+    width: 500px;
+    height: 500px;
+}
+
 #quagmire-image {
-    width: 150px;
-    transform: translateY(0px) translateX(113px);
+    justify-self: end;
 }
 
 #wheel {

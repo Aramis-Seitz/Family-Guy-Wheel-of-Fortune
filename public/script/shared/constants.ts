@@ -1,7 +1,7 @@
 //import { get } from "node:http";
 import { AssetCategory, Point } from "./types.js";
 
-export const WHEEL_CENTER: Point = { x: 150, y: 150 };
+export const WHEEL_CENTER: Point = { x: 100, y: 100 };
 export const WHEEL_RADIUS: number = 100;
 export const FULL_CIRCLE_RADIANS: number = Math.PI * 2;
 export const SPIN_START_DELAY: number = 5;

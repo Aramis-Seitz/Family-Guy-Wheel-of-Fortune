@@ -1,7 +1,8 @@
 import { randomInt, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-function getSecureRandomNumber(min, max) {
+function getSecureRandomNumber(min: number, max: number): number {
   return randomInt(min, max + 1);
 }
 
@@ -21,7 +22,23 @@ function createServiceClient() {
   });
 }
 
-export default async function handler(req, res) {
+type RandomResponse = {
+  ranNum: number;
+  spinToken: string;
+};
+
+type ErrorResponse = {
+  error: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+};
+
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse<RandomResponse | ErrorResponse>
+): Promise<void> {
   try {
     const ranNum = getSecureRandomNumber(360, 900);
 
@@ -33,7 +50,9 @@ export default async function handler(req, res) {
     }
 
     const authHeader = req.headers["authorization"] ?? "";
-    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+    const jwt = Array.isArray(authHeader)
+      ? authHeader[0].replace(/^Bearer\s+/i, "").trim()
+      : authHeader.replace(/^Bearer\s+/i, "").trim();
 
     if (!jwt) {
       return res.status(200).json({
@@ -91,15 +110,18 @@ export default async function handler(req, res) {
       ranNum,
       spinToken: tokenData.token,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    const stack = error instanceof Error ? error.stack : undefined;
+
     console.error("Random API failed:", {
-      message: error?.message,
-      stack: error?.stack,
+      message,
+      stack,
     });
 
     return res.status(500).json({
       error: "Failed to generate number",
-      message: error?.message,
+      message,
     });
   }
 }

@@ -58,7 +58,7 @@ async function addCoins(supabase: any, userId: string, amount: number): Promise<
     .eq('id', userId);
 }
 
-app.get("/api/random", async (req, res) => {
+app.get("/api/src/services/random", async (req, res) => {
   const authHeader = req.headers['authorization'] ?? '';
   const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
 
@@ -93,7 +93,7 @@ app.get("/api/random", async (req, res) => {
   res.json({ ranNum, spinToken: (tokenData as any).token ?? spinToken });
 });
 
-app.post("/api/award-coins", async (req, res) => {
+app.post("/api/src/services/award-coins", async (req, res) => {
   const authHeader = req.headers['authorization'] ?? '';
   const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
 

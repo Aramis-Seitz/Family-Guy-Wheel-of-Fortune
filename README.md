@@ -24,7 +24,7 @@ npm --version
 
 ```powershell
 git clone <repo-url>
-cd Family-Guy-Wheel-of-Fortune
+cd <repo-name>
 ```
 
 ### 2. Abhängigkeiten installieren
@@ -67,17 +67,6 @@ Der Main-Branch Hostet die Produktive version des Codes auf Vercel, wo diese auc
 
 ---
 
-## Proxy (nur im Telekom-Netz)
-
-Falls Supabase nicht erreichbar ist, Proxy-Variablen vor dem Start setzen:
-
-```powershell
-$env:HTTPS_PROXY = "http://sia-lb.telekom.de:8080"
-$env:HTTP_PROXY  = "http://sia-lb.telekom.de:8080"
-```
-
----
-
 ## Projektstruktur
 
 ```
@@ -91,16 +80,7 @@ $env:HTTP_PROXY  = "http://sia-lb.telekom.de:8080"
 
 ## Lokales Testing
 
-Es gibt zwei Testmodi je nachdem ob Supabase erreichbar ist oder nicht.
+Zwei Modi zum lokalen Testen — je nachdem ob Supabase erreichbar ist:
 
-### Semi-lokales Testing (mit Test-Supabase-DB)
-
-Verbindung läuft gegen eine echte Supabase-Instanz, aber eine dedizierte Test-DB — kein Produktivdaten-Risiko.
-
-→ Anleitung: [SemiLocal-Anleitung.md](./SemiLocal-Anleitung.md)
-
-### Komplett lokales Testing (kein Supabase, In-Memory-DB)
-
-Kein Netzwerk, kein Supabase nötig. Daten leben nur im Arbeitsspeicher und sind nach Neustart weg.
-
-→ Anleitung: [CompleteLocal.md](./CompleteLocal.md)
+- **Semi-lokal** (mit Test-Supabase-DB) — [Anleitung](./docs/setup/semi-local.md)
+- **Komplett lokal** (In-Memory-DB, kein Netzwerk) — [Anleitung](./docs/setup/complete-local.md)

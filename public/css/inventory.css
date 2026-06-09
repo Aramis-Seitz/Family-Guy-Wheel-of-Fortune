@@ -158,23 +158,27 @@
     height: 28px;
     padding: 0;
     font-size: 14px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 6px;
     cursor: pointer;
     opacity: 0;
     transition: opacity 160ms ease, background 160ms ease, transform 120ms ease;
 }
 
-.inventory-card:hover .inventory-delete-btn { opacity: 1; }
+.inventory-card:hover .inventory-delete-btn {
+    opacity: 1;
+}
 
 .inventory-delete-btn:hover {
-    background: rgba(220,38,38,0.25);
-    border-color: rgba(220,38,38,0.5);
+    background: rgba(220, 38, 38, 0.25);
+    border-color: rgba(220, 38, 38, 0.5);
     transform: scale(1.1);
 }
 
-.inventory-delete-btn:active { transform: scale(0.95); }
+.inventory-delete-btn:active {
+    transform: scale(0.95);
+}
 
 /* ── Add Item Modal ── */
 #addItemModal {
@@ -184,7 +188,7 @@
     color: #fff;
     padding: 0;
     width: min(380px, 92vw);
-    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -192,7 +196,7 @@
 }
 
 #addItemModal::backdrop {
-    background: rgba(0,0,0,.5);
+    background: rgba(0, 0, 0, .5);
     backdrop-filter: blur(3px);
 }
 
@@ -206,7 +210,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 #addItemHeader h3 {
@@ -225,9 +229,14 @@
     transition: color .15s, border-color .15s;
 }
 
-#closeAddItemBtn:hover { color: #fff; border-color: #888; }
+#closeAddItemBtn:hover {
+    color: #fff;
+    border-color: #888;
+}
 
-#addItemBody { padding: 20px; }
+#addItemBody {
+    padding: 20px;
+}
 
 .add-item-form-group {
     display: flex;
@@ -258,7 +267,7 @@
 
 #addItemInput:focus {
     border-color: #00a2ff;
-    box-shadow: 0 0 0 3px rgba(0,162,255,.18);
+    box-shadow: 0 0 0 3px rgba(0, 162, 255, .18);
 }
 
 #addItemFooter {
@@ -266,7 +275,7 @@
     justify-content: flex-end;
     gap: 10px;
     padding: 14px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 #cancelAddItemBtn {
@@ -281,7 +290,10 @@
     transition: all .15s;
 }
 
-#cancelAddItemBtn:hover { color: #fff; border-color: #888; }
+#cancelAddItemBtn:hover {
+    color: #fff;
+    border-color: #888;
+}
 
 #confirmAddItemBtn {
     background: #00a2ff;
@@ -296,8 +308,14 @@
     transition: filter .15s, transform .15s;
 }
 
-#confirmAddItemBtn:hover  { filter: brightness(1.1); transform: translateY(-1px); }
-#confirmAddItemBtn:active { transform: translateY(0); }
+#confirmAddItemBtn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+#confirmAddItemBtn:active {
+    transform: translateY(0);
+}
 
 /* ── Confirm Delete Modal ── */
 #confirmDeleteModal {
@@ -307,7 +325,7 @@
     color: #fff;
     padding: 0;
     width: min(360px, 92vw);
-    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -315,15 +333,18 @@
 }
 
 #confirmDeleteModal::backdrop {
-    background: rgba(0,0,0,.5);
+    background: rgba(0, 0, 0, .5);
     backdrop-filter: blur(3px);
 }
 
-#confirmDeleteInner { display: flex; flex-direction: column; }
+#confirmDeleteInner {
+    display: flex;
+    flex-direction: column;
+}
 
 #confirmDeleteHeader {
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 #confirmDeleteHeader h3 {
@@ -339,14 +360,17 @@
     line-height: 1.5;
 }
 
-#confirmDeleteBody strong { color: #fff; font-weight: 700; }
+#confirmDeleteBody strong {
+    color: #fff;
+    font-weight: 700;
+}
 
 #confirmDeleteFooter {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
     padding: 14px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 #cancelDeleteBtn {
@@ -361,7 +385,10 @@
     transition: all .15s;
 }
 
-#cancelDeleteBtn:hover { color: #fff; border-color: #888; }
+#cancelDeleteBtn:hover {
+    color: #fff;
+    border-color: #888;
+}
 
 #confirmDeleteBtn {
     background: #dc2626;
@@ -376,5 +403,18 @@
     transition: filter .15s, transform .15s;
 }
 
-#confirmDeleteBtn:hover  { filter: brightness(1.15); transform: translateY(-1px); }
-#confirmDeleteBtn:active { transform: translateY(0); }
+.inventory-date {
+    font-size: 11px;
+    opacity: 0.7;
+    margin: 2px 0 0;
+    text-align: center;
+}
+
+#confirmDeleteBtn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+#confirmDeleteBtn:active {
+    transform: translateY(0);
+}

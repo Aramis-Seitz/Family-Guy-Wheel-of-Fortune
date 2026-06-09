@@ -33,6 +33,7 @@ export type InventoryItem = {
   id: string;
   title: string;
   link: string | null;
+  created_at: string;
 };
 
 export type ToastType = "success" | "error";

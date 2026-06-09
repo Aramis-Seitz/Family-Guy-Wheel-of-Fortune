@@ -20,9 +20,9 @@
 
 <body>
 
-    <audio id="tickSound" src="/assets/he.mp3" preload="auto"></audio>
-    <audio id="drumroll" src="/assets/drumroll.mp3" preload="auto"></audio>
-    <audio id="cymbal-crash" src="/assets/cymbal-crash.wav" preload="auto"></audio>
+    <audio id="tickSound" src="/assets/sounds/peter-griffin-laugh.mp3" preload="auto"></audio>
+    <audio id="drumroll" src="/assets/sounds/drumroll.mp3" preload="auto"></audio>
+    <audio id="cymbal-crash" src="/assets/sounds/cymbal-crash.wav" preload="auto"></audio>
 
     <button class="spin-btn" id="spin-left-btn" type="button">SPIN LEFT</button>
     <button class="spin-btn" id="spin-right-btn" type="button">SPIN RIGHT</button>
@@ -42,7 +42,7 @@
             <hr class="inventory-modal__divider">
             
             <div class="inventory-wheel-grid" id="inventoryWheelGrid"></div>
-            <div class="inventory-asset-grid" id="inventoryAssetGrid"></div>    <!-- Noch überlegen, wie man das richtig einbindet -->
+            <div class="inventory-asset-grid" id="inventoryAssetGrid"></div>
         </div>
     </dialog>
 
@@ -103,7 +103,7 @@
     </div>
 
     <div class="container">
-        <img id ="quagmire-image" src="/assets/image.png" alt="pointer image">
+        <img id ="quagmire-image" src="/assets/companions/quagmire.png" alt="pointer image">
         <svg id="svg" viewBox="0 0 200 200">
             <g id="wheel"></g>
         </svg>

@@ -13,6 +13,47 @@ const signupDateOfBirthInput = document.getElementById('signupDateOfBirth') as H
 const signupPasswordInput = document.getElementById('signupPassword') as HTMLInputElement | null;
 const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword') as HTMLInputElement | null;
 
+async function createUserDefaultSelection(userId: string, assets: { id: string; category: string; name: string }[]): Promise<void> {
+    const entries = assets.map(asset => ({
+        user_id: userId,
+        category: asset.category,
+        asset_id: asset.id,
+    }));
+
+    const { error } = await supabaseClient.from('asset_selection').insert(entries);
+
+    if (error) {
+        throw new Error(`Asset-Selection Fehler: ${error.message}`);
+    }
+}
+
+async function createUserDefaultOwnership(userId: string, assets: { id: string; name: string }[]): Promise<void> {
+    const entries = assets.map(asset => ({
+        user_id: userId,
+        asset_id: asset.id,
+    }));
+
+    const { error } = await supabaseClient.from('asset_ownership').insert(entries);
+
+    if (error) {
+        throw new Error(`Asset-Ownership Fehler: ${error.message}`);
+    }
+}
+
+async function createUserDefaultAssets(userId: string): Promise<void> {
+    const { data: assets, error: assetsError } = await supabaseClient
+        .from('asset')
+        .select('id, category, name')
+        .in('name', ['Quagmire', 'Peter Laugh']);
+
+    if (assetsError || !assets || assets.length === 0) {
+        throw new Error('Keine Standard-Assets gefunden');
+    }
+
+    await createUserDefaultSelection(userId, assets);
+    await createUserDefaultOwnership(userId, assets);
+}
+
 if (loginForm) {
     loginForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
         event.preventDefault();
@@ -153,6 +194,8 @@ if (signupForm) {
                 });
                 return;
             }
+
+            await createUserDefaultAssets(data.user.id);
 
             window.location.href = "login.html"
 

@@ -56,7 +56,9 @@ function createAssetIcon(asset: Asset): HTMLElement {
     // Selbe Logik wie in /shop-assets.ts
     const assetIcon = document.createElement("img");
     assetIcon.className = "inventory-modal__asset-icon";
-    assetIcon.src = EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
+    assetIcon.src = (asset.category === "companion" && asset.asset_url)
+        ? asset.asset_url
+        : EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
     assetIcon.alt = asset.name;
     return assetIcon;
 }

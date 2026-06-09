@@ -49,7 +49,9 @@ function createAssetHeader(asset: Asset): HTMLElement {
 function createAssetIcon(asset: Asset): HTMLElement {
     const assetIcon = document.createElement("img");
     assetIcon.className = "shop-modal__asset-icon";
-    assetIcon.src = EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
+    assetIcon.src = (asset.category === "companion" && asset.asset_url)
+        ? asset.asset_url
+        : EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
     assetIcon.alt = asset.name;
     return assetIcon;
 }

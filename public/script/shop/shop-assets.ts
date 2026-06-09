@@ -4,6 +4,7 @@ import { EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
 import { getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop.js"
 import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
+import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -70,7 +71,7 @@ function createAssetDetailsRow(asset: Asset): HTMLElement {
     detailsRow.appendChild(createAssetTitle(asset));
 
     if (asset.category === "sound") {
-        detailsRow.appendChild(createPreviewButton());
+        detailsRow.appendChild(createPreviewButton(asset));
     }
 
     return detailsRow;
@@ -83,11 +84,33 @@ function createAssetTitle(asset: Asset): HTMLElement {
     return title;
 }
 
-function createPreviewButton(): HTMLElement {
-    const previewButton = document.createElement("button");
-    previewButton.className = "shop-modal__preview-btn";
-    previewButton.textContent = "▷";
-    return previewButton;
+let activePreviewButton: HTMLButtonElement | null = null;
+
+function createPreviewButton(asset: Asset): HTMLElement {
+  const previewButton = document.createElement("button");
+  previewButton.className = "shop-modal__preview-btn";
+  previewButton.textContent = "▶";
+
+  previewButton.addEventListener("click", async () => {
+    if (activePreviewButton === previewButton) {
+      stopAssetSound();
+      return;
+    }
+
+    activePreviewButton = previewButton;
+    previewButton.textContent = "⏹";
+
+    try {
+      await playAssetSound(asset.asset_url);
+    } finally {
+      previewButton.textContent = "▶";
+      if (activePreviewButton === previewButton) {
+        activePreviewButton = null;
+      }
+    }
+  });
+
+  return previewButton;
 }
 
 function createAssetBuyButton(asset: Asset, owned: boolean, tooExpensive: boolean): HTMLElement {

@@ -5,6 +5,7 @@ import { filterAssetsByCategory, loadInventoryByCategory } from "./inventory.js"
 import { getOwnedAssets, getSelectedAssetIds, selectAsset } from "../api/inventory-api.js";
 import { getOwnedAssetIds } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
+import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -78,7 +79,7 @@ function createInventoryAssetDetailsRow(asset: Asset): HTMLElement {
     detailsRow.appendChild(createInventoryAssetTitle(asset));
 
     if (asset.category === "sound") {
-        detailsRow.appendChild(createInventoryPreviewButton());
+        detailsRow.appendChild(createInventoryPreviewButton(asset));
     }
 
     return detailsRow;
@@ -92,11 +93,32 @@ function createInventoryAssetTitle(asset: Asset): HTMLElement {
     return title;
 }
 
-function createInventoryPreviewButton(): HTMLElement {
-    // Selbe Logik wie in /shop-assets.ts
+let activePreviewButton: HTMLButtonElement | null = null;
+
+function createInventoryPreviewButton(asset: Asset): HTMLElement {
     const previewButton = document.createElement("button");
     previewButton.className = "inventory-modal__preview-btn";
-    previewButton.textContent = "▷";
+    previewButton.textContent = "▶";
+
+    previewButton.addEventListener("click", async () => {
+        if (activePreviewButton === previewButton) {
+            stopAssetSound();
+            return;
+        }
+
+        activePreviewButton = previewButton;
+        previewButton.textContent = "⏹";
+
+        try {
+            await playAssetSound(asset.asset_url);
+        } finally {
+            previewButton.textContent = "▶";
+            if (activePreviewButton === previewButton) {
+                activePreviewButton = null;
+            }
+        }
+    });
+
     return previewButton;
 }
 

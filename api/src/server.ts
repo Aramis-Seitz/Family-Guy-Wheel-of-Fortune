@@ -1,16 +1,20 @@
 import dotenv from 'dotenv';
 import { existsSync } from 'fs';
-import { randomUUID, randomBytes } from 'crypto';
+import { randomUUID } from 'crypto';
 if (existsSync('.env.local')) dotenv.config({ path: '.env.local', override: true });
 dotenv.config();
 
 import express from "express";
 import path from "path";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { getSecureRandomNumber } from "./utils/random";
-import { createMockServiceClient } from "./mock-service";
 import { mockRouter } from "./mock-routes";
+import { createServiceClient } from "./supabase";
+import { router as roomCreateRouter } from "./room/create";
+import { router as roomJoinRouter } from "./room/join";
+import { router as roomSpinRouter } from "./room/spin";
+import { router as roomCloseRouter } from "./room/close";
 
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
@@ -31,13 +35,10 @@ if (USE_MOCK) {
   app.use('/api/mock', mockRouter);
 }
 
-function createServiceClient() {
-  if (USE_MOCK) return createMockServiceClient();
-  return createClient(
-    process.env.SUPABASE_URL ?? '',
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
-  );
-}
+app.use('/api/room/create', roomCreateRouter);
+app.use('/api/room/join', roomJoinRouter);
+app.use('/api/room/spin', roomSpinRouter);
+app.use('/api/room/close', roomCloseRouter);
 
 function randomBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -224,223 +225,6 @@ app.post("/api/award-coins", async (req, res) => {
 
   console.log(`[coins] Winner:  ${winnerName} → nicht im System, keine Coins`);
   res.json({ spinnerCoins, winnerCoins: 0 });
-});
-
-function generateRoomKey(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const bytes = randomBytes(6);
-  return Array.from(bytes, (b) => chars[b % chars.length]).join('');
-}
-
-app.post("/api/room/create", async (req, res) => {
-  const authHeader = req.headers['authorization'] ?? '';
-  const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
-
-  if (!jwt) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-
-  const supabase = createServiceClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
-
-  if (authError || !user) {
-    res.status(401).json({ error: 'Invalid session' });
-    return;
-  }
-
-  const roomKey = generateRoomKey();
-
-  const { data: hostProfile } = await supabase
-    .from('profiles')
-    .select('username')
-    .eq('id', user.id)
-    .single();
-
-  const hostUsername: string = (hostProfile as { username?: string } | null)?.username ?? user.id;
-
-  const { error: insertError } = await supabase
-    .from('rooms')
-    .insert({ room_key: roomKey, host_id: user.id, players: [hostUsername] });
-
-  if (insertError) {
-    console.error('[room/create] insert error:', insertError);
-    res.status(500).json({ error: 'Failed to create room' });
-    return;
-  }
-
-  res.json({ roomKey, players: [hostUsername] });
-});
-
-app.post("/api/room/join", async (req, res) => {
-  const authHeader = req.headers['authorization'] ?? '';
-  const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
-
-  if (!jwt) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-
-  const supabase = createServiceClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
-
-  if (authError || !user) {
-    res.status(401).json({ error: 'Invalid session' });
-    return;
-  }
-
-  const { roomKey } = (req.body ?? {}) as { roomKey?: string };
-
-  if (!roomKey) {
-    res.status(400).json({ error: 'Missing roomKey' });
-    return;
-  }
-
-  const { data: room, error: roomError } = await supabase
-    .from('rooms')
-    .select('id, players')
-    .eq('room_key', roomKey)
-    .single();
-
-  if (roomError || !room) {
-    res.status(404).json({ error: 'Room not found' });
-    return;
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('username')
-    .eq('id', user.id)
-    .single();
-
-  const username: string = (profile as { username?: string } | null)?.username ?? user.id;
-  const currentPlayers: string[] = (room as { players?: string[] }).players ?? [];
-
-  const updatedPlayers = currentPlayers.includes(username)
-    ? currentPlayers
-    : [...currentPlayers, username];
-
-  const { data: updated, error: updateError } = await supabase
-    .from('rooms')
-    .update({ players: updatedPlayers })
-    .eq('room_key', roomKey)
-    .select('players')
-    .single();
-
-  if (updateError || !updated) {
-    console.error('[room/join] update error:', updateError);
-    res.status(500).json({ error: 'Failed to join room' });
-    return;
-  }
-
-  res.json({ players: (updated as { players: string[] }).players });
-});
-
-app.post("/api/room/spin", async (req, res) => {
-  const authHeader = req.headers['authorization'] ?? '';
-  const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
-
-  if (!jwt) {
-    res.status(401).json({ error: 'Unauthorized' });
-    return;
-  }
-
-  const supabase = createServiceClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
-
-  if (authError || !user) {
-    res.status(401).json({ error: 'Invalid session' });
-    return;
-  }
-
-  const { roomKey } = (req.body ?? {}) as { roomKey?: string };
-
-  if (!roomKey) {
-    res.status(400).json({ error: 'Missing roomKey' });
-    return;
-  }
-
-  const { data: room, error: roomError } = await supabase
-    .from('rooms')
-    .select('host_id')
-    .eq('room_key', roomKey)
-    .single();
-
-  if (roomError || !room) {
-    res.status(404).json({ error: 'Room not found' });
-    return;
-  }
-
-  if ((room as { host_id: string }).host_id !== user.id) {
-    res.status(403).json({ error: 'Only the host may spin' });
-    return;
-  }
-
-  const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
-  const spunAt = new Date().toISOString();
-
-  const { error: updateError } = await supabase
-    .from('rooms')
-    .update({ last_spin: ranNum, spun_at: spunAt })
-    .eq('room_key', roomKey);
-
-  if (updateError) {
-    console.error('[room/spin] update error:', updateError);
-    res.status(500).json({ error: 'Failed to update room spin' });
-    return;
-  }
-
-  const spinToken = randomUUID();
-
-  const { data: tokenData, error: tokenError } = await supabase
-    .from('spin_tokens')
-    .insert({ token: spinToken, user_id: user.id, used: false })
-    .select('token')
-    .single();
-
-  if (tokenError || !tokenData) {
-    console.error('[room/spin] spin_token insert error:', tokenError);
-    res.status(500).json({ error: 'Failed to create spin token' });
-    return;
-  }
-
-  res.json({ ranNum, spinToken: (tokenData as { token: string }).token ?? spinToken });
-});
-
-app.post("/api/room/close", async (req, res) => {
-  const authHeader = req.headers['authorization'] ?? '';
-  const jwt = (authHeader as string).replace(/^Bearer\s+/, '');
-  if (!jwt) { res.status(401).json({ error: 'Unauthorized' }); return; }
-
-  const supabase = createServiceClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
-  if (authError || !user) { res.status(401).json({ error: 'Invalid session' }); return; }
-
-  const { roomKey } = (req.body ?? {}) as { roomKey?: string };
-  if (!roomKey) { res.status(400).json({ error: 'Missing roomKey' }); return; }
-
-  const { data: room, error: roomError } = await supabase
-    .from('rooms')
-    .select('host_id')
-    .eq('room_key', roomKey)
-    .single();
-
-  if (roomError || !room) { res.status(404).json({ error: 'Room not found' }); return; }
-  if ((room as { host_id: string }).host_id !== user.id) {
-    res.status(403).json({ error: 'Only the host may close the room' }); return;
-  }
-
-  const { error: updateError } = await supabase
-    .from('rooms')
-    .update({ players: [] })
-    .eq('room_key', roomKey);
-
-  if (updateError) {
-    console.error('[room/close] update error:', updateError);
-    res.status(500).json({ error: 'Failed to close room' }); return;
-  }
-
-  res.json({ ok: true });
 });
 
 if (process.env.VERCEL !== '1') {

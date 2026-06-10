@@ -1,11 +1,9 @@
 import { inventoryAssetGrid } from "../shared/dom.js";
 import { Asset, InventoryCategory } from "../shared/types.js";
-import { EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
 import { filterAssetsByCategory, loadInventoryByCategory } from "./inventory.js"
-import { getOwnedAssets, getSelectedAssetIds, selectAsset } from "../api/inventory-api.js";
-import { getOwnedAssetIds } from "../api/shop-api.js";
+import { getSelectedAssetIds, selectAsset } from "../api/inventory-api.js";
 import { showToast } from "../shared/toast.js";
-import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
+import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
 import { applySelectedAsset } from "../shared/asset-selection.js";
 
 
@@ -16,18 +14,10 @@ let currentSelectedAssetIds: string[] = await getSelectedAssetIds();
 export async function refreshSelectedAssetIds(): Promise<void> {
     currentSelectedAssetIds = await getSelectedAssetIds();
 }
-let currentOwnedAssetIds: string[] = await getOwnedAssetIds();
-let currentOwnedAssets: Asset[] = await getOwnedAssets();
 
 function isAssetSelected(assetId: string): boolean {
     return currentSelectedAssetIds.includes(assetId);
 }
-
-/*
-function isAssetOwned(assetId: string): boolean {
-    return currentOwnedAssetIds.includes(assetId);
-}
-*/
 
 export function loadOwnedAssets(activeCategory: InventoryCategory): void {
     let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
@@ -47,7 +37,6 @@ function createInventoryAssetCard(asset: Asset): HTMLElement {
 }
 
 function createInventoryAssetHeader(asset: Asset): HTMLElement {
-    // Selbe Logik wie in /shop-assets.ts
     const assetHeader = document.createElement("div");
     assetHeader.className = "inventory-modal__asset-header";
     assetHeader.appendChild(createAssetIcon(asset));
@@ -55,14 +44,11 @@ function createInventoryAssetHeader(asset: Asset): HTMLElement {
 }
 
 function createAssetIcon(asset: Asset): HTMLElement {
-    // Selbe Logik wie in /shop-assets.ts
-    const assetIcon = document.createElement("img");
-    assetIcon.className = "inventory-modal__asset-icon";
-    assetIcon.src = (asset.category === "companion" && asset.asset_url)
-        ? asset.asset_url
-        : EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
-    assetIcon.alt = asset.name;
-    return assetIcon;
+    const img = document.createElement("img");
+    img.className = "inventory-modal__asset-icon";
+    img.src = resolveAssetImageSrc(asset);
+    img.alt = asset.name;
+    return img;
 }
 
 function createInventoryAssetFooter(asset: Asset, selected: boolean): HTMLElement {
@@ -74,53 +60,22 @@ function createInventoryAssetFooter(asset: Asset, selected: boolean): HTMLElemen
 }
 
 function createInventoryAssetDetailsRow(asset: Asset): HTMLElement {
-    // Selbe Logik wie in /shop-assets.ts
     const detailsRow = document.createElement("div");
     detailsRow.className = "inventory-modal__asset-details-row";
     detailsRow.appendChild(createInventoryAssetTitle(asset));
 
     if (asset.category === "sound") {
-        detailsRow.appendChild(createInventoryPreviewButton(asset));
+        detailsRow.appendChild(createPreviewButton(asset, "inventory-modal__preview-btn"));
     }
 
     return detailsRow;
 }
 
 function createInventoryAssetTitle(asset: Asset): HTMLElement {
-    // Selbe Logik wie in /shop-assets.ts
     const title = document.createElement("p");
     title.className = "inventory-modal__asset-title";
     title.textContent = asset.name;
     return title;
-}
-
-let activePreviewButton: HTMLButtonElement | null = null;
-
-function createInventoryPreviewButton(asset: Asset): HTMLElement {
-    const previewButton = document.createElement("button");
-    previewButton.className = "inventory-modal__preview-btn";
-    previewButton.textContent = "▶";
-
-    previewButton.addEventListener("click", async () => {
-        if (activePreviewButton === previewButton) {
-            stopAssetSound();
-            return;
-        }
-
-        activePreviewButton = previewButton;
-        previewButton.textContent = "⏹";
-
-        try {
-            await playAssetSound(asset.asset_url);
-        } finally {
-            previewButton.textContent = "▶";
-            if (activePreviewButton === previewButton) {
-                activePreviewButton = null;
-            }
-        }
-    });
-
-    return previewButton;
 }
 
 function createInventoryAssetSelectButton(asset: Asset, selected: boolean): HTMLElement {

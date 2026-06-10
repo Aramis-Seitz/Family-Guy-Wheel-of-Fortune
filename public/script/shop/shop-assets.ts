@@ -1,10 +1,9 @@
 import { shopTabs, shopGrid } from "../shared/dom.js";
 import { Asset } from "../shared/types.js";
-import { EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "../shared/constants.js";
 import { getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop.js"
 import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
-import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
+import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -48,13 +47,11 @@ function createAssetHeader(asset: Asset): HTMLElement {
 }
 
 function createAssetIcon(asset: Asset): HTMLElement {
-    const assetIcon = document.createElement("img");
-    assetIcon.className = "shop-modal__asset-icon";
-    assetIcon.src = (asset.category === "companion" && asset.asset_url)
-        ? asset.asset_url
-        : EMPTY_STATE_THUMBNAIL_BY_CATEGORY[asset.category] || "";
-    assetIcon.alt = asset.name;
-    return assetIcon;
+    const img = document.createElement("img");
+    img.className = "shop-modal__asset-icon";
+    img.src = resolveAssetImageSrc(asset);
+    img.alt = asset.name;
+    return img;
 }
 
 function createAssetFooter(asset: Asset, owned: boolean, tooExpensive: boolean): HTMLElement {
@@ -71,7 +68,7 @@ function createAssetDetailsRow(asset: Asset): HTMLElement {
     detailsRow.appendChild(createAssetTitle(asset));
 
     if (asset.category === "sound") {
-        detailsRow.appendChild(createPreviewButton(asset));
+        detailsRow.appendChild(createPreviewButton(asset, "shop-modal__preview-btn"));
     }
 
     return detailsRow;
@@ -82,35 +79,6 @@ function createAssetTitle(asset: Asset): HTMLElement {
     title.className = "shop-modal__asset-title";
     title.textContent = asset.name;
     return title;
-}
-
-let activePreviewButton: HTMLButtonElement | null = null;
-
-function createPreviewButton(asset: Asset): HTMLElement {
-  const previewButton = document.createElement("button");
-  previewButton.className = "shop-modal__preview-btn";
-  previewButton.textContent = "▶";
-
-  previewButton.addEventListener("click", async () => {
-    if (activePreviewButton === previewButton) {
-      stopAssetSound();
-      return;
-    }
-
-    activePreviewButton = previewButton;
-    previewButton.textContent = "⏹";
-
-    try {
-      await playAssetSound(asset.asset_url);
-    } finally {
-      previewButton.textContent = "▶";
-      if (activePreviewButton === previewButton) {
-        activePreviewButton = null;
-      }
-    }
-  });
-
-  return previewButton;
 }
 
 function createAssetBuyButton(asset: Asset, owned: boolean, tooExpensive: boolean): HTMLElement {

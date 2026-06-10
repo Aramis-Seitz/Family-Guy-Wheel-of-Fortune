@@ -3,8 +3,9 @@
     height: 500px;
 }
 
-#quagmire-image {
+#companion-image {
     justify-self: end;
+    height: 350px;
 }
 
 #wheel {

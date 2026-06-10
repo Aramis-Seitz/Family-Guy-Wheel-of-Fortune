@@ -6,6 +6,7 @@ import { getOwnedAssets, getSelectedAssetIds, selectAsset } from "../api/invento
 import { getOwnedAssetIds } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
 import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
+import { applySelectedAsset } from "../shared/asset-selection.js";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -145,6 +146,7 @@ async function handleSelectionClick(asset: Asset, btn: HTMLButtonElement): Promi
         currentSelectedAssetIds = currentSelectedAssetIds.filter(id => id !== previousId);
         currentSelectedAssetIds.push(asset.id);
 
+        applySelectedAsset(asset);
         showToast({ message: `${asset.name} ausgewählt!`, type: "success" });
         loadInventoryByCategory();
     } catch (error) {

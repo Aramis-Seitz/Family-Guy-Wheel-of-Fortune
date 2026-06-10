@@ -8,12 +8,12 @@ insert into public.asset (
 )
 values
     ('Bruh', 'sound', 10, '/assets/sounds/bruh.mp3'),
-    ('Cleveland', 'companion', 40, '/assets/companion/cleveland.png'),
+    ('Cleveland', 'companion', 40, '/assets/companions/cleveland.png'),
     ('Dry Fart', 'sound', 20, '/assets/sounds/dry-fart.mp3'),
     ('Felix', 'companion', 150, '/assets/companions/felix.png'),
     ('Giggity', 'sound', 15, '/assets/sounds/giggity.mp3'),
-    ('Joe', 'companion', 45, '/assets/companion/joe.png'),
-    ('Meg', 'companion', 40, '/assets/companion/meg.png'),
+    ('Joe', 'companion', 45, '/assets/companions/joe.png'),
+    ('Meg', 'companion', 40, '/assets/companions/meg.png'),
     ('Michael Jackson', 'sound', 50, '/assets/sounds/michael-jackson-hee-hee.mp3'),
     ('Neee', 'sound', 25, '/assets/sounds/neee.mp3'),
     ('Perfect Fart', 'sound', 25, '/assets/sounds/perfect-fart.mp3'),

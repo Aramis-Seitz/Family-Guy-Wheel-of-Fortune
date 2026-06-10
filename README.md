@@ -39,7 +39,7 @@ npm install
 
 > Diese Dateien kommen **nie** in Git — sie sind in `.gitignore` eingetragen.
 
-**`api/.env`** anlegen:
+**`server/.env`** anlegen:
 
 ```
 SUPABASE_URL=https://xxxx.supabase.co
@@ -61,10 +61,7 @@ VITE_API_BASE_URL=http://localhost:3000
 
 ### 4. Fertig
 
-Für Code bearbeitung neunen Branche eröffnen.
-```
-Der Main-Branch enthaelt die aktuelle produktive Codebasis fuer das Express-Backend und das Vite-Frontend.
-```
+Für die Entwicklung einen neuen Branch von `main` erstellen.
 
 
 ---
@@ -73,9 +70,10 @@ Der Main-Branch enthaelt die aktuelle produktive Codebasis fuer das Express-Back
 
 ```
 /
-├── api/        # Express-Backend (TypeScript) — Port 3000
+├── server/     # Express-Backend (TypeScript) — Port 3000
 ├── public/     # Vite-Frontend (TypeScript)
-└── package.json  # Root-Workspace (verwaltet api + public)
+├── api/        # Vercel-Adapter (re-exportiert server/)
+└── package.json  # Root-Workspace (verwaltet server + public)
 ```
 
 ---

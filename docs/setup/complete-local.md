@@ -31,7 +31,7 @@ npm install
 
 ### Schritt 1 — Umgebungsvariablen setzen
 
-**`api/.env`** anlegen:
+**`server/.env`** anlegen:
 ```
 USE_MOCK=true
 ```
@@ -45,10 +45,9 @@ VITE_USE_MOCK=true
 
 ### Schritt 2 — Backend starten
 
-Im `api/` Ordner:
+Im **Root-Verzeichnis**:
 ```powershell
-cd api
-npm run dev
+npm run dev --workspace server
 ```
 
 ### Schritt 3 — Frontend starten
@@ -96,7 +95,7 @@ Danach landet man automatisch auf der Wheel-Seite.
 
 Flags in beiden `.env` Dateien auf `false` setzen:
 
-**`api/.env`:**
+**`server/.env`:**
 ```
 USE_MOCK=false
 SUPABASE_URL=https://xxxx.supabase.co

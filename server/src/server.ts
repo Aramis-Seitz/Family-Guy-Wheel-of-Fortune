@@ -15,7 +15,6 @@ import { getSecureRandomNumber } from "./lib/random";
 import { createMockServiceClient } from "./mock-service";
 import { mockRouter } from "./mock-routes";
 import { apiRoutes } from "./routes";
-import path from 'path';
 
 const USE_MOCK = process.env.USE_MOCK === 'true';
 

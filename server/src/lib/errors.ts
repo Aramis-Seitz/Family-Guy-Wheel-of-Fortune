@@ -16,4 +16,3 @@ export function asAppError(error: unknown): AppError {
     }
     return new AppError("Internal server error", 500);
 }
-

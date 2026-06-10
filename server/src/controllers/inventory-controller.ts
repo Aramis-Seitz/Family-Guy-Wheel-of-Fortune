@@ -1,7 +1,7 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { getOwnedAssets, selectAsset } from "../services/inventory-service";
 import { getSelectedAssetIds } from "../services/shop-service";
-import { sendMethodNotAllowed, sendUnexpectedError } from "./response";
+import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 
 type SelectRequestBody = {
@@ -9,11 +9,6 @@ type SelectRequestBody = {
 };
 
 export async function handleGetOwnedAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "GET") {
-        sendMethodNotAllowed(res, "GET");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -29,11 +24,6 @@ export async function handleGetOwnedAssets(req: HttpRequest, res: HttpResponse):
 }
 
 export async function handleGetSelectedAssetIds(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "GET") {
-        sendMethodNotAllowed(res, "GET");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -49,11 +39,6 @@ export async function handleGetSelectedAssetIds(req: HttpRequest, res: HttpRespo
 }
 
 export async function handleSelectAsset(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") {
-        sendMethodNotAllowed(res, "POST");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {

@@ -3,7 +3,7 @@ import {
     listOwnedAssets,
     userSelectedAsset
 } from "../repositories/asset-repository";
-import { AppError } from "./errors";
+import { AppError } from "../lib/errors";
 import { getAssetById, createAssetSelection } from "../repositories/asset-repository";
 
 export type SelectResult = {

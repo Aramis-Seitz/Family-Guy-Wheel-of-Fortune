@@ -1,6 +1,6 @@
 import { supabaseClient } from "../lib/supabase-client";
 import type { Asset, AssetCategory } from "../types/asset";
-import { AppError } from "../services/errors";
+import { AppError } from "../lib/errors";
 
 type AssetOwnershipRow = {
     asset?: Asset | Asset[] | null;
@@ -67,8 +67,13 @@ export async function listAssetCategories(): Promise<AssetCategory[]> {
 }
 
 export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {
-    const ownedAssets = await listOwnedAssets(userId);
-    return ownedAssets.map(asset => asset.id).includes(assetId);
+    const { data, error } = await supabaseClient
+        .from("asset_ownership")
+        .select("asset_id")
+        .eq("user_id", userId)
+        .eq("asset_id", assetId)
+        .single();
+    return !error && !!data;
 }
 
 export async function createAssetOwnership(userId: string, assetId: string): Promise<void> {
@@ -80,8 +85,13 @@ export async function createAssetOwnership(userId: string, assetId: string): Pro
 }
 
 export async function userSelectedAsset(userId: string, assetId: string): Promise<boolean> {
-    const selectedAssetIds = await listSelectedAssetIds(userId);
-    return selectedAssetIds.includes(assetId);
+    const { data, error } = await supabaseClient
+        .from("asset_selection")
+        .select("asset_id")
+        .eq("user_id", userId)
+        .eq("asset_id", assetId)
+        .single();
+    return !error && !!data;
 }
 
 export async function assignDefaultAssets(userId: string): Promise<void> {

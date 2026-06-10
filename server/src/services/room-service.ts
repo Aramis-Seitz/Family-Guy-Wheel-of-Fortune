@@ -8,7 +8,7 @@ import {
     updateRoomSpin,
     insertSpinToken,
 } from "../repositories/room-repository";
-import { AppError } from "./errors";
+import { AppError } from "../lib/errors";
 
 function generateRoomKey(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

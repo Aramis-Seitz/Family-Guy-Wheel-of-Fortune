@@ -1,5 +1,5 @@
 import type { HttpResponse } from "../types/http";
-import { asAppError } from "../services/errors";
+import { asAppError } from "../lib/errors";
 
 export function sendMethodNotAllowed(res: HttpResponse, allow: string): void {
     if (typeof res.setHeader === "function") {

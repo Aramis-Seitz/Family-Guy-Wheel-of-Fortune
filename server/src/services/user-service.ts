@@ -6,7 +6,7 @@ import {
     type ProfileSummary
 } from "../repositories/profile-repository";
 import { assignDefaultAssets } from "../repositories/asset-repository";
-import { AppError } from "./errors";
+import { AppError } from "../lib/errors";
 
 export async function getUserCoins(userId: string): Promise<number> {
     return getCoinsByUserId(userId);

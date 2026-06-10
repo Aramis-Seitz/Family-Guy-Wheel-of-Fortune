@@ -64,3 +64,22 @@ export async function insertSpinToken(token: string, userId: string): Promise<st
     if (error) throw error;
     return (data as { token: string }).token;
 }
+
+export async function findValidSpinToken(token: string, userId: string): Promise<boolean> {
+    const { data, error } = await supabaseClient
+        .from("spin_tokens")
+        .select("token")
+        .eq("token", token)
+        .eq("user_id", userId)
+        .eq("used", false)
+        .single();
+    return !error && !!data;
+}
+
+export async function markSpinTokenUsed(token: string): Promise<void> {
+    const { error } = await supabaseClient
+        .from("spin_tokens")
+        .update({ used: true })
+        .eq("token", token);
+    if (error) throw error;
+}

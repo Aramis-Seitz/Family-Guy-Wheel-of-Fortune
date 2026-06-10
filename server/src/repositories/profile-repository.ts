@@ -53,6 +53,17 @@ export async function updateCoinsByUserId(userId: string, coins: number): Promis
     if (error) throw error;
 }
 
+export async function getUserIdByUsername(username: string): Promise<string | null> {
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id")
+        .eq("username", username)
+        .single();
+
+    if (error || !data) return null;
+    return (data as { id: string }).id;
+}
+
 export async function insertProfile(userId: string, username: string, email: string, dateOfBirth: string): Promise<void> {
     const { error } = await supabaseClient
         .from("profiles")

@@ -1,12 +1,11 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { createRoom, joinRoom, closeRoom, spinRoom } from "../services/room-service";
-import { sendMethodNotAllowed, sendUnexpectedError } from "./response";
+import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 
 type RoomKeyBody = { roomKey?: string };
 
 export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") { sendMethodNotAllowed(res, "POST"); return; }
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
@@ -18,7 +17,6 @@ export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Pro
 }
 
 export async function handleJoinRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") { sendMethodNotAllowed(res, "POST"); return; }
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
@@ -32,7 +30,6 @@ export async function handleJoinRoom(req: HttpRequest, res: HttpResponse): Promi
 }
 
 export async function handleCloseRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") { sendMethodNotAllowed(res, "POST"); return; }
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
@@ -46,7 +43,6 @@ export async function handleCloseRoom(req: HttpRequest, res: HttpResponse): Prom
 }
 
 export async function handleSpinRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") { sendMethodNotAllowed(res, "POST"); return; }
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }

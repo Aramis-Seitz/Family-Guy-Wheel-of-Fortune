@@ -1,6 +1,6 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, setUserCoins, subtractUserCoins } from "../services/user-service";
-import { sendMethodNotAllowed, sendUnexpectedError } from "./response";
+import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 
 type RegisterRequestBody = {
@@ -18,11 +18,6 @@ type SubtractCoinsRequestBody = {
 };
 
 export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") {
-        sendMethodNotAllowed(res, "POST");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -38,11 +33,6 @@ export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpRespo
 }
 
 export async function handleRegisterUser(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") {
-        sendMethodNotAllowed(res, "POST");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -65,12 +55,7 @@ export async function handleRegisterUser(req: HttpRequest, res: HttpResponse): P
     }
 }
 
-export async function handleUserCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "GET" && req.method !== "POST") {
-        sendMethodNotAllowed(res, "GET, POST");
-        return;
-    }
-
+export async function handleGetUserCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -78,9 +63,18 @@ export async function handleUserCoins(req: HttpRequest, res: HttpResponse): Prom
             return;
         }
 
-        if (req.method === "GET") {
-            const coins = await getUserCoins(userId);
-            res.status(200).json({ coins });
+        const coins = await getUserCoins(userId);
+        res.status(200).json({ coins });
+    } catch (error) {
+        sendUnexpectedError(res, error);
+    }
+}
+
+export async function handleSetUserCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
+    try {
+        const userId = await resolveUserIdFromHeaders(req.headers);
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
             return;
         }
 
@@ -93,11 +87,6 @@ export async function handleUserCoins(req: HttpRequest, res: HttpResponse): Prom
 }
 
 export async function handleUserProfile(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "GET") {
-        sendMethodNotAllowed(res, "GET");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -118,11 +107,6 @@ export async function handleUserProfile(req: HttpRequest, res: HttpResponse): Pr
 }
 
 export async function handleSubtractCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
-    if (req.method !== "POST") {
-        sendMethodNotAllowed(res, "POST");
-        return;
-    }
-
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {

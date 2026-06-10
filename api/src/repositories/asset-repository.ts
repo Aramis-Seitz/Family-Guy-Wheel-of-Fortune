@@ -84,6 +84,28 @@ export async function userSelectedAsset(userId: string, assetId: string): Promis
     return selectedAssetIds.includes(assetId);
 }
 
+export async function assignDefaultAssets(userId: string): Promise<void> {
+    const { data: assets, error: assetsError } = await supabaseClient
+        .from("asset")
+        .select("id, category")
+        .in("name", ["Peter Laugh", "Quagmire"]);
+
+    if (assetsError) throw assetsError;
+    if (!assets || assets.length === 0) throw new AppError("Default-Assets nicht gefunden", 500);
+
+    const ownershipRows = assets.map((a) => ({ user_id: userId, asset_id: a.id }));
+    const { error: ownershipError } = await supabaseClient
+        .from("asset_ownership")
+        .upsert(ownershipRows, { onConflict: "user_id,asset_id", ignoreDuplicates: true });
+    if (ownershipError) throw ownershipError;
+
+    const selectionRows = assets.map((a) => ({ user_id: userId, asset_id: a.id, category: a.category }));
+    const { error: selectionError } = await supabaseClient
+        .from("asset_selection")
+        .upsert(selectionRows, { onConflict: "user_id,category", ignoreDuplicates: true });
+    if (selectionError) throw selectionError;
+}
+
 export async function createAssetSelection(userId: string, assetId: string): Promise<void> {
     const asset = await getAssetById(assetId);
 

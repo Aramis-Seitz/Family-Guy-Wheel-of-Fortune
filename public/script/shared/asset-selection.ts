@@ -2,9 +2,6 @@ import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api.js";
 import { companionImage, tickSoundTemplate } from "./dom.js";
 import type { Asset } from "./types.js";
 
-const DEFAULT_SOUND_URL = "/assets/sounds/peter-griffin-laugh.mp3";
-const DEFAULT_COMPANION_URL = "/assets/companions/quagmire.png";
-
 export async function applyActiveAssets(): Promise<void> {
     try {
         const [selectedIds, ownedAssets] = await Promise.all([
@@ -17,11 +14,10 @@ export async function applyActiveAssets(): Promise<void> {
         const selectedCompanion = ownedAssets.find(
             a => a.category === "companion" && selectedIds.includes(a.id)
         );
-        applyActiveSound(selectedSound?.asset_url ?? DEFAULT_SOUND_URL);
-        applyActiveCompanion(selectedCompanion?.asset_url ?? DEFAULT_COMPANION_URL);
+        if (selectedSound) applyActiveSound(selectedSound.asset_url);
+        if (selectedCompanion) applyActiveCompanion(selectedCompanion.asset_url);
     } catch {
-        applyActiveSound(DEFAULT_SOUND_URL);
-        applyActiveCompanion(DEFAULT_COMPANION_URL);
+        // API nicht erreichbar — Assets bleiben ohne src
     }
 }
 

@@ -1,7 +1,13 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
-import { getUserCoins, getUserProfile, setUserCoins, subtractUserCoins } from "../services/user-service";
+import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, setUserCoins, subtractUserCoins } from "../services/user-service";
 import { sendMethodNotAllowed, sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
+
+type RegisterRequestBody = {
+    username?: string;
+    email?: string;
+    dateOfBirth?: string;
+};
 
 type CoinsRequestBody = {
     coins?: number;
@@ -10,6 +16,54 @@ type CoinsRequestBody = {
 type SubtractCoinsRequestBody = {
     amount?: number;
 };
+
+export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
+    if (req.method !== "POST") {
+        sendMethodNotAllowed(res, "POST");
+        return;
+    }
+
+    try {
+        const userId = await resolveUserIdFromHeaders(req.headers);
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        await ensureDefaultAssets(userId);
+        res.status(200).json({ success: true });
+    } catch (error) {
+        sendUnexpectedError(res, error);
+    }
+}
+
+export async function handleRegisterUser(req: HttpRequest, res: HttpResponse): Promise<void> {
+    if (req.method !== "POST") {
+        sendMethodNotAllowed(res, "POST");
+        return;
+    }
+
+    try {
+        const userId = await resolveUserIdFromHeaders(req.headers);
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const body = (req.body ?? {}) as RegisterRequestBody;
+        const { username, email, dateOfBirth } = body;
+
+        if (!username || !email || !dateOfBirth) {
+            res.status(400).json({ error: "username, email und dateOfBirth sind erforderlich" });
+            return;
+        }
+
+        await registerUser(userId, username, email, dateOfBirth);
+        res.status(201).json({ success: true });
+    } catch (error) {
+        sendUnexpectedError(res, error);
+    }
+}
 
 export async function handleUserCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     if (req.method !== "GET" && req.method !== "POST") {

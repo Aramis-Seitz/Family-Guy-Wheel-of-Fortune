@@ -1,5 +1,6 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { showToast } from "../shared/toast.js";
+import { apiUrl } from "../shared/api-base.js";
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
@@ -12,47 +13,6 @@ const signupEmailInput = document.getElementById('signupEmail') as HTMLInputElem
 const signupDateOfBirthInput = document.getElementById('signupDateOfBirth') as HTMLInputElement | null;
 const signupPasswordInput = document.getElementById('signupPassword') as HTMLInputElement | null;
 const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword') as HTMLInputElement | null;
-
-async function createUserDefaultSelection(userId: string, assets: { id: string; category: string; name: string }[]): Promise<void> {
-    const entries = assets.map(asset => ({
-        user_id: userId,
-        category: asset.category,
-        asset_id: asset.id,
-    }));
-
-    const { error } = await supabaseClient.from('asset_selection').insert(entries);
-
-    if (error) {
-        throw new Error(`Asset-Selection Fehler: ${error.message}`);
-    }
-}
-
-async function createUserDefaultOwnership(userId: string, assets: { id: string; name: string }[]): Promise<void> {
-    const entries = assets.map(asset => ({
-        user_id: userId,
-        asset_id: asset.id,
-    }));
-
-    const { error } = await supabaseClient.from('asset_ownership').insert(entries);
-
-    if (error) {
-        throw new Error(`Asset-Ownership Fehler: ${error.message}`);
-    }
-}
-
-async function createUserDefaultAssets(userId: string): Promise<void> {
-    const { data: assets, error: assetsError } = await supabaseClient
-        .from('asset')
-        .select('id, category, name')
-        .in('name', ['Quagmire', 'Peter Laugh']);
-
-    if (assetsError || !assets || assets.length === 0) {
-        throw new Error('Keine Standard-Assets gefunden');
-    }
-
-    await createUserDefaultSelection(userId, assets);
-    await createUserDefaultOwnership(userId, assets);
-}
 
 if (loginForm) {
     loginForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
@@ -167,7 +127,7 @@ if (signupForm) {
                 return;
             }
 
-            if (!data.user) {
+            if (!data.user || !data.session) {
                 showToast({
                     message: "Benutzer konnte nicht erstellt werden.",
                     type: "error"
@@ -175,27 +135,23 @@ if (signupForm) {
                 return;
             }
 
-            const { error: profileError } = await supabaseClient
-                .from('profiles')
-                .insert([
-                    {
-                        id: data.user.id,
-                        username: username,
-                        email: email,
-                        date_of_birth: dateOfBirth,
-                    },
-                ]);
+            const registerResponse = await fetch(apiUrl("/api/user/register"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${data.session.access_token}`,
+                },
+                body: JSON.stringify({ username, email, dateOfBirth }),
+            });
 
-            if (profileError) {
-                console.error('Profile Insert Error:', profileError);
+            if (!registerResponse.ok) {
+                const body = await registerResponse.json().catch(() => ({})) as { error?: string };
                 showToast({
-                    message: `Benutzer erstellt, aber Profil konnte nicht gespeichert werden: ${profileError.message}`,
+                    message: `Registrierung fehlgeschlagen: ${body.error ?? registerResponse.statusText}`,
                     type: "error"
                 });
                 return;
             }
-
-            await createUserDefaultAssets(data.user.id);
 
             window.location.href = "login.html"
 

@@ -104,6 +104,20 @@ export async function setUserCoins(coins: number): Promise<number> {
     return typeof body.coins === "number" ? body.coins : 0;
 }
 
+export async function ensureDefaultAssets(): Promise<void> {
+    const headers = await buildAuthHeaders();
+
+    const response = await fetch(apiUrl("/api/user/ensure-defaults"), {
+        method: "POST",
+        headers
+    });
+
+    if (!response.ok) {
+        const message = await readApiError(response, "Default-Assets konnten nicht gesetzt werden");
+        throw new Error(message);
+    }
+}
+
 export async function subtractUserCoins(amount: number): Promise<number> {
     const headers = await buildAuthHeaders({
         "Content-Type": "application/json"

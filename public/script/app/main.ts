@@ -1,6 +1,7 @@
 import { addBtn, input } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { applyActiveAssets } from "../shared/asset-selection.js";
+import { ensureDefaultAssets } from "../api/user-api.js";
 import { initInventory } from "../inventory/inventory.js";
 import { addName, initNameList } from "../names/name-list.js";
 import { initShareFeature } from "../names/share-name-list.js";
@@ -38,6 +39,7 @@ async function initApp(): Promise<void> {
   initShareFeature();
   initWinnerModal();
   await initProfileUI();
+  await ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();
   initShop();

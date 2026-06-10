@@ -1,4 +1,5 @@
 import { showToast } from "../shared/toast";
+import { apiUrl } from "../shared/api-base.js";
 
 const addItemBody = document.getElementById('loginForm') as HTMLFormElement | null;
 const loginUserInput = document.getElementById('loginUser') as HTMLInputElement | null;
@@ -20,9 +21,10 @@ if (addItemBody) {
     const password = loginPasswordInput.value;
 
     try {
-      const response = await fetch('./api/basic-auth', {
+      const response = await fetch(apiUrl('/api/basic-auth'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
 
@@ -30,9 +32,9 @@ if (addItemBody) {
 
       if (!response.ok || !result.success) {
         showToast({
-        message: result.message ?? "Login fehlgeschlagen.",
-        type: "error"
-      });
+          message: result.message ?? "Login fehlgeschlagen.",
+          type: "error"
+        });
         return;
       }
       window.location.href = '/login.html';

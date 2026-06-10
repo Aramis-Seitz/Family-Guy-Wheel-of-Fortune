@@ -1,5 +1,6 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { showToast } from "../shared/toast.js";
+import { apiUrl } from "../shared/api-base.js";
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
@@ -126,7 +127,7 @@ if (signupForm) {
                 return;
             }
 
-            if (!data.user) {
+            if (!data.user || !data.session) {
                 showToast({
                     message: "Benutzer konnte nicht erstellt werden.",
                     type: "error"
@@ -134,21 +135,19 @@ if (signupForm) {
                 return;
             }
 
-            const { error: profileError } = await supabaseClient
-                .from('profiles')
-                .insert([
-                    {
-                        id: data.user.id,
-                        username: username,
-                        email: email,
-                        date_of_birth: dateOfBirth,
-                    },
-                ]);
+            const registerResponse = await fetch(apiUrl("/api/user/register"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${data.session.access_token}`,
+                },
+                body: JSON.stringify({ username, email, dateOfBirth }),
+            });
 
-            if (profileError) {
-                console.error('Profile Insert Error:', profileError);
+            if (!registerResponse.ok) {
+                const body = await registerResponse.json().catch(() => ({})) as { error?: string };
                 showToast({
-                    message: `Benutzer erstellt, aber Profil konnte nicht gespeichert werden: ${profileError.message}`,
+                    message: `Registrierung fehlgeschlagen: ${body.error ?? registerResponse.statusText}`,
                     type: "error"
                 });
                 return;

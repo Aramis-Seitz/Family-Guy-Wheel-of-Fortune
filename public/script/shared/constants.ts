@@ -1,6 +1,7 @@
-import type { Point } from "./types.js";
+//import { get } from "node:http";
+import { AssetCategory, Point } from "./types.js";
 
-export const WHEEL_CENTER: Point = { x: 150, y: 150 };
+export const WHEEL_CENTER: Point = { x: 100, y: 100 };
 export const WHEEL_RADIUS: number = 100;
 export const FULL_CIRCLE_RADIANS: number = Math.PI * 2;
 export const SPIN_START_DELAY: number = 5;
@@ -28,3 +29,14 @@ export const SEGMENT_COLORS: string[] = [
   "rgb(141, 116, 225)",
   "#504672",
 ];
+
+export const ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;
+export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
+
+export const EMPTY_STATE_THUMBNAIL_SOUND: string = "../../assets/default-thumbnail-sound-asset.png";
+export const EMPTY_STATE_THUMBNAIL_COMPANION: string = "../../assets/default-thumbnail-companion-asset.png";
+
+export const EMPTY_STATE_THUMBNAIL_BY_CATEGORY: Partial<Record<AssetCategory, string>> = {
+  sound: EMPTY_STATE_THUMBNAIL_SOUND,
+  companion: EMPTY_STATE_THUMBNAIL_COMPANION,
+};

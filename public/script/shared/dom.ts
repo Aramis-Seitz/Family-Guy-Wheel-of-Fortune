@@ -14,6 +14,7 @@ function optionalElement<T extends HTMLElement | SVGElement>(id: string): T | nu
 
 export const wheelElement = requiredElement<SVGGElement>("wheel");
 export const tickSoundTemplate = optionalElement<HTMLAudioElement>("tickSound");
+export const companionImage = optionalElement<HTMLImageElement>("companion-image");
 export const drumrollAudio = optionalElement<HTMLAudioElement>("drumroll");
 export const cymbalCrashAudio = optionalElement<HTMLAudioElement>("cymbal-crash");
 
@@ -37,7 +38,7 @@ export const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventoryCl
 export const inventoryModal = requiredElement<HTMLDialogElement>("inventoryModal");
 export const inventoryContent = requiredElement<HTMLDivElement>("inventoryContent");
 export const addItemModal = requiredElement<HTMLDialogElement>("addItemModal");
-export const inventoryGrid = document.querySelector(".inventory-grid") as HTMLElement;
+export const inventoryWheelGrid = requiredElement<HTMLElement>("inventoryWheelGrid");
 export const addItemInput = requiredElement<HTMLInputElement>("addItemInput");
 export const addItemBody = optionalElement<HTMLFormElement>("addItemBody");
 export const confirmAddItemBtn = requiredElement<HTMLButtonElement>("confirmAddItemBtn");
@@ -47,6 +48,15 @@ export const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirmDel
 export const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName");
 export const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
 export const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
+export const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
+export const inventoryAssetGrid = requiredElement<HTMLElement>("inventoryAssetGrid");
+
+export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
+export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
+export const shopModal = requiredElement<HTMLDialogElement>("shopModal");
+export const shopCoinBalance = requiredElement<HTMLDivElement>("shop-coin-balance");
+export const shopTabs = requiredElement<HTMLElement>("shop-modal-tabs");
+export const shopGrid = requiredElement<HTMLElement>("shop-modal-grid");
 
 export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
 export const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");

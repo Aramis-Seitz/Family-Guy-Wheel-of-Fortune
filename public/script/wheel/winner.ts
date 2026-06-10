@@ -1,4 +1,4 @@
-import { awardCoins } from "../api/client.js";
+import { awardCoins } from "../api/client-api.js";
 import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { getCurrentRotation, resetWheelRotation } from "./spin.js";

@@ -4,6 +4,8 @@ import {
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
 } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
+import { applyActiveAssets } from "../shared/asset-selection.js";
+import { ensureDefaultAssets } from "../api/user-api.js";
 import { initInventory } from "../inventory/inventory.js";
 import { addName, initNameList, getNames, replaceNames, lockNameEditing, unlockNameEditing } from "../names/name-list.js";
 import { nameState } from "../names/name-state.js";
@@ -17,12 +19,14 @@ import { initWinnerModal } from "../wheel/winner.js";
 import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
+import { initShop } from "../shop/shop.js";
 
 let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
 let nameStateUnsubscribe: (() => void) | null = null;
+
 
 function initNameControls(): void {
   addBtn.addEventListener("click", () => addName(input.value));
@@ -228,8 +232,11 @@ async function initApp(): Promise<void> {
   initShareFeature();
   initWinnerModal();
   await initProfileUI();
+  await ensureDefaultAssets();
+  await applyActiveAssets();
   initInventory();
   initRoomControls();
+  initShop();
 }
 
 void initApp();

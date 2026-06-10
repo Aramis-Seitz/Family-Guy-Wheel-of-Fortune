@@ -9,6 +9,7 @@ import {
   validateNameInput,
 } from "./name-input-validation.js";
 import { nameState } from "./name-state.js";
+//import { nameState } from "../../../shared/name-state.js";
 
 let roomLocked = false;
 
@@ -140,7 +141,7 @@ export function addName(rawName: string): void {
     return;
   }
 
- input.value = "";
+  input.value = "";
   clearNameInputError();
   input.focus();
 }

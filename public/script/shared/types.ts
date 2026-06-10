@@ -1,3 +1,5 @@
+import { ASSET_CATEGORIES, INVENTORY_CATEGORIES } from "./constants.js";
+
 export type Direction = "left" | "right";
 
 export interface Point {
@@ -53,4 +55,16 @@ export interface RoomRow {
   last_spin: number;
   spun_at: string;
   players: string[];
+}
+
+export type AssetCategory = typeof ASSET_CATEGORIES[number];
+
+export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
+
+export type Asset = {
+  readonly id: string;
+  readonly name: string;
+  readonly category: AssetCategory;
+  readonly price_coins: number;
+  readonly asset_url: string;
 }

@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { createMockServiceClient } from "../mock-service";
+import { createMockServiceClient } from "../mock/service";
 
 const USE_MOCK = process.env.USE_MOCK === "true";
 

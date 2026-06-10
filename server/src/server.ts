@@ -9,7 +9,7 @@ import express from "express";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { mockRouter } from "./mock-routes";
+import { mockRouter } from "./mock/routes";
 import { apiRoutes } from "./routes";
 
 const USE_MOCK = process.env.USE_MOCK === 'true';

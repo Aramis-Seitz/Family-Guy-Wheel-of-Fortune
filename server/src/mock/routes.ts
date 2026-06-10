@@ -9,7 +9,7 @@ import {
   getSavedLinks,
   createSavedLink,
   deleteSavedLink,
-} from './mock-store';
+} from './store';
 
 export function decodeMockJwt(jwt: string): { id: string; email: string; username: string; date_of_birth?: string | null } | null {
   if (!jwt.startsWith('mock_')) return null;

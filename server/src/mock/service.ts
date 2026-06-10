@@ -1,5 +1,5 @@
-import { decodeMockJwt } from './mock-routes';
-import { store, findProfile, createSpinToken } from './mock-store';
+import { decodeMockJwt } from './routes';
+import { store, findProfile, createSpinToken } from './store';
 
 function project(row: any, cols: string) {
   if (!cols || cols === '*') return { ...row };

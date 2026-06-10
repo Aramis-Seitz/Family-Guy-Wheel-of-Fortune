@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { randomUUID } from 'crypto';
-if (existsSync('.env.local')) dotenv.config({ path: '.env.local', override: true });
-dotenv.config();
+import path from 'path';
+const envDir = path.resolve(__dirname, '..');
+if (existsSync(path.join(envDir, '.env.local'))) dotenv.config({ path: path.join(envDir, '.env.local'), override: true });
+dotenv.config({ path: path.join(envDir, '.env') });
 
 import express from "express";
-import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import type { Request, Response, NextFunction } from "express";

@@ -3,11 +3,11 @@
   "private": true,
   "workspaces": [
     "public",
-    "api"
+    "server"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace api\" \"npm run build --workspace public\"",
-    "build": "npm run build --workspace api && npm run build --workspace public",
+    "dev": "concurrently \"npm run dev --workspace server\" \"npm run build --workspace public\"",
+    "build": "npm run build --workspace server && npm run build --workspace public",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@
   "outputDirectory": "public/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/", "destination": "/api/index" },
     { "source": "/login.html", "destination": "/api/index" },
     { "source": "/main.html", "destination": "/api/index" },
     { "source": "/signup.html", "destination": "/api/index" }

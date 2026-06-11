@@ -1,6 +1,11 @@
-img {
-    width: 150px;
-    transform: translateY(0px) translateX(113px);
+#svg {
+    width: 500px;
+    height: 500px;
+}
+
+#companion-image {
+    justify-self: end;
+    height: 350px;
 }
 
 #wheel {

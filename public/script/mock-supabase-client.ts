@@ -1,3 +1,5 @@
+import { apiUrl } from './shared/api-base.js';
+
 const SESSION_KEY = 'mock_session';
 
 interface MockSession {
@@ -88,10 +90,10 @@ class MockQueryBuilder {
         const username = this._eqFilter('username');
 
         const url = id
-          ? `/api/mock/profile/${id}`
+          ? apiUrl(`/api/mock/profile/${id}`)
           : username
-          ? `/api/mock/profile/by-username/${encodeURIComponent(username)}`
-          : null;
+            ? apiUrl(`/api/mock/profile/by-username/${encodeURIComponent(username)}`)
+            : null;
 
         if (!url) return { data: null, error: { message: 'Missing filter for profiles select' } };
 
@@ -103,7 +105,7 @@ class MockQueryBuilder {
 
       if (this._op === 'insert') {
         const data = Array.isArray(this._insertData) ? this._insertData[0] : this._insertData;
-        const res = await fetch('/api/mock/profile', {
+        const res = await fetch(apiUrl('/api/mock/profile'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -120,7 +122,7 @@ class MockQueryBuilder {
         const userId = this._eqFilter('user_id');
         if (!userId) return { data: [], error: null };
 
-        const res = await fetch(`/api/mock/saved_links/${userId}`);
+        const res = await fetch(apiUrl(`/api/mock/saved_links/${userId}`));
         if (!res.ok) return { data: [], error: null };
         const rows: any[] = await res.json();
         const projected = rows.map(r => projectRow(r, cols));
@@ -129,7 +131,7 @@ class MockQueryBuilder {
 
       if (this._op === 'insert') {
         const data = Array.isArray(this._insertData) ? this._insertData[0] : this._insertData;
-        const res = await fetch('/api/mock/saved_links', {
+        const res = await fetch(apiUrl('/api/mock/saved_links'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -141,7 +143,7 @@ class MockQueryBuilder {
       if (this._op === 'delete') {
         const id = this._eqFilter('id');
         if (!id) return { data: null, error: { message: 'No id filter for delete' } };
-        await fetch(`/api/mock/saved_links/${id}`, { method: 'DELETE' });
+        await fetch(apiUrl(`/api/mock/saved_links/${id}`), { method: 'DELETE' });
         return { data: null, error: null };
       }
     }
@@ -161,7 +163,7 @@ export function createMockClient() {
   return {
     auth: {
       async signInWithPassword({ email, password }: { email: string; password: string }) {
-        const res = await fetch('/api/mock/auth/login', {
+        const res = await fetch(apiUrl('/api/mock/auth/login'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -175,7 +177,7 @@ export function createMockClient() {
       async signUp({ email, password, options }: { email: string; password: string; options?: { data?: { username?: string; date_of_birth?: string } } }) {
         const username = options?.data?.username ?? '';
         const date_of_birth = options?.data?.date_of_birth ?? null;
-        const res = await fetch('/api/mock/auth/signup', {
+        const res = await fetch(apiUrl('/api/mock/auth/signup'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, username, date_of_birth }),

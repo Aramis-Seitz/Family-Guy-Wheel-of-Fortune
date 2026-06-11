@@ -20,4 +20,3 @@ logs/
 *.d.ts
 *.d.ts.map
 *.map
-.gitignore

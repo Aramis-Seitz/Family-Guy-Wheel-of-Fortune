@@ -1,4 +1,4 @@
-import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS } from "../shared/constants.js";
+import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS, INVENTORY_CATEGORIES, ASSET_CATEGORIES } from "../shared/constants.js";
 import {
   addItemModal,
   addItemInput,
@@ -10,18 +10,25 @@ import {
   confirmDeleteName,
   inventoryBtn,
   inventoryCloseBtn,
-  inventoryGrid,
+  inventoryWheelGrid,
   inventoryModal,
   cancelDeleteBtn,
-  closeOnBackdropClick
+  closeOnBackdropClick,
+  inventoryTabs,
+  inventoryAssetGrid
 } from "../shared/dom.js";
 import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
-import { InventoryItem } from "../shared/types.js";
+import { InventoryItem, Asset, InventoryCategory } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
+import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
+import { getOwnedAssets } from "../api/inventory-api.js";
+
 
 let pendingDeleteId: string | null = null;
+let currentOwnedAssets: Asset[] = await getOwnedAssets();
+
 
 function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
@@ -84,21 +91,20 @@ function closeAddItemModal(): void {
   addItemModal.close();
 }
 
-function renderInventory(items: InventoryItem[]): void {
-  inventoryGrid.innerHTML = "";
+function renderInventoryWheels(items: InventoryItem[]): void {
+  inventoryWheelGrid.innerHTML = "";
   let addCardPlaced = false;
 
   for (let i = 0; i < INVENTORY_LIMIT; i++) {
     const item = items[i];
 
     if (!item) {
-      inventoryGrid.appendChild(addCardPlaced ? createEmptyCard() : createAddCard());
+      inventoryWheelGrid.appendChild(addCardPlaced ? createEmptyCard() : createAddCard());
       addCardPlaced = true;
       continue;
     }
 
-    inventoryGrid.appendChild(createItemCard(item));
-
+    inventoryWheelGrid.appendChild(createItemCard(item));
   }
 }
 
@@ -183,7 +189,7 @@ function createDeleteButton(item: InventoryItem): HTMLButtonElement {
   return btn;
 }
 
-async function fetchInventoryItems(): Promise<InventoryItem[]> {
+async function fetchInventoryWheels(): Promise<InventoryItem[]> {
   const user = await fetchCurrentUser();
   if (!user) return [];
 
@@ -208,7 +214,9 @@ async function fetchInventoryItems(): Promise<InventoryItem[]> {
 }
 
 async function loadInventory(): Promise<void> {
-  renderInventory(await fetchInventoryItems());
+  await Promise.all([getOwnedAssets().then(a => { currentOwnedAssets = a; }), refreshSelectedAssetIds()]);
+  loadInventoryTabs();
+  loadInventoryByCategory();
 }
 
 async function submitItem(): Promise<void> {
@@ -373,4 +381,64 @@ function createMiniLabel(
   text.textContent = name;
 
   return text;
+}
+
+export function loadInventoryByCategory(): void {
+  inventoryAssetGrid.innerHTML = "";
+  inventoryWheelGrid.innerHTML = "";
+  const activeTab = inventoryTabs.querySelector(".inventory-modal__tab--active") as HTMLElement | null;
+  const activeCategory = getClickedInventoryCategory(activeTab);
+  if (!activeCategory) return;
+
+  const isWheel = activeCategory === "wheel";
+  inventoryWheelGrid.style.display = isWheel ? "" : "none";
+  inventoryAssetGrid.style.display = isWheel ? "none" : "";
+
+  isWheel ? loadWheelCards() : loadOwnedAssets(activeCategory);
+}
+
+
+export function getClickedInventoryCategory(inventoryTab: HTMLElement | null): InventoryCategory | null {
+  if (inventoryTab?.tagName === "BUTTON" && inventoryTab.dataset.category) {
+    return inventoryTab.dataset.category as InventoryCategory;
+  }
+  return null;
+}
+
+
+export async function loadWheelCards(): Promise<void> {
+  renderInventoryWheels(await fetchInventoryWheels());
+}
+
+export function filterAssetsByCategory(category: InventoryCategory): Asset[] {
+  return currentOwnedAssets.filter(asset => asset.category === category);
+}
+
+function createInventoryTabButton(category: InventoryCategory): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.className = "inventory-modal__tab";
+  button.dataset.category = category;
+  button.textContent = `${category}s`.toUpperCase();
+
+  if (category === "wheel") button.classList.add("inventory-modal__tab--active");
+
+  button.onclick = () => {
+
+    inventoryTabs.querySelectorAll(".inventory-modal__tab").forEach(btn => btn.classList.remove("inventory-modal__tab--active"));
+    button.classList.add("inventory-modal__tab--active");
+    loadInventoryByCategory();
+  };
+  return button;
+}
+
+function renderInventoryTabs(categories: (InventoryCategory)[]): void {
+  inventoryTabs.innerHTML = "";
+  categories.forEach(category => {
+    inventoryTabs.appendChild(createInventoryTabButton(category));
+  });
+}
+
+async function loadInventoryTabs(): Promise<void> {
+  const categories = INVENTORY_CATEGORIES;
+  renderInventoryTabs(categories as InventoryCategory[]);
 }

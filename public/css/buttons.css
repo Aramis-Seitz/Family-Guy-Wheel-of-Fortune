@@ -23,8 +23,8 @@
     cursor: pointer;
 }
 
-.share-btn:hover { background-color: #E20074; }
-.share-btn:active { background-color: #E20074; }
+.share-btn:hover { background-color: #cc0066; }
+.share-btn:active { background-color: #a30055; }
 
 .inventory-btn {
     background-color: #00a2ff;
@@ -36,6 +36,23 @@
     border-radius: 100px;
     cursor: pointer;
 }
+
+.inventory-btn:hover { background-color: #0086cc; }
+.inventory-btn:active { background-color: #006699; }
+
+.shop-btn {
+    background-color: #33cc33;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 15px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.shop-btn:hover { background-color: #28a828; }
+.shop-btn:active { background-color: #1f7a1f; }
 
 #reset-btn {
     background-color: #888;

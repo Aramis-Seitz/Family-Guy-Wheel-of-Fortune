@@ -11,7 +11,7 @@ import {
   wheelElement,
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
-import { fetchRandomNumber } from "../api/client.js";
+import { fetchRandomNumber } from "../api/client-api.js";
 import { getSegmentCount, getNames } from "../names/name-list.js";
 import { announceWinner, hideWinnerModal } from "./winner.js";
 import type { Direction, SpinConfig } from "../shared/types.js";

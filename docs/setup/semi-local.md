@@ -18,7 +18,7 @@ git checkout -b dein/branch
 
 > ⚠️ Diese Dateien kommen **nie** in Git — prüfe dass `.env` in `.gitignore` steht.
 
-### `api/.env`
+### `server/.env`
 
 ```
 SUPABASE_URL=https://xxxx.supabase.co
@@ -41,9 +41,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=eyJ...
 Im **Root** des Projekts ausführen:
 
 ```powershell
-npm install dotenv
-npm install @supabase/supabase-js --workspace api
-npm install undici --workspace api
+npm install
 ```
 
 ---
@@ -61,7 +59,7 @@ Warten bis Vite fertig ist und `public/dist/` erstellt wurde.
 ### Schritt 2 — Backend starten
 
 ```powershell
-npm run dev --workspace api
+npm run dev --workspace server
 ```
 
 Der Server startet auf `http://localhost:3000`.
@@ -83,12 +81,10 @@ http://localhost:3000/main.html
 | Schritt | Befehl | Wo |
 |---|---|---|
 | Branch erstellen | `git checkout -b test/staging` | Root |
-| `.env` anlegen | manuell | `api/` und `public/` |
-| dotenv installieren | `npm install dotenv` | Root |
-| supabase installieren | `npm install @supabase/supabase-js --workspace api` | Root |
-| supabase installieren | `npm install undici --workspace api` | Root |
+| `.env` anlegen | manuell | `server/` und `public/` |
+| Abhängigkeiten installieren | `npm install` | Root |
 | Frontend bauen | `npm run build --workspace public` | Root |
-| Backend starten | `npm run dev --workspace api` | Root |
+| Backend starten | `npm run dev --workspace server` | Root |
 | Browser öffnen | `localhost:3000/main.html` | Browser |
 
 ---
@@ -97,9 +93,9 @@ http://localhost:3000/main.html
 
 **`dist/` nicht gefunden** → `npm run build --workspace public` nochmal ausführen
 
-**401 Unauthorized** → `.env` in `api/` prüfen ob `SUPABASE_SERVICE_ROLE_KEY` gesetzt ist
+**401 Unauthorized** → `.env` in `server/` prüfen ob `SUPABASE_SERVICE_ROLE_KEY` gesetzt ist
 
-**Seite lädt nicht** → sicherstellen dass `npm run dev --workspace api` läuft und Port 3000 frei ist
+**Seite lädt nicht** → sicherstellen dass `npm run dev --workspace server` läuft und Port 3000 frei ist
 
 **Proxy-Fehler (ENOTFOUND)** → Proxy-Umgebungsvariablen setzen:
 ```powershell

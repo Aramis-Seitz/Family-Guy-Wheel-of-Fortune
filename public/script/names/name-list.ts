@@ -140,7 +140,7 @@ export function addName(rawName: string): void {
     return;
   }
 
- input.value = "";
+  input.value = "";
   clearNameInputError();
   input.focus();
 }

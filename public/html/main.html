@@ -15,31 +15,38 @@
     <link rel="stylesheet" href="../css/legal-links.css">
     <link rel="stylesheet" href="../css/toast.css">
     <link rel="stylesheet" href="../css/room.css">
+    <link rel="stylesheet" href="../css/shop.css">
     <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 
 <body>
 
-    <audio id="tickSound" src="/assets/he.mp3" preload="auto"></audio>
-    <audio id="drumroll" src="/assets/drumroll.mp3" preload="auto"></audio>
-    <audio id="cymbal-crash" src="/assets/cymbal-crash.wav" preload="auto"></audio>
+    <audio id="tickSound" preload="auto"></audio>
+    <audio id="drumroll" src="/assets/sounds/drumroll.mp3" preload="auto"></audio>
+    <audio id="cymbal-crash" src="/assets/sounds/cymbal-crash.wav" preload="auto"></audio>
 
     <button class="spin-btn" id="spin-left-btn" type="button">SPIN LEFT</button>
     <button class="spin-btn" id="spin-right-btn" type="button">SPIN RIGHT</button>
     <button id="reset-btn" type="button">RESET</button>
     <button class="share-btn" id="shareBtn">Share >3</button>
     <button class="inventory-btn" id="inventoryBtn">INVENTORY</button>
+    <button class="shop-btn" id="shopBtn">SHOP</button>
 
     <dialog id="inventoryModal">
         <div id="inventoryContent" class="inventory-content">
             <div class="inventory-header">
-                <h2>Inventar</h2>
+                <h2>INVENTORY</h2>
                 <button id="inventoryCloseBtn">✕</button>
             </div>
-            <div class="inventory-grid" id="inventoryGrid"></div>
+
+            <nav class="inventory-modal__tabs" id="inventory-modal-tabs"></nav>
+            <hr class="inventory-modal__divider">
+            
+            <div class="inventory-wheel-grid" id="inventoryWheelGrid"></div>
+            <div class="inventory-asset-grid" id="inventoryAssetGrid"></div>
         </div>
     </dialog>
-    
+
     <dialog id="addItemModal">
         <div id="addItemInner">
             <div id="addItemHeader">
@@ -74,6 +81,21 @@
         </div>
     </dialog>
 
+    <dialog class="shop-modal" id="shopModal">
+        <div class="shop-modal__container">
+            <header class="shop-modal__header">
+                <h2 class="shop-modal__title" id="shop-modal-title">SHOP</h2>
+                <div class="shop-modal__coin-balance" id="shop-coin-balance"></div>
+                <button class="shop-modal__close-btn" id="shop-modal-close-btn">✕</button>
+            </header>
+
+            <nav class="shop-modal__tabs" id="shop-modal-tabs"></nav>
+            <hr class="shop-modal__divider">
+
+            <div class="shop-modal__grid" id="shop-modal-grid"></div>
+        </div>
+    </dialog>
+
     <div id="userArea"
         style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">
         <span id="coinDisplay" style="display:none; margin-right:8px;">🪙 0</span>
@@ -103,8 +125,8 @@
     </div>
 
     <div class="container">
-        <img src="/assets/image.png" alt="pointer image">
-        <svg id="svg" width="700" height="700" viewBox="0 0 300 300">
+        <img id="companion-image" alt="pointer image">
+        <svg id="svg" viewBox="0 0 200 200">
             <g id="wheel"></g>
         </svg>
 

@@ -6,26 +6,12 @@ import { nameState } from "../names/name-state.js";
 import { isNameEditingLocked } from "../names/name-list.js";
 import { showToast } from "../shared/toast.js";
 import { MAX_ITEMS } from "../shared/constants.js";
+import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
   if (error || !session?.user) return null;
   return session;
-}
-
-async function fetchUserProfile(userId: string): Promise<ProfileData | null> {
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("username, coins")
-    .eq("id", userId)
-    .single();
-
-  if (error || !data) {
-    console.error("Profil konnte nicht geladen werden:", error);
-    return null;
-  }
-
-  return data;
 }
 
 function applyUnauthenticatedState(): void {
@@ -92,13 +78,8 @@ export async function refreshCoinDisplay(): Promise<void> {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
 
-  const { data: profile } = await supabaseClient
-    .from("profiles")
-    .select("coins")
-    .eq("id", session.user.id)
-    .single();
-
-  applyCoinDisplay((profile as { coins?: number } | null)?.coins ?? 0);
+  const coins = await getUserCoins();
+  applyCoinDisplay(coins);
 }
 
 export async function initProfileUI(): Promise<void> {
@@ -110,7 +91,7 @@ export async function initProfileUI(): Promise<void> {
     return;
   }
 
-  const profile = await fetchUserProfile(session.user.id);
+  const profile = await fetchUserProfileFromApi();
   applyAuthenticatedState(profile);
   subscribeToCoinUpdates(session.user.id);
 }

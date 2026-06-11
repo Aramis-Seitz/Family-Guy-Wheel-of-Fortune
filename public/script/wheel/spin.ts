@@ -80,7 +80,9 @@ function enableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeLi
 }
 
 function getSegmentIndex(rotation: number, stepAngle: number): number {
-  const normalizedRotation = ((rotation % 360) + 360) % 360;
+  const POINTER_OFFSET = 270; // Zeiger zeigt im Westen
+  const offsetRotation = rotation - POINTER_OFFSET;
+  const normalizedRotation = ((offsetRotation % 360) + 360) % 360;
   return Math.floor(normalizedRotation / stepAngle);
 }
 

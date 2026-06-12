@@ -12,7 +12,7 @@ import {
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client-api.js";
-import { getSegmentCount } from "../names/name-list.js";
+import { getSegmentCount, getNames } from "../names/name-list.js";
 import { announceWinner, hideWinnerModal } from "./winner.js";
 import type { Direction, SpinConfig } from "../shared/types.js";
 
@@ -110,7 +110,11 @@ function performSpinStep(step: number, config: SpinConfig): void {
   lastTickRotation = currentRotation;
   if (step >= config.totalSteps) {
     playCymbalCrash();
-    announceWinner(config.segmentCount, config.spinToken);
+    const names = getNames();
+    const normalizedFinal = ((270 - currentRotation) % 360 + 360) % 360;
+    const winnerIndex = Math.floor(normalizedFinal / config.stepAngle) % config.segmentCount;
+    const winner = names[winnerIndex] ?? names[0];
+    announceWinner(config.spinToken, winner);
     return;
   }
 
@@ -135,27 +139,18 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
   performSpinStep(0, config);
 }
 
-function logSpinDetails(ranNum: number, multiplier: number, boostedValue: number): void {
-  console.log("Number from fs server:", ranNum);
-  console.log("Multiplier:", multiplier);
-  console.log("Boosted value:", boostedValue);
-}
-
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
   if (getSegmentCount() < 2) return;
 
-  console.log(`[SPIN] 🎡 Spin-Button geklickt – Richtung: ${direction}`);
   disableElements(getSpinRelatedElements());
 
   try {
-    const { ranNum, spinToken } = await fetchRandomNumber();
-    console.log("[SPIN] Token empfangen:", spinToken ? `"${spinToken}"` : "LEER!");
+    const names = getNames();
     const multiplier = getMultiplier();
-    const boostedRanNum = ranNum * multiplier;
-    logSpinDetails(ranNum, multiplier, boostedRanNum);
-    spinWheel(boostedRanNum, direction, spinToken);
+    const { ranNum, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
+    spinWheel(Math.floor(ranNum * multiplier), direction, spinToken);
   } catch (error) {
-    console.error("[SPIN] ❌ Fehler beim Spin :", error);
+    console.error("[SPIN] Fehler beim Spin:", error);
     enableElements(getSpinRelatedElements());
   }
 }

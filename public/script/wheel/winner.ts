@@ -1,26 +1,13 @@
 import { awardCoins } from "../api/client-api.js";
 import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";
-import { getCurrentRotation, resetWheelRotation } from "./spin.js";
+import { resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
 import { showToast } from "../shared/toast.js";
 import { winnerModal, closeWinnerModalBtn, removeWinnerBtn, winnerText, confettiCanvas } from "../shared/dom.js";
 
-export function getWinningSegmentIndexForRotation(rotation: number, segmentCount: number): number {
-  const normalizedRotation = ((rotation % 360) + 360) % 360;
-  const stepAngle = 360 / segmentCount;
-  const adjustedRotation = (360 - normalizedRotation + 270) % 360;
-  return Math.floor(adjustedRotation / stepAngle) % segmentCount;
-}
-
-export function getWinningSegmentIndex(segmentCount: number): number {
-  return getWinningSegmentIndexForRotation(getCurrentRotation(), segmentCount);
-}
-
 export function displayWinnerModal(winnerName: string): void {
-
   if (!winnerModal || !winnerText) return;
-
   winnerText.textContent = `${winnerName}`;
   winnerModal.classList.remove("hidden");
 }
@@ -84,47 +71,46 @@ function startConfetti(): void {
   }, 3000);
 }
 
-let lastWinnerIndex: number = -1;
 let lastWinnerName: string = "";
 
-export function announceWinner(segmentCount: number, spinToken: string): void {
+export function announceWinner(spinToken: string, winnerName: string): void {
   stopDrumRoll();
-
-  lastWinnerIndex = getWinningSegmentIndex(segmentCount);
-  const names = getNames();
-  const winnerName = names[lastWinnerIndex];
   lastWinnerName = winnerName;
-
-  console.log("[SPIN] 🏆 Gewinner ermittelt:", { winnerName, spinToken: spinToken || "LEER" });
-
   displayWinnerModal(winnerName);
   startConfetti();
-  awardCoins(spinToken, winnerName)
+
+  awardCoins(spinToken)
     .then((result) => {
       if (result) {
-        console.log("[SPIN] ✅ Coins erfolgreich vergeben:", result);
         return refreshCoinDisplay();
       }
-      // Guest im Raum: Host vergibst Coins async — nach Verzögerung neu laden
-      console.warn("[SPIN] ⚠️ awardCoins hat null zurückgegeben – warte auf Host-Update");
       setTimeout(() => void refreshCoinDisplay(), 4000);
     })
     .catch((err: unknown) => {
-      console.error("[SPIN] ❌ Fehler beim Vergeben von Coins:", err);
+      console.error("[SPIN] Fehler beim Vergeben von Coins:", err);
     });
 }
 
 function removeWinner(): void {
-  if (lastWinnerIndex < 0) return;
+  if (!lastWinnerName) return;
   const removedName = lastWinnerName;
-  if (getNames().length > 2) {
+  const names = getNames();
+  const index = names.indexOf(removedName);
+
+  if (index < 0) {
+    hideWinnerModal();
+    resetWheelRotation();
+    return;
+  }
+
+  if (names.length > 2) {
     showToast({
       message: `"${removedName}" wurde erfolgreich aus dem Rad entfernt.`,
       type: "success"
     });
   }
 
-  removeNameByIndex(lastWinnerIndex);
+  removeNameByIndex(index);
   hideWinnerModal();
   resetWheelRotation();
 }

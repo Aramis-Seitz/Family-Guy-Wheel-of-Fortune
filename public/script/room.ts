@@ -37,8 +37,8 @@ export async function joinRoom(roomKey: string): Promise<string[]> {
   return players;
 }
 
-export async function spinRoom(roomKey: string): Promise<RoomSpinResponse> {
-  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey });
+export async function spinRoom(roomKey: string, names: string[]): Promise<RoomSpinResponse> {
+  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names });
 }
 
 export async function closeRoom(roomKey: string): Promise<void> {

@@ -1,4 +1,5 @@
 import type { AwardCoinsResponse, RandomResponse } from "../shared/types.js";
+import type { Direction } from "../shared/types.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { apiUrl } from "../shared/api-base.js";
 
@@ -7,23 +8,27 @@ async function getAccessToken(): Promise<string> {
     data: { session },
   } = await supabaseClient.auth.getSession();
 
-  const token = session?.access_token ?? "";
-  console.log("[SPIN] getAccessToken →", token ? `OK (${token.slice(0, 20)}…)` : "LEER – kein aktiver Login!");
-  return token;
+  return session?.access_token ?? "";
 }
 
-export async function fetchRandomNumber(): Promise<{ ranNum: number; spinToken: string }> {
-  console.log("[SPIN] fetchRandomNumber: Anfrage an /api/random wird gesendet…");
+export async function fetchRandomNumber(
+  names: string[],
+  currentRotation: number,
+  direction: Direction,
+  multiplier: number
+): Promise<{ ranNum: number; spinToken: string }> {
   const accessToken = await getAccessToken();
 
   const response = await fetch(apiUrl("/api/random"), {
-    headers: { Authorization: `Bearer ${accessToken}` },
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ names, currentRotation, direction, multiplier }),
   });
 
-  console.log("[SPIN] /api/random Antwort – Status:", response.status, response.statusText);
-
   if (!response.ok) {
-    console.error("[SPIN] /api/random fehlgeschlagen:", response.status);
     throw new Error("Server response not ok.");
   }
 
@@ -40,21 +45,11 @@ export async function fetchRandomNumber(): Promise<{ ranNum: number; spinToken: 
   return { ranNum: data.ranNum, spinToken: data.spinToken };
 }
 
-export async function awardCoins(spinToken: string, winnerName: string): Promise<AwardCoinsResponse | null> {
-  console.log("[SPIN] awardCoins aufgerufen:", { spinToken: spinToken || "LEER", winnerName });
-
-  if (!spinToken) {
-    console.warn("[SPIN] ⚠️ awardCoins abgebrochen – spinToken ist leer!");
-    return null;
-  }
+export async function awardCoins(spinToken: string): Promise<AwardCoinsResponse | null> {
+  if (!spinToken) return null;
 
   const accessToken = await getAccessToken();
-  if (!accessToken) {
-    console.warn("[SPIN] ⚠️ awardCoins abgebrochen – kein Access Token!");
-    return null;
-  }
-
-  console.log("[SPIN] POST /api/award-coins wird gesendet…", { spinToken, winnerName });
+  if (!accessToken) return null;
 
   const response = await fetch(apiUrl("/api/award-coins"), {
     method: "POST",
@@ -62,18 +57,14 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ spinToken, winnerName }),
+    body: JSON.stringify({ spinToken }),
   });
-
-  console.log("[SPIN] /api/award-coins Antwort – Status:", response.status, response.statusText);
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    console.error("[SPIN] /api/award-coins fehlgeschlagen:", response.status, body);
+    console.error("[award-coins] fehlgeschlagen:", response.status, body);
     throw new Error("Award coins request failed.");
   }
 
-  const result = await response.json() as AwardCoinsResponse;
-  console.log("[SPIN] ✅ Coins vergeben:", result);
-  return result;
+  return response.json() as Promise<AwardCoinsResponse>;
 }

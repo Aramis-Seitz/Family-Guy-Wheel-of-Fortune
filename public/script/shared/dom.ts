@@ -28,6 +28,11 @@ export const emptyHint = requiredElement<HTMLParagraphElement>("emptyHint");
 
 export const multiplierSlider = requiredElement<HTMLInputElement>("multiplierSlider");
 export const multiplierValue = requiredElement<HTMLSpanElement>("multiplierValue");
+
+export const volumeSlider = requiredElement<HTMLInputElement>("volumeSlider");
+export const volumeValue = requiredElement<HTMLSpanElement>("volumeValue");
+export const volumeIcon = requiredElement<HTMLButtonElement>("volumeIcon");
+
 export const spinLeftBtn = requiredElement<HTMLButtonElement>("spin-left-btn");
 export const spinRightBtn = requiredElement<HTMLButtonElement>("spin-right-btn");
 export const resetBtn = requiredElement<HTMLButtonElement>("reset-btn");

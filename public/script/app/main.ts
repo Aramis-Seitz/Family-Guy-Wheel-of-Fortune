@@ -15,6 +15,7 @@ import {
   initMultiplierSlider, initWheelControls, spinWheel,
   setSpinOverride, lockSpinButtons, unlockSpinButtons, getMultiplier,
 } from "../wheel/spin.js";
+import { initVolumeSlider } from "../wheel/volume.js";
 import { initWinnerModal } from "../wheel/winner.js";
 import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
@@ -229,6 +230,7 @@ async function initApp(): Promise<void> {
   initNameList();
   initNameControls();
   initMultiplierSlider();
+  initVolumeSlider();
   initWheelControls();
   initShareFeature();
   initWinnerModal();

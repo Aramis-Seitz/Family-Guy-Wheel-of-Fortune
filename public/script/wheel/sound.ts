@@ -1,11 +1,19 @@
-import { cymbalCrashAudio, drumrollAudio, tickSoundTemplate } from "../shared/dom.js";
+import { cymbalCrashAudio, drumrollAudio } from "../shared/dom.js";
 
 let drumrollStarted = false;
+let tickBuffer: AudioBuffer | null = null;
+
+export async function preloadTickBuffer(url: string): Promise<void> {
+  tickBuffer = await loadBuffer(url);
+}
 
 export function playTickSound(): void {
-  if (!tickSoundTemplate) return;
-  const tickSound = tickSoundTemplate.cloneNode(true) as HTMLAudioElement;
-  tickSound.play();
+  if (!tickBuffer) return;
+  const ctx = getAudioContext();
+  const source = ctx.createBufferSource();
+  source.buffer = tickBuffer;
+  source.connect(ctx.destination);
+  source.start(ctx.currentTime);
 }
 
 // --- Asset Sound via Web Audio API (saubere Fades, kein Clip-Knacken) ---

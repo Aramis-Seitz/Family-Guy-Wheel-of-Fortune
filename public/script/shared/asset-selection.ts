@@ -1,5 +1,6 @@
 import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api.js";
 import { companionImage, tickSoundTemplate } from "./dom.js";
+import { preloadTickBuffer } from "../wheel/sound.js";
 import type { Asset } from "./types.js";
 
 export async function applyActiveAssets(): Promise<void> {
@@ -29,6 +30,7 @@ export function applySelectedAsset(asset: Asset): void {
 
 function applyActiveSound(url: string): void {
     if (tickSoundTemplate) tickSoundTemplate.src = url;
+    void preloadTickBuffer(url);
 }
 
 function applyActiveCompanion(url: string): void {

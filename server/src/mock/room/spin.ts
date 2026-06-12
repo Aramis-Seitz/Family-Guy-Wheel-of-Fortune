@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { randomUUID } from 'crypto';
 import { createServiceClient } from '../supabase';
-import { getSecureRandomNumber } from '../utils/random';
+import { getSecureRandomNumber } from '../../lib/random';
 
 export const router = Router();
 

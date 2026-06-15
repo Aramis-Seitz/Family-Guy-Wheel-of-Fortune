@@ -3,5 +3,5 @@ import { handleGenerateSpin, handleAwardCoins } from "../controllers/spin-contro
 
 export const spinRoutes = Router();
 
-spinRoutes.get("/random", handleGenerateSpin);
+spinRoutes.post("/random", handleGenerateSpin);
 spinRoutes.post("/award-coins", handleAwardCoins);

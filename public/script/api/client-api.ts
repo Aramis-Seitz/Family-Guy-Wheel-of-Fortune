@@ -45,7 +45,7 @@ export async function fetchRandomNumber(
   return { ranNum: data.ranNum, spinToken: data.spinToken };
 }
 
-export async function awardCoins(spinToken: string): Promise<AwardCoinsResponse | null> {
+export async function awardCoins(spinToken: string, winnerName: string): Promise<AwardCoinsResponse | null> {
   if (!spinToken) return null;
 
   const accessToken = await getAccessToken();
@@ -57,7 +57,7 @@ export async function awardCoins(spinToken: string): Promise<AwardCoinsResponse 
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ spinToken }),
+    body: JSON.stringify({ spinToken, winnerName }),
   });
 
   if (!response.ok) {

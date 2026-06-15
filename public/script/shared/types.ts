@@ -26,6 +26,15 @@ export interface SpinConfig {
   spinToken: string;
 }
 
+export type SpinHandler = (direction: Direction) => Promise<void>;
+
+export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
+
+export interface SpinFrameState {
+  distanceTravelled: number;
+  readonly sign: number;
+}
+
 export interface ProfileData {
   username: string;
   coins: number;

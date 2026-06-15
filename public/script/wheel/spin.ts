@@ -1,4 +1,3 @@
-import { DRUMROLL_DELAY_THRESHOLD, SPIN_END_DELAY, SPIN_START_DELAY } from "../shared/constants.js";
 import {
   addBtn,
   getRemoveBtn,
@@ -13,10 +12,21 @@ import {
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client-api.js";
 import { getSegmentCount, getNames } from "../names/name-list.js";
-import { announceWinner, hideWinnerModal } from "./winner.js";
-import type { Direction, SpinConfig } from "../shared/types.js";
-
-type SpinHandler = (direction: Direction) => Promise<void>;
+import { announceWinner } from "./winner.js";
+import {
+  FULL_CIRCLE_DEG,
+  POINTER_OFFSET_DEG,
+  MIN_ITEMS,
+  DRUMROLL_LEAD_IN_STEPS,
+  MAX_SPIN_VELOCITY,
+  MIN_SPIN_VELOCITY,
+  SPIN_FAST_PHASE_RATIO,
+  SPIN_EASE_EXPONENT,
+  SPIN_DISABLED_OPACITY,
+  MIN_SPIN_ROTATIONS,
+  DEFAULT_MULTIPLIER,
+} from "../shared/constants.js";
+import type { Direction, SpinConfig, SpinHandler, SpinElement, SpinFrameState } from "../shared/types.js";
 
 let currentRotation = 0;
 let lastTickRotation = 0;
@@ -28,61 +38,45 @@ export function setSpinOverride(handler: SpinHandler | null): void {
 }
 
 export function lockSpinButtons(): void {
-  disableElements(getSpinRelatedElements());
+  setElementsDisabled(getSpinRelatedElements(), true);
 }
 
 export function unlockSpinButtons(): void {
-  enableElements(getSpinRelatedElements());
+  setElementsDisabled(getSpinRelatedElements(), false);
 }
 
 function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-function getSpinRelatedElements(): (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>)[] {
+function getSpinRelatedElements(): SpinElement[] {
   return [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider];
 }
 
-function disableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>)[]): void {
-  elements.forEach((element) => {
-    if (element instanceof NodeList) {
-      element.forEach((item) => {
-        (item as HTMLButtonElement).disabled = true;
-        item.style.setProperty("opacity", "0.5");
-        item.style.setProperty("cursor", "not-allowed");
-        item.style.setProperty("pointer-events", "none");
-      });
-    } else if (element) {
-      element.disabled = true;
-      element.style.setProperty("opacity", "0.5");
-      element.style.setProperty("cursor", "not-allowed");
-      element.style.setProperty("pointer-events", "none");
-    }
-  });
+function applyDisabledStyle(el: HTMLButtonElement | HTMLInputElement, disabled: boolean): void {
+  el.disabled = disabled;
+  if (disabled) {
+    el.style.setProperty("opacity", SPIN_DISABLED_OPACITY);
+    el.style.setProperty("cursor", "not-allowed");
+    el.style.setProperty("pointer-events", "none");
+  } else {
+    el.style.removeProperty("opacity");
+    el.style.removeProperty("cursor");
+    el.style.removeProperty("pointer-events");
+  }
 }
 
-function enableElements(elements: (HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>)[]): void {
-  elements.forEach((element) => {
-    if (element instanceof NodeList) {
-      element.forEach((item) => {
-        (item as HTMLButtonElement).disabled = false;
-        item.style.removeProperty("opacity");
-        item.style.removeProperty("cursor");
-        item.style.removeProperty("pointer-events");
-      });
-    } else if (element) {
-      element.disabled = false;
-      element.style.removeProperty("opacity");
-      element.style.removeProperty("cursor");
-      element.style.removeProperty("pointer-events");
-    }
-  });
+function setElementsDisabled(
+  elements: SpinElement[],
+  disabled: boolean,
+): void {
+  const flat = elements.flatMap((el) => (el instanceof NodeList ? [...el] : el ? [el] : []));
+  flat.forEach((el) => applyDisabledStyle(el, disabled));
 }
 
 function getSegmentIndex(rotation: number, stepAngle: number): number {
-  const POINTER_OFFSET = 270; // Zeiger zeigt im Westen
-  const offsetRotation = rotation - POINTER_OFFSET;
-  const normalizedRotation = ((offsetRotation % 360) + 360) % 360;
+  const offsetRotation = rotation - POINTER_OFFSET_DEG;
+  const normalizedRotation = ((offsetRotation % FULL_CIRCLE_DEG) + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
   return Math.floor(normalizedRotation / stepAngle);
 }
 
@@ -92,123 +86,63 @@ function hasEnteredNewSegment(stepAngle: number): boolean {
   return previous !== current;
 }
 
-
-
-
-function animateSpin(config: SpinConfig): void {
-  const directionMultiplier =
-    config.direction === "right" ? 1 : -1;
-
-  const FAST_PHASE_RATIO = 0.15;
-
-  let travelled = 0;
-
-  const maxVelocity = 15;
-  const minVelocity = 0.5;
-
-  function frame(): void {
-    if (spinCancelled) {
-      stopDrumRoll();
-      return;
-    }
-
-    const progress = travelled / config.totalSteps;
-
-    let velocity: number;
-
-    if (progress < FAST_PHASE_RATIO) {
-      velocity = maxVelocity;
-    } else {
-      const brakeProgress =
-        (progress - FAST_PHASE_RATIO) /
-        (1 - FAST_PHASE_RATIO);
-
-      const easeOut = Math.pow(1 - brakeProgress, 1.4);
-
-      velocity =
-        minVelocity +
-        (maxVelocity - minVelocity) * easeOut;
-    }
-
-    currentRotation += velocity * directionMultiplier;
-    travelled += velocity;
-
-    updateWheelRotation();
-
-    if (hasEnteredNewSegment(config.stepAngle)) {
-      playTickSound();
-    }
-
-    lastTickRotation = currentRotation;
-
-    if (travelled > config.totalSteps - 321) {
-      playDrumRoll();
-    }
-
-    if (travelled >= config.totalSteps) {
-      stopDrumRoll();
-      playCymbalCrash();
-      const names = getNames();
-      const normalizedFinal = ((270 - currentRotation) % 360 + 360) % 360;
-      const winnerIndex = Math.floor(normalizedFinal / config.stepAngle) % config.segmentCount;
-      const winnerName = names[winnerIndex] ?? names[0];
-      announceWinner(config.spinToken, winnerName);
-      return;
-    }
-
-    requestAnimationFrame(frame);
-  }
-
-  requestAnimationFrame(frame);
+function computeVelocity(progress: number): number {
+  if (progress < SPIN_FAST_PHASE_RATIO) return MAX_SPIN_VELOCITY;
+  const decelRatio = (progress - SPIN_FAST_PHASE_RATIO) / (1 - SPIN_FAST_PHASE_RATIO);
+  return MIN_SPIN_VELOCITY + (MAX_SPIN_VELOCITY - MIN_SPIN_VELOCITY) * Math.pow(1 - decelRatio, SPIN_EASE_EXPONENT);
 }
 
-
-
-function calculateStepDelay(completedSteps: number, totalSteps: number): number {
-  const progress = completedSteps / totalSteps;
-  return SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
+function resolveWinner(rotation: number, config: SpinConfig): string {
+  const names = getNames();
+  const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
+  const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
+  return names[winnerIndex] ?? names[0];
 }
 
-function advanceRotation(direction: Direction): void {
-  currentRotation += direction === "right" ? 1 : -1;
+function finishSpin(config: SpinConfig): void {
+  stopDrumRoll();
+  playCymbalCrash();
+  announceWinner(config.spinToken, resolveWinner(currentRotation, config));
+}
+
+function runSpinFrame(state: SpinFrameState, config: SpinConfig): void {
+  if (spinCancelled) { stopDrumRoll(); return; }
+
+  const velocity = computeVelocity(state.distanceTravelled / config.totalSteps);
+  currentRotation += velocity * state.sign;
+  state.distanceTravelled += velocity;
+
   updateWheelRotation();
-}
-
-function performSpinStep(step: number, config: SpinConfig): void {
-  if (spinCancelled) return;
-  advanceRotation(config.direction);
-  step++;
-
   if (hasEnteredNewSegment(config.stepAngle)) playTickSound();
   lastTickRotation = currentRotation;
-  if (step >= config.totalSteps) {
-    playCymbalCrash();
-    const names = getNames();
-    const normalizedFinal = ((270 - currentRotation) % 360 + 360) % 360;
-    const winnerIndex = Math.floor(normalizedFinal / config.stepAngle) % config.segmentCount;
-    const winner = names[winnerIndex] ?? names[0];
-    announceWinner(config.spinToken, winner);
-    return;
-  }
+  if (state.distanceTravelled > config.totalSteps - DRUMROLL_LEAD_IN_STEPS) playDrumRoll();
 
-  const delay = calculateStepDelay(step, config.totalSteps);
-  if (delay > DRUMROLL_DELAY_THRESHOLD) playDrumRoll();
-  setTimeout(() => performSpinStep(step, config), delay);
+  if (state.distanceTravelled >= config.totalSteps) {
+    finishSpin(config);
+  } else {
+    requestAnimationFrame(() => runSpinFrame(state, config));
+  }
+}
+
+function animateSpin(config: SpinConfig): void {
+  const state: SpinFrameState = {
+    distanceTravelled: 0,
+    sign: config.direction === "right" ? 1 : -1,
+  };
+  requestAnimationFrame(() => runSpinFrame(state, config));
 }
 
 export function spinWheel(totalSteps: number, direction: Direction, spinToken: string): void {
   spinCancelled = false;
   const segmentCount = getSegmentCount();
-  if (segmentCount < 2) return;
+  if (segmentCount < MIN_ITEMS) return;
 
-  // Sicherstellen, dass es mindestens 3 volle Umdrehungen gibt
-  const MIN_FULL_ROTATIONS = 5 * 360;
-  const enforcedTotalSteps = Math.max(Math.floor(totalSteps), MIN_FULL_ROTATIONS);
+  const clampedSteps = Math.max(Math.floor(totalSteps), MIN_SPIN_ROTATIONS);
 
   const config: SpinConfig = {
-    totalSteps: enforcedTotalSteps,
+    totalSteps: clampedSteps,
     direction,
-    stepAngle: 360 / segmentCount,
+    stepAngle: FULL_CIRCLE_DEG / segmentCount,
     segmentCount,
     spinToken,
   };
@@ -217,18 +151,18 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
-  if (getSegmentCount() < 2) return;
+  if (getSegmentCount() < MIN_ITEMS) return;
 
-  disableElements(getSpinRelatedElements());
+  lockSpinButtons();
 
   try {
     const names = getNames();
     const multiplier = getMultiplier();
-    const { ranNum, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
-    spinWheel(Math.floor(ranNum * multiplier), direction, spinToken);
+    const { ranNum: rawSteps, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
+    spinWheel(Math.floor(rawSteps * multiplier), direction, spinToken);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);
-    enableElements(getSpinRelatedElements());
+    unlockSpinButtons();
   }
 }
 
@@ -237,7 +171,7 @@ export function resetWheelRotation(): void {
   currentRotation = 0;
   lastTickRotation = 0;
   updateWheelRotation();
-  enableElements(getSpinRelatedElements());
+  unlockSpinButtons();
   stopDrumRoll();
 }
 
@@ -257,7 +191,7 @@ export function initMultiplierSlider(): void {
 
 export function getMultiplier(): number {
   const value = parseFloat(multiplierSlider.value);
-  return Number.isNaN(value) ? 1 : value;
+  return Number.isNaN(value) ? DEFAULT_MULTIPLIER : value;
 }
 
 export function getCurrentRotation(): number {

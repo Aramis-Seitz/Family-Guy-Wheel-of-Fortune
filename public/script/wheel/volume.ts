@@ -1,6 +1,8 @@
 import { volumeSlider, volumeValue, volumeIcon } from "../shared/dom.js";
+import { masterGain } from "./sound.js";
 
 const VOLUME_STORAGE_KEY = "wheelOfFortune_volume";
+const PREVIOUS_VOLUME_KEY = "wheelOfFortune_previousVolume";
 let previousVolume: number | null = null;
 
 export function updateVolumeDisplay(): void {
@@ -11,9 +13,9 @@ export function updateVolumeDisplay(): void {
 
     if (volume === 0) {
         volumeIcon.textContent = "🔇";
-    } else if (volume < 33) {
+    } else if (volume <= 33) {
         volumeIcon.textContent = "🔈";
-    } else if (volume < 67) {
+    } else if (volume <= 66) {
         volumeIcon.textContent = "🔉";
     } else {
         volumeIcon.textContent = "🔊";
@@ -22,9 +24,15 @@ export function updateVolumeDisplay(): void {
     applyVolumeToAudio(volume / 100);
 }
 
-function saveVolumeToStorage(): void {
+function savePreviousVolume(volume: number): void {
+    previousVolume = volume;
+    localStorage.setItem(PREVIOUS_VOLUME_KEY, volume.toString());
+}
+
+function onSliderChange(): void {
     if (!volumeSlider) return;
     const volume = parseInt(volumeSlider.value);
+    if (volume > 0) savePreviousVolume(volume);
     localStorage.setItem(VOLUME_STORAGE_KEY, volume.toString());
 }
 
@@ -33,6 +41,9 @@ export function applyVolumeToAudio(volumeLevel: number): void {
     audioElements.forEach((audio) => {
         audio.volume = volumeLevel;
     });
+    if (masterGain) {
+        masterGain.gain.value = volumeLevel;
+    }
 }
 
 export function toggleMute(): void {
@@ -41,30 +52,27 @@ export function toggleMute(): void {
     const currentVolume = parseInt(volumeSlider.value);
 
     if (currentVolume === 0) {
-        if (previousVolume !== null) {
-            volumeSlider.value = previousVolume.toString();
-        }
+        volumeSlider.value = (previousVolume ?? 50).toString();
     } else {
-        previousVolume = currentVolume;
+        savePreviousVolume(currentVolume);
         volumeSlider.value = "0";
     }
 
     updateVolumeDisplay();
-    saveVolumeToStorage();
+    localStorage.setItem(VOLUME_STORAGE_KEY, volumeSlider.value);
 }
 
 export function initVolumeSlider(): void {
     if (!volumeSlider || !volumeIcon) return;
 
     const savedVolume = localStorage.getItem(VOLUME_STORAGE_KEY);
-    if (savedVolume) {
-        volumeSlider.value = savedVolume;
-    } else {
-        volumeSlider.value = "50";
-    }
+    volumeSlider.value = savedVolume ?? "50";
+
+    const savedPrevious = localStorage.getItem(PREVIOUS_VOLUME_KEY);
+    if (savedPrevious) previousVolume = parseInt(savedPrevious);
 
     updateVolumeDisplay();
     volumeSlider.addEventListener("input", updateVolumeDisplay);
-    volumeSlider.addEventListener("change", saveVolumeToStorage);
+    volumeSlider.addEventListener("change", onSliderChange);
     volumeIcon.addEventListener("click", toggleMute);
 }

@@ -1,7 +1,19 @@
-import { cymbalCrashAudio, drumrollAudio } from "../shared/dom.js";
+import { cymbalCrashAudio, drumrollAudio, volumeSlider } from "../shared/dom.js";
 
 let drumrollStarted = false;
 let tickBuffer: AudioBuffer | null = null;
+
+export let masterGain: GainNode | null = null;
+
+function getMasterGain(): GainNode {
+  const ctx = getAudioContext();
+  if (!masterGain) {
+    masterGain = ctx.createGain();
+    masterGain.gain.value = getCurrentVolume();
+    masterGain.connect(ctx.destination);
+  }
+  return masterGain;
+}
 
 export async function preloadTickBuffer(url: string): Promise<void> {
   tickBuffer = await loadBuffer(url);
@@ -12,7 +24,7 @@ export function playTickSound(): void {
   const ctx = getAudioContext();
   const source = ctx.createBufferSource();
   source.buffer = tickBuffer;
-  source.connect(ctx.destination);
+  source.connect(getMasterGain());
   source.start(ctx.currentTime);
 }
 
@@ -103,18 +115,22 @@ export async function playAssetSound(assetUrl: string): Promise<void> {
   source.buffer = buffer;
   applyFadeEnvelope(gain, buffer.duration);
   source.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getMasterGain());
 
   currentSource = source;
   currentGain = gain;
   return startAndAwait(source);
 }
 
+function getCurrentVolume(): number {
+  return volumeSlider ? parseInt(volumeSlider.value) / 100 : 1;
+}
+
 // --- Drumroll mit Fade-Out beim Stoppen ---
 export function playDrumRoll(): void {
   if (!drumrollAudio || drumrollStarted) return;
   drumrollStarted = true;
-  drumrollAudio.volume = 1;
+  drumrollAudio.volume = getCurrentVolume();
   drumrollAudio.currentTime = 0;
   drumrollAudio.play();
 }
@@ -123,22 +139,24 @@ export function stopDrumRoll(): void {
   if (!drumrollAudio || !drumrollStarted) return;
   drumrollStarted = false;
   const audio = drumrollAudio;
+  const startVolume = audio.volume;
   const STEPS = 10;
   const INTERVAL = 20;
   let step = 0;
   const fade = setInterval(() => {
     step++;
-    audio.volume = Math.max(0, 1 - step / STEPS);
+    audio.volume = Math.max(0, startVolume * (1 - step / STEPS));
     if (step < STEPS) return;
     clearInterval(fade);
     audio.pause();
     audio.currentTime = 0;
-    audio.volume = 1;
+    audio.volume = getCurrentVolume();
   }, INTERVAL);
 }
 
 export function playCymbalCrash(): void {
   if (!cymbalCrashAudio) return;
+  cymbalCrashAudio.volume = getCurrentVolume();
   cymbalCrashAudio.currentTime = 0;
   cymbalCrashAudio.play();
 }

@@ -2,22 +2,13 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "public/dist",
-  "headers": [
-    {
-      "source": "/assets/(.*)\\.js",
-      "headers": [{ "key": "Content-Type", "value": "application/javascript; charset=utf-8" }]
-    },
-    {
-      "source": "/assets/(.*)\\.css",
-      "headers": [{ "key": "Content-Type", "value": "text/css; charset=utf-8" }]
-    }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/api/(.*)", "dest": "/api/index" },
-    { "src": "/", "dest": "/api/index" },
-    { "src": "/login\\.html", "dest": "/api/index" },
-    { "src": "/main\\.html", "dest": "/api/index" },
-    { "src": "/signup\\.html", "dest": "/api/index" }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" },
+    { "source": "/", "destination": "/html/index.html" },
+    { "source": "/main.html", "destination": "/html/main.html" },
+    { "source": "/login.html", "destination": "/html/login.html" },
+    { "source": "/signup.html", "destination": "/html/signup.html" },
+    { "source": "/privacy.html", "destination": "/html/privacy.html" },
+    { "source": "/imprint.html", "destination": "/html/imprint.html" }
   ]
 }

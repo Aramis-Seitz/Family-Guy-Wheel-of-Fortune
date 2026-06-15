@@ -2,11 +2,22 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "public/dist",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
-    { "source": "/", "destination": "/api/index" },
-    { "source": "/login.html", "destination": "/api/index" },
-    { "source": "/main.html", "destination": "/api/index" },
-    { "source": "/signup.html", "destination": "/api/index" }
+  "headers": [
+    {
+      "source": "/assets/(.*)\\.js",
+      "headers": [{ "key": "Content-Type", "value": "application/javascript; charset=utf-8" }]
+    },
+    {
+      "source": "/assets/(.*)\\.css",
+      "headers": [{ "key": "Content-Type", "value": "text/css; charset=utf-8" }]
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api/index" },
+    { "src": "/", "dest": "/api/index" },
+    { "src": "/login\\.html", "dest": "/api/index" },
+    { "src": "/main\\.html", "dest": "/api/index" },
+    { "src": "/signup\\.html", "dest": "/api/index" }
   ]
 }

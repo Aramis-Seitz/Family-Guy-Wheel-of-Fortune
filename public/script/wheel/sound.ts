@@ -1,7 +1,9 @@
-import { cymbalCrashAudio, drumrollAudio, volumeSlider } from "../shared/dom.js";
+import { volumeSlider } from "../shared/dom.js";
 
 let drumrollStarted = false;
 let tickBuffer: AudioBuffer | null = null;
+let drumrollBuffer: AudioBuffer | null = null;
+let cymbalBuffer: AudioBuffer | null = null;
 
 export let masterGain: GainNode | null = null;
 
@@ -126,37 +128,54 @@ function getCurrentVolume(): number {
   return volumeSlider ? parseInt(volumeSlider.value) / 100 : 1;
 }
 
-// --- Drumroll mit Fade-Out beim Stoppen ---
+export async function preloadStaticSounds(): Promise<void> {
+  [drumrollBuffer, cymbalBuffer] = await Promise.all([
+    loadBuffer("/assets/sounds/drumroll.mp3"),
+    loadBuffer("/assets/sounds/cymbal-crash.wav"),
+  ]);
+}
+
+// --- Drumroll via Web Audio API (loop + sauberer Fade-Out) ---
+const DRUMROLL_FADE = 0.2;
+let drumrollSource: AudioBufferSourceNode | null = null;
+let drumrollGain: GainNode | null = null;
+
 export function playDrumRoll(): void {
-  if (!drumrollAudio || drumrollStarted) return;
+  if (!drumrollBuffer || drumrollStarted) return;
   drumrollStarted = true;
-  drumrollAudio.volume = getCurrentVolume();
-  drumrollAudio.currentTime = 0;
-  drumrollAudio.play();
+  const ctx = getAudioContext();
+  const source = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  source.buffer = drumrollBuffer;
+  source.loop = true;
+  gain.gain.setValueAtTime(1, ctx.currentTime);
+  source.connect(gain);
+  gain.connect(getMasterGain());
+  source.start();
+  drumrollSource = source;
+  drumrollGain = gain;
 }
 
 export function stopDrumRoll(): void {
-  if (!drumrollAudio || !drumrollStarted) return;
+  if (!drumrollSource || !drumrollGain || !drumrollStarted) return;
   drumrollStarted = false;
-  const audio = drumrollAudio;
-  const startVolume = audio.volume;
-  const STEPS = 10;
-  const INTERVAL = 20;
-  let step = 0;
-  const fade = setInterval(() => {
-    step++;
-    audio.volume = Math.max(0, startVolume * (1 - step / STEPS));
-    if (step < STEPS) return;
-    clearInterval(fade);
-    audio.pause();
-    audio.currentTime = 0;
-    audio.volume = getCurrentVolume();
-  }, INTERVAL);
+  const source = drumrollSource;
+  const gain = drumrollGain;
+  drumrollSource = null;
+  drumrollGain = null;
+  const ctx = getAudioContext();
+  gain.gain.cancelScheduledValues(ctx.currentTime);
+  gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + DRUMROLL_FADE);
+  setTimeout(() => stopSourceSafely(source), DRUMROLL_FADE * 1000);
 }
 
+// --- Cymbal Crash via Web Audio API ---
 export function playCymbalCrash(): void {
-  if (!cymbalCrashAudio) return;
-  cymbalCrashAudio.volume = getCurrentVolume();
-  cymbalCrashAudio.currentTime = 0;
-  cymbalCrashAudio.play();
+  if (!cymbalBuffer) return;
+  const ctx = getAudioContext();
+  const source = ctx.createBufferSource();
+  source.buffer = cymbalBuffer;
+  source.connect(getMasterGain());
+  source.start();
 }

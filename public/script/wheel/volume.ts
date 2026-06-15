@@ -37,13 +37,7 @@ function onSliderChange(): void {
 }
 
 export function applyVolumeToAudio(volumeLevel: number): void {
-    const audioElements = document.querySelectorAll("audio");
-    audioElements.forEach((audio) => {
-        audio.volume = volumeLevel;
-    });
-    if (masterGain) {
-        masterGain.gain.value = volumeLevel;
-    }
+    if (masterGain) masterGain.gain.value = volumeLevel;
 }
 
 export function toggleMute(): void {

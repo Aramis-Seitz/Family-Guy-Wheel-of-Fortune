@@ -13,10 +13,7 @@ function optionalElement<T extends HTMLElement | SVGElement>(id: string): T | nu
 }
 
 export const wheelElement = requiredElement<SVGGElement>("wheel");
-export const tickSoundTemplate = optionalElement<HTMLAudioElement>("tickSound");
 export const companionImage = optionalElement<HTMLImageElement>("companion-image");
-export const drumrollAudio = optionalElement<HTMLAudioElement>("drumroll");
-export const cymbalCrashAudio = optionalElement<HTMLAudioElement>("cymbal-crash");
 
 export const input = requiredElement<HTMLInputElement>("nameInput");
 export const addBtn = requiredElement<HTMLButtonElement>("addBtn");

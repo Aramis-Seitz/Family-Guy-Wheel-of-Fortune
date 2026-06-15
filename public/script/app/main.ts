@@ -16,6 +16,7 @@ import {
   setSpinOverride, lockSpinButtons, unlockSpinButtons, getMultiplier,
 } from "../wheel/spin.js";
 import { initVolumeSlider } from "../wheel/volume.js";
+import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal } from "../wheel/winner.js";
 import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
@@ -231,6 +232,7 @@ async function initApp(): Promise<void> {
   initNameControls();
   initMultiplierSlider();
   initVolumeSlider();
+  void preloadStaticSounds();
   initWheelControls();
   initShareFeature();
   initWinnerModal();

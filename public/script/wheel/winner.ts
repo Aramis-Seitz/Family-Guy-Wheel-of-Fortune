@@ -79,7 +79,7 @@ export function announceWinner(spinToken: string, winnerName: string): void {
   displayWinnerModal(winnerName);
   startConfetti();
 
-  awardCoins(spinToken)
+  awardCoins(spinToken, winnerName)
     .then((result) => {
       if (result) {
         return refreshCoinDisplay();

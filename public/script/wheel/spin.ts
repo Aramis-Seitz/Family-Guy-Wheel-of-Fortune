@@ -92,6 +92,78 @@ function hasEnteredNewSegment(stepAngle: number): boolean {
   return previous !== current;
 }
 
+
+
+
+function animateSpin(config: SpinConfig): void {
+  const directionMultiplier =
+    config.direction === "right" ? 1 : -1;
+
+  const FAST_PHASE_RATIO = 0.15;
+
+  let travelled = 0;
+
+  const maxVelocity = 15;
+  const minVelocity = 0.5;
+
+  function frame(): void {
+    if (spinCancelled) {
+      stopDrumRoll();
+      return;
+    }
+
+    const progress = travelled / config.totalSteps;
+
+    let velocity: number;
+
+    if (progress < FAST_PHASE_RATIO) {
+      velocity = maxVelocity;
+    } else {
+      const brakeProgress =
+        (progress - FAST_PHASE_RATIO) /
+        (1 - FAST_PHASE_RATIO);
+
+      const easeOut = Math.pow(1 - brakeProgress, 1.4);
+
+      velocity =
+        minVelocity +
+        (maxVelocity - minVelocity) * easeOut;
+    }
+
+    currentRotation += velocity * directionMultiplier;
+    travelled += velocity;
+
+    updateWheelRotation();
+
+    if (hasEnteredNewSegment(config.stepAngle)) {
+      playTickSound();
+    }
+
+    lastTickRotation = currentRotation;
+
+    if (travelled > config.totalSteps - 321) {
+      playDrumRoll();
+    }
+
+    if (travelled >= config.totalSteps) {
+      stopDrumRoll();
+      playCymbalCrash();
+      const names = getNames();
+      const normalizedFinal = ((270 - currentRotation) % 360 + 360) % 360;
+      const winnerIndex = Math.floor(normalizedFinal / config.stepAngle) % config.segmentCount;
+      const winnerName = names[winnerIndex] ?? names[0];
+      announceWinner(config.spinToken, winnerName);
+      return;
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+}
+
+
+
 function calculateStepDelay(completedSteps: number, totalSteps: number): number {
   const progress = completedSteps / totalSteps;
   return SPIN_START_DELAY + (SPIN_END_DELAY - SPIN_START_DELAY) * (progress ** 4);
@@ -129,15 +201,19 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
   const segmentCount = getSegmentCount();
   if (segmentCount < 2) return;
 
+  // Sicherstellen, dass es mindestens 3 volle Umdrehungen gibt
+  const MIN_FULL_ROTATIONS = 5 * 360;
+  const enforcedTotalSteps = Math.max(Math.floor(totalSteps), MIN_FULL_ROTATIONS);
+
   const config: SpinConfig = {
-    totalSteps,
+    totalSteps: enforcedTotalSteps,
     direction,
     stepAngle: 360 / segmentCount,
     segmentCount,
     spinToken,
   };
 
-  performSpinStep(0, config);
+  animateSpin(config);
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {

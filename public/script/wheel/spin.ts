@@ -151,7 +151,7 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
   try {
     const multiplier = getMultiplier();
     const { ranNum: rawSteps, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
-    spinWheel(Math.floor(rawSteps * multiplier), direction, spinToken, names);
+    spinWheel(Math.round(MIN_SPIN_ROTATIONS * multiplier) + rawSteps, direction, spinToken, names);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);
     unlockSpinButtons();

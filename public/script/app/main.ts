@@ -22,6 +22,7 @@ import { initWinnerModal } from "../wheel/winner.js";
 import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
+import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
 import { initShop } from "../shop/shop.js";
 
 let activeRoomKey: string | null = null;
@@ -126,7 +127,7 @@ function handleRoomSpinEvent(lastSpin: number): void {
   if (isHost) return; // host already spun directly from POST response
   lockSpinButtons();
   const names = getNames();
-  const totalSteps = Math.round(lastSpin * getMultiplier());
+  const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + lastSpin;
   spinWheel(totalSteps, 'right', '', names);
 }
 
@@ -137,7 +138,7 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   try {
     const names = getNames();
     const { ranNum, spinToken } = await spinRoom(activeRoomKey, names);
-    const totalSteps = Math.round(ranNum * getMultiplier());
+    const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
     spinWheel(totalSteps, direction, spinToken, names);
   } catch (error) {
     console.error('[ROOM] Spin fehlgeschlagen:', error);

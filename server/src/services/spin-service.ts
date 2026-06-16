@@ -9,8 +9,8 @@ import {
 } from "../repositories/profile-repository";
 import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
 
-const MIN_ROTATION_DEGREE = 140;
-const MAX_ROTATION_DEGREE = 900;
+const MIN_ROTATION_DEGREE = 0;
+const MAX_ROTATION_DEGREE = 359;
 
 export type AwardCoinsResult = {
     spinnerCoins: number;

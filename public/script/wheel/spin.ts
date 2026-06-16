@@ -3,7 +3,6 @@ import {
   getRemoveBtn,
   input,
   multiplierSlider,
-  multiplierValue,
   resetBtn,
   spinLeftBtn,
   spinRightBtn,
@@ -11,8 +10,9 @@ import {
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client-api.js";
-import { getSegmentCount, getNames } from "../names/name-list.js";
-import { announceWinner } from "./winner.js";
+import { getNames } from "../names/name-list.js";
+import { announceWinner, resolveWinner } from "./winner.js";
+import { getMultiplier } from "./multiplier.js";
 import {
   FULL_CIRCLE_DEG,
   POINTER_OFFSET_DEG,
@@ -24,7 +24,6 @@ import {
   SPIN_EASE_EXPONENT,
   SPIN_DISABLED_OPACITY,
   MIN_SPIN_ROTATIONS,
-  DEFAULT_MULTIPLIER,
 } from "../shared/constants.js";
 import type { Direction, SpinConfig, SpinHandler, SpinElement, SpinFrameState } from "../shared/types.js";
 
@@ -92,13 +91,6 @@ function computeVelocity(progress: number): number {
   return MIN_SPIN_VELOCITY + (MAX_SPIN_VELOCITY - MIN_SPIN_VELOCITY) * Math.pow(1 - decelRatio, SPIN_EASE_EXPONENT);
 }
 
-function resolveWinner(rotation: number, config: SpinConfig): string {
-  const names = getNames();
-  const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
-  const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
-  return names[winnerIndex] ?? names[0];
-}
-
 function finishSpin(config: SpinConfig): void {
   stopDrumRoll();
   playCymbalCrash();
@@ -132,34 +124,34 @@ function animateSpin(config: SpinConfig): void {
   requestAnimationFrame(() => runSpinFrame(state, config));
 }
 
-export function spinWheel(totalSteps: number, direction: Direction, spinToken: string): void {
+export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[]): void {
   spinCancelled = false;
-  const segmentCount = getSegmentCount();
-  if (segmentCount < MIN_ITEMS) return;
+  if (names.length < MIN_ITEMS) return;
 
   const clampedSteps = Math.max(Math.floor(totalSteps), MIN_SPIN_ROTATIONS);
 
   const config: SpinConfig = {
     totalSteps: clampedSteps,
     direction,
-    stepAngle: FULL_CIRCLE_DEG / segmentCount,
-    segmentCount,
+    stepAngle: FULL_CIRCLE_DEG / names.length,
+    segmentCount: names.length,
     spinToken,
+    names,
   };
 
   animateSpin(config);
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
-  if (getSegmentCount() < MIN_ITEMS) return;
+  const names = getNames();
+  if (names.length < MIN_ITEMS) return;
 
   lockSpinButtons();
 
   try {
-    const names = getNames();
     const multiplier = getMultiplier();
     const { ranNum: rawSteps, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
-    spinWheel(Math.floor(rawSteps * multiplier), direction, spinToken);
+    spinWheel(Math.floor(rawSteps * multiplier), direction, spinToken, names);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);
     unlockSpinButtons();
@@ -173,25 +165,6 @@ export function resetWheelRotation(): void {
   updateWheelRotation();
   unlockSpinButtons();
   stopDrumRoll();
-}
-
-export function setMultiplierSlider(multiplier: number): void {
-  multiplierSlider.value = `${multiplier}`;
-}
-
-export function updateMultiplierDisplay(): void {
-  if (!multiplierSlider || !multiplierValue) return;
-  multiplierValue.textContent = multiplierSlider.value;
-}
-
-export function initMultiplierSlider(): void {
-  multiplierSlider?.addEventListener("input", updateMultiplierDisplay);
-  updateMultiplierDisplay();
-}
-
-export function getMultiplier(): number {
-  const value = parseFloat(multiplierSlider.value);
-  return Number.isNaN(value) ? DEFAULT_MULTIPLIER : value;
 }
 
 export function getCurrentRotation(): number {

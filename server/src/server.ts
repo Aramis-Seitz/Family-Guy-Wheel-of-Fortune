@@ -30,29 +30,36 @@ const corsOptions = {
   credentials: true,
 };
 
-function requireBasicAuthCookie(req: Request, res: Response, next: NextFunction): void {
-  const expected = process.env.AUTH_SECRET;
-  if (!expected) {
+function requireBasicAuth(req: Request, res: Response, next: NextFunction): void {
+  const validUser = process.env.AUTH_USER;
+  const validPwd = process.env.AUTH_PWD;
+
+  if (!validUser || !validPwd) {
     next();
     return;
   }
 
-  const cookieHeader = req.headers.cookie ?? '';
-  const match = cookieHeader.match(/(?:^|;\s*)basic_auth=([^;]+)/);
-  const cookieValue = match?.[1];
+  const header = req.headers.authorization ?? '';
+  const b64 = header.replace(/^Basic\s+/i, '');
 
-  if (cookieValue !== expected) {
-    res.redirect(302, '/');
-    return;
+  if (b64) {
+    const decoded = Buffer.from(b64, 'base64').toString('utf-8');
+    const colonIndex = decoded.indexOf(':');
+    const inputUser = decoded.slice(0, colonIndex);
+    const inputPwd = decoded.slice(colonIndex + 1);
+    if (inputUser === validUser && inputPwd === validPwd) {
+      return next();
+    }
   }
 
-  next();
+  res.setHeader('WWW-Authenticate', 'Basic realm="Wheeel"');
+  res.status(401).send('Unauthorized');
 }
 
 app.use(express.json());
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
-app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthCookie);
+app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuth);
 app.use(express.static(path.resolve(__dirname, "../../public/dist/html")));
 app.use(express.static(path.resolve(__dirname, "../../public/dist")));
 app.use('/api', apiRoutes);
@@ -61,39 +68,6 @@ if (USE_MOCK) {
   app.use('/api/mock', mockRouter);
 }
 
-app.post('/api/basic-auth', (req, res) => {
-  const { username, password } = req.body ?? {};
-  const validUser = process.env.AUTH_USER;
-  const validPwd = process.env.AUTH_PWD;
-  const authSecret = process.env.AUTH_SECRET;
-
-  if (!username || !password) {
-    res.status(400).json({ success: false, message: 'Benutzername und Passwort erforderlich.' });
-    return;
-  }
-
-  if (!validUser || !validPwd || !authSecret) {
-    res.status(500).json({ success: false, message: 'Auth-Konfiguration fehlt.' });
-    return;
-  }
-
-  if (username !== validUser || password !== validPwd) {
-    res.status(401).json({ success: false, message: 'Ungültige Zugangsdaten.' });
-    return;
-  }
-
-  res.setHeader(
-    'Set-Cookie',
-    `basic_auth=${authSecret}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800`
-  );
-
-  res.status(200).json({ success: true });
-});
-
-app.post('/api/logout', (_req, res) => {
-  res.setHeader('Set-Cookie', 'basic_auth=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
-  res.status(200).json({ success: true });
-});
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {

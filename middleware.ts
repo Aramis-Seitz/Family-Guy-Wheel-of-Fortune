@@ -1,22 +1,33 @@
 export const config = {
     matcher: ['/login.html', '/main.html', '/signup.html'],
 };
+
 declare const process: {
     env: {
-        AUTH_SECRET: string;
+        AUTH_USER: string;
+        AUTH_PWD: string;
     };
 };
+
 export default function middleware(request: Request) {
-    const url = new URL(request.url);
-    const cookieHeader = request.headers.get('cookie') ?? '';
-    const expected = process.env.AUTH_SECRET;
+    const validUser = process.env.AUTH_USER;
+    const validPwd = process.env.AUTH_PWD;
 
-    const match = cookieHeader.match(/(?:^|;\s*)basic_auth=([^;]+)/);
-    const cookieValue = match?.[1];
+    if (!validUser || !validPwd) return;
 
-    if (cookieValue !== expected) {
-        return Response.redirect(new URL('/', url), 302);
+    const header = request.headers.get('authorization') ?? '';
+    const b64 = header.replace(/^Basic\s+/i, '');
+
+    if (b64) {
+        const decoded = atob(b64);
+        const colonIndex = decoded.indexOf(':');
+        const inputUser = decoded.slice(0, colonIndex);
+        const inputPwd = decoded.slice(colonIndex + 1);
+        if (inputUser === validUser && inputPwd === validPwd) return;
     }
 
-    return;
+    return new Response('Unauthorized', {
+        status: 401,
+        headers: { 'WWW-Authenticate': 'Basic realm="Wheeel"' },
+    });
 }

@@ -5,6 +5,14 @@ import { resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
 import { showToast } from "../shared/toast.js";
 import { winnerModal, closeWinnerModalBtn, removeWinnerBtn, winnerText, confettiCanvas } from "../shared/dom.js";
+import { POINTER_OFFSET_DEG, FULL_CIRCLE_DEG } from "../shared/constants.js";
+import type { SpinConfig } from "../shared/types.js";
+
+export function resolveWinner(rotation: number, config: SpinConfig): string {
+  const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
+  const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
+  return config.names[winnerIndex] ?? config.names[0];
+}
 
 export function displayWinnerModal(winnerName: string): void {
   if (!winnerModal || !winnerText) return;

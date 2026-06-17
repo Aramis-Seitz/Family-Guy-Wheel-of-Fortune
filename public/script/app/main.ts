@@ -12,15 +12,17 @@ import { nameState } from "../names/name-state.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import {
-  initMultiplierSlider, initWheelControls, spinWheel,
-  setSpinOverride, lockSpinButtons, unlockSpinButtons, getMultiplier,
+  initWheelControls, spinWheel,
+  setSpinOverride, lockSpinButtons, unlockSpinButtons,
 } from "../wheel/spin.js";
+import { initMultiplierSlider, getMultiplier } from "../wheel/multiplier.js";
 import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal } from "../wheel/winner.js";
 import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
+import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
 import { initShop } from "../shop/shop.js";
 
 let activeRoomKey: string | null = null;
@@ -124,8 +126,9 @@ function clearRoom(): void {
 function handleRoomSpinEvent(lastSpin: number): void {
   if (isHost) return; // host already spun directly from POST response
   lockSpinButtons();
-  const totalSteps = Math.round(lastSpin * getMultiplier());
-  spinWheel(totalSteps, 'right', '');
+  const names = getNames();
+  const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + lastSpin;
+  spinWheel(totalSteps, 'right', '', names);
 }
 
 // Host only: POST → spin directly (token guaranteed, no race condition)
@@ -135,8 +138,8 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   try {
     const names = getNames();
     const { ranNum, spinToken } = await spinRoom(activeRoomKey, names);
-    const totalSteps = Math.round(ranNum * getMultiplier());
-    spinWheel(totalSteps, direction, spinToken);
+    const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
+    spinWheel(totalSteps, direction, spinToken, names);
   } catch (error) {
     console.error('[ROOM] Spin fehlgeschlagen:', error);
     unlockSpinButtons();

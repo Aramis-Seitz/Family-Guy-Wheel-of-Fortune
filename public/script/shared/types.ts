@@ -24,6 +24,7 @@ export interface SpinConfig {
   stepAngle: number;
   segmentCount: number;
   spinToken: string;
+  names: string[];
 }
 
 export type SpinHandler = (direction: Direction) => Promise<void>;

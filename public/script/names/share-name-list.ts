@@ -1,5 +1,5 @@
 import { shareBtn } from "../shared/dom.js";
-import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/spin.js";
+import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier.js";
 import { getNames, replaceNames } from "./name-list.js";
 import { showToast } from "../shared/toast.js";
 

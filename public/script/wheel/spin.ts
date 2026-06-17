@@ -25,12 +25,18 @@ import {
   SPIN_DISABLED_OPACITY,
   MIN_SPIN_ROTATIONS,
 } from "../shared/constants.js";
+import { profileName } from "../shared/dom.js";
 import type { Direction, SpinConfig, SpinHandler, SpinElement, SpinFrameState } from "../shared/types.js";
 
 let currentRotation = 0;
 let lastTickRotation = 0;
 let spinCancelled = false;
 let activeSpinOverride: SpinHandler | null = null;
+let spinning = false;
+
+export function isSpinning(): boolean {
+  return spinning;
+}
 
 export function setSpinOverride(handler: SpinHandler | null): void {
   activeSpinOverride = handler;
@@ -38,10 +44,12 @@ export function setSpinOverride(handler: SpinHandler | null): void {
 
 export function lockSpinButtons(): void {
   setElementsDisabled(getSpinRelatedElements(), true);
+  profileName?.classList.remove("is-clickable");
 }
 
 export function unlockSpinButtons(): void {
   setElementsDisabled(getSpinRelatedElements(), false);
+  profileName?.classList.add("is-clickable");
 }
 
 function updateWheelRotation(): void {
@@ -92,6 +100,7 @@ function computeVelocity(progress: number): number {
 }
 
 function finishSpin(config: SpinConfig): void {
+  spinning = false;
   stopDrumRoll();
   playCymbalCrash();
   announceWinner(config.spinToken, resolveWinner(currentRotation, config));
@@ -126,6 +135,7 @@ function animateSpin(config: SpinConfig): void {
 
 export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[]): void {
   spinCancelled = false;
+  spinning = true;
   if (names.length < MIN_ITEMS) return;
 
   const clampedSteps = Math.max(Math.floor(totalSteps), MIN_SPIN_ROTATIONS);
@@ -160,6 +170,7 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
 
 export function resetWheelRotation(): void {
   spinCancelled = true;
+  spinning = false;
   currentRotation = 0;
   lastTickRotation = 0;
   updateWheelRotation();

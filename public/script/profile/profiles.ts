@@ -53,7 +53,7 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
-    window.location.href = "/login";
+    window.location.href = "/login.html";
   });
 }
 

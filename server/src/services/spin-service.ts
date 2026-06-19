@@ -20,8 +20,7 @@ export type AwardCoinsResult = {
 
 export async function generateSpin(userId: string): Promise<{ ranNum: number; spinToken: string }> {
     const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
-    const token = randomUUID();
-    const spinToken = await insertSpinToken(token, userId);
+    const spinToken = await insertSpinToken(randomUUID(), userId);
     return { ranNum, spinToken };
 }
 

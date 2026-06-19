@@ -19,7 +19,7 @@ export async function fetchRandomNumber(
 ): Promise<{ ranNum: number; spinToken: string }> {
   const accessToken = await getAccessToken();
 
-  const response = await fetch(apiUrl("/api/random"), {
+  const response = await fetch(apiUrl("/api/spin/random"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export async function fetchRandomNumber(
   }
 
   const data: RandomResponse = await response.json();
-  console.log("[SPIN] /api/random Daten:", {
+  console.log("[SPIN] /api/spin/random Daten:", {
     ranNum: data.ranNum,
     spinToken: data.spinToken || "LEER ← Backend-Env-Variablen fehlen wahrscheinlich!",
   });
@@ -51,7 +51,7 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
   const accessToken = await getAccessToken();
   if (!accessToken) return null;
 
-  const response = await fetch(apiUrl("/api/award-coins"), {
+  const response = await fetch(apiUrl("/api/spin/award-coins"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

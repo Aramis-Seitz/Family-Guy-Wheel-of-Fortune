@@ -6,6 +6,7 @@ import {
     updateRoomPlayers,
     clearRoomPlayers,
     updateRoomSpin,
+    updateRoomMultiplier,
     insertSpinToken,
 } from "../repositories/room-repository";
 import { AppError } from "../lib/errors";
@@ -24,7 +25,7 @@ export async function createRoom(userId: string): Promise<{ roomKey: string; pla
     return { roomKey, players: [hostUsername] };
 }
 
-export async function joinRoom(userId: string, roomKey: string): Promise<string[]> {
+export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number }> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
@@ -35,7 +36,9 @@ export async function joinRoom(userId: string, roomKey: string): Promise<string[
         ? currentPlayers
         : [...currentPlayers, username];
 
-    return updateRoomPlayers(roomKey, updatedPlayers);
+    const players = await updateRoomPlayers(roomKey, updatedPlayers);
+    const multiplier = room.multiplier ?? 1;
+    return { players, multiplier };
 }
 
 export async function closeRoom(userId: string, roomKey: string): Promise<void> {
@@ -57,4 +60,12 @@ export async function spinRoom(userId: string, roomKey: string): Promise<{ ranNu
     const token = randomUUID();
     const spinToken = await insertSpinToken(token, userId);
     return { ranNum, spinToken };
+}
+
+export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    if (!room) throw new AppError("Room not found", 404);
+    if (room.host_id !== userId) throw new AppError("Only the host may change the multiplier", 403);
+    const clamped = Math.min(2, Math.max(1, multiplier));
+    await updateRoomMultiplier(roomKey, clamped);
 }

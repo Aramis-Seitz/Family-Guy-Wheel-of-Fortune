@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -15,11 +15,11 @@ import {
   initWheelControls, spinWheel,
   setSpinOverride, lockSpinButtons, unlockSpinButtons,
 } from "../wheel/spin.js";
-import { initMultiplierSlider, getMultiplier } from "../wheel/multiplier.js";
+import { initMultiplierSlider, getMultiplier, setMultiplierSlider, updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider } from "../wheel/multiplier.js";
 import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal } from "../wheel/winner.js";
-import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
+import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
 import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
@@ -30,6 +30,7 @@ let isHost = false;
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
 let nameStateUnsubscribe: (() => void) | null = null;
+let multiplierSyncListener: (() => void) | null = null;
 
 
 function initNameControls(): void {
@@ -118,16 +119,21 @@ function clearRoom(): void {
   if (roomInfo) roomInfo.classList.add('hidden');
   spinLeftBtn.classList.remove('room-guest', 'room-solo');
   spinRightBtn.classList.remove('room-guest', 'room-solo');
+  if (multiplierSyncListener) {
+    multiplierSlider?.removeEventListener('input', multiplierSyncListener);
+    multiplierSyncListener = null;
+  }
+  enableMultiplierSlider();
   renderPlayersSidebar([]);
   replaceNames(savedNames);
 }
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
-function handleRoomSpinEvent(lastSpin: number): void {
+function handleRoomSpinEvent(lastSpin: number, multiplier: number): void {
   if (isHost) return; // host already spun directly from POST response
   lockSpinButtons();
   const names = getNames();
-  const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + lastSpin;
+  const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + lastSpin;
   spinWheel(totalSteps, 'right', '', names);
 }
 
@@ -163,6 +169,11 @@ function initRoomControls(): void {
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
         subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
+        multiplierSyncListener = () => {
+          if (!activeRoomKey) return;
+          void setMultiplier(activeRoomKey, getMultiplier());
+        };
+        multiplierSlider?.addEventListener('input', multiplierSyncListener);
         showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Erstellen fehlgeschlagen:', error);
@@ -177,11 +188,17 @@ function initRoomControls(): void {
       if (!roomKey) return;
       try {
         savedNames = getNames();
-        const players = await joinRoom(roomKey);
+        const { players, multiplier } = await joinRoom(roomKey);
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
+        setMultiplierSlider(multiplier);
+        updateMultiplierDisplay();
+        disableMultiplierSlider();
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, (m) => {
+          setMultiplierSlider(m);
+          updateMultiplierDisplay();
+        });
         showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Beitreten fehlgeschlagen:', error);

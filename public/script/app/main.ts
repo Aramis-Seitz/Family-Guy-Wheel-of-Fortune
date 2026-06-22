@@ -242,13 +242,13 @@ async function initApp(): Promise<void> {
   void preloadStaticSounds();
   initWheelControls();
   initShareFeature();
-  initWinnerModal();
   await initProfileUI();
   await ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();
-  initRoomControls();
   initShop();
+  initRoomControls();
+  initWinnerModal();
 }
 
 void initApp();

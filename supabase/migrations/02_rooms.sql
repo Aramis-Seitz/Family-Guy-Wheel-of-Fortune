@@ -17,19 +17,22 @@ create table if not exists public.rooms (
 
 alter table public.rooms enable row level security;
 
-create or replace policy "Users can read rooms"
+drop policy if exists "Users can read rooms" on public.rooms;
+create policy "Users can read rooms"
 on public.rooms
 for select
 to authenticated
 using (true);
 
-create or replace policy "Host can update own room"
+drop policy if exists "Host can update own room" on public.rooms;
+create policy "Host can update own room"
 on public.rooms
 for update
 to authenticated
 using (auth.uid() = host_id);
 
-create or replace policy "Users can create rooms"
+drop policy if exists "Users can create rooms" on public.rooms;
+create policy "Users can create rooms"
 on public.rooms
 for insert
 to authenticated

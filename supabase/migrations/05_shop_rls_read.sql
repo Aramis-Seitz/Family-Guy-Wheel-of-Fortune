@@ -9,19 +9,22 @@ alter table public.asset enable row level security;
 alter table public.asset_ownership enable row level security;
 alter table public.asset_selection enable row level security;
 
-create or replace policy "Users can read assets"
+drop policy if exists "Users can read assets" on public.asset;
+create policy "Users can read assets"
 on public.asset
 for select
 to authenticated
 using (true);
 
-create or replace policy "Users can read own asset ownership"
+drop policy if exists "Users can read own asset ownership" on public.asset_ownership;
+create policy "Users can read own asset ownership"
 on public.asset_ownership
 for select
 to authenticated
 using (auth.uid() = user_id);
 
-create or replace policy "Users can read own asset selection"
+drop policy if exists "Users can read own asset selection" on public.asset_selection;
+create policy "Users can read own asset selection"
 on public.asset_selection
 for select
 to authenticated

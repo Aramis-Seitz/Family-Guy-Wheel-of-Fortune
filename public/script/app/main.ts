@@ -225,6 +225,10 @@ function initRoomControls(): void {
   });
 }
 
+export function isMultiplayerActive(): boolean {
+  return (activeRoomKey !== null);
+}
+
 async function initApp(): Promise<void> {
   if (!(await hasActiveSession())) {
     window.location.href = "/login.html";

@@ -1,3 +1,4 @@
+import { isMultiplayerActive } from "../app/main.js";
 import { awardCoins } from "../api/client-api.js";
 import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";
@@ -131,5 +132,9 @@ export function initWinnerModal(): void {
     resetWheelRotation();
   });
 
-  removeWinnerBtn.addEventListener("click", removeWinner);
+  if (isMultiplayerActive()) {
+    removeWinnerBtn.classList.add("hidden");
+  } else {
+    removeWinnerBtn.addEventListener("click", removeWinner);  
+  }
 }

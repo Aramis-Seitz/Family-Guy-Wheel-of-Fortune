@@ -15,6 +15,14 @@ export function initMultiplierSlider(): void {
   updateMultiplierDisplay();
 }
 
+export function disableMultiplierSlider(): void {
+  if (multiplierSlider) multiplierSlider.disabled = true;
+}
+
+export function enableMultiplierSlider(): void {
+  if (multiplierSlider) multiplierSlider.disabled = false;
+}
+
 export function getMultiplier(): number {
   const value = parseFloat(multiplierSlider.value);
   return Number.isNaN(value) ? DEFAULT_MULTIPLIER : value;

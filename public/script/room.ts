@@ -4,6 +4,7 @@ import type { RoomSpinResponse, RoomRow } from './shared/types.js';
 
 let activeChannel: RealtimeChannel | null = null;
 let lastKnownPlayersJson = '';
+let lastKnownMultiplier: number | null = null;
 
 async function getAccessToken(): Promise<string> {
   const { data: { session } } = await supabaseClient.auth.getSession();
@@ -32,9 +33,12 @@ export async function createRoom(): Promise<{ roomKey: string; players: string[]
   return postJson<{ roomKey: string; players: string[] }>('/api/room/create');
 }
 
-export async function joinRoom(roomKey: string): Promise<string[]> {
-  const { players } = await postJson<{ players: string[] }>('/api/room/join', { roomKey });
-  return players;
+export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number }> {
+  return postJson<{ players: string[]; multiplier: number }>('/api/room/join', { roomKey });
+}
+
+export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
+  await postJson('/api/room/multiplier', { roomKey, multiplier });
 }
 
 export async function spinRoom(roomKey: string, names: string[]): Promise<RoomSpinResponse> {
@@ -47,11 +51,13 @@ export async function closeRoom(roomKey: string): Promise<void> {
 
 export function subscribeToRoom(
   roomKey: string,
-  onSpin: (lastSpin: number) => void,
+  onSpin: (lastSpin: number, multiplier: number) => void,
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
+  onMultiplierUpdate?: (multiplier: number) => void,
 ): void {
   lastKnownPlayersJson = '';
+  lastKnownMultiplier = null;
 
   activeChannel = supabaseClient
     .channel(`room:${roomKey}`)
@@ -81,11 +87,18 @@ export function subscribeToRoom(
           }
         }
 
+        // Notify when the host changes the multiplier
+        const newMultiplier = row.multiplier ?? 1;
+        if (newMultiplier !== lastKnownMultiplier) {
+          lastKnownMultiplier = newMultiplier;
+          onMultiplierUpdate?.(newMultiplier);
+        }
+
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();
         if (ageMs > 5000) return;
 
-        onSpin(row.last_spin);
+        onSpin(row.last_spin, newMultiplier);
       },
     )
     .subscribe();
@@ -97,4 +110,5 @@ export function unsubscribeFromRoom(): void {
     activeChannel = null;
   }
   lastKnownPlayersJson = '';
+  lastKnownMultiplier = null;
 }

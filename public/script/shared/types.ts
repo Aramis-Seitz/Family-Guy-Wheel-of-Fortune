@@ -65,6 +65,7 @@ export interface RoomRow {
   last_spin: number;
   spun_at: string;
   players: string[];
+  multiplier: number;
 }
 
 export type AssetCategory = typeof ASSET_CATEGORIES[number];

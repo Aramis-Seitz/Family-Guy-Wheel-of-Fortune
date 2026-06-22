@@ -226,7 +226,8 @@ function initRoomControls(): void {
 }
 
 export function isMultiplayerActive(): boolean {
-  return (activeRoomKey !== null);
+  //return (activeRoomKey !== null);
+  return true;
 }
 
 async function initApp(): Promise<void> {

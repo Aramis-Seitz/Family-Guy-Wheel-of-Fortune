@@ -225,6 +225,10 @@ function initRoomControls(): void {
   });
 }
 
+export function isMultiplayerActive(): boolean {
+  return !!activeRoomKey;
+}
+
 async function initApp(): Promise<void> {
   if (!(await hasActiveSession())) {
     window.location.href = "/login.html";
@@ -238,13 +242,13 @@ async function initApp(): Promise<void> {
   void preloadStaticSounds();
   initWheelControls();
   initShareFeature();
-  initWinnerModal();
   await initProfileUI();
   await ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();
-  initRoomControls();
   initShop();
+  initRoomControls();
+  initWinnerModal();
 }
 
 void initApp();

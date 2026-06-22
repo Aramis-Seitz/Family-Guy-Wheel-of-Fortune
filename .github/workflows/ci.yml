@@ -33,5 +33,10 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Run DB Migrations
+        run: npx supabase db push --linked
+        env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCES_TOKEN }}
+
       - name: Build
         run: npm run build

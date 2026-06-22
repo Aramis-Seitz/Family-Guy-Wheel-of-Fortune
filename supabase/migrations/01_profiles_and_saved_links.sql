@@ -15,19 +15,19 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
-create policy "Users can read their own profile"
+create or replace policy "Users can read their own profile"
 on public.profiles
 for select
 to authenticated
 using (auth.uid() = id);
 
-create policy "Users can insert their own profile"
+create or replace policy "Users can insert their own profile"
 on public.profiles
 for insert
 to authenticated
 with check (auth.uid() = id);
 
-create policy "Users can update their own profile"
+create or replace policy "Users can update their own profile"
 on public.profiles
 for update
 to authenticated
@@ -46,26 +46,26 @@ create table if not exists public.saved_links (
 
 alter table public.saved_links enable row level security;
 
-create policy "Users can read own links"
+create or replace policy "Users can read own links"
 on public.saved_links
 for select
 to authenticated
 using (auth.uid() = user_id);
 
-create policy "Users can insert own links"
+create or replace policy "Users can insert own links"
 on public.saved_links
 for insert
 to authenticated
 with check (auth.uid() = user_id);
 
-create policy "Users can update own links"
+create or replace policy "Users can update own links"
 on public.saved_links
 for update
 to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
-create policy "Users can delete own links"
+create or replace policy "Users can delete own links"
 on public.saved_links
 for delete
 to authenticated

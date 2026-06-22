@@ -24,6 +24,7 @@ values
     ('Rizz', 'sound', 20, '/assets/sounds/rizz.mp3'),
     ('Stewie', 'companion', 50, '/assets/companions/stewie.png'),
     ('Super Mario Bros', 'sound', 20, '/assets/sounds/super-mario-bros.mp3'),
-    ('Whip', 'sound', 10, '/assets/sounds/whip.mp3');
+    ('Whip', 'sound', 10, '/assets/sounds/whip.mp3')
+on conflict do nothing;
 
 commit;

@@ -23,6 +23,7 @@ export function displayWinnerModal(winnerName: string): void {
   if (isMultiplayerActive()) {
     removeWinnerBtn.classList.add("hidden");
   } else {
+    removeWinnerBtn.classList.remove("hidden");
     removeWinnerBtn.addEventListener("click", removeWinner);
   }
 }

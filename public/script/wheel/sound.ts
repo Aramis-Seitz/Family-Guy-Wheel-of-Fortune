@@ -131,7 +131,7 @@ function getCurrentVolume(): number {
 export async function preloadStaticSounds(): Promise<void> {
   [drumrollBuffer, cymbalBuffer] = await Promise.all([
     loadBuffer("/assets/sounds/drumroll.mp3"),
-    loadBuffer("/assets/sounds/cymbal-crash.wav"),
+    loadBuffer("/assets/sounds/cymbal-crash.mp3"),
   ]);
 }
 

@@ -59,6 +59,7 @@ export interface ToastOptions {
 export interface RoomSpinResponse {
   ranNum: number;
   spinToken: string;
+  direction: Direction;
 }
 
 export interface RoomRow {
@@ -66,6 +67,7 @@ export interface RoomRow {
   spun_at: string;
   players: string[];
   multiplier: number;
+  spin_direction: string | null;
 }
 
 export type AssetCategory = typeof ASSET_CATEGORIES[number];

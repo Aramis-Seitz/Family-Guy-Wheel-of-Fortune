@@ -7,6 +7,7 @@ export type RoomData = {
     last_spin?: number | null;
     spun_at?: string | null;
     multiplier?: number | null;
+    spin_direction?: string | null;
 };
 
 export async function insertRoom(roomKey: string, hostId: string, hostUsername: string): Promise<void> {
@@ -48,10 +49,10 @@ export async function clearRoomPlayers(roomKey: string): Promise<void> {
     if (error) throw error;
 }
 
-export async function updateRoomSpin(roomKey: string, lastSpin: number, spunAt: string): Promise<void> {
+export async function updateRoomSpin(roomKey: string, lastSpin: number, spunAt: string, direction: string): Promise<void> {
     const { error } = await supabaseClient
         .from("rooms")
-        .update({ last_spin: lastSpin, spun_at: spunAt })
+        .update({ last_spin: lastSpin, spun_at: spunAt, spin_direction: direction })
         .eq("room_key", roomKey);
     if (error) throw error;
 }

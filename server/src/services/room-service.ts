@@ -48,14 +48,14 @@ export async function closeRoom(userId: string, roomKey: string): Promise<void> 
     await clearRoomPlayers(roomKey);
 }
 
-export async function spinRoom(userId: string, roomKey: string): Promise<{ ranNum: number; spinToken: string }> {
+export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<{ ranNum: number; spinToken: string }> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError("Only the host may spin", 403);
 
     const ranNum = randomInt(140, 901);
     const spunAt = new Date().toISOString();
-    await updateRoomSpin(roomKey, ranNum, spunAt);
+    await updateRoomSpin(roomKey, ranNum, spunAt, direction);
 
     const token = randomUUID();
     const spinToken = await insertSpinToken(token, userId);

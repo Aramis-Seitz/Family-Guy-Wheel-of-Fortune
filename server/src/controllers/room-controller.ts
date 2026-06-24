@@ -5,6 +5,7 @@ import type { HttpRequest, HttpResponse } from "../types/http";
 
 type RoomKeyBody = {
     roomKey?: string;
+    direction?: string;
 };
 
 type SetMultiplierBody = {
@@ -77,13 +78,17 @@ export async function handleSpinRoom(req: HttpRequest, res: HttpResponse): Promi
             return;
         }
 
-        const { roomKey } = (req.body ?? {}) as RoomKeyBody;
+        const { roomKey, direction } = (req.body ?? {}) as RoomKeyBody;
         if (!roomKey) {
             res.status(400).json({ error: "Missing roomKey" });
             return;
         }
+        if (direction !== "left" && direction !== "right") {
+            res.status(400).json({ error: "Missing or invalid direction" });
+            return;
+        }
 
-        const result = await spinRoom(userId, roomKey);
+        const result = await spinRoom(userId, roomKey, direction);
         res.status(200).json(result);
     } catch (error) {
         sendUnexpectedError(res, error);

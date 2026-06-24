@@ -16,8 +16,9 @@ router.post('/', async (req, res) => {
   const { data: { user }, error: authError } = await supabase.auth.getUser(jwt);
   if (authError || !user) { res.status(401).json({ error: 'Invalid session' }); return; }
 
-  const { roomKey } = (req.body ?? {}) as { roomKey?: string };
+  const { roomKey, direction } = (req.body ?? {}) as { roomKey?: string; direction?: string };
   if (!roomKey) { res.status(400).json({ error: 'Missing roomKey' }); return; }
+  if (direction !== 'left' && direction !== 'right') { res.status(400).json({ error: 'Missing or invalid direction' }); return; }
 
   const { data: room, error: roomError } = await supabase
     .from('rooms')
@@ -37,7 +38,7 @@ router.post('/', async (req, res) => {
 
   const { error: updateError } = await supabase
     .from('rooms')
-    .update({ last_spin: ranNum, spun_at: spunAt })
+    .update({ last_spin: ranNum, spun_at: spunAt, spin_direction: direction })
     .eq('room_key', roomKey);
 
   if (updateError) {

@@ -144,12 +144,12 @@ function clearRoom(): void {
 }
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
-function handleRoomSpinEvent(lastSpin: number, multiplier: number): void {
+function handleRoomSpinEvent(lastSpin: number, multiplier: number, direction: string): void {
   if (isHost) return; // host already spun directly from POST response
   lockSpinButtons();
   const names = getNames();
   const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + lastSpin;
-  spinWheel(totalSteps, 'right', '', names);
+  spinWheel(totalSteps, direction as Direction, '', names);
 }
 
 // Host only: POST → spin directly (token guaranteed, no race condition)
@@ -158,7 +158,7 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   lockSpinButtons();
   try {
     const names = getNames();
-    const { ranNum, spinToken } = await spinRoom(activeRoomKey, names);
+    const { ranNum, spinToken } = await spinRoom(activeRoomKey, names, direction);
     const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
     spinWheel(totalSteps, direction, spinToken, names);
   } catch (error) {

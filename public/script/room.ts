@@ -41,8 +41,8 @@ export async function setMultiplier(roomKey: string, multiplier: number): Promis
   await postJson('/api/room/multiplier', { roomKey, multiplier });
 }
 
-export async function spinRoom(roomKey: string, names: string[]): Promise<RoomSpinResponse> {
-  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names });
+export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<RoomSpinResponse> {
+  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names, direction });
 }
 
 export async function closeRoom(roomKey: string): Promise<void> {
@@ -55,7 +55,7 @@ export async function resetRoom(roomKey: string): Promise<void> {
 
 export function subscribeToRoom(
   roomKey: string,
-  onSpin: (lastSpin: number, multiplier: number) => void,
+  onSpin: (lastSpin: number, multiplier: number, direction: string) => void,
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
@@ -102,13 +102,14 @@ export function subscribeToRoom(
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();
         if (ageMs > 5000) return;
-
+        
         if (row.last_spin === -1) {
           onReset?.();
           return;
         }
+        
+        onSpin(row.last_spin, newMultiplier, row.spin_direction ?? 'right');
 
-        onSpin(row.last_spin, newMultiplier);
       },
     )
     .subscribe();

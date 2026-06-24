@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, resetBtn } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -13,13 +13,14 @@ import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import {
   initWheelControls, spinWheel,
-  setSpinOverride, lockSpinButtons, unlockSpinButtons,
+  setSpinOverride, setResetOverride, lockSpinButtons, unlockSpinButtons,
+  resetWheelRotation,
 } from "../wheel/spin.js";
 import { initMultiplierSlider, getMultiplier } from "../wheel/multiplier.js";
 import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
-import { initWinnerModal } from "../wheel/winner.js";
-import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
+import { initWinnerModal, hideWinnerModal } from "../wheel/winner.js";
+import { createRoom, joinRoom, spinRoom, closeRoom, resetRoom, subscribeToRoom, unsubscribeFromRoom } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
 import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
@@ -30,6 +31,11 @@ let isHost = false;
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
 let nameStateUnsubscribe: (() => void) | null = null;
+
+function handleLocalReset(): void {
+  resetWheelRotation();
+  hideWinnerModal();
+}
 
 
 function initNameControls(): void {
@@ -100,6 +106,11 @@ function setRoomActive(roomKey: string, host: boolean): void {
   if (!host) {
     spinLeftBtn.classList.add('room-guest');
     spinRightBtn.classList.add('room-guest');
+    resetBtn.disabled = true;
+    resetBtn.style.setProperty('opacity', '0.4');
+    resetBtn.style.setProperty('cursor', 'not-allowed');
+  } else {
+    setResetOverride(() => { void handleRoomResetClick(); });
   }
 }
 
@@ -112,12 +123,16 @@ function clearRoom(): void {
   unlockNameEditing();
   unsubscribeFromRoom();
   setSpinOverride(null);
+  setResetOverride(handleLocalReset);
   activeRoomKey = null;
   isHost = false;
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
   spinLeftBtn.classList.remove('room-guest', 'room-solo');
   spinRightBtn.classList.remove('room-guest', 'room-solo');
+  resetBtn.disabled = false;
+  resetBtn.style.removeProperty('opacity');
+  resetBtn.style.removeProperty('cursor');
   renderPlayersSidebar([]);
   replaceNames(savedNames);
 }
@@ -147,6 +162,22 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   }
 }
 
+async function handleRoomResetClick(): Promise<void> {
+  if (!activeRoomKey || !isHost) return;
+  try {
+    await resetRoom(activeRoomKey);
+    handleLocalReset();
+  } catch (error) {
+    console.error('[ROOM] Reset fehlgeschlagen:', error);
+    showToast({ message: 'Reset fehlgeschlagen', type: 'error' });
+  }
+}
+
+function handleRoomResetEvent(): void {
+  if (isHost) return; // host already reset locally after POST
+  handleLocalReset();
+}
+
 function onRoomClosed(): void {
   if (isHost) return; // host handles its own leave flow
   clearRoom();
@@ -162,7 +193,7 @@ function initRoomControls(): void {
         setRoomActive(roomKey, true);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, handleRoomResetEvent);
         showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Erstellen fehlgeschlagen:', error);
@@ -181,7 +212,7 @@ function initRoomControls(): void {
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, handleRoomResetEvent);
         showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Beitreten fehlgeschlagen:', error);
@@ -237,6 +268,7 @@ async function initApp(): Promise<void> {
   initVolumeSlider();
   void preloadStaticSounds();
   initWheelControls();
+  setResetOverride(handleLocalReset);
   initShareFeature();
   initWinnerModal();
   await initProfileUI();

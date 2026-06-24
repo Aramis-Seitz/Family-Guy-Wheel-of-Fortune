@@ -64,6 +64,14 @@ export async function updateRoomMultiplier(roomKey: string, multiplier: number):
     if (error) throw error;
 }
 
+export async function updateRoomReset(roomKey: string): Promise<void> {
+    const { error } = await supabaseClient
+        .from("rooms")
+        .update({ last_spin: -1, spun_at: new Date().toISOString() })
+        .eq("room_key", roomKey);
+    if (error) throw error;
+}
+
 export async function insertSpinToken(token: string, userId: string): Promise<string> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")

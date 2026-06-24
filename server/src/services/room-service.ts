@@ -7,6 +7,7 @@ import {
     clearRoomPlayers,
     updateRoomSpin,
     updateRoomMultiplier,
+    updateRoomReset,
     insertSpinToken,
 } from "../repositories/room-repository";
 import { AppError } from "../lib/errors";
@@ -60,6 +61,13 @@ export async function spinRoom(userId: string, roomKey: string): Promise<{ ranNu
     const token = randomUUID();
     const spinToken = await insertSpinToken(token, userId);
     return { ranNum, spinToken };
+}
+
+export async function resetRoom(userId: string, roomKey: string): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    if (!room) throw new AppError("Room not found", 404);
+    if (room.host_id !== userId) throw new AppError("Only the host may reset", 403);
+    await updateRoomReset(roomKey);
 }
 
 export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {

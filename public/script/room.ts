@@ -49,12 +49,17 @@ export async function closeRoom(roomKey: string): Promise<void> {
   await postJson('/api/room/close', { roomKey });
 }
 
+export async function resetRoom(roomKey: string): Promise<void> {
+  await postJson('/api/room/reset', { roomKey });
+}
+
 export function subscribeToRoom(
   roomKey: string,
   onSpin: (lastSpin: number, multiplier: number, direction: string) => void,
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
+  onReset?: () => void,
 ): void {
   lastKnownPlayersJson = '';
   lastKnownMultiplier = null;
@@ -97,8 +102,14 @@ export function subscribeToRoom(
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();
         if (ageMs > 5000) return;
-
+        
+        if (row.last_spin === -1) {
+          onReset?.();
+          return;
+        }
+        
         onSpin(row.last_spin, newMultiplier, row.spin_direction ?? 'right');
+
       },
     )
     .subscribe();

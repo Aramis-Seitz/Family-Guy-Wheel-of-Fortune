@@ -109,6 +109,24 @@
   padding-top: 10px;
 }
 
+#bulkAddToWheelBtn {
+  margin-top: 10px;
+  width: 100%;
+  background: #00c853;
+  color: white;
+  font-size: 0.85rem;
+  border-radius: 100px;
+  padding: 8px 12px;
+}
+
+#bulkAddToWheelBtn:hover {
+  background: #00b245;
+}
+
+.hidden {
+  display: none !important;
+}
+
 #roomInfo.hidden { display: none; }
 
 .room-key-row {

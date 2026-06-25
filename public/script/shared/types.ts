@@ -65,6 +65,7 @@ export interface RoomRow {
   last_spin: number;
   spun_at: string;
   players: string[];
+  wheel_items?: string[];
   multiplier: number;
 }
 

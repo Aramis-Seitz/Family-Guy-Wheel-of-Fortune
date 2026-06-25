@@ -4,6 +4,7 @@ import {
     insertRoom,
     getRoomByKey,
     updateRoomPlayers,
+    updateRoomWheelItems,
     clearRoomPlayers,
     updateRoomSpin,
     updateRoomMultiplier,
@@ -17,15 +18,15 @@ function generateRoomKey(): string {
     return Array.from(bytes, (b) => chars[b % chars.length]).join("");
 }
 
-export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[] }> {
+export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[]; wheelItems: string[] }> {
     const profile = await getProfileByUserId(userId);
     const hostUsername = profile?.username ?? userId;
     const roomKey = generateRoomKey();
     await insertRoom(roomKey, userId, hostUsername);
-    return { roomKey, players: [hostUsername] };
+    return { roomKey, players: [hostUsername], wheelItems: [] };
 }
 
-export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number }> {
+export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; wheelItems: string[] }> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
@@ -38,7 +39,8 @@ export async function joinRoom(userId: string, roomKey: string): Promise<{ playe
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
     const multiplier = room.multiplier ?? 1;
-    return { players, multiplier };
+    const wheelItems = room.wheel_items ?? [];
+    return { players, multiplier, wheelItems };
 }
 
 export async function closeRoom(userId: string, roomKey: string): Promise<void> {
@@ -60,6 +62,13 @@ export async function spinRoom(userId: string, roomKey: string): Promise<{ ranNu
     const token = randomUUID();
     const spinToken = await insertSpinToken(token, userId);
     return { ranNum, spinToken };
+}
+
+export async function setRoomWheelItems(userId: string, roomKey: string, wheelItems: string[]): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    if (!room) throw new AppError("Room not found", 404);
+    if (room.host_id !== userId) throw new AppError("Only the host may update wheel items", 403);
+    await updateRoomWheelItems(roomKey, wheelItems);
 }
 
 export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {

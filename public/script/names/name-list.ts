@@ -11,15 +11,18 @@ import {
 import { nameState } from "./name-state.js";
 
 let roomLocked = false;
+let disableAddWhileLocked = true;
 
-export function lockNameEditing(): void {
+export function lockNameEditing(disableAdd = true): void {
   roomLocked = true;
+  disableAddWhileLocked = disableAdd;
   syncAddElements();
   syncRemoveButtons();
 }
 
 export function unlockNameEditing(): void {
   roomLocked = false;
+  disableAddWhileLocked = false;
   syncAddElements();
   syncRemoveButtons();
 }
@@ -86,7 +89,7 @@ export function syncRemoveButtons(): void {
 }
 
 export function syncAddElements(): void {
-  const disabled = roomLocked || getSegmentCount() >= MAX_ITEMS;
+  const disabled = (roomLocked && disableAddWhileLocked) || getSegmentCount() >= MAX_ITEMS;
 
   addBtn.disabled = disabled;
   input.disabled = disabled;

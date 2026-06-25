@@ -78,6 +78,8 @@ export const copyRoomKeyBtn = optionalElement<HTMLButtonElement>("copyRoomKeyBtn
 export const roomKeyDisplay = optionalElement<HTMLSpanElement>("roomKeyDisplay");
 export const roomInfo = optionalElement<HTMLDivElement>("roomInfo");
 export const playersList = optionalElement<HTMLUListElement>("playersList");
+export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("bulkAddToWheelBtn");
+export const wheelEmptyHint = optionalElement<HTMLDivElement>("wheelEmptyHint");
 
 export function closeOnBackdropClick(modal: HTMLDialogElement, onClose?: () => void): void {
   modal.addEventListener("click", (e) => {

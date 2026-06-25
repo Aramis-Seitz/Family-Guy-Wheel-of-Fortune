@@ -14,7 +14,7 @@ import { initProfileUI } from "../profile/profiles.js";
 import {
   initWheelControls, spinWheel,
   setSpinOverride, setResetOverride, lockSpinButtons, unlockSpinButtons,
-  resetWheelRotation,
+  resetWheelRotation, isSpinning,
 } from "../wheel/spin.js";
 import { initMultiplierSlider, getMultiplier, setMultiplierSlider, updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider } from "../wheel/multiplier.js";
 import { initVolumeSlider } from "../wheel/volume.js";
@@ -239,6 +239,10 @@ function initRoomControls(): void {
   });
 
   leaveRoomBtn?.addEventListener('click', () => {
+    if (isSpinning()) {
+      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      return;
+    }
     void (async () => {
       const wasHost = isHost;
       const roomKey = activeRoomKey;

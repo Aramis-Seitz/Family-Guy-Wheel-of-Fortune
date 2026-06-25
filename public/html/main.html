@@ -151,7 +151,7 @@
         </div>
 
         <div class="panel">
-            <div class="add-row">
+            <div class="add-row" id="sidebarAddRow">
                 <input type="text" id="nameInput" placeholder="Enter name …" />
                 <button class="btn-add" id="addBtn">+</button>
             </div>
@@ -164,6 +164,14 @@
             <p class="error-hint hidden" id="errorHint">At least 2 entries required.</p>
             <p class="empty-hint" id="emptyHint" style="display:none">No names yet. Add some!</p>
         </div>
+
+                <!-- centered input shown when wheel empty -->
+                <div id="centeredInput" class="centered-input-overlay centered-input-hidden">
+                    <div class="add-row">
+                        <input type="text" id="nameInputCentered" placeholder="Enter name …" />
+                        <button class="btn-add" id="addBtnCentered">+</button>
+                    </div>
+                </div>
 
         <div id="winnerModal" class="modal hidden">
             <div class="modal-content">

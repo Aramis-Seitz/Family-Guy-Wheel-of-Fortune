@@ -17,6 +17,9 @@ export const companionImage = optionalElement<HTMLImageElement>("companion-image
 
 export const input = requiredElement<HTMLInputElement>("nameInput");
 export const addBtn = requiredElement<HTMLButtonElement>("addBtn");
+export const centeredInput = optionalElement<HTMLDivElement>("centeredInput");
+export const inputCentered = optionalElement<HTMLInputElement>("nameInputCentered");
+export const addBtnCentered = optionalElement<HTMLButtonElement>("addBtnCentered");
 export const list = requiredElement<HTMLUListElement>("nameList");
 export const getRemoveBtn = (): NodeListOf<HTMLButtonElement> =>
   list.querySelectorAll(".btn-remove");

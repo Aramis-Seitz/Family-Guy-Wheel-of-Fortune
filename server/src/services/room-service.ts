@@ -5,10 +5,12 @@ import {
     getRoomByKey,
     updateRoomPlayers,
     clearRoomPlayers,
+    removePlayerFromRoom,
     updateRoomSpin,
     updateRoomMultiplier,
     updateRoomReset,
     insertSpinToken,
+    type RoomPlayer,
 } from "../repositories/room-repository";
 import { AppError } from "../lib/errors";
 
@@ -16,6 +18,10 @@ function generateRoomKey(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const bytes = randomBytes(6);
     return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+}
+
+function toUsernames(players: RoomPlayer[]): string[] {
+    return players.map((p) => p.username);
 }
 
 export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[] }> {
@@ -33,13 +39,26 @@ export async function joinRoom(userId: string, roomKey: string): Promise<{ playe
     const profile = await getProfileByUserId(userId);
     const username = profile?.username ?? userId;
     const currentPlayers = room.players ?? [];
-    const updatedPlayers = currentPlayers.includes(username)
+    const updatedPlayers = currentPlayers.some((p) => p.id === userId)
         ? currentPlayers
-        : [...currentPlayers, username];
+        : [...currentPlayers, { id: userId, username }];
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
     const multiplier = room.multiplier ?? 1;
-    return { players, multiplier };
+    return { players: toUsernames(players), multiplier };
+}
+
+export async function leaveRoom(userId: string, roomKey: string): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    if (!room) throw new AppError("Room not found", 404);
+
+    if (room.host_id === userId) {
+        // Host verlässt → Raum schließen
+        await clearRoomPlayers(roomKey);
+    } else {
+        // Gast verlässt → nur diesen Spieler nach userId entfernen
+        await removePlayerFromRoom(roomKey, userId);
+    }
 }
 
 export async function closeRoom(userId: string, roomKey: string): Promise<void> {

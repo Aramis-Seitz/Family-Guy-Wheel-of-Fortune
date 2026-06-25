@@ -45,6 +45,10 @@ export async function spinRoom(roomKey: string, names: string[], direction: stri
   return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names, direction });
 }
 
+export async function leaveRoom(roomKey: string): Promise<void> {
+  await postJson('/api/room/leave', { roomKey });
+}
+
 export async function closeRoom(roomKey: string): Promise<void> {
   await postJson('/api/room/close', { roomKey });
 }
@@ -88,7 +92,7 @@ export function subscribeToRoom(
           const json = JSON.stringify(row.players);
           if (json !== lastKnownPlayersJson) {
             lastKnownPlayersJson = json;
-            onPlayersUpdate?.(row.players);
+            onPlayersUpdate?.(row.players.map((p) => p.username));
           }
         }
 

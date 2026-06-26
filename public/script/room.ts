@@ -33,8 +33,8 @@ export async function createRoom(): Promise<{ roomKey: string; players: string[]
   return postJson<{ roomKey: string; players: string[] }>('/api/room/create');
 }
 
-export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number }> {
-  return postJson<{ players: string[]; multiplier: number }>('/api/room/join', { roomKey });
+export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; hostName: string }> {
+  return postJson<{ players: string[]; multiplier: number; hostName: string }>('/api/room/join', { roomKey });
 }
 
 export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {

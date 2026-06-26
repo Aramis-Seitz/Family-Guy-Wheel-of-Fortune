@@ -6,6 +6,10 @@ import {
   SEGMENT_COLORS,
 } from "../shared/constants.js";
 import { wheelElement } from "../shared/dom.js";
+import {
+  wheelSvgElement,
+  wheelEmptyStateElement,
+} from "../shared/dom.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -85,7 +89,12 @@ export function generateWheel(names: string[]): void {
   const segmentCount = names.length;
   clearWheel();
 
-  if (segmentCount === 0) return;
+  if (names.length === 0) {
+    showWheelEmptyState();
+    return;
+  }
+
+  hideWheelEmptyState();
 
   if (segmentCount === 1) {
     const circle = document.createElementNS(SVG_NS, "circle");
@@ -118,4 +127,14 @@ export function generateWheel(names: string[]): void {
     wheelElement.appendChild(segmentPath);
     wheelElement.appendChild(label);
   });
+}
+
+function showWheelEmptyState(): void {
+  wheelSvgElement.hidden = true;
+  wheelEmptyStateElement.hidden = false;
+}
+
+function hideWheelEmptyState(): void {
+  wheelSvgElement.hidden = false;
+  wheelEmptyStateElement.hidden = true;
 }

@@ -14,6 +14,8 @@ function optionalElement<T extends HTMLElement | SVGElement>(id: string): T | nu
 
 export const wheelElement = requiredElement<SVGGElement>("wheel");
 export const companionImage = optionalElement<HTMLImageElement>("companion-image");
+export const wheelEmptyStateElement = document.getElementById("wheelEmptyState") as HTMLDivElement;
+export const wheelSvgElement = document.getElementById("svg") as HTMLElement;
 
 export const input = requiredElement<HTMLInputElement>("nameInput");
 export const addBtn = requiredElement<HTMLButtonElement>("addBtn");

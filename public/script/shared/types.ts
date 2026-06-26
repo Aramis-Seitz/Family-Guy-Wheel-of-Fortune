@@ -62,10 +62,15 @@ export interface RoomSpinResponse {
   direction: Direction;
 }
 
+export interface RoomPlayer {
+  id: string;
+  username: string;
+}
+
 export interface RoomRow {
   last_spin: number;
   spun_at: string;
-  players: string[];
+  players: RoomPlayer[];
   multiplier: number;
   spin_direction: string | null;
 }

@@ -20,7 +20,7 @@ import { initMultiplierSlider, getMultiplier, setMultiplierSlider, updateMultipl
 import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal, hideWinnerModal } from "../wheel/winner.js";
-import { createRoom, joinRoom, spinRoom, closeRoom, resetRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier } from "../room.js";
+import { createRoom, joinRoom, leaveRoom, spinRoom, closeRoom, resetRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
 import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
@@ -30,6 +30,7 @@ let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
+let roomPrevNames: string[] = [];
 let nameStateUnsubscribe: (() => void) | null = null;
 let multiplierSyncListener: (() => void) | null = null;
 
@@ -81,17 +82,20 @@ function initRoomPlayers(players: string[]): void {
 
   // Track manual removals so syncRoomPlayers can filter them out later.
   if (nameStateUnsubscribe) nameStateUnsubscribe();
-  let prevNames = [...players];
+  roomPrevNames = [...players];
   nameStateUnsubscribe = nameState.subscribe((names) => {
     if (!activeRoomKey) return;
-    prevNames.filter(n => !names.includes(n)).forEach(n => removedInRoom.add(n));
-    prevNames = [...names];
+    roomPrevNames.filter(n => !names.includes(n)).forEach(n => removedInRoom.add(n));
+    roomPrevNames = [...names];
   });
 }
 
 // Called on Realtime player-list updates — only adds new players, never re-adds removed ones.
 function syncRoomPlayers(players: string[]): void {
   const toShow = players.filter(p => !removedInRoom.has(p));
+  // Update roomPrevNames before replaceNames so the nameState subscriber
+  // doesn't mistake this room sync as a manual removal.
+  roomPrevNames = [...toShow];
   replaceNames(toShow);
   renderPlayersSidebar(players);
   updateSpinButtonState(toShow.length);
@@ -247,15 +251,13 @@ function initRoomControls(): void {
       const wasHost = isHost;
       const roomKey = activeRoomKey;
       clearRoom(); // unsubscribe first so we don't receive our own close event
-      if (wasHost && roomKey) {
+      if (roomKey) {
         try {
-          await closeRoom(roomKey);
-          showToast({ message: 'Raum geschlossen', type: 'success' });
+          await leaveRoom(roomKey);
+          showToast({ message: wasHost ? 'Raum geschlossen' : 'Raum verlassen', type: 'success' });
         } catch {
-          showToast({ message: 'Raum konnte nicht geschlossen werden', type: 'error' });
+          showToast({ message: wasHost ? 'Raum konnte nicht geschlossen werden' : 'Raum konnte nicht verlassen werden', type: 'error' });
         }
-      } else {
-        showToast({ message: 'Raum verlassen', type: 'success' });
       }
     })();
   });

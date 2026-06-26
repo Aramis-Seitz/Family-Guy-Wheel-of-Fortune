@@ -28,6 +28,7 @@ import { initShop } from "../shop/shop.js";
 
 let activeRoomKey: string | null = null;
 let isHost = false;
+let activeRoomHostName: string = '';
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
 let roomPrevNames: string[] = [];
@@ -59,6 +60,12 @@ function renderPlayersSidebar(players: string[]): void {
   players.forEach((name) => {
     const li = document.createElement('li');
     li.textContent = name;
+    if (name === activeRoomHostName) {
+      const tag = document.createElement('span');
+      tag.textContent = 'Host';
+      tag.className = 'host-tag';
+      li.appendChild(tag);
+    }
     list.appendChild(li);
   });
 }
@@ -130,6 +137,7 @@ function clearRoom(): void {
   setSpinOverride(null);
   activeRoomKey = null;
   isHost = false;
+  activeRoomHostName = '';
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
   spinLeftBtn.classList.remove('room-guest', 'room-solo');
@@ -200,6 +208,7 @@ function initRoomControls(): void {
       try {
         savedNames = getNames();
         const { roomKey, players } = await createRoom();
+        activeRoomHostName = players[0] ?? '';
         setRoomActive(roomKey, true);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
@@ -223,7 +232,8 @@ function initRoomControls(): void {
       if (!roomKey) return;
       try {
         savedNames = getNames();
-        const { players, multiplier } = await joinRoom(roomKey);
+        const { players, multiplier, hostName } = await joinRoom(roomKey);
+        activeRoomHostName = hostName;
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);

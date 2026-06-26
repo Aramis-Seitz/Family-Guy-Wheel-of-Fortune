@@ -32,7 +32,7 @@ export async function createRoom(userId: string): Promise<{ roomKey: string; pla
     return { roomKey, players: [hostUsername] };
 }
 
-export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number }> {
+export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; hostName: string }> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
@@ -44,8 +44,10 @@ export async function joinRoom(userId: string, roomKey: string): Promise<{ playe
         : [...currentPlayers, { id: userId, username }];
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
+    const hostPlayer = room.players.find((p) => p.id === room.host_id);
+    const hostName = hostPlayer?.username ?? (players[0]?.username ?? '');
     const multiplier = room.multiplier ?? 1;
-    return { players: toUsernames(players), multiplier };
+    return { players: toUsernames(players), multiplier, hostName };
 }
 
 export async function leaveRoom(userId: string, roomKey: string): Promise<void> {

@@ -199,7 +199,7 @@ function handleRoomResetEvent(): void {
 function onRoomClosed(): void {
   if (isHost) return; // host handles its own leave flow
   clearRoom();
-  showToast({ message: 'Der Host hat den Raum geschlossen', type: 'error' });
+  showToast({ message: 'Der Host hat den Raum geschlossen', type: 'success' });
 }
 
 function initRoomControls(): void {

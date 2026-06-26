@@ -30,6 +30,7 @@ let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
+let roomPrevNames: string[] = [];
 let nameStateUnsubscribe: (() => void) | null = null;
 let multiplierSyncListener: (() => void) | null = null;
 
@@ -81,17 +82,20 @@ function initRoomPlayers(players: string[]): void {
 
   // Track manual removals so syncRoomPlayers can filter them out later.
   if (nameStateUnsubscribe) nameStateUnsubscribe();
-  let prevNames = [...players];
+  roomPrevNames = [...players];
   nameStateUnsubscribe = nameState.subscribe((names) => {
     if (!activeRoomKey) return;
-    prevNames.filter(n => !names.includes(n)).forEach(n => removedInRoom.add(n));
-    prevNames = [...names];
+    roomPrevNames.filter(n => !names.includes(n)).forEach(n => removedInRoom.add(n));
+    roomPrevNames = [...names];
   });
 }
 
 // Called on Realtime player-list updates — only adds new players, never re-adds removed ones.
 function syncRoomPlayers(players: string[]): void {
   const toShow = players.filter(p => !removedInRoom.has(p));
+  // Update roomPrevNames before replaceNames so the nameState subscriber
+  // doesn't mistake this room sync as a manual removal.
+  roomPrevNames = [...toShow];
   replaceNames(toShow);
   renderPlayersSidebar(players);
   updateSpinButtonState(toShow.length);

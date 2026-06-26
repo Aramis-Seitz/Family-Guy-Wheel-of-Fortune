@@ -196,6 +196,10 @@ function onRoomClosed(): void {
 
 function initRoomControls(): void {
   createRoomBtn?.addEventListener('click', () => {
+    if (isSpinning()) {
+      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      return;
+    }
     void (async () => {
       try {
         savedNames = getNames();
@@ -218,6 +222,10 @@ function initRoomControls(): void {
   });
 
   joinRoomBtn?.addEventListener('click', () => {
+    if (isSpinning()) {
+      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      return;
+    }
     void (async () => {
       const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
       if (!roomKey) return;

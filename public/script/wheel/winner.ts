@@ -1,4 +1,4 @@
-import { isMultiplayerActive } from "../app/main.js";
+import { isMultiplayerActive } from "../app/room-controls.js";
 import { awardCoins } from "../api/client-api.js";
 import { getNames, removeNameByIndex } from "../names/name-list.js";
 import { stopDrumRoll } from "./sound.js";

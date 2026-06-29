@@ -8,6 +8,7 @@
 @import url('legal-links.css');
 @import url('toast.css');
 @import url('shop.css');
+@import url('empty-state.css');
 
 .video-corner-container {
     position: fixed;

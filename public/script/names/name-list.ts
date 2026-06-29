@@ -9,6 +9,7 @@ import {
   validateNameInput,
 } from "./name-input-validation.js";
 import { nameState } from "./name-state.js";
+import { showWheelEmptyState } from "../wheel/renderer.js";
 
 let roomLocked = false;
 
@@ -120,6 +121,7 @@ function handleRemove(index: number, item: HTMLLIElement): void {
   if (getSegmentCount() <= MIN_ITEMS) {
     shakeItem(item);
     showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
+    showWheelEmptyState();
     return;
   }
 

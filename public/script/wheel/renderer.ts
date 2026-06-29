@@ -129,7 +129,7 @@ export function generateWheel(names: string[]): void {
   });
 }
 
-function showWheelEmptyState(): void {
+ export function showWheelEmptyState(): void {
   wheelSvgElement.hidden = true;
   wheelEmptyStateElement.hidden = false;
 }

@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint, centeredInput, inputCentered, addBtnCentered } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -53,6 +53,29 @@ function initNameControls(): void {
       }
     }
   });
+
+  const centeredInputField = inputCentered;
+  if (addBtnCentered && centeredInputField) {
+    addBtnCentered.addEventListener("click", async () => {
+      const centeredValue = centeredInputField.value ?? '';
+      if (activeRoomKey && isHost) {
+        await addCustomWheelItem(centeredValue);
+      } else {
+        addName(centeredValue);
+      }
+    });
+
+    centeredInputField.addEventListener("keydown", async (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        const centeredValue = centeredInputField.value ?? '';
+        if (activeRoomKey && isHost) {
+          await addCustomWheelItem(centeredValue);
+        } else {
+          addName(centeredValue);
+        }
+      }
+    });
+  }
 }
 
 async function hasActiveSession(): Promise<boolean> {
@@ -120,20 +143,24 @@ function setHostControlsVisibility(host: boolean): void {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
   }
 
-  const hostOnlyInputs = [input, addBtn];
+  const hostOnlyInputs = [input, addBtn, inputCentered, addBtnCentered];
   hostOnlyInputs.forEach((el) => {
     if (!el) return;
     el.disabled = !host;
     el.style.opacity = host ? '1' : '0.5';
     el.style.cursor = host ? 'text' : 'not-allowed';
   });
+
+  if (centeredInput) {
+    centeredInput.classList.toggle('host-disabled', !host);
+  }
 }
 
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
   wheelEmptyHint.classList.toggle('hidden', roomWheelItems.length > 0);
-  // show/hide centered input overlay when wheel is empty
-  const centered = (document.getElementById('centeredInput') as HTMLDivElement | null);
+
+  const centered = centeredInput;
   const sidebarRow = document.getElementById('sidebarAddRow') as HTMLDivElement | null;
   if (centered && sidebarRow) {
     if (roomWheelItems.length === 0) {
@@ -151,12 +178,14 @@ function initRoomPlayers(players: string[]): void {
   currentPlayers = [...players];
   replaceNames([]);
   renderPlayersSidebar(currentPlayers);
+  updateBulkButtonState(currentPlayers);
   updateSpinButtonState(getNames().length);
 }
 
 function syncRoomPlayers(players: string[]): void {
   currentPlayers = [...players];
   renderPlayersSidebar(currentPlayers);
+  updateBulkButtonState(currentPlayers);
   updateSpinButtonState(getNames().length);
 }
 
@@ -254,12 +283,15 @@ async function addCustomWheelItem(rawName: string): Promise<void> {
   if (!trimmed) return;
   if (!activeRoomKey || !isHost) {
     addName(trimmed);
+    input.value = '';
+    if (inputCentered) inputCentered.value = '';
     return;
   }
 
   const updatedItems = [...(roomWheelItems ?? []), trimmed];
   await updateRoomWheelItems(activeRoomKey, updatedItems);
   input.value = '';
+  if (inputCentered) inputCentered.value = '';
 }
 
 async function addPlayerToWheelItem(playerName: string): Promise<void> {
@@ -280,28 +312,15 @@ async function removePlayerFromWheelItem(playerName: string): Promise<void> {
 async function addAllPlayersToWheel(players: string[]): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   const current = roomWheelItems ?? [];
+  const missingPlayers = players.filter((player) => !current.includes(player));
 
-  const currentCounts = current.reduce<Record<string, number>>((acc, value) => {
-    acc[value] = (acc[value] ?? 0) + 1;
-    return acc;
-  }, {});
+  if (missingPlayers.length > 0) {
+    const updatedItems = [...current, ...missingPlayers];
+    await updateRoomWheelItems(activeRoomKey, updatedItems);
+    return;
+  }
 
-  const playersToAdd: string[] = [];
-  const requestedCounts = players.reduce<Record<string, number>>((acc, name) => {
-    acc[name] = (acc[name] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  Object.entries(requestedCounts).forEach(([player, count]) => {
-    const existingCount = currentCounts[player] ?? 0;
-    const missing = Math.max(0, count - existingCount);
-    for (let i = 0; i < missing; i += 1) {
-      playersToAdd.push(player);
-    }
-  });
-
-  if (playersToAdd.length === 0) return;
-  const updatedItems = [...current, ...playersToAdd];
+  const updatedItems = current.filter((item) => !players.includes(item));
   await updateRoomWheelItems(activeRoomKey, updatedItems);
 }
 

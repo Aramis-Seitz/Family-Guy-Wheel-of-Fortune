@@ -4,19 +4,30 @@
 }
 
 #wheelEmptyHint {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    max-width: 180px;
-    padding: 12px 16px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 320px;
+    padding: 14px 18px;
     background: rgba(255, 255, 255, 0.95);
     border: 2px solid #333;
-    border-radius: 18px;
-    font-size: 0.9rem;
-    font-weight: bold;
+    border-radius: 24px;
+    font-size: 1rem;
+    font-weight: 700;
     color: #111;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
     z-index: 2;
+}
+
+.centered-input-overlay.host-disabled {
+    opacity: 0.6;
+}
+
+.centered-input-overlay.host-disabled input,
+.centered-input-overlay.host-disabled button {
+    cursor: not-allowed;
 }
 
 #wheelEmptyHint.hidden {

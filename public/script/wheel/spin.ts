@@ -7,6 +7,7 @@ import {
   spinLeftBtn,
   spinRightBtn,
   wheelElement,
+  bulkAddToWheelBtn,
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client-api.js";
@@ -57,7 +58,14 @@ function updateWheelRotation(): void {
 }
 
 function getSpinRelatedElements(): SpinElement[] {
-  return [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider];
+  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".player-toggle-btn");
+  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, playerToggleButtons];
+
+  if (bulkAddToWheelBtn) {
+    elements.push(bulkAddToWheelBtn);
+  }
+
+  return elements;
 }
 
 function applyDisabledStyle(el: HTMLButtonElement | HTMLInputElement, disabled: boolean): void {

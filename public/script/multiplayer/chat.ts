@@ -75,6 +75,7 @@ export function initChat(roomKey: string, username: string): void {
     };
 
     void chatChannel.send({ type: 'broadcast', event: 'message', payload: msg });
+    appendMessage(msg, true);
     chatInput.value = '';
   }
 

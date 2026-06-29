@@ -84,6 +84,7 @@ function initRoomPlayers(players: string[]): void {
 
 // Called on Realtime player-list updates — only adds new players, never re-adds removed ones.
 function syncRoomPlayers(players: string[]): void {
+  if (!activeRoomKey) return;
   const toShow = players.filter(p => !removedInRoom.has(p));
   replaceNames(toShow);
   renderPlayersSidebar(players);

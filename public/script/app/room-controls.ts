@@ -161,6 +161,7 @@ function clearRoom(): void {
     multiplierSyncListener = null;
   }
   enableMultiplierSlider();
+  unlockSpinButtons();
   setHostControlsVisibility(false);
   renderPlayersSidebar([]);
   replaceNames(savedNames);
@@ -202,6 +203,7 @@ function setWheelItemsFromRoom(items: string[]): void {
   updateWheelEmptyState();
   if (currentPlayers.length > 0) renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
+  updateSpinButtonState(getNames().length);
 }
 
 async function addCustomWheelItem(rawName: string): Promise<void> {

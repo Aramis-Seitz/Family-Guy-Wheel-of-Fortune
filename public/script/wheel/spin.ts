@@ -103,6 +103,7 @@ function finishSpin(config: SpinConfig): void {
   spinning = false;
   stopDrumRoll();
   playCymbalCrash();
+  unlockSpinButtons();
   announceWinner(config.spinToken, resolveWinner(currentRotation, config));
 }
 
@@ -135,8 +136,11 @@ function animateSpin(config: SpinConfig): void {
 
 export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[]): void {
   spinCancelled = false;
+  if (names.length < MIN_ITEMS) {
+    spinning = false;
+    return;
+  }
   spinning = true;
-  if (names.length < MIN_ITEMS) return;
 
   const clampedSteps = Math.max(Math.floor(totalSteps), MIN_SPIN_ROTATIONS);
 

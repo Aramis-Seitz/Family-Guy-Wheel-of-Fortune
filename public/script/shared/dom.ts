@@ -79,6 +79,11 @@ export const roomKeyDisplay = optionalElement<HTMLSpanElement>("roomKeyDisplay")
 export const roomInfo = optionalElement<HTMLDivElement>("roomInfo");
 export const playersList = optionalElement<HTMLUListElement>("playersList");
 
+export const leaveRoomConfirmModal = optionalElement<HTMLDialogElement>("leaveRoomConfirmModal");
+export const leaveRoomConfirmMessage = optionalElement<HTMLParagraphElement>("leaveRoomConfirmMessage");
+export const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("confirmLeaveRoomBtn");
+export const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("cancelLeaveRoomBtn");
+
 export function closeOnBackdropClick(modal: HTMLDialogElement, onClose?: () => void): void {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {

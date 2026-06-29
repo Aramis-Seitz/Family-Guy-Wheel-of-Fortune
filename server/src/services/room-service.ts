@@ -3,6 +3,7 @@ import { getProfileByUserId } from "../repositories/profile-repository";
 import {
     insertRoom,
     getRoomByKey,
+    getActiveRoomForUser,
     updateRoomPlayers,
     clearRoomPlayers,
     removePlayerFromRoom,
@@ -25,6 +26,15 @@ function toUsernames(players: RoomPlayer[]): string[] {
 }
 
 export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[] }> {
+    const existingRoom = await getActiveRoomForUser(userId);
+    if (existingRoom) {
+        if (existingRoom.host_id === userId) {
+            await clearRoomPlayers(existingRoom.room_key);
+        } else {
+            await removePlayerFromRoom(existingRoom.room_key, userId);
+        }
+    }
+
     const profile = await getProfileByUserId(userId);
     const hostUsername = profile?.username ?? userId;
     const roomKey = generateRoomKey();
@@ -33,6 +43,15 @@ export async function createRoom(userId: string): Promise<{ roomKey: string; pla
 }
 
 export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; hostName: string }> {
+    const existingRoom = await getActiveRoomForUser(userId);
+    if (existingRoom && existingRoom.room_key !== roomKey) {
+        if (existingRoom.host_id === userId) {
+            await clearRoomPlayers(existingRoom.room_key);
+        } else {
+            await removePlayerFromRoom(existingRoom.room_key, userId);
+        }
+    }
+
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 

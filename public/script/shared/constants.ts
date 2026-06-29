@@ -14,7 +14,9 @@ export const FULL_CIRCLE_RADIANS: number = Math.PI * 2;
 export const FULL_CIRCLE_DEG: number = 360;
 export const POINTER_OFFSET_DEG: number = 270;
 
-export const MIN_ITEMS: number = 2;
+// export const MIN_ITEMS: number = 2;
+export const MIN_ITEMS: number = 0;
+
 export const MAX_ITEMS: number = 16;
 
 export const SEGMENT_COLORS: string[] = [

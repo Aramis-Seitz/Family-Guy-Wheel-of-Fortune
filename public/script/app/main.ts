@@ -25,6 +25,7 @@ import type { Direction } from "../shared/types.js";
 import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
 import { initShop } from "../shop/shop.js";
 
+// test comment before refactoring
 let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];

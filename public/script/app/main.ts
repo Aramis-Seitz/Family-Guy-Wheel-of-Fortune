@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, resetBtn } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, resetBtn, profileName } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -21,6 +21,7 @@ import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal, hideWinnerModal } from "../wheel/winner.js";
 import { createRoom, joinRoom, leaveRoom, spinRoom, closeRoom, resetRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier } from "../room.js";
+import { initChat, destroyChat } from "../multiplayer/chat.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
 import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
@@ -29,6 +30,7 @@ import { initShop } from "../shop/shop.js";
 let activeRoomKey: string | null = null;
 let isHost = false;
 let activeRoomHostName: string = '';
+let myUsername = '';
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
 let roomPrevNames: string[] = [];
@@ -153,6 +155,7 @@ function clearRoom(): void {
   enableMultiplierSlider();
   renderPlayersSidebar([]);
   replaceNames(savedNames);
+  destroyChat();
 }
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
@@ -213,6 +216,7 @@ function initRoomControls(): void {
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
         subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, undefined, handleRoomResetEvent);
+        initChat(roomKey, myUsername);
         multiplierSyncListener = () => {
           if (!activeRoomKey) return;
           void setMultiplier(activeRoomKey, getMultiplier());
@@ -244,6 +248,7 @@ function initRoomControls(): void {
           setMultiplierSlider(m);
           updateMultiplierDisplay();
         }, handleRoomResetEvent);
+        initChat(roomKey, myUsername);
         showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Beitreten fehlgeschlagen:', error);
@@ -308,6 +313,7 @@ async function initApp(): Promise<void> {
   setResetOverride(handleLocalReset);
   initShareFeature();
   await initProfileUI();
+  myUsername = profileName?.textContent?.trim() || 'Anonym';
   await ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();

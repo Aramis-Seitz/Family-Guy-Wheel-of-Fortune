@@ -8,34 +8,27 @@ import {
   initNameInputValidation,
   validateNameInput,
 } from "./name-input-validation.js";
-import { nameState, NameEntry } from "./name-state.js";
+import { nameState } from "./name-state.js";
 
 let roomLocked = false;
-let protectedNames = new Set<string>();
+let disableAddWhileLocked = true;
 
-export function lockNameEditing(): void {
+export function lockNameEditing(disableAdd = true): void {
   roomLocked = true;
-  syncListButtons();
+  disableAddWhileLocked = disableAdd;
   syncAddElements();
+  syncRemoveButtons();
 }
 
 export function unlockNameEditing(): void {
   roomLocked = false;
-  syncListButtons();
+  disableAddWhileLocked = false;
   syncAddElements();
+  syncRemoveButtons();
 }
 
 export function isNameEditingLocked(): boolean {
   return roomLocked;
-}
-
-export function setProtectedNames(names: string[]): void {
-  protectedNames = new Set(names.filter((name) => name.trim().length > 0));
-  syncListButtons();
-}
-
-function isProtectedName(name: string): boolean {
-  return protectedNames.has(name);
 }
 
 export function getNames(): string[] {
@@ -56,43 +49,29 @@ function getInitialNamesFromMarkup(): string[] {
     .filter((name) => validateName(name).valid);
 }
 
-function createNameItem(entry: NameEntry, index: number): HTMLLIElement {
+function createNameItem(name: string, index: number): HTMLLIElement {
   const li = document.createElement("li");
   li.className = "name-item";
-  if (!entry.active) {
-    li.classList.add("inactive");
-  }
   li.style.backgroundColor = getSegmentColor(index);
 
   const span = document.createElement("span");
   span.className = "name-text";
-  span.textContent = entry.value;
+  span.textContent = name;
 
-  const btnToggle = document.createElement("button");
-  btnToggle.className = "btn-toggle";
-  btnToggle.type = "button";
-  btnToggle.textContent = entry.active ? "−" : "+";
-  btnToggle.title = entry.active ? "Aus dem Rad entfernen" : "Wieder ins Rad hinzufügen";
-  btnToggle.addEventListener("click", () => handleToggle(index, li));
-
-  const btnDelete = document.createElement("button");
-  btnDelete.className = "btn-delete";
-  btnDelete.type = "button";
-  btnDelete.textContent = "🗑";
-  btnDelete.title = "Aus der Liste löschen";
-  btnDelete.dataset.name = entry.value;
-  btnDelete.disabled = roomLocked || isProtectedName(entry.value);
-  btnDelete.addEventListener("click", () => handleDelete(index, li));
+  const btn = document.createElement("button");
+  btn.className = "btn-remove";
+  btn.type = "button";
+  btn.textContent = "-";
+  btn.addEventListener("click", () => handleRemove(index, li));
 
   li.appendChild(span);
-  li.appendChild(btnToggle);
-  li.appendChild(btnDelete);
+  li.appendChild(btn);
   return li;
 }
 
-function renderNames(entries: NameEntry[]): void {
-  list.replaceChildren(...entries.map(createNameItem));
-  syncListButtons();
+function renderNames(names: string[]): void {
+  list.replaceChildren(...names.map(createNameItem));
+  syncRemoveButtons();
   syncAddElements();
   updateEmptyState();
   refreshWheel();
@@ -102,22 +81,15 @@ export function updateEmptyState(): void {
   emptyHint.style.display = getSegmentCount() === 0 ? "block" : "none";
 }
 
-export function syncListButtons(): void {
-  const toggleButtons = list.querySelectorAll(".btn-toggle") as NodeListOf<HTMLButtonElement>;
-  const deleteButtons = list.querySelectorAll(".btn-delete") as NodeListOf<HTMLButtonElement>;
-
-  toggleButtons.forEach((btn) => {
+export function syncRemoveButtons(): void {
+  const buttons = list.querySelectorAll(".btn-remove") as NodeListOf<HTMLButtonElement>;
+  buttons.forEach((btn) => {
     btn.disabled = roomLocked;
-  });
-
-  deleteButtons.forEach((btn) => {
-    const name = btn.dataset.name ?? "";
-    btn.disabled = roomLocked || isProtectedName(name);
   });
 }
 
 export function syncAddElements(): void {
-  const disabled = roomLocked || getSegmentCount() >= MAX_ITEMS;
+  const disabled = (roomLocked && disableAddWhileLocked) || getSegmentCount() >= MAX_ITEMS;
 
   addBtn.disabled = disabled;
   input.disabled = disabled;
@@ -146,28 +118,9 @@ function shakeItem(item: HTMLLIElement): void {
   item.addEventListener("animationend", () => item.classList.remove("shake"), { once: true });
 }
 
-function handleToggle(index: number, item: HTMLLIElement): void {
+function handleRemove(index: number, item: HTMLLIElement): void {
   if (roomLocked) return;
-  if (!nameState.toggleActiveAt(index)) {
-    shakeItem(item);
-    showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
-    return;
-  }
-}
-
-function handleDelete(index: number, item: HTMLLIElement): void {
-  if (roomLocked) return;
-
-  const entry = nameState.getEntries()[index];
-  if (!entry) return;
-
-  if (isProtectedName(entry.value)) {
-    shakeItem(item);
-    showErrorToast("Spieler in der Lobby kann nicht gelöscht werden.");
-    return;
-  }
-
-  if (entry.active && nameState.getActiveCount() <= MIN_ITEMS) {
+  if (getSegmentCount() <= MIN_ITEMS) {
     shakeItem(item);
     showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
     return;
@@ -199,14 +152,7 @@ export function removeNameByIndex(index: number): void {
   const item = list.querySelectorAll(".name-item")[index] as HTMLLIElement | undefined;
 
   if (item) {
-    handleDelete(index, item);
-  }
-}
-
-export function deactivateNameByIndex(index: number): void {
-  const item = list.querySelectorAll(".name-item")[index] as HTMLLIElement | undefined;
-  if (item) {
-    handleToggle(index, item);
+    handleRemove(index, item);
   }
 }
 

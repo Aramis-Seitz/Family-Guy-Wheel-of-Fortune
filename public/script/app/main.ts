@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -7,7 +7,7 @@ import { supabaseClient } from "../shared/supabase-client.js";
 import { applyActiveAssets } from "../shared/asset-selection.js";
 import { ensureDefaultAssets } from "../api/user-api.js";
 import { initInventory } from "../inventory/inventory.js";
-import { addName, initNameList, getNames, replaceNames, lockNameEditing, unlockNameEditing, setProtectedNames } from "../names/name-list.js";
+import { addName, initNameList, getNames, replaceNames, lockNameEditing, unlockNameEditing } from "../names/name-list.js";
 import { nameState } from "../names/name-state.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
@@ -19,7 +19,7 @@ import { initMultiplierSlider, getMultiplier, setMultiplierSlider, updateMultipl
 import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal } from "../wheel/winner.js";
-import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier } from "../room.js";
+import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier, updateRoomWheelItems } from "../room.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
 import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
@@ -29,14 +29,29 @@ let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];
 let removedInRoom = new Set<string>();
+let roomWheelItems: string[] = [];
 let nameStateUnsubscribe: (() => void) | null = null;
 let multiplierSyncListener: (() => void) | null = null;
+let currentPlayers: string[] = [];
 
 
 function initNameControls(): void {
-  addBtn.addEventListener("click", () => addName(input.value));
-  input.addEventListener("keydown", (event: KeyboardEvent) => {
-    if (event.key === "Enter") addName(input.value);
+  addBtn.addEventListener("click", async () => {
+    if (activeRoomKey && isHost) {
+      await addCustomWheelItem(input.value);
+    } else {
+      addName(input.value);
+    }
+  });
+
+  input.addEventListener("keydown", async (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      if (activeRoomKey && isHost) {
+        await addCustomWheelItem(input.value);
+      } else {
+        addName(input.value);
+      }
+    }
   });
 }
 
@@ -51,7 +66,41 @@ function renderPlayersSidebar(players: string[]): void {
   list.innerHTML = '';
   players.forEach((name) => {
     const li = document.createElement('li');
-    li.textContent = name;
+    li.className = 'player-item';
+
+    const label = document.createElement('span');
+    label.className = 'player-name';
+    label.textContent = name;
+    li.appendChild(label);
+
+    if (isHost) {
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'player-toggle-btn';
+      const inWheel = (roomWheelItems ?? []).includes(name);
+      toggle.textContent = inWheel ? '−' : '+';
+      if (inWheel) toggle.classList.add('added');
+      toggle.title = inWheel ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
+
+      toggle.addEventListener('click', async () => {
+        // disable while processing
+        toggle.disabled = true;
+        try {
+          if ((roomWheelItems ?? []).includes(name)) {
+            await removePlayerFromWheelItem(name);
+          } else {
+            await addPlayerToWheelItem(name);
+          }
+        } catch (err) {
+          console.error('[ROOM] toggle player failed', err);
+        } finally {
+          toggle.disabled = false;
+        }
+      });
+
+      li.appendChild(toggle);
+    }
+
     list.appendChild(li);
   });
 }
@@ -66,42 +115,69 @@ function updateSpinButtonState(activeCount: number): void {
   }
 }
 
-// Called once when creating or joining a room — sets the wheel to exactly the room's player list.
-function initRoomPlayers(players: string[]): void {
-  removedInRoom.clear();
-  setProtectedNames(players);
-  replaceNames(players);
-  renderPlayersSidebar(players);
-  updateSpinButtonState(players.length);
+function setHostControlsVisibility(host: boolean): void {
+  if (bulkAddToWheelBtn) {
+    bulkAddToWheelBtn.classList.toggle('hidden', !host);
+  }
 
-  // Track manual removals so syncRoomPlayers can filter them out later.
-  if (nameStateUnsubscribe) nameStateUnsubscribe();
-  nameStateUnsubscribe = nameState.subscribe((entries) => {
-    if (!activeRoomKey) return;
-    const activeNames = entries.filter((entry) => entry.active).map((entry) => entry.value);
-    removedInRoom = new Set(players.filter((name) => !activeNames.includes(name)));
+  const hostOnlyInputs = [input, addBtn];
+  hostOnlyInputs.forEach((el) => {
+    if (!el) return;
+    el.disabled = !host;
+    el.style.opacity = host ? '1' : '0.5';
+    el.style.cursor = host ? 'text' : 'not-allowed';
   });
 }
 
-// Called on Realtime player-list updates — only adds new players, never re-adds removed ones.
+function updateWheelEmptyState(): void {
+  if (!wheelEmptyHint) return;
+  wheelEmptyHint.classList.toggle('hidden', roomWheelItems.length > 0);
+  // show/hide centered input overlay when wheel is empty
+  const centered = (document.getElementById('centeredInput') as HTMLDivElement | null);
+  const sidebarRow = document.getElementById('sidebarAddRow') as HTMLDivElement | null;
+  if (centered && sidebarRow) {
+    if (roomWheelItems.length === 0) {
+      centered.classList.remove('centered-input-hidden');
+      sidebarRow.classList.add('centered-input-hidden');
+    } else {
+      centered.classList.add('centered-input-hidden');
+      sidebarRow.classList.remove('centered-input-hidden');
+    }
+  }
+}
+
+// Called once when creating or joining a room — sets the wheel to exactly the room's player list.
+function initRoomPlayers(players: string[]): void {
+  currentPlayers = [...players];
+  replaceNames([]);
+  renderPlayersSidebar(currentPlayers);
+  updateSpinButtonState(getNames().length);
+}
+
 function syncRoomPlayers(players: string[]): void {
-  setProtectedNames(players);
-  const toShow = players.filter((p) => !removedInRoom.has(p));
-  replaceNames(toShow);
-  renderPlayersSidebar(players);
-  updateSpinButtonState(toShow.length);
+  currentPlayers = [...players];
+  renderPlayersSidebar(currentPlayers);
+  updateSpinButtonState(getNames().length);
 }
 
 function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
   isHost = host;
-  lockNameEditing();
+  if (host) {
+    lockNameEditing(false);
+  } else {
+    lockNameEditing(true);
+  }
+  setHostControlsVisibility(host);
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
   if (roomInfo) roomInfo.classList.remove('hidden');
 
   if (!host) {
     spinLeftBtn.classList.add('room-guest');
     spinRightBtn.classList.add('room-guest');
+  } else {
+    spinLeftBtn.classList.remove('room-guest');
+    spinRightBtn.classList.remove('room-guest');
   }
 }
 
@@ -111,7 +187,7 @@ function clearRoom(): void {
     nameStateUnsubscribe = null;
   }
   removedInRoom.clear();
-  setProtectedNames([]);
+  roomWheelItems = [];
   unlockNameEditing();
   unsubscribeFromRoom();
   setSpinOverride(null);
@@ -126,8 +202,10 @@ function clearRoom(): void {
     multiplierSyncListener = null;
   }
   enableMultiplierSlider();
+  setHostControlsVisibility(false);
   renderPlayersSidebar([]);
   replaceNames(savedNames);
+  updateWheelEmptyState();
 }
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
@@ -161,16 +239,105 @@ function onRoomClosed(): void {
   showToast({ message: 'Der Host hat den Raum geschlossen', type: 'error' });
 }
 
+function setWheelItemsFromRoom(items: string[]): void {
+  roomWheelItems = [...items];
+  replaceNames(items);
+  updateWheelEmptyState();
+  // refresh player sidebar buttons so their toggle state updates
+  if (currentPlayers.length > 0) renderPlayersSidebar(currentPlayers);
+  // update bulk button label
+  updateBulkButtonState(currentPlayers);
+}
+
+async function addCustomWheelItem(rawName: string): Promise<void> {
+  const trimmed = rawName.trim();
+  if (!trimmed) return;
+  if (!activeRoomKey || !isHost) {
+    addName(trimmed);
+    return;
+  }
+
+  const updatedItems = [...(roomWheelItems ?? []), trimmed];
+  await updateRoomWheelItems(activeRoomKey, updatedItems);
+  input.value = '';
+}
+
+async function addPlayerToWheelItem(playerName: string): Promise<void> {
+  if (!activeRoomKey || !isHost) return;
+  const updatedItems = [...(roomWheelItems ?? []), playerName];
+  await updateRoomWheelItems(activeRoomKey, updatedItems);
+}
+
+async function removePlayerFromWheelItem(playerName: string): Promise<void> {
+  if (!activeRoomKey || !isHost) return;
+  const items = roomWheelItems ?? [];
+  const index = items.findIndex((item) => item === playerName);
+  if (index < 0) return;
+  const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
+  await updateRoomWheelItems(activeRoomKey, updatedItems);
+}
+
+async function addAllPlayersToWheel(players: string[]): Promise<void> {
+  if (!activeRoomKey || !isHost) return;
+  const current = roomWheelItems ?? [];
+
+  const currentCounts = current.reduce<Record<string, number>>((acc, value) => {
+    acc[value] = (acc[value] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const playersToAdd: string[] = [];
+  const requestedCounts = players.reduce<Record<string, number>>((acc, name) => {
+    acc[name] = (acc[name] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  Object.entries(requestedCounts).forEach(([player, count]) => {
+    const existingCount = currentCounts[player] ?? 0;
+    const missing = Math.max(0, count - existingCount);
+    for (let i = 0; i < missing; i += 1) {
+      playersToAdd.push(player);
+    }
+  });
+
+  if (playersToAdd.length === 0) return;
+  const updatedItems = [...current, ...playersToAdd];
+  await updateRoomWheelItems(activeRoomKey, updatedItems);
+}
+
+function updateBulkButtonState(players: string[]): void {
+  if (!bulkAddToWheelBtn) return;
+  const anyMissing = players.some((p) => !(roomWheelItems ?? []).includes(p));
+  if (anyMissing) {
+    bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
+    bulkAddToWheelBtn.classList.remove('bulk-remove');
+  } else {
+    bulkAddToWheelBtn.textContent = 'Alle vom Rad entfernen';
+    bulkAddToWheelBtn.classList.add('bulk-remove');
+  }
+}
+
 function initRoomControls(): void {
+  bulkAddToWheelBtn?.addEventListener('click', async () => {
+    if (!activeRoomKey || !isHost) return;
+    const players = Array.from(playersList?.querySelectorAll('.player-name') ?? [])
+      .map((node) => node.textContent?.trim() ?? '');
+    await addAllPlayersToWheel(players);
+  });
+
   createRoomBtn?.addEventListener('click', () => {
     void (async () => {
       try {
         savedNames = getNames();
-        const { roomKey, players } = await createRoom();
+        const { roomKey, players, wheelItems } = await createRoom();
         setRoomActive(roomKey, true);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed);
+        setWheelItemsFromRoom(wheelItems ?? []);
+        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, (m) => {
+          setMultiplierSlider(m);
+          updateMultiplierDisplay();
+        }, setWheelItemsFromRoom);
         multiplierSyncListener = () => {
           if (!activeRoomKey) return;
           void setMultiplier(activeRoomKey, getMultiplier());
@@ -190,17 +357,18 @@ function initRoomControls(): void {
       if (!roomKey) return;
       try {
         savedNames = getNames();
-        const { players, multiplier } = await joinRoom(roomKey);
+        const { players, multiplier, wheelItems } = await joinRoom(roomKey);
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
+        setWheelItemsFromRoom(wheelItems ?? []);
         setMultiplierSlider(multiplier);
         updateMultiplierDisplay();
         disableMultiplierSlider();
         subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, (m) => {
           setMultiplierSlider(m);
           updateMultiplierDisplay();
-        });
+        }, setWheelItemsFromRoom);
         showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
       } catch (error) {
         console.error('[ROOM] Beitreten fehlgeschlagen:', error);

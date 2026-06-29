@@ -7,17 +7,16 @@
 
 #svg,
 .wheel-empty-state {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-}
-
-.wheel-empty-state {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
+
+    position: absolute;
+    inset: 0;
+}
+
+.wheel-empty-state.visible {
+    display: flex;
 }
 
 .speech-bubble {

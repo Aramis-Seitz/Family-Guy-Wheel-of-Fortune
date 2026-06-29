@@ -7,7 +7,7 @@ import { supabaseClient } from "../shared/supabase-client.js";
 import { applyActiveAssets } from "../shared/asset-selection.js";
 import { ensureDefaultAssets } from "../api/user-api.js";
 import { initInventory } from "../inventory/inventory.js";
-import { addName, initNameList, getNames, replaceNames, lockNameEditing, unlockNameEditing } from "../names/name-list.js";
+import { addName, initNameList, getNames, replaceNames, lockNameEditing, unlockNameEditing, setOnNameRemoved } from "../names/name-list.js";
 import { nameState } from "../names/name-state.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
@@ -154,9 +154,9 @@ function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
   isHost = host;
   if (host) {
-    lockNameEditing(false);
+    lockNameEditing(false, false);
   } else {
-    lockNameEditing(true);
+    lockNameEditing(true, true);
   }
   setHostControlsVisibility(host);
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
@@ -178,6 +178,7 @@ function clearRoom(): void {
   }
   removedInRoom.clear();
   roomWheelItems = [];
+  setOnNameRemoved(null);
   unlockNameEditing();
   unsubscribeFromRoom();
   setSpinOverride(null);
@@ -259,6 +260,15 @@ async function addPlayerToWheelItem(playerName: string): Promise<void> {
   await updateRoomWheelItems(activeRoomKey, updatedItems);
 }
 
+async function removeNameFromWheelItem(itemName: string): Promise<void> {
+  if (!activeRoomKey || !isHost) return;
+  const items = roomWheelItems ?? [];
+  const index = items.findIndex((item) => item === itemName);
+  if (index < 0) return;
+  const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
+  await updateRoomWheelItems(activeRoomKey, updatedItems);
+}
+
 async function removePlayerFromWheelItem(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   const items = roomWheelItems ?? [];
@@ -296,6 +306,10 @@ function updateBulkButtonState(players: string[]): void {
 }
 
 function initRoomControls(): void {
+  setOnNameRemoved(async (removedName: string): Promise<void> => {
+    await removeNameFromWheelItem(removedName);
+  });
+
   bulkAddToWheelBtn?.addEventListener('click', async () => {
     if (!activeRoomKey || !isHost) return;
     const players = Array.from(playersList?.querySelectorAll('.player-name') ?? [])

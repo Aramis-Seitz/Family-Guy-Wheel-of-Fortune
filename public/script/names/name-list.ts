@@ -12,10 +12,17 @@ import { nameState } from "./name-state.js";
 
 let roomLocked = false;
 let disableAddWhileLocked = true;
+let disableRemoveWhileLocked = true;
+let onNameRemoved: ((removedName: string, index: number) => Promise<void> | void) | null = null;
 
-export function lockNameEditing(disableAdd = true): void {
+export function setOnNameRemoved(callback: ((removedName: string, index: number) => Promise<void> | void) | null): void {
+  onNameRemoved = callback;
+}
+
+export function lockNameEditing(disableAdd = true, disableRemove = true): void {
   roomLocked = true;
   disableAddWhileLocked = disableAdd;
+  disableRemoveWhileLocked = disableRemove;
   syncAddElements();
   syncRemoveButtons();
 }
@@ -23,6 +30,7 @@ export function lockNameEditing(disableAdd = true): void {
 export function unlockNameEditing(): void {
   roomLocked = false;
   disableAddWhileLocked = false;
+  disableRemoveWhileLocked = false;
   syncAddElements();
   syncRemoveButtons();
 }
@@ -62,7 +70,9 @@ function createNameItem(name: string, index: number): HTMLLIElement {
   btn.className = "btn-remove";
   btn.type = "button";
   btn.textContent = "-";
-  btn.addEventListener("click", () => handleRemove(index, li));
+  btn.addEventListener("click", async () => {
+    await handleRemove(index, li);
+  });
 
   li.appendChild(span);
   li.appendChild(btn);
@@ -83,8 +93,11 @@ export function updateEmptyState(): void {
 
 export function syncRemoveButtons(): void {
   const buttons = list.querySelectorAll(".btn-remove") as NodeListOf<HTMLButtonElement>;
+  const disabled = roomLocked && disableRemoveWhileLocked;
   buttons.forEach((btn) => {
-    btn.disabled = roomLocked;
+    btn.disabled = disabled;
+    btn.style.cursor = disabled ? "not-allowed" : "pointer";
+    btn.style.opacity = disabled ? "0.5" : "1";
   });
 }
 
@@ -118,12 +131,25 @@ function shakeItem(item: HTMLLIElement): void {
   item.addEventListener("animationend", () => item.classList.remove("shake"), { once: true });
 }
 
-function handleRemove(index: number, item: HTMLLIElement): void {
-  if (roomLocked) return;
+async function handleRemove(index: number, item: HTMLLIElement): Promise<void> {
+  if (roomLocked && disableRemoveWhileLocked) return;
   if (getSegmentCount() <= MIN_ITEMS) {
     shakeItem(item);
     showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
     return;
+  }
+
+  const nameText = item.querySelector(".name-text")?.textContent?.trim() ?? "";
+  if (onNameRemoved && nameText) {
+    const button = item.querySelector(".btn-remove") as HTMLButtonElement | null;
+    if (button) button.disabled = true;
+    try {
+      await onNameRemoved(nameText, index);
+    } catch (error) {
+      if (button) button.disabled = false;
+      console.error("Failed to remove name from room wheel items:", error);
+      return;
+    }
   }
 
   nameState.removeAt(index);

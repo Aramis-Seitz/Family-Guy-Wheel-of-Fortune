@@ -48,7 +48,7 @@ export type InventoryItem = {
   created_at: string;
 };
 
-export type ToastType = "success" | "error";
+export type ToastType = "success" | "error" | "info";
 
 export interface ToastOptions {
   message: string;

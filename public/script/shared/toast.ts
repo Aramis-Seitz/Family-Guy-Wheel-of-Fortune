@@ -1,3 +1,4 @@
+import { toastIcon } from "./constants.js";
 import { ToastType, ToastOptions } from "./types.js";
 
 const toastDurationMs = 3000;
@@ -23,7 +24,7 @@ function createToastElement(message: string, type: ToastType): HTMLDivElement {
 
   const icon = document.createElement("span");
   icon.className = "toast__icon";
-  icon.textContent = type === "success" ? "✓" : "✕";
+  icon.textContent = toastIcon[type];
 
   const text = document.createElement("span");
   text.className = "toast__message";

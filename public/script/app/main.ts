@@ -2,6 +2,8 @@ import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, resetBtn } 
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
+  leaveRoomConfirmModal, leaveRoomConfirmMessage,
+  confirmLeaveRoomBtn, cancelLeaveRoomBtn,
 } from "../shared/dom.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import { applyActiveAssets } from "../shared/asset-selection.js";
@@ -30,6 +32,7 @@ let activeRoomKey: string | null = null;
 let isHost = false;
 let activeRoomHostName: string = '';
 let savedNames: string[] = [];
+let roomPlayersList: string[] = [];
 let removedInRoom = new Set<string>();
 let roomPrevNames: string[] = [];
 let nameStateUnsubscribe: (() => void) | null = null;
@@ -83,6 +86,7 @@ function updateSpinButtonState(activeCount: number): void {
 // Called once when creating or joining a room — sets the wheel to exactly the room's player list.
 function initRoomPlayers(players: string[]): void {
   removedInRoom.clear();
+  roomPlayersList = [...players];
   replaceNames(players);
   renderPlayersSidebar(players);
   updateSpinButtonState(players.length);
@@ -99,6 +103,8 @@ function initRoomPlayers(players: string[]): void {
 
 // Called on Realtime player-list updates — only adds new players, never re-adds removed ones.
 function syncRoomPlayers(players: string[]): void {
+  if (!activeRoomKey) return;
+  roomPlayersList = [...players];
   const toShow = players.filter(p => !removedInRoom.has(p));
   // Update roomPrevNames before replaceNames so the nameState subscriber
   // doesn't mistake this room sync as a manual removal.
@@ -132,6 +138,7 @@ function clearRoom(): void {
     nameStateUnsubscribe = null;
   }
   removedInRoom.clear();
+  roomPlayersList = [];
   unlockNameEditing();
   unsubscribeFromRoom();
   setSpinOverride(null);
@@ -202,11 +209,25 @@ function onRoomClosed(): void {
   showToast({ message: 'Der Host hat den Raum geschlossen', type: 'success' });
 }
 
+async function executeLeaveRoom(): Promise<void> {
+  const wasHost = isHost;
+  const roomKey = activeRoomKey;
+  clearRoom(); // unsubscribe first so we don't receive our own close event
+  if (roomKey) {
+    try {
+      await leaveRoom(roomKey);
+      showToast({ message: wasHost ? 'Raum geschlossen' : 'Raum verlassen', type: 'success' });
+    } catch {
+      showToast({ message: wasHost ? 'Raum konnte nicht geschlossen werden' : 'Raum konnte nicht verlassen werden', type: 'error' });
+    }
+  }
+}
+
 function initRoomControls(): void {
   createRoomBtn?.addEventListener('click', () => {
     void (async () => {
       try {
-        savedNames = getNames();
+        if (!activeRoomKey) savedNames = getNames();
         const { roomKey, players } = await createRoom();
         activeRoomHostName = players[0] ?? '';
         setRoomActive(roomKey, true);
@@ -231,7 +252,7 @@ function initRoomControls(): void {
       const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
       if (!roomKey) return;
       try {
-        savedNames = getNames();
+        if (!activeRoomKey) savedNames = getNames();
         const { players, multiplier, hostName } = await joinRoom(roomKey);
         activeRoomHostName = hostName;
         setRoomActive(roomKey, false);
@@ -257,19 +278,26 @@ function initRoomControls(): void {
       showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
       return;
     }
-    void (async () => {
-      const wasHost = isHost;
-      const roomKey = activeRoomKey;
-      clearRoom(); // unsubscribe first so we don't receive our own close event
-      if (roomKey) {
-        try {
-          await leaveRoom(roomKey);
-          showToast({ message: wasHost ? 'Raum geschlossen' : 'Raum verlassen', type: 'success' });
-        } catch {
-          showToast({ message: wasHost ? 'Raum konnte nicht geschlossen werden' : 'Raum konnte nicht verlassen werden', type: 'error' });
-        }
+    const needsConfirm = isHost && roomPlayersList.length > 1;
+    if (needsConfirm) {
+      const guestCount = roomPlayersList.length - 1;
+      if (leaveRoomConfirmMessage) {
+        leaveRoomConfirmMessage.textContent =
+          `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
       }
-    })();
+      leaveRoomConfirmModal?.showModal();
+      return;
+    }
+    void executeLeaveRoom();
+  });
+
+  confirmLeaveRoomBtn?.addEventListener('click', () => {
+    leaveRoomConfirmModal?.close();
+    void executeLeaveRoom();
+  });
+
+  cancelLeaveRoomBtn?.addEventListener('click', () => {
+    leaveRoomConfirmModal?.close();
   });
 
   copyRoomKeyBtn?.addEventListener('click', () => {

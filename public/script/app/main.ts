@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint, centeredInput, inputCentered, addBtnCentered } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -53,29 +53,6 @@ function initNameControls(): void {
       }
     }
   });
-
-  const centeredInputField = inputCentered;
-  if (addBtnCentered && centeredInputField) {
-    addBtnCentered.addEventListener("click", async () => {
-      const centeredValue = centeredInputField.value ?? '';
-      if (activeRoomKey && isHost) {
-        await addCustomWheelItem(centeredValue);
-      } else {
-        addName(centeredValue);
-      }
-    });
-
-    centeredInputField.addEventListener("keydown", async (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        const centeredValue = centeredInputField.value ?? '';
-        if (activeRoomKey && isHost) {
-          await addCustomWheelItem(centeredValue);
-        } else {
-          addName(centeredValue);
-        }
-      }
-    });
-  }
 }
 
 async function hasActiveSession(): Promise<boolean> {
@@ -143,34 +120,18 @@ function setHostControlsVisibility(host: boolean): void {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
   }
 
-  const hostOnlyInputs = [input, addBtn, inputCentered, addBtnCentered];
+  const hostOnlyInputs = [input, addBtn];
   hostOnlyInputs.forEach((el) => {
     if (!el) return;
     el.disabled = !host;
     el.style.opacity = host ? '1' : '0.5';
     el.style.cursor = host ? 'text' : 'not-allowed';
   });
-
-  if (centeredInput) {
-    centeredInput.classList.toggle('host-disabled', !host);
-  }
 }
 
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
   wheelEmptyHint.classList.toggle('hidden', roomWheelItems.length > 0);
-
-  const centered = centeredInput;
-  const sidebarRow = document.getElementById('sidebarAddRow') as HTMLDivElement | null;
-  if (centered && sidebarRow) {
-    if (roomWheelItems.length === 0) {
-      centered.classList.remove('centered-input-hidden');
-      sidebarRow.classList.add('centered-input-hidden');
-    } else {
-      centered.classList.add('centered-input-hidden');
-      sidebarRow.classList.remove('centered-input-hidden');
-    }
-  }
 }
 
 // Called once when creating or joining a room — sets the wheel to exactly the room's player list.
@@ -284,14 +245,12 @@ async function addCustomWheelItem(rawName: string): Promise<void> {
   if (!activeRoomKey || !isHost) {
     addName(trimmed);
     input.value = '';
-    if (inputCentered) inputCentered.value = '';
     return;
   }
 
   const updatedItems = [...(roomWheelItems ?? []), trimmed];
   await updateRoomWheelItems(activeRoomKey, updatedItems);
   input.value = '';
-  if (inputCentered) inputCentered.value = '';
 }
 
 async function addPlayerToWheelItem(playerName: string): Promise<void> {

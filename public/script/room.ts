@@ -136,15 +136,16 @@ export function unsubscribeFromRoom(): void {
 export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void {
   let cachedToken = '';
 
-  void supabaseClient.auth.getSession().then((result: { data: { session: Session | null } }) => {
-    cachedToken = result.data.session?.access_token ?? '';
+  void supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
+    cachedToken = session?.access_token ?? '';
   });
 
   supabaseClient.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
     cachedToken = session?.access_token ?? '';
   });
 
-  window.addEventListener('beforeunload', () => {
+  window.addEventListener('pagehide', (event) => {
+    if (event.persisted) return;
     const roomKey = getActiveRoomKey();
     if (!roomKey || !cachedToken) return;
     leaveRoomOnUnload(roomKey, cachedToken);

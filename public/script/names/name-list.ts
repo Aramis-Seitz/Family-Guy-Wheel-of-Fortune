@@ -13,6 +13,7 @@ import { nameState } from "./name-state.js";
 let roomLocked = false;
 let disableAddWhileLocked = true;
 let disableRemoveWhileLocked = true;
+let multiplayerMode = false;
 let onNameRemoved: ((removedName: string, index: number) => Promise<void> | void) | null = null;
 
 export function setOnNameRemoved(callback: ((removedName: string, index: number) => Promise<void> | void) | null): void {
@@ -84,7 +85,9 @@ function renderNames(names: string[]): void {
   syncRemoveButtons();
   syncAddElements();
   updateEmptyState();
-  updateSpinButtonState();
+  if (!multiplayerMode) {
+    updateSpinButtonState();
+  }
   refreshWheel();
 }
 
@@ -131,6 +134,13 @@ export function syncAddElements(): void {
   addBtn.style.cursor = disabled ? "not-allowed" : "pointer";
   input.style.opacity = disabled ? "0.5" : "1";
   input.style.cursor = disabled ? "not-allowed" : "text";
+}
+
+export function setMultiplayerMode(active: boolean): void {
+  multiplayerMode = active;
+  if (!active) {
+    updateSpinButtonState();
+  }
 }
 
 function showErrorToast(message: string): void {

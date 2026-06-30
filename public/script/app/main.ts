@@ -13,6 +13,7 @@ import { initInventory } from "../inventory/inventory.js";
 import {
   addName, initNameList, getNames, replaceNames,
   lockNameEditing, unlockNameEditing, setOnNameRemoved,
+  setMultiplayerMode,
 } from "../names/name-list.js";
 import { initShareFeature } from "../names/share-name-list.js";
 import { initProfileUI } from "../profile/profiles.js";
@@ -180,6 +181,7 @@ function syncRoomPlayers(players: string[]): void {
 function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
   isHost = host;
+  setMultiplayerMode(true);
   if (host) {
     lockNameEditing(false, false);
   } else {
@@ -204,6 +206,7 @@ function setRoomActive(roomKey: string, host: boolean): void {
 
 function clearRoom(): void {
   roomWheelItems = [];
+  setMultiplayerMode(false);
   setOnNameRemoved(null);
   unlockNameEditing();
   unsubscribeFromRoom();

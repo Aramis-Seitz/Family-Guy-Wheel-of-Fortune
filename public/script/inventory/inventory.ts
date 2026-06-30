@@ -19,6 +19,7 @@ import {
 } from "../shared/dom.js";
 import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
+import { replaceNames } from "../names/name-list.js";
 import { InventoryItem, Asset, InventoryCategory } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
@@ -133,14 +134,25 @@ function createEmptyCard(): HTMLDivElement {
 
 function createItemCard(item: InventoryItem): HTMLElement {
   const hasValidLink = (item.link ?? "").trim() !== "";
-  const card = hasValidLink
-    ? document.createElement("a")
-    : document.createElement("div");
-
+  const card = document.createElement("div");
   card.classList.add("inventory-card");
 
-  if (card instanceof HTMLAnchorElement) {
-    card.href = item.link!;
+  if (hasValidLink) {
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+
+    const names = extractNamesFromLink(item.link);
+    const handleLoad = () => {
+      if (names.length > 0) replaceNames(names);
+      inventoryModal.close();
+    };
+    card.addEventListener("click", handleLoad);
+    card.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleLoad();
+      }
+    });
   }
 
   card.appendChild(buildCardContent(item));

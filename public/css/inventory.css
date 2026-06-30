@@ -98,6 +98,10 @@
     text-decoration: none;
 }
 
+.inventory-card[role="button"] {
+    cursor: pointer;
+}
+
 .inventory-card:hover {
     background: rgba(0, 162, 255, 0.28);
     transform: translateY(-2px);

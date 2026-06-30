@@ -1,4 +1,4 @@
-import { addBtn, input, spinLeftBtn, spinRightBtn, resetBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint } from "../shared/dom.js";
+import { addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider, bulkAddToWheelBtn, wheelEmptyHint } from "../shared/dom.js";
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -8,7 +8,6 @@ import { addName, getNames, replaceNames, lockNameEditing, unlockNameEditing, se
 import {
   spinWheel,
   setSpinOverride, lockSpinButtons, unlockSpinButtons,
-  resetWheelRotation, isSpinning,
 } from "../wheel/spin.js";
 import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider } from "../wheel/multiplier.js";
 import { createRoom, joinRoom, spinRoom, closeRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier, updateRoomWheelItems } from "../room.js";
@@ -19,6 +18,7 @@ import type { Direction } from "../shared/types.js";
 let activeRoomKey: string | null = null;
 let isHost = false;
 let savedNames: string[] = [];
+let removedInRoom = new Set<string>();
 let roomWheelItems: string[] = [];
 let nameStateUnsubscribe: (() => void) | null = null;
 let multiplierSyncListener: (() => void) | null = null;
@@ -47,7 +47,7 @@ function renderPlayersSidebar(players: string[]): void {
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'player-toggle-btn';
-      const inWheel = roomWheelItems.includes(name);
+      const inWheel = (roomWheelItems ?? []).includes(name);
       toggle.textContent = inWheel ? '−' : '+';
       if (inWheel) toggle.classList.add('added');
       toggle.title = inWheel ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
@@ -55,7 +55,7 @@ function renderPlayersSidebar(players: string[]): void {
       toggle.addEventListener('click', async () => {
         toggle.disabled = true;
         try {
-          if (roomWheelItems.includes(name)) {
+          if ((roomWheelItems ?? []).includes(name)) {
             await removePlayerFromWheelItem(name);
           } else {
             await addPlayerToWheelItem(name);
@@ -98,18 +98,6 @@ function setHostControlsVisibility(host: boolean): void {
   });
 }
 
-function updateResetButtonState(host: boolean): void {
-  if (!resetBtn) return;
-  resetBtn.disabled = !host;
-  if (!host) {
-    resetBtn.style.setProperty('opacity', '0.4');
-    resetBtn.style.setProperty('cursor', 'not-allowed');
-  } else {
-    resetBtn.style.removeProperty('opacity');
-    resetBtn.style.removeProperty('cursor');
-  }
-}
-
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
   wheelEmptyHint.classList.toggle('hidden', roomWheelItems.length > 0);
@@ -139,7 +127,6 @@ function setRoomActive(roomKey: string, host: boolean): void {
     lockNameEditing(true, true);
   }
   setHostControlsVisibility(host);
-  updateResetButtonState(host);
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
   if (roomInfo) roomInfo.classList.remove('hidden');
 
@@ -157,7 +144,7 @@ function clearRoom(): void {
     nameStateUnsubscribe();
     nameStateUnsubscribe = null;
   }
-
+  removedInRoom.clear();
   roomWheelItems = [];
   setOnNameRemoved(null);
   unlockNameEditing();
@@ -169,7 +156,6 @@ function clearRoom(): void {
   if (roomInfo) roomInfo.classList.add('hidden');
   spinLeftBtn.classList.remove('room-guest', 'room-solo');
   spinRightBtn.classList.remove('room-guest', 'room-solo');
-  updateResetButtonState(false);
   if (multiplierSyncListener) {
     multiplierSlider?.removeEventListener('input', multiplierSyncListener);
     multiplierSyncListener = null;
@@ -205,10 +191,6 @@ export async function handleRoomSpinClick(direction: Direction): Promise<void> {
   }
 }
 
-export function handleLocalReset(): void {
-  resetWheelRotation();
-}
-
 function onRoomClosed(): void {
   if (isHost) return;
   clearRoom();
@@ -233,20 +215,20 @@ async function addCustomWheelItem(rawName: string): Promise<void> {
     return;
   }
 
-  const updatedItems = [...roomWheelItems, trimmed];
+  const updatedItems = [...(roomWheelItems ?? []), trimmed];
   await updateRoomWheelItems(activeRoomKey, updatedItems);
   input.value = '';
 }
 
 async function addPlayerToWheelItem(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const updatedItems = [...roomWheelItems, playerName];
+  const updatedItems = [...(roomWheelItems ?? []), playerName];
   await updateRoomWheelItems(activeRoomKey, updatedItems);
 }
 
 async function removeNameFromWheelItem(itemName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const items = roomWheelItems;
+  const items = roomWheelItems ?? [];
   const index = items.findIndex((item) => item === itemName);
   if (index < 0) return;
   const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
@@ -255,7 +237,7 @@ async function removeNameFromWheelItem(itemName: string): Promise<void> {
 
 async function removePlayerFromWheelItem(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const items = roomWheelItems;
+  const items = roomWheelItems ?? [];
   const index = items.findIndex((item) => item === playerName);
   if (index < 0) return;
   const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
@@ -264,21 +246,22 @@ async function removePlayerFromWheelItem(playerName: string): Promise<void> {
 
 async function addAllPlayersToWheel(players: string[]): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const missingPlayers = players.filter((player) => !roomWheelItems.includes(player));
+  const current = roomWheelItems ?? [];
+  const missingPlayers = players.filter((player) => !current.includes(player));
 
   if (missingPlayers.length > 0) {
-    const updatedItems = [...roomWheelItems, ...missingPlayers];
+    const updatedItems = [...current, ...missingPlayers];
     await updateRoomWheelItems(activeRoomKey, updatedItems);
     return;
   }
 
-  const updatedItems = roomWheelItems.filter((item) => !players.includes(item));
+  const updatedItems = current.filter((item) => !players.includes(item));
   await updateRoomWheelItems(activeRoomKey, updatedItems);
 }
 
 function updateBulkButtonState(players: string[]): void {
   if (!bulkAddToWheelBtn) return;
-  const anyMissing = players.some((p) => !roomWheelItems.includes(p));
+  const anyMissing = players.some((p) => !(roomWheelItems ?? []).includes(p));
   if (anyMissing) {
     bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
     bulkAddToWheelBtn.classList.remove('bulk-remove');
@@ -373,10 +356,6 @@ export function initRoomControls(): void {
   });
 
   leaveRoomBtn?.addEventListener('click', () => {
-    if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
-      return;
-    }
     void (async () => {
       const wasHost = isHost;
       const roomKey = activeRoomKey;

@@ -20,7 +20,7 @@ import { initMultiplierSlider, getMultiplier, setMultiplierSlider, updateMultipl
 import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal, hideWinnerModal } from "../wheel/winner.js";
-import { createRoom, joinRoom, leaveRoom, spinRoom, closeRoom, resetRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier } from "../room.js";
+import { createRoom, joinRoom, leaveRoom, spinRoom, closeRoom, resetRoom, subscribeToRoom, unsubscribeFromRoom, setMultiplier, initRoomUnloadGuard } from "../room.js";
 import { initChat, destroyChat } from "../multiplayer/chat.js";
 import { showToast } from "../shared/toast.js";
 import type { Direction } from "../shared/types.js";
@@ -50,10 +50,6 @@ function initNameControls(): void {
   });
 }
 
-async function hasActiveSession(): Promise<boolean> {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  return Boolean(session);
-}
 
 function renderPlayersSidebar(players: string[]): void {
   if (!playersList) return;
@@ -299,10 +295,13 @@ export function isMultiplayerActive(): boolean {
 }
 
 async function initApp(): Promise<void> {
-  if (!(await hasActiveSession())) {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) {
     window.location.href = "/login.html";
     return;
   }
+
+  initRoomUnloadGuard(() => activeRoomKey);
 
   initNameList();
   initNameControls();

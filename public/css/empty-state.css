@@ -37,16 +37,16 @@
     content: "";
 
     position: absolute;
-    left: 24px;
-    bottom: -10px;
+    left: -10px;
+    top: 50%;
 
     width: 16px;
     height: 16px;
 
     background: white;
 
-    border-right: 2px solid black;
+    border-left: 2px solid black;
     border-bottom: 2px solid black;
 
-    transform: rotate(45deg);
+    transform: translateY(-50%) rotate(45deg);
 }

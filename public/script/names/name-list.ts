@@ -1,4 +1,4 @@
-import { MAX_ITEMS, MIN_ITEMS } from "../shared/constants.js";
+import { MAX_ITEMS } from "../shared/constants.js";
 import { addBtn, emptyHint, input, list } from "../shared/dom.js";
 import { showToast } from "../shared/toast.js";
 import { validateName } from "../shared/validation.js";
@@ -133,11 +133,6 @@ function shakeItem(item: HTMLLIElement): void {
 
 async function handleRemove(index: number, item: HTMLLIElement): Promise<void> {
   if (roomLocked && disableRemoveWhileLocked) return;
-  if (getSegmentCount() <= MIN_ITEMS) {
-    shakeItem(item);
-    showErrorToast("Mindestens 2 Namen müssen im Rad verbleiben.");
-    return;
-  }
 
   const nameText = item.querySelector(".name-text")?.textContent?.trim() ?? "";
   if (onNameRemoved && nameText) {

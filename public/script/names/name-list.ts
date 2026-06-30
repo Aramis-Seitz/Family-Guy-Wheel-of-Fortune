@@ -85,9 +85,7 @@ function renderNames(names: string[]): void {
   syncRemoveButtons();
   syncAddElements();
   updateEmptyState();
-  if (!multiplayerMode) {
-    updateSpinButtonState();
-  }
+  updateSpinButtonState();
   refreshWheel();
 }
 

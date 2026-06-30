@@ -37,6 +37,7 @@ let removedInRoom = new Set<string>();
 let roomPrevNames: string[] = [];
 let nameStateUnsubscribe: (() => void) | null = null;
 let multiplierSyncListener: (() => void) | null = null;
+let pendingRoomAction: (() => Promise<void>) | null = null;
 
 function handleLocalReset(): void {
   resetWheelRotation();
@@ -223,54 +224,86 @@ async function executeLeaveRoom(): Promise<void> {
   }
 }
 
+async function executeCreateRoom(): Promise<void> {
+  try {
+    const { roomKey, players } = await createRoom();
+    activeRoomHostName = players[0] ?? '';
+    setRoomActive(roomKey, true);
+    setSpinOverride(handleRoomSpinClick);
+    initRoomPlayers(players);
+    subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, undefined, handleRoomResetEvent);
+    multiplierSyncListener = () => {
+      if (!activeRoomKey) return;
+      void setMultiplier(activeRoomKey, getMultiplier());
+    };
+    multiplierSlider?.addEventListener('input', multiplierSyncListener);
+    showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
+  } catch (error) {
+    console.error('[ROOM] Erstellen fehlgeschlagen:', error);
+    showToast({ message: 'Raum konnte nicht erstellt werden', type: 'error' });
+  }
+}
+
+async function executeJoinRoom(roomKey: string): Promise<void> {
+  try {
+    const { players, multiplier, hostName } = await joinRoom(roomKey);
+    activeRoomHostName = hostName;
+    setRoomActive(roomKey, false);
+    setSpinOverride(handleRoomSpinClick);
+    initRoomPlayers(players);
+    setMultiplierSlider(multiplier);
+    updateMultiplierDisplay();
+    disableMultiplierSlider();
+    subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, (m) => {
+      setMultiplierSlider(m);
+      updateMultiplierDisplay();
+    }, handleRoomResetEvent);
+    showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
+  } catch (error) {
+    console.error('[ROOM] Beitreten fehlgeschlagen:', error);
+    showToast({ message: 'Raum nicht gefunden oder Fehler beim Beitreten', type: 'error' });
+  }
+}
+
+function showSwitchRoomConfirm(message: string, action: () => Promise<void>): void {
+  if (leaveRoomConfirmMessage) leaveRoomConfirmMessage.textContent = message;
+  pendingRoomAction = action;
+  leaveRoomConfirmModal?.showModal();
+}
+
 function initRoomControls(): void {
   createRoomBtn?.addEventListener('click', () => {
-    void (async () => {
-      try {
-        if (!activeRoomKey) savedNames = getNames();
-        const { roomKey, players } = await createRoom();
-        activeRoomHostName = players[0] ?? '';
-        setRoomActive(roomKey, true);
-        setSpinOverride(handleRoomSpinClick);
-        initRoomPlayers(players);
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, undefined, handleRoomResetEvent);
-        multiplierSyncListener = () => {
-          if (!activeRoomKey) return;
-          void setMultiplier(activeRoomKey, getMultiplier());
-        };
-        multiplierSlider?.addEventListener('input', multiplierSyncListener);
-        showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
-      } catch (error) {
-        console.error('[ROOM] Erstellen fehlgeschlagen:', error);
-        showToast({ message: 'Raum konnte nicht erstellt werden', type: 'error' });
-      }
-    })();
+    if (isSpinning()) {
+      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      return;
+    }
+    if (!activeRoomKey) savedNames = getNames();
+    if (activeRoomKey) {
+      showSwitchRoomConfirm(
+        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
+        executeCreateRoom,
+      );
+      return;
+    }
+    void executeCreateRoom();
   });
 
   joinRoomBtn?.addEventListener('click', () => {
-    void (async () => {
-      const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
-      if (!roomKey) return;
-      try {
-        if (!activeRoomKey) savedNames = getNames();
-        const { players, multiplier, hostName } = await joinRoom(roomKey);
-        activeRoomHostName = hostName;
-        setRoomActive(roomKey, false);
-        setSpinOverride(handleRoomSpinClick);
-        initRoomPlayers(players);
-        setMultiplierSlider(multiplier);
-        updateMultiplierDisplay();
-        disableMultiplierSlider();
-        subscribeToRoom(roomKey, handleRoomSpinEvent, syncRoomPlayers, onRoomClosed, (m) => {
-          setMultiplierSlider(m);
-          updateMultiplierDisplay();
-        }, handleRoomResetEvent);
-        showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
-      } catch (error) {
-        console.error('[ROOM] Beitreten fehlgeschlagen:', error);
-        showToast({ message: 'Raum nicht gefunden oder Fehler beim Beitreten', type: 'error' });
-      }
-    })();
+    const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
+    if (!roomKey) return;
+    if (isSpinning()) {
+      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      return;
+    }
+    if (!activeRoomKey) savedNames = getNames();
+    if (activeRoomKey) {
+      showSwitchRoomConfirm(
+        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,
+        () => executeJoinRoom(roomKey),
+      );
+      return;
+    }
+    void executeJoinRoom(roomKey);
   });
 
   leaveRoomBtn?.addEventListener('click', () => {
@@ -278,26 +311,32 @@ function initRoomControls(): void {
       showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
       return;
     }
-    const needsConfirm = isHost && roomPlayersList.length > 1;
-    if (needsConfirm) {
-      const guestCount = roomPlayersList.length - 1;
-      if (leaveRoomConfirmMessage) {
+    if (leaveRoomConfirmMessage) {
+      if (isHost && roomPlayersList.length > 1) {
+        const guestCount = roomPlayersList.length - 1;
         leaveRoomConfirmMessage.textContent =
           `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
+      } else {
+        leaveRoomConfirmMessage.textContent = isHost ? 'Raum wirklich schließen?' : 'Raum wirklich verlassen?';
       }
-      leaveRoomConfirmModal?.showModal();
-      return;
     }
-    void executeLeaveRoom();
+    leaveRoomConfirmModal?.showModal();
   });
 
   confirmLeaveRoomBtn?.addEventListener('click', () => {
     leaveRoomConfirmModal?.close();
-    void executeLeaveRoom();
+    if (pendingRoomAction) {
+      const action = pendingRoomAction;
+      pendingRoomAction = null;
+      void action();
+    } else {
+      void executeLeaveRoom();
+    }
   });
 
   cancelLeaveRoomBtn?.addEventListener('click', () => {
     leaveRoomConfirmModal?.close();
+    pendingRoomAction = null;
   });
 
   copyRoomKeyBtn?.addEventListener('click', () => {

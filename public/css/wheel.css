@@ -8,17 +8,31 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 320px;
-    padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid #333;
-    border-radius: 24px;
-    font-size: 1rem;
+    max-width: 240px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #111;
     text-align: center;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    line-height: 1.4;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
     z-index: 2;
+}
+
+#wheelEmptyHint::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-left: 2px solid black;
+    border-bottom: 2px solid black;
+    transform: translateY(-50%) rotate(45deg);
 }
 
 .centered-input-overlay.host-disabled {

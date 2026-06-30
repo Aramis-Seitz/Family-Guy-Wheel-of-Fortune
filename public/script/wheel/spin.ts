@@ -33,6 +33,7 @@ let currentRotation = 0;
 let lastTickRotation = 0;
 let spinCancelled = false;
 let activeSpinOverride: SpinHandler | null = null;
+let activeResetOverride: (() => void) | null = null;
 let spinning = false;
 
 export function isSpinning(): boolean {
@@ -41,6 +42,10 @@ export function isSpinning(): boolean {
 
 export function setSpinOverride(handler: SpinHandler | null): void {
   activeSpinOverride = handler;
+}
+
+export function setResetOverride(handler: (() => void) | null): void {
+  activeResetOverride = handler;
 }
 
 export function lockSpinButtons(): void {
@@ -203,5 +208,7 @@ export function initWheelControls(): void {
     void (activeSpinOverride ? activeSpinOverride("right") : spinWheelWithRandomSteps("right"));
   });
 
-  resetBtn.addEventListener("click", resetWheelRotation);
+  resetBtn.addEventListener("click", () => {
+    (activeResetOverride ?? resetWheelRotation)();
+  });
 }

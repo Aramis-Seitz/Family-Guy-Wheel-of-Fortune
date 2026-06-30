@@ -34,16 +34,20 @@ export async function createRoom(): Promise<{ roomKey: string; players: string[]
   return postJson<{ roomKey: string; players: string[]; wheelItems: string[] }>('/api/room/create');
 }
 
-export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; wheelItems: string[] }> {
-  return postJson<{ players: string[]; multiplier: number; wheelItems: string[] }>('/api/room/join', { roomKey });
+export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; wheelItems: string[]; hostName: string }> {
+  return postJson<{ players: string[]; multiplier: number; wheelItems: string[]; hostName: string }>('/api/room/join', { roomKey });
 }
 
 export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
   await postJson('/api/room/multiplier', { roomKey, multiplier });
 }
 
-export async function spinRoom(roomKey: string, names: string[]): Promise<RoomSpinResponse> {
-  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names });
+export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<RoomSpinResponse> {
+  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names, direction });
+}
+
+export async function leaveRoom(roomKey: string): Promise<void> {
+  await postJson('/api/room/leave', { roomKey });
 }
 
 export async function closeRoom(roomKey: string): Promise<void> {
@@ -54,13 +58,18 @@ export async function updateRoomWheelItems(roomKey: string, wheelItems: string[]
   await postJson('/api/room/wheel-items', { roomKey, wheelItems });
 }
 
+export async function resetRoom(roomKey: string): Promise<void> {
+  await postJson('/api/room/reset', { roomKey });
+}
+
 export function subscribeToRoom(
   roomKey: string,
-  onSpin: (lastSpin: number, multiplier: number) => void,
+  onSpin: (lastSpin: number, multiplier: number, direction: string) => void,
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
   onWheelItemsUpdate?: (wheelItems: string[]) => void,
+  onReset?: () => void,
 ): void {
   lastKnownPlayersJson = '';
   lastKnownMultiplier = null;
@@ -89,7 +98,7 @@ export function subscribeToRoom(
           const json = JSON.stringify(row.players);
           if (json !== lastKnownPlayersJson) {
             lastKnownPlayersJson = json;
-            onPlayersUpdate?.(row.players);
+            onPlayersUpdate?.(row.players.map((p) => p.username));
           }
         }
 
@@ -111,8 +120,14 @@ export function subscribeToRoom(
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();
         if (ageMs > 5000) return;
+        
+        if (row.last_spin === -1) {
+          onReset?.();
+          return;
+        }
+        
+        onSpin(row.last_spin, newMultiplier, row.spin_direction ?? 'right');
 
-        onSpin(row.last_spin, newMultiplier);
       },
     )
     .subscribe();

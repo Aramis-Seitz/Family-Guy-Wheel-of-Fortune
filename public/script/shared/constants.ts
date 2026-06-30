@@ -63,3 +63,11 @@ export const EMPTY_STATE_THUMBNAIL_BY_CATEGORY: Partial<Record<AssetCategory, st
   sound: EMPTY_STATE_THUMBNAIL_SOUND,
   companion: EMPTY_STATE_THUMBNAIL_COMPANION,
 };
+
+// ─── Toast Notification ─────────────────────────────────────────────────────────
+
+export const toastIcon = {
+  "success": "✓",
+  "error" : "✕",
+  "info": "𝐢",
+}

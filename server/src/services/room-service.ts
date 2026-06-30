@@ -6,9 +6,12 @@ import {
     updateRoomPlayers,
     updateRoomWheelItems,
     clearRoomPlayers,
+    removePlayerFromRoom,
     updateRoomSpin,
     updateRoomMultiplier,
+    updateRoomReset,
     insertSpinToken,
+    type RoomPlayer,
 } from "../repositories/room-repository";
 import { AppError } from "../lib/errors";
 
@@ -16,6 +19,10 @@ function generateRoomKey(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const bytes = randomBytes(6);
     return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+}
+
+function toUsernames(players: RoomPlayer[]): string[] {
+    return players.map((p) => p.username);
 }
 
 export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[]; wheelItems: string[] }> {
@@ -26,21 +33,37 @@ export async function createRoom(userId: string): Promise<{ roomKey: string; pla
     return { roomKey, players: [hostUsername], wheelItems: [] };
 }
 
-export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; wheelItems: string[] }> {
+export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; wheelItems: string[]; hostName: string }> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
     const profile = await getProfileByUserId(userId);
     const username = profile?.username ?? userId;
     const currentPlayers = room.players ?? [];
-    const updatedPlayers = currentPlayers.includes(username)
+    const updatedPlayers = currentPlayers.some((p) => p.id === userId)
         ? currentPlayers
-        : [...currentPlayers, username];
+        : [...currentPlayers, { id: userId, username }];
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
+    const hostPlayer = room.players.find((p) => p.id === room.host_id);
+    const hostName = hostPlayer?.username ?? (players[0]?.username ?? '');
     const multiplier = room.multiplier ?? 1;
     const wheelItems = room.wheel_items ?? [];
-    return { players, multiplier, wheelItems };
+    
+    return { players: toUsernames(players), multiplier, wheelItems, hostName };
+}
+
+export async function leaveRoom(userId: string, roomKey: string): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    if (!room) throw new AppError("Room not found", 404);
+
+    if (room.host_id === userId) {
+        // Host verlässt → Raum schließen
+        await clearRoomPlayers(roomKey);
+    } else {
+        // Gast verlässt → nur diesen Spieler nach userId entfernen
+        await removePlayerFromRoom(roomKey, userId);
+    }
 }
 
 export async function closeRoom(userId: string, roomKey: string): Promise<void> {
@@ -50,14 +73,14 @@ export async function closeRoom(userId: string, roomKey: string): Promise<void> 
     await clearRoomPlayers(roomKey);
 }
 
-export async function spinRoom(userId: string, roomKey: string): Promise<{ ranNum: number; spinToken: string }> {
+export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<{ ranNum: number; spinToken: string }> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError("Only the host may spin", 403);
 
     const ranNum = randomInt(140, 901);
     const spunAt = new Date().toISOString();
-    await updateRoomSpin(roomKey, ranNum, spunAt);
+    await updateRoomSpin(roomKey, ranNum, spunAt, direction);
 
     const token = randomUUID();
     const spinToken = await insertSpinToken(token, userId);
@@ -69,6 +92,13 @@ export async function setRoomWheelItems(userId: string, roomKey: string, wheelIt
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError("Only the host may update wheel items", 403);
     await updateRoomWheelItems(roomKey, wheelItems);
+}
+
+export async function resetRoom(userId: string, roomKey: string): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    if (!room) throw new AppError("Room not found", 404);
+    if (room.host_id !== userId) throw new AppError("Only the host may reset", 403);
+    await updateRoomReset(roomKey);
 }
 
 export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {

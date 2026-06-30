@@ -1,5 +1,5 @@
-import { MAX_ITEMS } from "../shared/constants.js";
-import { addBtn, emptyHint, input, list } from "../shared/dom.js";
+import { MAX_ITEMS, MIN_ITEMS, SPIN_DISABLED_OPACITY } from "../shared/constants.js";
+import { addBtn, emptyHint, input, list, spinLeftBtn, spinRightBtn, wheelEmptyHint } from "../shared/dom.js";
 import { showToast } from "../shared/toast.js";
 import { validateName } from "../shared/validation.js";
 import { generateWheel, getSegmentColor } from "../wheel/renderer.js";
@@ -84,11 +84,31 @@ function renderNames(names: string[]): void {
   syncRemoveButtons();
   syncAddElements();
   updateEmptyState();
+  updateSpinButtonState();
   refreshWheel();
 }
 
 export function updateEmptyState(): void {
   emptyHint.style.display = getSegmentCount() === 0 ? "block" : "none";
+  if (wheelEmptyHint) {
+    wheelEmptyHint.classList.toggle("hidden", getSegmentCount() > 0);
+  }
+}
+
+function updateSpinButtonState(): void {
+  const disabled = getSegmentCount() < MIN_ITEMS;
+  [spinLeftBtn, spinRightBtn].forEach((btn) => {
+    btn.disabled = disabled;
+    if (disabled) {
+      btn.style.setProperty("opacity", SPIN_DISABLED_OPACITY);
+      btn.style.setProperty("cursor", "not-allowed");
+      btn.style.setProperty("pointer-events", "none");
+    } else {
+      btn.style.removeProperty("opacity");
+      btn.style.removeProperty("cursor");
+      btn.style.removeProperty("pointer-events");
+    }
+  });
 }
 
 export function syncRemoveButtons(): void {

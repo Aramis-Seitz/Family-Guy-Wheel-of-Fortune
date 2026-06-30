@@ -155,7 +155,7 @@ function setHostControlsVisibility(host: boolean): void {
 
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
-  wheelEmptyHint.classList.toggle('hidden', roomWheelItems.length > 0);
+  wheelEmptyHint.classList.toggle('hidden', getNames().length > 0);
 }
 
 // Called once when creating or joining a room — sidebar gets the full player

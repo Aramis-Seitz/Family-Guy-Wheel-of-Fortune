@@ -86,3 +86,9 @@ export type Asset = {
   readonly price_coins: number;
   readonly asset_url: string;
 }
+
+export interface ChatMessage {
+  username: string;
+  text: string;
+  timestamp: string;
+}

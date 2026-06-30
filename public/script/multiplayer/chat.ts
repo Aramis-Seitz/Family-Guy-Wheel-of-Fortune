@@ -1,14 +1,9 @@
 import { supabaseClient } from '../shared/supabase-client.js';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { ChatMessage } from '../shared/types.js';
 
 const MAX_LENGTH = 200;
 const SPAM_DELAY_MS = 1000;
-
-interface ChatMessage {
-  username: string;
-  text: string;
-  timestamp: string;
-}
 
 let chatChannel: RealtimeChannel | null = null;
 let myUsername = '';

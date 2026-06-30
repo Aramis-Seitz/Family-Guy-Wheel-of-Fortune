@@ -250,6 +250,21 @@
   flex-direction: column;
   gap: 4px;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+#chatMessages::-webkit-scrollbar {
+  width: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 100px;
 }
 
 .chat-message {

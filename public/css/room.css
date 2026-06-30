@@ -199,6 +199,9 @@
   margin-top: 10px;
   border-top: 1.5px solid #f0f0f0;
   padding-top: 8px;
+  width: 0;
+  min-width: 100%;
+  overflow: hidden;
 }
 
 .chat-header {
@@ -208,7 +211,7 @@
   margin-bottom: 6px;
   cursor: pointer;
   user-select: none;
-  border-radius: 6px;
+  border-radius: 50px;
   padding: 2px 4px;
   margin-left: -4px;
   margin-right: -4px;
@@ -244,7 +247,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 160px;
+  height: 160px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -294,6 +297,7 @@
   margin: 0;
   word-break: break-word;
   line-height: 1.3;
+  text-align: left;
 }
 
 .chat-message--mine .chat-text {

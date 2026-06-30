@@ -103,8 +103,8 @@ export function destroyChat(): void {
   if (list) list.innerHTML = '';
 
   const chatBody = document.getElementById('chatBody');
-  chatBody?.classList.remove('chat-body--collapsed');
+  chatBody?.classList.add('chat-body--collapsed');
 
   const toggleBtn = document.getElementById('chatToggleBtn') as HTMLElement | null;
-  if (toggleBtn) toggleBtn.textContent = '▲';
+  if (toggleBtn) toggleBtn.textContent = '▼';
 }

@@ -102,11 +102,11 @@ export function subscribeToRoom(
           }
         }
 
-        if (Array.isArray(row.wheel_items)) {
-          const wheelJson = JSON.stringify(row.wheel_items);
+        if (Array.isArray(row.wheel_names)) {
+          const wheelJson = JSON.stringify(row.wheel_names);
           if (wheelJson !== lastKnownNamesJson) {
             lastKnownNamesJson = wheelJson;
-            onNamesUpdate?.(row.wheel_items);
+            onNamesUpdate?.(row.wheel_names);
           }
         }
 

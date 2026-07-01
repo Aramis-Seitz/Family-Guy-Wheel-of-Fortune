@@ -6,7 +6,7 @@ export type RoomData = {
     id: string;
     host_id: string;
     players: RoomPlayer[];
-    wheel_items?: string[];
+    wheel_names?: string[];
     last_spin?: number | null;
     spun_at?: string | null;
     multiplier?: number | null;
@@ -20,7 +20,7 @@ export async function insertRoom(roomKey: string, hostId: string, hostUsername: 
             room_key: roomKey, 
             host_id: hostId, 
             players: [{ id: hostId, username: hostUsername }], 
-            wheel_items: [] 
+            wheel_names: [] 
         });
     if (error) throw error;
 }
@@ -28,7 +28,7 @@ export async function insertRoom(roomKey: string, hostId: string, hostUsername: 
 export async function getRoomByKey(roomKey: string): Promise<RoomData | null> {
     const { data, error } = await supabaseClient
         .from("rooms")
-        .select("id, host_id, players, wheel_items, last_spin, spun_at, multiplier, spin_direction")
+        .select("id, host_id, players, wheel_names, last_spin, spun_at, multiplier, spin_direction")
         .eq("room_key", roomKey)
         .single();
     if (error) {
@@ -70,12 +70,12 @@ export async function removePlayerFromRoom(roomKey: string, userId: string): Pro
 export async function updateRoomNames(roomKey: string, names: string[]): Promise<string[]> {
     const { data, error } = await supabaseClient
         .from("rooms")
-        .update({ wheel_items: names })
+        .update({ wheel_names: names })
         .eq("room_key", roomKey)
-        .select("wheel_items")
+        .select("wheel_names")
         .single();
     if (error) throw error;
-    return (data as { wheel_items: string[] }).wheel_items;
+    return (data as { wheel_names: string[] }).wheel_names;
 }
 
 export async function clearRoomPlayers(roomKey: string): Promise<void> {

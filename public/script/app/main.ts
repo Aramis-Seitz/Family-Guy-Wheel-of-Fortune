@@ -294,9 +294,13 @@ export function isMultiplayerActive(): boolean {
   return !!activeRoomKey;
 }
 
-async function initApp(): Promise<void> {
+async function hasActiveSession(): Promise<boolean> {
   const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session) {
+  return Boolean(session);
+}
+
+async function initApp(): Promise<void> {
+  if (!(await hasActiveSession())) {
     window.location.href = "/login.html";
     return;
   }

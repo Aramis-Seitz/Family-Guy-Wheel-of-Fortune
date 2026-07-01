@@ -7,6 +7,7 @@ import {
   spinLeftBtn,
   spinRightBtn,
   wheelElement,
+  bulkAddToWheelBtn,
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/client-api.js";
@@ -62,7 +63,14 @@ function updateWheelRotation(): void {
 }
 
 function getSpinRelatedElements(): SpinElement[] {
-  return [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider];
+  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".player-toggle-btn");
+  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, playerToggleButtons];
+
+  if (bulkAddToWheelBtn) {
+    elements.push(bulkAddToWheelBtn);
+  }
+
+  return elements;
 }
 
 function applyDisabledStyle(el: HTMLButtonElement | HTMLInputElement, disabled: boolean): void {
@@ -108,6 +116,7 @@ function finishSpin(config: SpinConfig): void {
   spinning = false;
   stopDrumRoll();
   playCymbalCrash();
+  unlockSpinButtons();
   announceWinner(config.spinToken, resolveWinner(currentRotation, config));
 }
 
@@ -140,8 +149,11 @@ function animateSpin(config: SpinConfig): void {
 
 export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[]): void {
   spinCancelled = false;
+  if (names.length < MIN_ITEMS) {
+    spinning = false;
+    return;
+  }
   spinning = true;
-  if (names.length < MIN_ITEMS) return;
 
   const clampedSteps = Math.max(Math.floor(totalSteps), MIN_SPIN_ROTATIONS);
 

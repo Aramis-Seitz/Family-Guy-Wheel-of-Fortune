@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { handleCreateRoom, handleJoinRoom, handleLeaveRoom, handleCloseRoom, handleSpinRoom, handleResetRoom, handleSetMultiplier } from "../controllers/room-controller";
+import { handleCreateRoom, handleJoinRoom, handleLeaveRoom, handleCloseRoom, handleSpinRoom, handleResetRoom, handleSetMultiplier, handleUpdateNames } from "../controllers/room-controller";
 
 export const roomRoutes = Router();
 
@@ -10,3 +10,4 @@ roomRoutes.post("/close", handleCloseRoom);
 roomRoutes.post("/spin", handleSpinRoom);
 roomRoutes.post("/reset", handleResetRoom);
 roomRoutes.post("/multiplier", handleSetMultiplier);
+roomRoutes.post("/wheel-items", handleUpdateNames);

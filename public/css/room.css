@@ -117,9 +117,71 @@
   padding-top: 10px;
 }
 
-#roomInfo.hidden {
-  display: none;
+#bulkAddToWheelBtn {
+  margin-top: 10px;
+  width: 100%;
+  background: #1c1c1e; /* Fancy Apple-Grey */
+  color: white;
+  font-size: 0.85rem;
+  border-radius: 100px;
+  padding: 8px 12px;
 }
+
+#bulkAddToWheelBtn:hover {
+  background: #2c2c2e;
+}
+
+/* Bulk remove variant (when all players present) */
+#bulkAddToWheelBtn.bulk-remove {
+  background: #111;
+}
+
+/* Player toggle button styling */
+.player-toggle-btn {
+  margin-left: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: none;
+  background: #f0f0f0;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 36px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.player-toggle-btn.added {
+  background: #111;
+  color: white;
+}
+
+.player-toggle-btn:active { transform: scale(0.96); }
+
+/* Centered input when wheel is empty */
+.centered-input-overlay {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9500;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.centered-input-overlay .add-row { background: transparent; box-shadow: none; }
+
+.centered-input-hidden { display: none !important; }
+
+.hidden {
+  display: none !important;
+}
+
+#roomInfo.hidden { display: none; }
 
 .room-key-row {
   display: flex;

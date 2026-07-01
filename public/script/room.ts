@@ -1,5 +1,5 @@
 import { supabaseClient } from './shared/supabase-client.js';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import type { RoomSpinResponse, RoomRow } from './shared/types.js';
 
 let activeChannel: RealtimeChannel | null = null;
@@ -12,8 +12,8 @@ async function getAccessToken(): Promise<string> {
   return session?.access_token ?? '';
 }
 
-async function postJson<T>(path: string, body?: Record<string, unknown>): Promise<T> {
-  const token = await getAccessToken();
+async function postJson<T>(path: string, body?: Record<string, unknown>, options: { token?: string; keepalive?: boolean } = {}): Promise<T> {
+  const token = options.token ?? await getAccessToken();
   const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
@@ -21,6 +21,7 @@ async function postJson<T>(path: string, body?: Record<string, unknown>): Promis
     method: 'POST',
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
+    keepalive: options.keepalive,
   });
 
   if (!response.ok) {
@@ -48,6 +49,10 @@ export async function spinRoom(roomKey: string, names: string[], direction: stri
 
 export async function leaveRoom(roomKey: string): Promise<void> {
   await postJson('/api/room/leave', { roomKey });
+}
+
+function leaveRoomOnUnload(roomKey: string, token: string): void {
+  void postJson('/api/room/leave', { roomKey }, { token, keepalive: true });
 }
 
 export async function closeRoom(roomKey: string): Promise<void> {
@@ -141,4 +146,23 @@ export function unsubscribeFromRoom(): void {
   lastKnownPlayersJson = '';
   lastKnownNamesJson = '';
   lastKnownMultiplier = null;
+}
+
+export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void {
+  let cachedToken = '';
+
+  void supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
+    cachedToken = session?.access_token ?? '';
+  });
+
+  supabaseClient.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
+    cachedToken = session?.access_token ?? '';
+  });
+
+  window.addEventListener('pagehide', (event) => {
+    if (event.persisted) return;
+    const roomKey = getActiveRoomKey();
+    if (!roomKey || !cachedToken) return;
+    leaveRoomOnUnload(roomKey, cachedToken);
+  });
 }

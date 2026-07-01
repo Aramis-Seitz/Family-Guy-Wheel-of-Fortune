@@ -30,8 +30,9 @@ import { initVolumeSlider } from "../wheel/volume.js";
 import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal, hideWinnerModal } from "../wheel/winner.js";
 import {
-  createRoom, joinRoom, leaveRoom, spinRoom, resetRoom,
+  createRoom, joinRoom, leaveRoom, spinRoom, closeRoom, resetRoom,
   subscribeToRoom, unsubscribeFromRoom, setMultiplier, updateRoomNames,
+  initRoomUnloadGuard
 } from "../room.js";
 import { initChat, destroyChat } from "../multiplayer/chat.js";
 import { showToast } from "../shared/toast.js";
@@ -73,10 +74,6 @@ function initNameControls(): void {
   });
 }
 
-async function hasActiveSession(): Promise<boolean> {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  return Boolean(session);
-}
 
 function renderPlayersSidebar(players: string[]): void {
   if (!playersList) return;
@@ -500,11 +497,18 @@ export function isMultiplayerActive(): boolean {
   return !!activeRoomKey;
 }
 
+async function hasActiveSession(): Promise<boolean> {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  return Boolean(session);
+}
+
 async function initApp(): Promise<void> {
   if (!(await hasActiveSession())) {
     window.location.href = "/login.html";
     return;
   }
+
+  initRoomUnloadGuard(() => activeRoomKey);
 
   initNameList();
   initNameControls();

@@ -4,7 +4,7 @@ import type { RoomSpinResponse, RoomRow } from './shared/types.js';
 
 let activeChannel: RealtimeChannel | null = null;
 let lastKnownPlayersJson = '';
-let lastKnownWheelItemsJson = '';
+let lastKnownNamesJson = '';
 let lastKnownMultiplier: number | null = null;
 
 async function getAccessToken(): Promise<string> {
@@ -30,12 +30,12 @@ async function postJson<T>(path: string, body?: Record<string, unknown>): Promis
   return response.json() as Promise<T>;
 }
 
-export async function createRoom(): Promise<{ roomKey: string; players: string[]; wheelItems: string[] }> {
-  return postJson<{ roomKey: string; players: string[]; wheelItems: string[] }>('/api/room/create');
+export async function createRoom(): Promise<{ roomKey: string; players: string[]; names: string[] }> {
+  return postJson<{ roomKey: string; players: string[]; names: string[] }>('/api/room/create');
 }
 
-export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; wheelItems: string[]; hostName: string }> {
-  return postJson<{ players: string[]; multiplier: number; wheelItems: string[]; hostName: string }>('/api/room/join', { roomKey });
+export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; names: string[]; hostName: string }> {
+  return postJson<{ players: string[]; multiplier: number; names: string[]; hostName: string }>('/api/room/join', { roomKey });
 }
 
 export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
@@ -54,8 +54,8 @@ export async function closeRoom(roomKey: string): Promise<void> {
   await postJson('/api/room/close', { roomKey });
 }
 
-export async function updateRoomWheelItems(roomKey: string, wheelItems: string[]): Promise<void> {
-  await postJson('/api/room/wheel-items', { roomKey, wheelItems });
+export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
+  await postJson('/api/room/wheel-items', { roomKey, names });
 }
 
 export async function resetRoom(roomKey: string): Promise<void> {
@@ -68,7 +68,7 @@ export function subscribeToRoom(
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
-  onWheelItemsUpdate?: (wheelItems: string[]) => void,
+  onNamesUpdate?: (names: string[]) => void,
   onReset?: () => void,
 ): void {
   lastKnownPlayersJson = '';
@@ -104,9 +104,9 @@ export function subscribeToRoom(
 
         if (Array.isArray(row.wheel_items)) {
           const wheelJson = JSON.stringify(row.wheel_items);
-          if (wheelJson !== lastKnownWheelItemsJson) {
-            lastKnownWheelItemsJson = wheelJson;
-            onWheelItemsUpdate?.(row.wheel_items);
+          if (wheelJson !== lastKnownNamesJson) {
+            lastKnownNamesJson = wheelJson;
+            onNamesUpdate?.(row.wheel_items);
           }
         }
 
@@ -139,6 +139,6 @@ export function unsubscribeFromRoom(): void {
     activeChannel = null;
   }
   lastKnownPlayersJson = '';
-  lastKnownWheelItemsJson = '';
+  lastKnownNamesJson = '';
   lastKnownMultiplier = null;
 }

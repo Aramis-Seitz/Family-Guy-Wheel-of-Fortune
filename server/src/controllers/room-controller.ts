@@ -1,5 +1,5 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
-import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomWheelItems, resetRoom, setMultiplier } from "../services/room-service";
+import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
 import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 
@@ -13,9 +13,9 @@ type SetMultiplierBody = {
     multiplier?: number;
 };
 
-type SetWheelItemsBody = {
+type SetNamesBody = {
     roomKey?: string;
-    wheelItems?: string[];
+    names?: string[];
 };
 
 export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
@@ -168,7 +168,7 @@ export async function handleSetMultiplier(req: HttpRequest, res: HttpResponse): 
     }
 }
 
-export async function handleUpdateWheelItems(req: HttpRequest, res: HttpResponse): Promise<void> {
+export async function handleUpdateNames(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
         if (!userId) {
@@ -176,18 +176,18 @@ export async function handleUpdateWheelItems(req: HttpRequest, res: HttpResponse
             return;
         }
 
-        const { roomKey, wheelItems } = (req.body ?? {}) as SetWheelItemsBody;
+        const { roomKey, names } = (req.body ?? {}) as SetNamesBody;
         if (!roomKey) {
             res.status(400).json({ error: "Missing roomKey" });
             return;
         }
 
-        if (!Array.isArray(wheelItems)) {
-            res.status(400).json({ error: "Missing wheelItems" });
+        if (!Array.isArray(names)) {
+            res.status(400).json({ error: "Missing names" });
             return;
         }
 
-        await setRoomWheelItems(userId, roomKey, wheelItems);
+        await setRoomNames(userId, roomKey, names);
         res.status(200).json({ ok: true });
     } catch (error) {
         sendUnexpectedError(res, error);

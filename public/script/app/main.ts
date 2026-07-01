@@ -31,7 +31,7 @@ import { preloadStaticSounds } from "../wheel/sound.js";
 import { initWinnerModal, hideWinnerModal } from "../wheel/winner.js";
 import {
   createRoom, joinRoom, leaveRoom, spinRoom, resetRoom,
-  subscribeToRoom, unsubscribeFromRoom, setMultiplier, updateRoomWheelItems,
+  subscribeToRoom, unsubscribeFromRoom, setMultiplier, updateRoomNames,
 } from "../room.js";
 import { initChat, destroyChat } from "../multiplayer/chat.js";
 import { showToast } from "../shared/toast.js";
@@ -44,7 +44,7 @@ let isHost = false;
 let activeRoomHostName = '';
 let myUsername = '';
 let savedNames: string[] = [];
-let roomWheelItems: string[] = [];
+let roomNames: string[] = [];
 let currentPlayers: string[] = [];
 let multiplierSyncListener: (() => void) | null = null;
 
@@ -103,7 +103,7 @@ function renderPlayersSidebar(players: string[]): void {
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'player-toggle-btn';
-      const inWheel = (roomWheelItems ?? []).includes(name);
+      const inWheel = (roomNames ?? []).includes(name);
       toggle.textContent = inWheel ? '−' : '+';
       if (inWheel) toggle.classList.add('added');
       toggle.title = inWheel ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
@@ -111,7 +111,7 @@ function renderPlayersSidebar(players: string[]): void {
       toggle.addEventListener('click', async () => {
         toggle.disabled = true;
         try {
-          if ((roomWheelItems ?? []).includes(name)) {
+          if ((roomNames ?? []).includes(name)) {
             await removePlayerFromWheelItem(name);
           } else {
             await addPlayerToWheelItem(name);
@@ -183,7 +183,7 @@ function updateWheelEmptyState(): void {
 }
 
 // Called once when creating or joining a room — sidebar gets the full player
-// list, the wheel itself starts empty until setWheelItemsFromRoom() applies
+// list, the wheel itself starts empty until setNamesFromRoom() applies
 // the room's persisted wheel-item selection.
 function initRoomPlayers(players: string[]): void {
   currentPlayers = [...players];
@@ -230,7 +230,7 @@ function setRoomActive(roomKey: string, host: boolean): void {
 }
 
 function clearRoom(): void {
-  roomWheelItems = [];
+  roomNames = [];
   setMultiplayerMode(false);
   setOnNameRemoved(null);
   unlockNameEditing();
@@ -306,8 +306,8 @@ function onRoomClosed(): void {
   showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
 }
 
-function setWheelItemsFromRoom(items: string[]): void {
-  roomWheelItems = [...items];
+function setNamesFromRoom(items: string[]): void {
+  roomNames = [...items];
   replaceNames(items);
   updateWheelEmptyState();
   // refresh player sidebar buttons so their toggle state updates
@@ -325,53 +325,53 @@ async function addCustomWheelItem(rawName: string): Promise<void> {
     return;
   }
 
-  const updatedItems = [...(roomWheelItems ?? []), trimmed];
-  await updateRoomWheelItems(activeRoomKey, updatedItems);
+  const updatedItems = [...(roomNames ?? []), trimmed];
+  await updateRoomNames(activeRoomKey, updatedItems);
   input.value = '';
 }
 
 async function addPlayerToWheelItem(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const updatedItems = [...(roomWheelItems ?? []), playerName];
-  await updateRoomWheelItems(activeRoomKey, updatedItems);
+  const updatedItems = [...(roomNames ?? []), playerName];
+  await updateRoomNames(activeRoomKey, updatedItems);
 }
 
 async function removeNameFromWheelItem(itemName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const items = roomWheelItems ?? [];
+  const items = roomNames ?? [];
   const index = items.findIndex((item) => item === itemName);
   if (index < 0) return;
   const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
-  await updateRoomWheelItems(activeRoomKey, updatedItems);
+  await updateRoomNames(activeRoomKey, updatedItems);
 }
 
 async function removePlayerFromWheelItem(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const items = roomWheelItems ?? [];
+  const items = roomNames ?? [];
   const index = items.findIndex((item) => item === playerName);
   if (index < 0) return;
   const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
-  await updateRoomWheelItems(activeRoomKey, updatedItems);
+  await updateRoomNames(activeRoomKey, updatedItems);
 }
 
 async function addAllPlayersToWheel(players: string[]): Promise<void> {
   if (!activeRoomKey || !isHost) return;
-  const current = roomWheelItems ?? [];
+  const current = roomNames ?? [];
   const missingPlayers = players.filter((player) => !current.includes(player));
 
   if (missingPlayers.length > 0) {
     const updatedItems = [...current, ...missingPlayers];
-    await updateRoomWheelItems(activeRoomKey, updatedItems);
+    await updateRoomNames(activeRoomKey, updatedItems);
     return;
   }
 
   const updatedItems = current.filter((item) => !players.includes(item));
-  await updateRoomWheelItems(activeRoomKey, updatedItems);
+  await updateRoomNames(activeRoomKey, updatedItems);
 }
 
 function updateBulkButtonState(players: string[]): void {
   if (!bulkAddToWheelBtn) return;
-  const anyMissing = players.some((p) => !(roomWheelItems ?? []).includes(p));
+  const anyMissing = players.some((p) => !(roomNames ?? []).includes(p));
   if (anyMissing) {
     bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
     bulkAddToWheelBtn.classList.remove('bulk-remove');
@@ -397,19 +397,19 @@ function initRoomControls(): void {
     void (async () => {
       try {
         savedNames = getNames();
-        const { roomKey, players, wheelItems } = await createRoom();
+        const { roomKey, players, names } = await createRoom();
         activeRoomHostName = players[0] ?? '';
         setRoomActive(roomKey, true);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
-        setWheelItemsFromRoom(wheelItems ?? []);
+        setNamesFromRoom(names ?? []);
         subscribeToRoom(
           roomKey,
           handleRoomSpinEvent,
           syncRoomPlayers,
           onRoomClosed,
           (m) => { setMultiplierSlider(m); updateMultiplierDisplay(); },
-          setWheelItemsFromRoom,
+          setNamesFromRoom,
           handleRoomResetEvent,
         );
         initChat(roomKey, myUsername);
@@ -432,12 +432,12 @@ function initRoomControls(): void {
       if (!roomKey) return;
       try {
         savedNames = getNames();
-        const { players, multiplier, wheelItems, hostName } = await joinRoom(roomKey);
+        const { players, multiplier, names, hostName } = await joinRoom(roomKey);
         activeRoomHostName = hostName;
         setRoomActive(roomKey, false);
         setSpinOverride(handleRoomSpinClick);
         initRoomPlayers(players);
-        setWheelItemsFromRoom(wheelItems ?? []);
+        setNamesFromRoom(names ?? []);
         setMultiplierSlider(multiplier);
         updateMultiplierDisplay();
         disableMultiplierSlider();
@@ -447,7 +447,7 @@ function initRoomControls(): void {
           syncRoomPlayers,
           onRoomClosed,
           (m) => { setMultiplierSlider(m); updateMultiplierDisplay(); },
-          setWheelItemsFromRoom,
+          setNamesFromRoom,
           handleRoomResetEvent,
         );
         initChat(roomKey, myUsername);

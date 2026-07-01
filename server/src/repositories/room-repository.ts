@@ -67,10 +67,10 @@ export async function removePlayerFromRoom(roomKey: string, userId: string): Pro
     return (data as { players: RoomPlayer[] }).players;
 }
 
-export async function updateRoomWheelItems(roomKey: string, wheelItems: string[]): Promise<string[]> {
+export async function updateRoomNames(roomKey: string, names: string[]): Promise<string[]> {
     const { data, error } = await supabaseClient
         .from("rooms")
-        .update({ wheel_items: wheelItems })
+        .update({ wheel_items: names })
         .eq("room_key", roomKey)
         .select("wheel_items")
         .single();

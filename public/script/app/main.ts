@@ -35,7 +35,7 @@ import {
 } from "../room.js";
 import { initChat, destroyChat } from "../multiplayer/chat.js";
 import { showToast } from "../shared/toast.js";
-import { MIN_SPIN_ROTATIONS } from "../shared/constants.js";
+import { MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY } from "../shared/constants.js";
 import type { Direction } from "../shared/types.js";
 import { initShop } from "../shop/shop.js";
 
@@ -140,6 +140,29 @@ function updateSpinButtonState(activeCount: number): void {
   }
 }
 
+function syncMultiplayerSpinButtonState(): void {
+  if (!activeRoomKey) return;
+
+  const hasEnoughItems = getNames().length >= 2;
+  const disabled = !hasEnoughItems || !isHost;
+
+  [spinLeftBtn, spinRightBtn].forEach((btn) => {
+    btn.disabled = disabled;
+    btn.classList.toggle('room-solo', !hasEnoughItems);
+    btn.classList.toggle('room-guest', !isHost);
+
+    if (disabled) {
+      btn.style.setProperty('opacity', SPIN_DISABLED_OPACITY);
+      btn.style.setProperty('cursor', 'not-allowed');
+      btn.style.setProperty('pointer-events', 'none');
+    } else {
+      btn.style.removeProperty('opacity');
+      btn.style.removeProperty('cursor');
+      btn.style.removeProperty('pointer-events');
+    }
+  });
+}
+
 function setHostControlsVisibility(host: boolean): void {
   if (bulkAddToWheelBtn) {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
@@ -167,7 +190,7 @@ function initRoomPlayers(players: string[]): void {
   replaceNames([]);
   renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
-  updateSpinButtonState(getNames().length);
+  syncMultiplayerSpinButtonState();
 }
 
 // Called on Realtime player-list updates.
@@ -175,7 +198,7 @@ function syncRoomPlayers(players: string[]): void {
   currentPlayers = [...players];
   renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
-  updateSpinButtonState(getNames().length);
+  syncMultiplayerSpinButtonState();
 }
 
 function setRoomActive(roomKey: string, host: boolean): void {
@@ -202,6 +225,8 @@ function setRoomActive(roomKey: string, host: boolean): void {
     spinRightBtn.classList.remove('room-guest');
     setResetOverride(() => { void handleRoomResetClick(); });
   }
+
+  syncMultiplayerSpinButtonState();
 }
 
 function clearRoom(): void {
@@ -288,6 +313,7 @@ function setWheelItemsFromRoom(items: string[]): void {
   // refresh player sidebar buttons so their toggle state updates
   if (currentPlayers.length > 0) renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
+  syncMultiplayerSpinButtonState();
 }
 
 async function addCustomWheelItem(rawName: string): Promise<void> {

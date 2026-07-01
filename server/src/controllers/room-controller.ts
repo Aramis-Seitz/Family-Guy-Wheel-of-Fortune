@@ -1,5 +1,5 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
-import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, resetRoom, setMultiplier } from "../services/room-service";
+import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
 import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 
@@ -11,6 +11,11 @@ type RoomKeyBody = {
 type SetMultiplierBody = {
     roomKey?: string;
     multiplier?: number;
+};
+
+type SetNamesBody = {
+    roomKey?: string;
+    names?: string[];
 };
 
 export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
@@ -157,6 +162,32 @@ export async function handleSetMultiplier(req: HttpRequest, res: HttpResponse): 
         }
 
         await setMultiplier(userId, roomKey, multiplier);
+        res.status(200).json({ ok: true });
+    } catch (error) {
+        sendUnexpectedError(res, error);
+    }
+}
+
+export async function handleUpdateNames(req: HttpRequest, res: HttpResponse): Promise<void> {
+    try {
+        const userId = await resolveUserIdFromHeaders(req.headers);
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const { roomKey, names } = (req.body ?? {}) as SetNamesBody;
+        if (!roomKey) {
+            res.status(400).json({ error: "Missing roomKey" });
+            return;
+        }
+
+        if (!Array.isArray(names)) {
+            res.status(400).json({ error: "Missing names" });
+            return;
+        }
+
+        await setRoomNames(userId, roomKey, names);
         res.status(200).json({ ok: true });
     } catch (error) {
         sendUnexpectedError(res, error);

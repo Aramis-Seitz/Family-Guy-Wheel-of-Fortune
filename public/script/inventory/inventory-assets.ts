@@ -9,7 +9,7 @@ import { applySelectedAsset } from "../shared/asset-selection.js";
 
 // ----- ASSET ERSTELLEN UND LADEN -----
 
-let currentSelectedAssetIds: string[] = await getSelectedAssetIds();
+let currentSelectedAssetIds: string[] = [];
 
 export async function refreshSelectedAssetIds(): Promise<void> {
     currentSelectedAssetIds = await getSelectedAssetIds();

@@ -518,6 +518,15 @@ async function initApp(): Promise<void> {
   initWheelControls();
   setResetOverride(handleLocalReset);
   initShareFeature();
+
+  const authChannel = new BroadcastChannel("auth");
+
+  authChannel.onmessage = (event) => {
+    if (event.data === "ACCOUNT_CHANGED") {
+      location.reload();
+    }
+  };
+
   await initProfileUI();
   myUsername = profileName?.textContent?.trim() || 'Anonym';
   await ensureDefaultAssets();

@@ -64,6 +64,10 @@
   color: #ef4444;
 }
 
+.toast--info .toast__icon {
+  color: #2196F3;
+}
+
 .toast__message {
   max-width: 320px;
   white-space: nowrap;

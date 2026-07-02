@@ -3,6 +3,55 @@
     height: 500px;
 }
 
+#wheelEmptyHint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 240px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+    text-align: center;
+    line-height: 1.4;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+    z-index: 2;
+}
+
+#wheelEmptyHint::after {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-left: 2px solid black;
+    border-bottom: 2px solid black;
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.container {
+    position: relative;
+}
+
+.centered-input-overlay.host-disabled {
+    opacity: 0.6;
+}
+
+.centered-input-overlay.host-disabled input,
+.centered-input-overlay.host-disabled button {
+    cursor: not-allowed;
+}
+
+#wheelEmptyHint.hidden {
+    display: none;
+}
+
 #companion-image {
     justify-self: end;
     height: 350px;

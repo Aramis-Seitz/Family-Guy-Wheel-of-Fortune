@@ -135,11 +135,26 @@
             </div>
             <p class="players-label">Mitspieler:</p>
             <ul id="playersList"></ul>
+            <button id="bulkAddToWheelBtn" class="room-btn room-btn--small hidden" type="button">Alle zum Rad hinzufügen</button>
+            <div id="chatSection">
+                <div id="chatHeader" class="chat-header">
+                    <span class="chat-label">💬Chat</span>
+                    <span id="chatToggleBtn" class="chat-toggle-btn">▼</span>
+                </div>
+                <div id="chatBody" class="chat-body--collapsed">
+                    <ul id="chatMessages"></ul>
+                    <div class="chat-input-row">
+                        <input type="text" id="chatInput" placeholder="Nachricht eingeben" maxlength="200" autocomplete="off">
+                        <button id="chatSendBtn" class="chat-send-btn" type="button">&#10148;</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="container">
         <img id="companion-image" alt="pointer image">
+        <div id="wheelEmptyHint" class="wheel-empty-hint hidden">Trage Namen in die Liste ein, um das Rad zu erstellen.</div>
         <svg id="svg" viewBox="0 0 200 200">
             <g id="wheel"></g>
         </svg>
@@ -164,7 +179,7 @@
         </div>
 
         <div class="panel">
-            <div class="add-row">
+            <div class="add-row" id="sidebarAddRow">
                 <input type="text" id="nameInput" placeholder="Enter name …" />
                 <button class="btn-add" id="addBtn">+</button>
             </div>
@@ -177,6 +192,14 @@
             <p class="error-hint hidden" id="errorHint">At least 2 entries required.</p>
             <p class="empty-hint" id="emptyHint" style="display:none">No names yet. Add some!</p>
         </div>
+
+                <!-- centered input shown when wheel empty -->
+                <div id="centeredInput" class="centered-input-overlay centered-input-hidden">
+                    <div class="add-row">
+                        <input type="text" id="nameInputCentered" placeholder="Enter name …" />
+                        <button class="btn-add" id="addBtnCentered">+</button>
+                    </div>
+                </div>
 
         <div id="winnerModal" class="modal hidden">
             <div class="modal-content">

@@ -1,9 +1,10 @@
 import { supabaseClient } from './shared/supabase-client.js';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import type { RoomSpinResponse, RoomRow } from './shared/types.js';
 
 let activeChannel: RealtimeChannel | null = null;
 let lastKnownPlayersJson = '';
+let lastKnownNamesJson = '';
 let lastKnownMultiplier: number | null = null;
 
 async function getAccessToken(): Promise<string> {
@@ -11,8 +12,8 @@ async function getAccessToken(): Promise<string> {
   return session?.access_token ?? '';
 }
 
-async function postJson<T>(path: string, body?: Record<string, unknown>): Promise<T> {
-  const token = await getAccessToken();
+async function postJson<T>(path: string, body?: Record<string, unknown>, options: { token?: string; keepalive?: boolean } = {}): Promise<T> {
+  const token = options.token ?? await getAccessToken();
   const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
@@ -20,6 +21,7 @@ async function postJson<T>(path: string, body?: Record<string, unknown>): Promis
     method: 'POST',
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
+    keepalive: options.keepalive,
   });
 
   if (!response.ok) {
@@ -29,12 +31,12 @@ async function postJson<T>(path: string, body?: Record<string, unknown>): Promis
   return response.json() as Promise<T>;
 }
 
-export async function createRoom(): Promise<{ roomKey: string; players: string[] }> {
-  return postJson<{ roomKey: string; players: string[] }>('/api/room/create');
+export async function createRoom(): Promise<{ roomKey: string; players: string[]; names: string[] }> {
+  return postJson<{ roomKey: string; players: string[]; names: string[] }>('/api/room/create');
 }
 
-export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; hostName: string }> {
-  return postJson<{ players: string[]; multiplier: number; hostName: string }>('/api/room/join', { roomKey });
+export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; names: string[]; hostName: string }> {
+  return postJson<{ players: string[]; multiplier: number; names: string[]; hostName: string }>('/api/room/join', { roomKey });
 }
 
 export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
@@ -49,8 +51,16 @@ export async function leaveRoom(roomKey: string): Promise<void> {
   await postJson('/api/room/leave', { roomKey });
 }
 
+function leaveRoomOnUnload(roomKey: string, token: string): void {
+  void postJson('/api/room/leave', { roomKey }, { token, keepalive: true });
+}
+
 export async function closeRoom(roomKey: string): Promise<void> {
   await postJson('/api/room/close', { roomKey });
+}
+
+export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
+  await postJson('/api/room/wheel-items', { roomKey, names });
 }
 
 export async function resetRoom(roomKey: string): Promise<void> {
@@ -63,6 +73,7 @@ export function subscribeToRoom(
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
+  onNamesUpdate?: (names: string[]) => void,
   onReset?: () => void,
 ): void {
   unsubscribeFromRoom();
@@ -95,6 +106,14 @@ export function subscribeToRoom(
           }
         }
 
+        if (Array.isArray(row.wheel_names)) {
+          const wheelJson = JSON.stringify(row.wheel_names);
+          if (wheelJson !== lastKnownNamesJson) {
+            lastKnownNamesJson = wheelJson;
+            onNamesUpdate?.(row.wheel_names);
+          }
+        }
+
         // Notify when the host changes the multiplier
         const newMultiplier = row.multiplier ?? 1;
         if (newMultiplier !== lastKnownMultiplier) {
@@ -124,5 +143,25 @@ export function unsubscribeFromRoom(): void {
     activeChannel = null;
   }
   lastKnownPlayersJson = '';
+  lastKnownNamesJson = '';
   lastKnownMultiplier = null;
+}
+
+export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void {
+  let cachedToken = '';
+
+  void supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
+    cachedToken = session?.access_token ?? '';
+  });
+
+  supabaseClient.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
+    cachedToken = session?.access_token ?? '';
+  });
+
+  window.addEventListener('pagehide', (event) => {
+    if (event.persisted) return;
+    const roomKey = getActiveRoomKey();
+    if (!roomKey || !cachedToken) return;
+    leaveRoomOnUnload(roomKey, cachedToken);
+  });
 }

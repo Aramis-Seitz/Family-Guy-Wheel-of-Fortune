@@ -48,7 +48,7 @@ export type InventoryItem = {
   created_at: string;
 };
 
-export type ToastType = "success" | "error";
+export type ToastType = "success" | "error" | "info";
 
 export interface ToastOptions {
   message: string;
@@ -71,6 +71,7 @@ export interface RoomRow {
   last_spin: number;
   spun_at: string;
   players: RoomPlayer[];
+  wheel_names?: string[];
   multiplier: number;
   spin_direction: string | null;
 }
@@ -85,4 +86,10 @@ export type Asset = {
   readonly category: AssetCategory;
   readonly price_coins: number;
   readonly asset_url: string;
+}
+
+export interface ChatMessage {
+  username: string;
+  text: string;
+  timestamp: string;
 }

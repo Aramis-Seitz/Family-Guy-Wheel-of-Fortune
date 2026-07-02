@@ -117,9 +117,71 @@
   padding-top: 10px;
 }
 
-#roomInfo.hidden {
-  display: none;
+#bulkAddToWheelBtn {
+  margin-top: 10px;
+  width: 100%;
+  background: #1c1c1e; /* Fancy Apple-Grey */
+  color: white;
+  font-size: 0.85rem;
+  border-radius: 100px;
+  padding: 8px 12px;
 }
+
+#bulkAddToWheelBtn:hover {
+  background: #2c2c2e;
+}
+
+/* Bulk remove variant (when all players present) */
+#bulkAddToWheelBtn.bulk-remove {
+  background: #111;
+}
+
+/* Player toggle button styling */
+.player-toggle-btn {
+  margin-left: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: none;
+  background: #f0f0f0;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 36px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.player-toggle-btn.added {
+  background: #111;
+  color: white;
+}
+
+.player-toggle-btn:active { transform: scale(0.96); }
+
+/* Centered input when wheel is empty */
+.centered-input-overlay {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9500;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.centered-input-overlay .add-row { background: transparent; box-shadow: none; }
+
+.centered-input-hidden { display: none !important; }
+
+.hidden {
+  display: none !important;
+}
+
+#roomInfo.hidden { display: none; }
 
 .room-key-row {
   display: flex;
@@ -266,3 +328,155 @@
 
 .room-confirm-modal__confirm:hover { filter: brightness(1.15); transform: translateY(-1px); }
 .room-confirm-modal__confirm:active { transform: translateY(0); }
+/* ── Chat ── */
+
+#chatSection {
+  margin-top: 10px;
+  border-top: 1.5px solid #f0f0f0;
+  padding-top: 8px;
+  width: 0;
+  min-width: 100%;
+  overflow: hidden;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 50px;
+  padding: 2px 4px;
+  margin-left: -4px;
+  margin-right: -4px;
+  transition: background var(--transition);
+  background: #f5f5f5;
+}
+
+.chat-label {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.chat-toggle-btn {
+  font-size: 0.75rem;
+  color: #999;
+  line-height: 1;
+}
+
+#chatBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#chatBody.chat-body--collapsed {
+  display: none;
+}
+
+#chatMessages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+#chatMessages::-webkit-scrollbar {
+  width: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 100px;
+}
+
+.chat-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 90%;
+}
+
+.chat-message--mine {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.chat-meta {
+  font-size: 0.65rem;
+  color: #aaa;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.chat-text {
+  font-size: 0.8rem;
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 4px 10px;
+  margin: 0;
+  word-break: break-word;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.chat-message--mine .chat-text {
+  background: #00a2ff;
+  color: white;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+#chatInput {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: 1.5px solid #ddd;
+  border-radius: 100px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--transition);
+  min-width: 0;
+}
+
+#chatInput:focus {
+  border-color: #00a2ff;
+}
+
+.chat-send-btn {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  background: #00a2ff;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.chat-send-btn:hover {
+  background: #0090e0;
+}
+
+.chat-send-btn:active {
+  transform: scale(0.96);
+}

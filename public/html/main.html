@@ -79,6 +79,21 @@
         </div>
     </dialog>
 
+    <dialog id="leaveRoomConfirmModal" class="room-confirm-modal">
+        <div class="room-confirm-modal__inner">
+            <div class="room-confirm-modal__header">
+                <h3>Raum schließen?</h3>
+            </div>
+            <div class="room-confirm-modal__body">
+                <p id="leaveRoomConfirmMessage"></p>
+            </div>
+            <div class="room-confirm-modal__footer">
+                <button id="cancelLeaveRoomBtn" class="room-confirm-modal__cancel" type="button">Abbrechen</button>
+                <button id="confirmLeaveRoomBtn" class="room-confirm-modal__confirm" type="button">Bestätigen</button>
+            </div>
+        </div>
+    </dialog>
+
     <dialog class="shop-modal" id="shopModal">
         <div class="shop-modal__container">
             <header class="shop-modal__header">
@@ -103,7 +118,7 @@
 
     <div id="roomPanel">
         <h3>Multiplayer</h3>
-        <div class="room-controls">
+        <div class="room-controls" id="roomControls">
             <button id="createRoomBtn" class="room-btn" type="button">Raum erstellen</button>
             <div class="room-join">
                 <input type="text" id="roomKeyInput" placeholder="Code" maxlength="6" autocomplete="off">

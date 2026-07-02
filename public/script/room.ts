@@ -76,8 +76,7 @@ export function subscribeToRoom(
   onNamesUpdate?: (names: string[]) => void,
   onReset?: () => void,
 ): void {
-  lastKnownPlayersJson = '';
-  lastKnownMultiplier = null;
+  unsubscribeFromRoom();
 
   activeChannel = supabaseClient
     .channel(`room:${roomKey}`)

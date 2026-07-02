@@ -4,6 +4,7 @@ export type RoomPlayer = { id: string; username: string };
 
 export type RoomData = {
     id: string;
+    room_key: string;
     host_id: string;
     players: RoomPlayer[];
     wheel_names?: string[];
@@ -12,6 +13,17 @@ export type RoomData = {
     multiplier?: number | null;
     spin_direction?: string | null;
 };
+
+export async function getActiveRoomForUser(userId: string): Promise<RoomData | null> {
+    const { data, error } = await supabaseClient
+        .from("rooms")
+        .select("id, host_id, players, last_spin, spun_at, multiplier, spin_direction, room_key")
+        .filter("players", "cs", JSON.stringify([{ id: userId }]))
+        .limit(1)
+        .maybeSingle();
+    if (error) throw error;
+    return data as RoomData | null;
+}
 
 export async function insertRoom(roomKey: string, hostId: string, hostUsername: string): Promise<void> {
     const { error } = await supabaseClient

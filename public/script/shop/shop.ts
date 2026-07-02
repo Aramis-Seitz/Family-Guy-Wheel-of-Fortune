@@ -7,7 +7,7 @@ import { getUserCoins } from "../api/user-api.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
-let currentAssets: Asset[] = await getShopAssets();
+let currentAssets: Asset[] = [];
 
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
@@ -29,6 +29,7 @@ export function initShop(): void {
 }
 
 async function refreshShop(): Promise<void> {
+    currentAssets = await getShopAssets();
     await loadCoinBalance();
     renderCoinBalance();
     renderShopTabs(["all", ...ASSET_CATEGORIES] as (AssetCategory | "all")[]);

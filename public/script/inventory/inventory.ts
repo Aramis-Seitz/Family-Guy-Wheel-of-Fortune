@@ -28,7 +28,7 @@ import { getOwnedAssets } from "../api/inventory-api.js";
 
 
 let pendingDeleteId: string | null = null;
-let currentOwnedAssets: Asset[] = await getOwnedAssets();
+let currentOwnedAssets: Asset[] = [];
 
 
 function openDeleteModal(id: string, title: string): void {

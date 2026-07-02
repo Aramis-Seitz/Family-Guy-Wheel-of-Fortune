@@ -8,7 +8,7 @@ import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-previ
 
 // ----- ASSET ERSTELLEN UND LADEN -----
 
-let currentOwnedAssetIds: string[] = await getOwnedAssetIds();
+let currentOwnedAssetIds: string[] = [];
 
 function isAssetOwned(assetId: string): boolean {
     return currentOwnedAssetIds.includes(assetId);

@@ -44,6 +44,11 @@ if (loginForm) {
                 return;
             }
 
+            if (!error) {
+                new BroadcastChannel("auth").postMessage("ACCOUNT_CHANGED");
+                window.location.href = "main.html";
+            }
+
             window.location.href = 'main.html';
         } catch (err: unknown) {
             console.error('Netzwerkfehler beim Login:', err);
@@ -158,9 +163,9 @@ if (signupForm) {
         } catch (err: unknown) {
             console.error('Netzwerkfehler bei der Registrierung:', err);
             showToast({
-                    message: "Netzwerkfehler. Bitte versuchen Sie es später erneut.",
-                    type: "error"
-                });
+                message: "Netzwerkfehler. Bitte versuchen Sie es später erneut.",
+                type: "error"
+            });
         }
     });
 }//

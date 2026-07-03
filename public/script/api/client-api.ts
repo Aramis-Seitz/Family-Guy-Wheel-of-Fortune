@@ -1,15 +1,8 @@
+import { getAccessToken } from "./api-helpers.js";
 import type { AwardCoinsResponse, RandomResponse } from "../shared/types.js";
 import type { Direction } from "../shared/types.js";
-import { supabaseClient } from "../shared/supabase-client.js";
 import { apiUrl } from "../shared/api-base.js";
 
-async function getAccessToken(): Promise<string> {
-  const {
-    data: { session },
-  } = await supabaseClient.auth.getSession();
-
-  return session?.access_token ?? "";
-}
 
 export async function fetchRandomNumber(
   names: string[],

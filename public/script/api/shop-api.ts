@@ -1,10 +1,7 @@
-import { supabaseClient } from "../shared/supabase-client.js";
+import { readApiError, buildAuthHeaders } from "./api-helpers.js";
 import type { Asset, AssetCategory } from "../shared/types.js";
 import { apiUrl } from "../shared/api-base.js";
 
-type ApiErrorBody = {
-    error?: string;
-};
 
 type AssetsResponseBody = {
     assets?: Asset[];
@@ -20,32 +17,12 @@ type PurchaseResponseBody = {
     assetId?: string;
 };
 
+
 export type PurchaseAssetResult = {
     success: boolean;
     coins: number | null;
     assetId: string;
 };
-
-async function readApiError(response: Response, fallback: string): Promise<string> {
-    try {
-        const body = await response.json() as ApiErrorBody;
-        if (body.error) return body.error;
-    } catch {
-        // Keep fallback when response is not valid JSON.
-    }
-    return fallback;
-}
-
-async function buildAuthHeaders(baseHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    const token = session?.access_token;
-    if (!token) throw new Error("Not authenticated");
-
-    return {
-        ...baseHeaders,
-        Authorization: `Bearer ${token}`
-    };
-}
 
 export async function getShopAssets(): Promise<Asset[]> {
     const headers = await buildAuthHeaders({

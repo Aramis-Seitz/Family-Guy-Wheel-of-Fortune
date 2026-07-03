@@ -1,10 +1,6 @@
-
-import { supabaseClient } from "../shared/supabase-client.js";
+import { readApiError, buildAuthHeaders } from "./api-helpers.js";
 import { apiUrl } from "../shared/api-base.js";
 
-type ApiErrorBody = {
-    error?: string;
-};
 
 type CoinsResponseBody = {
     coins?: number;
@@ -17,26 +13,6 @@ type ProfileResponseBody = {
     };
 };
 
-async function readApiError(response: Response, fallback: string): Promise<string> {
-    try {
-        const body = await response.json() as ApiErrorBody;
-        if (body.error) return body.error;
-    } catch {
-        // Keep fallback when response is not valid JSON.
-    }
-    return fallback;
-}
-
-async function buildAuthHeaders(baseHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    const token = session?.access_token;
-    if (!token) throw new Error("Not authenticated");
-
-    return {
-        ...baseHeaders,
-        Authorization: `Bearer ${token}`
-    };
-}
 
 export async function getUserCoins(): Promise<number> {
     const headers = await buildAuthHeaders({

@@ -27,6 +27,7 @@ import { initChat, destroyChat } from "./multiplayer/chat.js";
 import { showToast } from "./shared/toast.js";
 import { MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY } from "./shared/constants.js";
 import type { Direction } from "./shared/types.js";
+import { postJson } from './api/api-helpers.js';
 
 let activeChannel: RealtimeChannel | null = null;
 let lastKnownPlayersJson = '';
@@ -46,30 +47,6 @@ let pendingRoomAction: (() => Promise<void>) | null = null;
 
 export function setMyUsername(newUsername: string): void {
   myUsername = newUsername;
-}
-
-async function getAccessToken(): Promise<string> {
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  return session?.access_token ?? '';
-}
-
-async function postJson<T>(path: string, body?: Record<string, unknown>, options: { token?: string; keepalive?: boolean } = {}): Promise<T> {
-  const token = options.token ?? await getAccessToken();
-  const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
-
-  const response = await fetch(path, {
-    method: 'POST',
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    keepalive: options.keepalive,
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({})) as { error?: string };
-    throw new Error(err.error ?? `HTTP ${response.status}`);
-  }
-  return response.json() as Promise<T>;
 }
 
 export async function createRoom(): Promise<{ roomKey: string; players: string[]; names: string[] }> {
@@ -165,12 +142,12 @@ export function subscribeToRoom(
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();
         if (ageMs > 5000) return;
-        
+
         if (row.last_spin === -1) {
           onReset?.();
           return;
         }
-        
+
         onSpin(row.last_spin, newMultiplier, row.spin_direction ?? 'right');
 
       },

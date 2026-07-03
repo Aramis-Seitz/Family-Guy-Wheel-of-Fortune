@@ -10,7 +10,7 @@ import {
   bulkAddToWheelBtn,
 } from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
-import { fetchRandomNumber } from "../api/client-api.js";
+import { fetchRandomNumber } from "../api/spin-api.js";
 import { getNames } from "../names/name-list.js";
 import { announceWinner, resolveWinner } from "./winner.js";
 import { getMultiplier } from "./multiplier.js";

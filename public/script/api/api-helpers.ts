@@ -33,7 +33,12 @@ export async function getAccessToken(): Promise<string> {
     return session?.access_token ?? '';
 }
 
-async function request<T>(method: HttpMethod, path: string, body?: Record<string, unknown>, options: RequestOptions = {}): Promise<T> {
+async function request<T>(method: HttpMethod,
+    path: string,
+    body?: Record<string, unknown>,
+    options: RequestOptions = {}
+): Promise<T> {
+
     const token = options.token ?? await getAccessToken();
 
     const response = await fetch(apiUrl(path), {

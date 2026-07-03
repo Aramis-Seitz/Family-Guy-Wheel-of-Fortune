@@ -1,6 +1,7 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { showToast } from "../shared/toast.js";
 import { apiUrl } from "../shared/api-base.js";
+import { notifyAccountChanged } from "../shared/auth-channel.js";
 
 const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
 const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
@@ -45,7 +46,7 @@ if (loginForm) {
             }
 
             if (!error) {
-                new BroadcastChannel("auth").postMessage("ACCOUNT_CHANGED");
+                notifyAccountChanged();
                 window.location.href = "main.html";
             }
 

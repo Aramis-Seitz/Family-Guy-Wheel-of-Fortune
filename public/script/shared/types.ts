@@ -62,6 +62,19 @@ export interface RoomSpinResponse {
   direction: Direction;
 }
 
+export interface CreateRoomResponse {
+  roomKey: string;
+  players: string[];
+  names: string[];
+}
+
+export interface JoinRoomResponse {
+  players: string[];
+  multiplier: number;
+  names: string[];
+  hostName: string;
+}
+
 export interface RoomPlayer {
   id: string;
   username: string;

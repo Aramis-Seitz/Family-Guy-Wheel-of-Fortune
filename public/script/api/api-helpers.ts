@@ -1,5 +1,5 @@
 import { supabaseClient } from "../shared/supabase-client.js";
-import { HttpRequest, RequestOptions } from "../shared/types.js";
+import { HttpMethod, RequestOptions } from "../shared/types.js";
 import { apiUrl } from "../shared/api-base.js";
 
 
@@ -33,7 +33,7 @@ export async function getAccessToken(): Promise<string> {
     return session?.access_token ?? '';
 }
 
-async function request<T>(method: HttpRequest, path: string, body?: Record<string, unknown>, options: RequestOptions = {}): Promise<T> {
+async function request<T>(method: HttpMethod, path: string, body?: Record<string, unknown>, options: RequestOptions = {}): Promise<T> {
     const token = options.token ?? await getAccessToken();
 
     const response = await fetch(apiUrl(path), {

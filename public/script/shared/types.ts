@@ -94,10 +94,10 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-export type HttpRequest = 'GET' | 'POST';
+export type HttpMethod = 'GET' | 'POST';
 
 export type RequestOptions = {
-    token?: string;
-    keepalive?: boolean;
-    errorFallback?: string;
+  token?: string;
+  keepalive?: boolean;
+  errorFallback?: string;
 };

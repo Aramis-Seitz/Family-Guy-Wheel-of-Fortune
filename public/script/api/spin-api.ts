@@ -1,7 +1,6 @@
-import { getAccessToken } from "./api-helpers.js";
+import { postJson, getAccessToken, ApiError } from "./api-helpers.js";
 import type { AwardCoinsResponse, RandomResponse } from "../shared/types.js";
 import type { Direction } from "../shared/types.js";
-import { apiUrl } from "../shared/api-base.js";
 
 
 export async function fetchRandomNumber(
@@ -10,22 +9,13 @@ export async function fetchRandomNumber(
   direction: Direction,
   multiplier: number
 ): Promise<{ ranNum: number; spinToken: string }> {
-  const accessToken = await getAccessToken();
 
-  const response = await fetch(apiUrl("/api/spin/random"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({ names, currentRotation, direction, multiplier }),
+  const data = await postJson<RandomResponse>(
+    "/api/spin/random",
+    { names, currentRotation, direction, multiplier }, {
+    errorFallback: "Server response not ok."
   });
 
-  if (!response.ok) {
-    throw new Error("Server response not ok.");
-  }
-
-  const data: RandomResponse = await response.json();
   console.log("[SPIN] /api/spin/random Daten:", {
     ranNum: data.ranNum,
     spinToken: data.spinToken || "LEER ← Backend-Env-Variablen fehlen wahrscheinlich!",
@@ -44,20 +34,15 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
   const accessToken = await getAccessToken();
   if (!accessToken) return null;
 
-  const response = await fetch(apiUrl("/api/spin/award-coins"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({ spinToken, winnerName }),
-  });
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    console.error("[award-coins] fehlgeschlagen:", response.status, body);
-    throw new Error("Award coins request failed.");
+  try {
+    return await postJson<AwardCoinsResponse>("/api/spin/award-coins", { spinToken, winnerName }, {
+      token: accessToken,
+      errorFallback: "Award coins request failed."
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      console.error("[award-coins] fehlgeschlagen:", error.status, error.message);
+    }
+    throw error;
   }
-
-  return response.json() as Promise<AwardCoinsResponse>;
 }

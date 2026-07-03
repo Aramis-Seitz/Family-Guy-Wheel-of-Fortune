@@ -1,6 +1,6 @@
 import { supabaseClient } from './shared/supabase-client.js';
 import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
-import type { RoomSpinResponse, RoomRow } from './shared/types.js';
+import type { RoomRow } from './shared/types.js';
 import {
   createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
   roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
@@ -27,7 +27,16 @@ import { initChat, destroyChat } from "./multiplayer/chat.js";
 import { showToast } from "./shared/toast.js";
 import { MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY } from "./shared/constants.js";
 import type { Direction } from "./shared/types.js";
-import { postJson } from './api/api-helpers.js';
+import {
+  createRoom,
+  leaveRoom,
+  joinRoom,
+  spinRoom,
+  leaveRoomOnUnload,
+  resetRoom,
+  updateRoomNames,
+  setMultiplier
+} from './api/room-api.js';
 
 let activeChannel: RealtimeChannel | null = null;
 let lastKnownPlayersJson = '';
@@ -47,42 +56,6 @@ let pendingRoomAction: (() => Promise<void>) | null = null;
 
 export function setMyUsername(newUsername: string): void {
   myUsername = newUsername;
-}
-
-export async function createRoom(): Promise<{ roomKey: string; players: string[]; names: string[] }> {
-  return postJson<{ roomKey: string; players: string[]; names: string[] }>('/api/room/create');
-}
-
-export async function joinRoom(roomKey: string): Promise<{ players: string[]; multiplier: number; names: string[]; hostName: string }> {
-  return postJson<{ players: string[]; multiplier: number; names: string[]; hostName: string }>('/api/room/join', { roomKey });
-}
-
-export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
-  await postJson('/api/room/multiplier', { roomKey, multiplier });
-}
-
-export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<RoomSpinResponse> {
-  return postJson<RoomSpinResponse>('/api/room/spin', { roomKey, names, direction });
-}
-
-export async function leaveRoom(roomKey: string): Promise<void> {
-  await postJson('/api/room/leave', { roomKey });
-}
-
-function leaveRoomOnUnload(roomKey: string, token: string): void {
-  void postJson('/api/room/leave', { roomKey }, { token, keepalive: true });
-}
-
-export async function closeRoom(roomKey: string): Promise<void> {
-  await postJson('/api/room/close', { roomKey });
-}
-
-export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
-  await postJson('/api/room/wheel-items', { roomKey, names });
-}
-
-export async function resetRoom(roomKey: string): Promise<void> {
-  await postJson('/api/room/reset', { roomKey });
 }
 
 export function subscribeToRoom(

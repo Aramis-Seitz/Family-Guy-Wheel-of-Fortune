@@ -1,10 +1,22 @@
 import { supabaseClient } from "../shared/supabase-client.js";
+import { HttpRequest, RequestOptions } from "../shared/types.js";
+import { apiUrl } from "../shared/api-base.js";
 
 
 type ApiErrorBody = {
     error?: string;
 };
 
+
+export class ApiError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+    }
+}
 
 export async function readApiError(response: Response, fallback: string): Promise<string> {
     try {
@@ -16,27 +28,16 @@ export async function readApiError(response: Response, fallback: string): Promis
     return fallback;
 }
 
-export async function buildAuthHeaders(baseHeaders: Record<string, string> = {}): Promise<Record<string, string>> {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    const token = session?.access_token;
-    if (!token) throw new Error("Not authenticated");
-
-    return {
-        ...baseHeaders,
-        Authorization: `Bearer ${token}`
-    };
-}
-
 export async function getAccessToken(): Promise<string> {
     const { data: { session } } = await supabaseClient.auth.getSession();
     return session?.access_token ?? '';
 }
 
-export async function postJson<T>(path: string, body?: Record<string, unknown>, options: { token?: string; keepalive?: boolean } = {}): Promise<T> {
+async function request<T>(method: HttpRequest, path: string, body?: Record<string, unknown>, options: RequestOptions = {}): Promise<T> {
     const token = options.token ?? await getAccessToken();
 
-    const response = await fetch(path, {
-        method: 'POST',
+    const response = await fetch(apiUrl(path), {
+        method,
         headers: {
             Authorization: `Bearer ${token}`,
             ...(body !== undefined && { 'Content-Type': 'application/json' }),
@@ -45,6 +46,17 @@ export async function postJson<T>(path: string, body?: Record<string, unknown>, 
         keepalive: options.keepalive,
     });
 
-    if (!response.ok) throw new Error(await readApiError(response, `HTTP ${response.status}`));
+    if (!response.ok) {
+        const message = await readApiError(response, options.errorFallback ?? `HTTP ${response.status}`);
+        throw new ApiError(message, response.status);
+    }
     return response.json() as Promise<T>;
+}
+
+export function postJson<T>(path: string, body?: Record<string, unknown>, options: RequestOptions = {}): Promise<T> {
+    return request<T>('POST', path, body, options);
+}
+
+export function getJson<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    return request<T>('GET', path, undefined, options);
 }

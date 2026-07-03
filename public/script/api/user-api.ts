@@ -1,5 +1,4 @@
-import { readApiError, buildAuthHeaders } from "./api-helpers.js";
-import { apiUrl } from "../shared/api-base.js";
+import { getJson, postJson, ApiError } from "./api-helpers.js";
 
 
 type CoinsResponseBody = {
@@ -15,42 +14,23 @@ type ProfileResponseBody = {
 
 
 export async function getUserCoins(): Promise<number> {
-    const headers = await buildAuthHeaders({
-        "Accept": "application/json"
+    const body = await getJson<CoinsResponseBody>("/api/user/coins", {
+        errorFallback: "Coins konnten nicht geladen werden"
     });
-
-    const response = await fetch(apiUrl("/api/user/coins"), {
-        method: "GET",
-        headers
-    });
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Coins konnten nicht geladen werden");
-        throw new Error(message);
-    }
-
-    const body = await response.json() as CoinsResponseBody;
     return typeof body.coins === "number" ? body.coins : 0;
 }
 
 export async function getUserProfile(): Promise<{ username: string; coins: number } | null> {
-    const headers = await buildAuthHeaders({
-        "Accept": "application/json"
-    });
-
-    const response = await fetch(apiUrl("/api/user/profile"), {
-        method: "GET",
-        headers
-    });
-
-    if (response.status === 404) return null;
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Profil konnte nicht geladen werden");
-        throw new Error(message);
+    let body: ProfileResponseBody;
+    try {
+        body = await getJson<ProfileResponseBody>("/api/user/profile", {
+            errorFallback: "Profil konnte nicht geladen werden"
+        });
+    } catch (error) {
+        if (error instanceof ApiError && error.status === 404) return null;
+        throw error;
     }
 
-    const body = await response.json() as ProfileResponseBody;
     const profile = body.profile;
     if (!profile || typeof profile.username !== "string") return null;
 
@@ -61,55 +41,21 @@ export async function getUserProfile(): Promise<{ username: string; coins: numbe
 }
 
 export async function setUserCoins(coins: number): Promise<number> {
-    const headers = await buildAuthHeaders({
-        "Content-Type": "application/json"
+    const body = await postJson<CoinsResponseBody>("/api/user/coins", { coins }, {
+        errorFallback: "Failed to set coins"
     });
-
-    const response = await fetch(apiUrl("/api/user/coins"), {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ coins })
-    });
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Failed to set coins");
-        throw new Error(message);
-    }
-
-    const body = await response.json() as CoinsResponseBody;
     return typeof body.coins === "number" ? body.coins : 0;
 }
 
 export async function ensureDefaultAssets(): Promise<void> {
-    const headers = await buildAuthHeaders();
-
-    const response = await fetch(apiUrl("/api/user/ensure-defaults"), {
-        method: "POST",
-        headers
+    await postJson("/api/user/ensure-defaults", undefined, {
+        errorFallback: "Default-Assets konnten nicht gesetzt werden"
     });
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Default-Assets konnten nicht gesetzt werden");
-        throw new Error(message);
-    }
 }
 
 export async function subtractUserCoins(amount: number): Promise<number> {
-    const headers = await buildAuthHeaders({
-        "Content-Type": "application/json"
+    const body = await postJson<CoinsResponseBody>("/api/user/subtract-coins", { amount }, {
+        errorFallback: "Failed to subtract coins"
     });
-
-    const response = await fetch(apiUrl("/api/user/subtract-coins"), {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ amount })
-    });
-
-    if (!response.ok) {
-        const message = await readApiError(response, "Failed to subtract coins");
-        throw new Error(message);
-    }
-
-    const body = await response.json() as CoinsResponseBody;
     return typeof body.coins === "number" ? body.coins : 0;
 }

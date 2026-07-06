@@ -81,7 +81,7 @@ Die Pipeline macht folgendes (`.github/workflows/ci.yml`):
 
 | Secret | Wo finden |
 |---|---|
-| `SUPABASE_ACCES_TOKEN` | supabase.com → Account → Access Tokens |
+| `SUPABASE_ACCESS_TOKEN` | supabase.com → Account → Access Tokens |
 | `SUPABASE_PROJECT_ID` | Supabase Dashboard → Project Settings → General → Reference ID |
 | `SUPABASE_DB_PASSWORD` | Supabase Dashboard → Project Settings → Database → Password |
 

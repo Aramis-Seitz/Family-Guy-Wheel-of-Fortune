@@ -15,6 +15,9 @@ type SelectResponseBody = {
     assetId?: string;
 };
 
+type DeleteResponseBody = {
+    success?: boolean;
+}
 
 export type SelectAssetResult = {
     success: boolean;
@@ -45,7 +48,14 @@ export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
     });
 
     return {
-        success: body.success !== false,
+        success: body.success === true,
         assetId: typeof body.assetId === "string" && body.assetId ? body.assetId : assetId
     };
+}
+
+export async function deleteWheel(id: string): Promise<boolean> {
+    const body = await postJson<DeleteResponseBody>("/api/inventory/delete-wheel", { id }, {
+        errorFallback: "Rad konnte nicht gelöscht werden."
+    });
+    return body.success === true;
 }

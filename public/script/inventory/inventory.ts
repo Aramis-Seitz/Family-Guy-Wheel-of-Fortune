@@ -24,7 +24,8 @@ import { InventoryItem, Asset, InventoryCategory } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
-import { getOwnedAssets } from "../api/inventory-api.js";
+import { getOwnedAssets, deleteWheel } from "../api/inventory-api.js";
+import { ApiError } from "../api/api-helpers.js"
 
 
 let pendingDeleteId: string | null = null;
@@ -42,41 +43,26 @@ async function openInventoryModal(): Promise<void> {
   inventoryModal.showModal();
 }
 
-async function confirmDelete(): Promise<void> {
+async function confirmDeleteWheel(): Promise<void> {
   confirmDeleteModal.close();
   if (!pendingDeleteId) return;
-
-  const success = await deleteItem(pendingDeleteId);
+  const id = pendingDeleteId;
   pendingDeleteId = null;
 
-  if (success) await loadInventory();
+  try {
+    const success = await deleteWheel(id);
+    if (!success) throw new Error("Rad konnte nicht gelöscht werden.");
+    await loadInventory();
+    showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
+  } catch (error) {
+    const message = error instanceof ApiError ? error.message : "Rad konnte nicht gelöscht werden.";
+    showToast({ message, type: "error" });
+  }
 }
 
 function cancelDelete(): void {
   confirmDeleteModal.close();
   pendingDeleteId = null;
-}
-
-async function deleteItem(id: string): Promise<boolean> {
-  const { error } = await supabaseClient
-    .from("saved_links")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error("Fehler beim Löschen:", error);
-    showToast({
-      message: "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      type: "error"
-    });
-    return false;
-  }
-
-  showToast({
-    message: "Eintrag erfolgreich gelöscht.",
-    type: "success"
-  });
-  return true;
 }
 
 function openAddItemModal(): void {
@@ -287,7 +273,7 @@ export function initInventory(): void {
   });
   closeOnBackdropClick(addItemModal, closeAddItemModal);
 
-  confirmDeleteBtn.addEventListener("click", confirmDelete);
+  confirmDeleteBtn.addEventListener("click", confirmDeleteWheel);
   cancelDeleteBtn.addEventListener("click", cancelDelete);
   closeOnBackdropClick(confirmDeleteModal, cancelDelete);
 }

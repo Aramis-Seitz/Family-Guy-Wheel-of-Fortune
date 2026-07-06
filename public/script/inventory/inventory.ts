@@ -192,7 +192,7 @@ async function fetchInventoryWheels(): Promise<InventoryItem[]> {
   if (!user) return [];
 
   const { data, error } = await supabaseClient
-    .from("saved_links")
+    .from("saved_wheels")
     .select(`
   id,
   title:link_name,
@@ -228,7 +228,7 @@ async function submitItem(): Promise<void> {
   if (!user) return;
 
   const { error } = await supabaseClient
-    .from("saved_links")
+    .from("saved_wheels")
     .insert({
       user_id: user.id,
       link_name: name,

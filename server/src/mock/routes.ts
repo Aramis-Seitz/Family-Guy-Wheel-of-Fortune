@@ -79,17 +79,17 @@ mockRouter.post('/profile', (req, res) => {
   res.json(profile);
 });
 
-mockRouter.get('/saved_links/:userId', (req, res) => {
+mockRouter.get('/saved_wheels/:userId', (req, res) => {
   res.json(getSavedLinks(req.params.userId));
 });
 
-mockRouter.post('/saved_links', (req, res) => {
+mockRouter.post('/saved_wheels', (req, res) => {
   const { user_id, link_name, url } = req.body ?? {};
   const link = createSavedLink({ user_id, link_name, url });
   res.json(link);
 });
 
-mockRouter.delete('/saved_links/:id', (req, res) => {
+mockRouter.delete('/saved_wheels/:id', (req, res) => {
   deleteSavedLink(req.params.id);
   res.json({ success: true });
 });

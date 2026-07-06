@@ -1,0 +1,1 @@
+export const INVENTORY_LIMIT: number = 12;

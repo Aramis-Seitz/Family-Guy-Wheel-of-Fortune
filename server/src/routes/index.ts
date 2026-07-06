@@ -11,4 +11,4 @@ apiRoutes.use("/user", userRoutes);
 apiRoutes.use("/shop", shopRoutes);
 apiRoutes.use("/inventory", inventoryRoutes);
 apiRoutes.use("/room", roomRoutes);
-apiRoutes.use("/", spinRoutes);
+apiRoutes.use("/spin", spinRoutes);

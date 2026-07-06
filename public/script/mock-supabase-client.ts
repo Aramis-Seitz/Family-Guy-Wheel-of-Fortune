@@ -117,12 +117,12 @@ class MockQueryBuilder {
       }
     }
 
-    if (t === 'saved_links') {
+    if (t === 'saved_wheels') {
       if (this._op === 'select') {
         const userId = this._eqFilter('user_id');
         if (!userId) return { data: [], error: null };
 
-        const res = await fetch(apiUrl(`/api/mock/saved_links/${userId}`));
+        const res = await fetch(apiUrl(`/api/mock/saved_wheels/${userId}`));
         if (!res.ok) return { data: [], error: null };
         const rows: any[] = await res.json();
         const projected = rows.map(r => projectRow(r, cols));
@@ -131,7 +131,7 @@ class MockQueryBuilder {
 
       if (this._op === 'insert') {
         const data = Array.isArray(this._insertData) ? this._insertData[0] : this._insertData;
-        const res = await fetch(apiUrl('/api/mock/saved_links'), {
+        const res = await fetch(apiUrl('/api/mock/saved_wheels'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -143,7 +143,7 @@ class MockQueryBuilder {
       if (this._op === 'delete') {
         const id = this._eqFilter('id');
         if (!id) return { data: null, error: { message: 'No id filter for delete' } };
-        await fetch(apiUrl(`/api/mock/saved_links/${id}`), { method: 'DELETE' });
+        await fetch(apiUrl(`/api/mock/saved_wheels/${id}`), { method: 'DELETE' });
         return { data: null, error: null };
       }
     }

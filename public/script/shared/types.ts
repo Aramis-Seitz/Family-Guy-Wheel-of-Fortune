@@ -41,7 +41,7 @@ export interface ProfileData {
   coins: number;
 }
 
-export type InventoryItem = {
+export type SavedWheel = {
   id: string;
   title: string;
   link: string | null;
@@ -60,6 +60,19 @@ export interface RoomSpinResponse {
   ranNum: number;
   spinToken: string;
   direction: Direction;
+}
+
+export interface CreateRoomResponse {
+  roomKey: string;
+  players: string[];
+  names: string[];
+}
+
+export interface JoinRoomResponse {
+  players: string[];
+  multiplier: number;
+  names: string[];
+  hostName: string;
 }
 
 export interface RoomPlayer {
@@ -93,3 +106,11 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
 }
+
+export type HttpMethod = 'GET' | 'POST';
+
+export type RequestOptions = {
+  token?: string;
+  keepalive?: boolean;
+  errorFallback?: string;
+};

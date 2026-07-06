@@ -20,11 +20,12 @@ import {
 import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
 import { replaceNames } from "../names/name-list.js";
-import { InventoryItem, Asset, InventoryCategory } from "../shared/types.js";
+import { SavedWheel, Asset, InventoryCategory } from "../shared/types.js";
 import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
-import { getOwnedAssets } from "../api/inventory-api.js";
+import { getOwnedAssets, deleteSavedWheel, getSavedWheels } from "../api/inventory-api.js";
+import { ApiError } from "../api/api-helpers.js"
 
 
 let pendingDeleteId: string | null = null;
@@ -42,41 +43,26 @@ async function openInventoryModal(): Promise<void> {
   inventoryModal.showModal();
 }
 
-async function confirmDelete(): Promise<void> {
+async function confirmDeleteWheel(): Promise<void> {
   confirmDeleteModal.close();
   if (!pendingDeleteId) return;
-
-  const success = await deleteItem(pendingDeleteId);
+  const id = pendingDeleteId;
   pendingDeleteId = null;
 
-  if (success) await loadInventory();
+  try {
+    const success = await deleteSavedWheel(id);
+    if (!success) throw new Error("Rad konnte nicht gelöscht werden.");
+    await loadInventory();
+    showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
+  } catch (error) {
+    const message = error instanceof ApiError ? error.message : "Rad konnte nicht gelöscht werden.";
+    showToast({ message, type: "error" });
+  }
 }
 
 function cancelDelete(): void {
   confirmDeleteModal.close();
   pendingDeleteId = null;
-}
-
-async function deleteItem(id: string): Promise<boolean> {
-  const { error } = await supabaseClient
-    .from("saved_links")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error("Fehler beim Löschen:", error);
-    showToast({
-      message: "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      type: "error"
-    });
-    return false;
-  }
-
-  showToast({
-    message: "Eintrag erfolgreich gelöscht.",
-    type: "success"
-  });
-  return true;
 }
 
 function openAddItemModal(): void {
@@ -92,7 +78,7 @@ function closeAddItemModal(): void {
   addItemModal.close();
 }
 
-function renderInventoryWheels(items: InventoryItem[]): void {
+function renderInventoryWheels(items: SavedWheel[]): void {
   inventoryWheelGrid.innerHTML = "";
   let addCardPlaced = false;
 
@@ -132,7 +118,7 @@ function createEmptyCard(): HTMLDivElement {
   return card;
 }
 
-function createItemCard(item: InventoryItem): HTMLElement {
+function createItemCard(item: SavedWheel): HTMLElement {
   const hasValidLink = (item.link ?? "").trim() !== "";
   const card = document.createElement("div");
   card.classList.add("inventory-card");
@@ -164,7 +150,7 @@ function createItemCard(item: InventoryItem): HTMLElement {
   return card;
 }
 
-function buildCardContent(item: InventoryItem): HTMLDivElement {
+function buildCardContent(item: SavedWheel): HTMLDivElement {
   const content = document.createElement("div");
   content.className = "inventory-card-content";
 
@@ -188,7 +174,7 @@ function buildCardContent(item: InventoryItem): HTMLDivElement {
   return content;
 }
 
-function createDeleteButton(item: InventoryItem): HTMLButtonElement {
+function createDeleteButton(item: SavedWheel): HTMLButtonElement {
   const btn = document.createElement("button");
   btn.className = "inventory-delete-btn";
   btn.setAttribute("aria-label", "Eintrag löschen");
@@ -201,28 +187,8 @@ function createDeleteButton(item: InventoryItem): HTMLButtonElement {
   return btn;
 }
 
-async function fetchInventoryWheels(): Promise<InventoryItem[]> {
-  const user = await fetchCurrentUser();
-  if (!user) return [];
-
-  const { data, error } = await supabaseClient
-    .from("saved_links")
-    .select(`
-  id,
-  title:link_name,
-  link:url,
-  created_at
- `)
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true })
-    .limit(INVENTORY_LIMIT);
-
-  if (error) {
-    console.error("Fehler beim Laden:", error);
-    return [];
-  }
-
-  return data ?? [];
+async function fetchInventoryWheels(): Promise<SavedWheel[]> {
+  return await getSavedWheels();
 }
 
 async function loadInventory(): Promise<void> {
@@ -242,7 +208,7 @@ async function submitItem(): Promise<void> {
   if (!user) return;
 
   const { error } = await supabaseClient
-    .from("saved_links")
+    .from("saved_wheels")
     .insert({
       user_id: user.id,
       link_name: name,
@@ -287,7 +253,7 @@ export function initInventory(): void {
   });
   closeOnBackdropClick(addItemModal, closeAddItemModal);
 
-  confirmDeleteBtn.addEventListener("click", confirmDelete);
+  confirmDeleteBtn.addEventListener("click", confirmDeleteWheel);
   cancelDeleteBtn.addEventListener("click", cancelDelete);
   closeOnBackdropClick(confirmDeleteModal, cancelDelete);
 }

@@ -8,6 +8,7 @@ import { isSpinning } from "../wheel/spin.js";
 import { showToast } from "../shared/toast.js";
 import { MAX_ITEMS } from "../shared/constants.js";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
+import { notifyAccountChanged } from "../shared/auth-channel.js";
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -53,7 +54,7 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
-    new BroadcastChannel("auth").postMessage("ACCOUNT_CHANGED");
+    notifyAccountChanged();
     window.location.href = "/login.html";
   });
 }

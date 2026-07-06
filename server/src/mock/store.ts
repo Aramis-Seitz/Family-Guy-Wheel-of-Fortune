@@ -36,7 +36,7 @@ export const store = {
     },
   ] as Profile[],
   spin_tokens: [] as SpinToken[],
-  saved_links: [] as SavedLink[],
+  saved_wheels: [] as SavedLink[],
 };
 
 export function findProfile(id: string) {
@@ -83,7 +83,7 @@ export function markTokenUsed(token: string): void {
 }
 
 export function getSavedLinks(userId: string): SavedLink[] {
-  return store.saved_links
+  return store.saved_wheels
     .filter(l => l.user_id === userId)
     .sort((a, b) => a.created_at.localeCompare(b.created_at))
     .slice(0, 12);
@@ -95,11 +95,11 @@ export function createSavedLink(data: Omit<SavedLink, 'id' | 'created_at'>): Sav
     ...data,
     created_at: new Date().toISOString(),
   };
-  store.saved_links.push(link);
+  store.saved_wheels.push(link);
   return link;
 }
 
 export function deleteSavedLink(id: string): void {
-  const idx = store.saved_links.findIndex(l => l.id === id);
-  if (idx >= 0) store.saved_links.splice(idx, 1);
+  const idx = store.saved_wheels.findIndex(l => l.id === id);
+  if (idx >= 0) store.saved_wheels.splice(idx, 1);
 }

@@ -41,7 +41,7 @@ export interface ProfileData {
   coins: number;
 }
 
-export type InventoryItem = {
+export type SavedWheel = {
   id: string;
   title: string;
   link: string | null;

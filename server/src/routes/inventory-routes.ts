@@ -3,7 +3,8 @@ import {
     handleGetOwnedAssets,
     handleGetSelectedAssetIds,
     handleSelectAsset,
-    handleDeleteWheel
+    handleDeleteWheel,
+    handleGetSavedWheels
 } from "../controllers/inventory-controller";
 
 export const inventoryRoutes = Router();
@@ -11,4 +12,5 @@ export const inventoryRoutes = Router();
 inventoryRoutes.get("/assets", handleGetOwnedAssets);
 inventoryRoutes.get("/selected-asset-ids", handleGetSelectedAssetIds);
 inventoryRoutes.post("/select", handleSelectAsset);
-inventoryRoutes.post("/delete-wheel", handleDeleteWheel);
+inventoryRoutes.post("/delete-saved-wheel", handleDeleteWheel);
+inventoryRoutes.get("/saved-wheels", handleGetSavedWheels);

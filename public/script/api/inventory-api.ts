@@ -1,5 +1,5 @@
 import { getJson, postJson } from "./api-helpers.js";
-import type { Asset } from "../shared/types.js";
+import type { Asset, SavedWheel } from "../shared/types.js";
 
 
 type AssetsResponseBody = {
@@ -23,6 +23,10 @@ export type SelectAssetResult = {
     success: boolean;
     assetId: string;
 };
+
+type SavedWheelResponseBody = {
+    savedWheel: SavedWheel[];
+}
 
 export async function getOwnedAssets(): Promise<Asset[]> {
     const body = await getJson<AssetsResponseBody>("/api/inventory/assets", {
@@ -53,9 +57,16 @@ export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
     };
 }
 
-export async function deleteWheel(id: string): Promise<boolean> {
-    const body = await postJson<DeleteResponseBody>("/api/inventory/delete-wheel", { id }, {
+export async function deleteSavedWheel(wheelId: string): Promise<boolean> {
+    const body = await postJson<DeleteResponseBody>("/api/inventory/delete-saved-wheel", { wheelId }, {
         errorFallback: "Rad konnte nicht gelöscht werden."
     });
     return body.success === true;
+}
+
+export async function getSavedWheels(): Promise<SavedWheel[]> {
+    const body = await getJson<SavedWheelResponseBody>("/api/inventory/saved-wheels", {
+        errorFallback: "Räder konnten nicht geladen werden"
+    });
+    return Array.isArray(body.savedWheel) ? body.savedWheel : [];
 }

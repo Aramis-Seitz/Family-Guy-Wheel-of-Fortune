@@ -6,7 +6,8 @@ import {
     getAssetById,
     createAssetSelection,
 } from "../repositories/asset-repository";
-import { deleteWheelById } from "../repositories/wheel-repository"
+import { deleteWheelById, listSavedWheels } from "../repositories/wheel-repository"
+import { SavedWheel } from "../types/wheel";
 
 export type SelectResult = {
     success: true;
@@ -47,4 +48,8 @@ export async function selectAsset(userId: string, assetId: string): Promise<Sele
 export async function deleteWheel(userId: string, wheelId: string): Promise<DeleteResult> {
     await deleteWheelById(userId, wheelId);
     return { success: true };
+}
+
+export async function getSavedWheels(userId: string): Promise<SavedWheel[]> {
+    return listSavedWheels(userId);
 }

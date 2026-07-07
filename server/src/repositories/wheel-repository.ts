@@ -32,3 +32,19 @@ export async function listSavedWheels(userId: string): Promise<SavedWheel[]> {
 
     return data ?? [];
 }
+
+export async function insertSavedWheels(userId: string, title: string, url: string): Promise<{ success: boolean }> {
+    const { error } = await supabaseClient
+        .from("saved_wheels")
+        .insert({
+            user_id: userId,
+            link_name: title,
+            url
+        });
+
+    if (error) throw error;
+
+    return {
+        success: true
+    };
+}

@@ -6,9 +6,8 @@ import {
     getAssetById,
     createAssetSelection,
 } from "../repositories/asset-repository";
-import { deleteWheelById, listSavedWheels } from "../repositories/wheel-repository"
+import { deleteWheelById, listSavedWheels, insertSavedWheels } from "../repositories/wheel-repository"
 import { SavedWheel } from "../types/wheel";
-import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 
 export type SelectResult = {
     success: true;
@@ -18,6 +17,10 @@ export type SelectResult = {
 export type DeleteResult = {
     success: true;
 }
+
+export type SaveSavedWheelResult = {
+    success: true;
+};
 
 export async function getOwnedAssets(userId: string): Promise<Asset[]> {
     return listOwnedAssets(userId);
@@ -55,24 +58,7 @@ export async function getSavedWheels(userId: string): Promise<SavedWheel[]> {
     return listSavedWheels(userId);
 }
 
-export async function saveSavedWheels(
-    userId: string,
-    title: string,
-    url: string
-): Promise<{ success: boolean }> {
-    const { error } = await supabaseClient
-        .from("saved_links")
-        .insert({
-            user_id: userId,
-            link_name: title,
-            url
-        });
-
-    if (error) {
-        throw error;
-    }
-
-    return {
-        success: true
-    };
+export async function saveSavedWheels(userId: string, title: string, url: string): Promise<SaveSavedWheelResult> {
+    await insertSavedWheels(userId, title, url);
+    return { success: true };
 }

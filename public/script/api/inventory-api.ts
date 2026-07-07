@@ -25,7 +25,7 @@ export type SelectAssetResult = {
 };
 
 type SavedWheelResponseBody = {
-    savedWheel: SavedWheel[];
+    savedWheels: SavedWheel[];
 }
 
 export async function getOwnedAssets(): Promise<Asset[]> {
@@ -68,5 +68,5 @@ export async function getSavedWheels(): Promise<SavedWheel[]> {
     const body = await getJson<SavedWheelResponseBody>("/api/inventory/saved-wheels", {
         errorFallback: "Räder konnten nicht geladen werden"
     });
-    return Array.isArray(body.savedWheel) ? body.savedWheel : [];
+    return Array.isArray(body.savedWheels) ? body.savedWheels : [];
 }

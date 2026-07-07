@@ -28,6 +28,11 @@ type SavedWheelResponseBody = {
     savedWheels: SavedWheel[];
 }
 
+type SaveSavedWheelResponseBody = {
+    success: boolean;
+    savedWheels?: SavedWheel[];
+};
+
 export async function getOwnedAssets(): Promise<Asset[]> {
     const body = await getJson<AssetsResponseBody>("/api/inventory/assets", {
         errorFallback: "Assets konnten nicht geladen werden"
@@ -69,4 +74,11 @@ export async function getSavedWheels(): Promise<SavedWheel[]> {
         errorFallback: "Räder konnten nicht geladen werden"
     });
     return Array.isArray(body.savedWheels) ? body.savedWheels : [];
+}
+
+export async function saveSavedWheels(title: string, url: string): Promise<boolean> {
+    const body = await postJson<SaveSavedWheelResponseBody>("/api/inventory/save-saved-wheel", {title, url,}, {
+            errorFallback: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+        });
+    return body.success === true;
 }

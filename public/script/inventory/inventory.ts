@@ -17,7 +17,6 @@ import {
   inventoryTabs,
   inventoryAssetGrid
 } from "../shared/dom.js";
-import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
 import { generateShareLink } from "../names/share-name-list.js";
 import { replaceNames } from "../names/name-list.js";
 import { SavedWheel, Asset, InventoryCategory } from "../shared/types.js";
@@ -26,7 +25,7 @@ import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
 import { getOwnedAssets, deleteSavedWheel, getSavedWheels } from "../api/inventory-api.js";
 import { ApiError } from "../api/api-helpers.js"
-
+import { saveSavedWheels } from "../api/inventory-api.js";
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
@@ -204,26 +203,15 @@ async function submitItem(): Promise<void> {
     return;
   }
 
-  const user = await fetchCurrentUser();
-  if (!user) return;
+  const success = await saveSavedWheels(name, generateShareLink());
 
-  const { error } = await supabaseClient
-    .from("saved_wheels")
-    .insert({
-      user_id: user.id,
-      link_name: name,
-      url: generateShareLink()
-    });
-
-  if (error) {
-    console.error("Fehler beim Speichern:", error);
+  if (!success) {
     showToast({
       message: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
       type: "error"
     });
     return;
   }
-
   closeAddItemModal();
   await loadInventory();
   showToast({

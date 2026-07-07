@@ -4,6 +4,7 @@ import { getSelectedAssetIds } from "../services/shop-service";
 import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "../types/http";
 import { deleteWheel } from "../services/inventory-service";
+import { saveSavedWheels } from "../services/inventory-service";
 
 type SelectRequestBody = {
     assetId?: string;
@@ -11,6 +12,11 @@ type SelectRequestBody = {
 
 type DeleteWheelRequestBody = {
     wheelId?: string
+};
+
+type SaveSavedWheelRequestBody = {
+    title: string;
+    url: string;
 };
 
 export async function handleGetOwnedAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
@@ -92,6 +98,31 @@ export async function handleGetSavedWheels(req: HttpRequest, res: HttpResponse):
 
         const savedWheels = await getSavedWheels(userId);
         res.status(200).json({ savedWheels });
+    } catch (error) {
+        sendUnexpectedError(res, error);
+    }
+}
+
+export async function handleSaveSavedWheels(req: HttpRequest, res: HttpResponse): Promise<void> {
+    try {
+        const userId = await resolveUserIdFromHeaders(req.headers);
+        if (!userId) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const body = (req.body ?? {}) as SaveSavedWheelRequestBody;
+        const title = String(body.title ?? "");
+        const url = String(body.url ?? "");
+
+        if (!title || !url) {
+            res.status(400).json({ error: "title and url are required" });
+            return;
+        }
+
+        const result = await saveSavedWheels(userId, title, url);
+
+        res.status(200).json(result);
     } catch (error) {
         sendUnexpectedError(res, error);
     }

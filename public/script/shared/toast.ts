@@ -1,6 +1,3 @@
-import { toastIcon } from "./constants.js";
-import { ToastType, ToastOptions } from "./types.js";
-
 const toastDurationMs = 3000;
 const toastAnimationMs = 300;
 
@@ -15,6 +12,14 @@ function getOrCreateToastContainer(): HTMLDivElement {
   container.showPopover();
   return container;
 }
+
+export type ToastType = "success" | "error" | "info";
+
+const toastIcon = {
+  "success": "✓",
+  "error": "✕",
+  "info": "𝐢",
+};
 
 function createToastElement(message: string, type: ToastType): HTMLDivElement {
   const toast = document.createElement("div");
@@ -40,6 +45,12 @@ function dismissToast(toast: HTMLDivElement): void {
   toast.classList.add("toast--hidden");
 
   setTimeout(() => toast.remove(), toastAnimationMs);
+}
+
+export interface ToastOptions {
+  message: string;
+  type: ToastType;
+  durationMs?: number;
 }
 
 export function showToast({ message, type, durationMs = toastDurationMs }: ToastOptions): void {

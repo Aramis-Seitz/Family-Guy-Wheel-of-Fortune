@@ -1,7 +1,7 @@
-import { shareBtn } from "../shared/dom.js";
 import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier.js";
 import { getNames, replaceNames } from "./name-list.js";
 import { showToast } from "../shared/toast.js";
+import { requiredElement } from "../shared/dom-helpers.js";
 
 export function generateShareLink(): string {
     const names = getNames();
@@ -37,6 +37,8 @@ export function loadInformationFromUrl(): void {
     setMultiplierSlider(powerValue);
     updateMultiplierDisplay();
 }
+
+const shareBtn = requiredElement<HTMLButtonElement>("shareBtn");
 
 export function initShareFeature(): void {
     console.log("initShareFeature loaded");

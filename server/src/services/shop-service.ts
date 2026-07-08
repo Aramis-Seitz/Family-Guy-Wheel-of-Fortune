@@ -1,4 +1,4 @@
-import type { Asset, AssetCategory } from "../types/asset";
+import type { Asset, AssetCategory } from "../repositories/asset-repository";
 import {
     createAssetOwnership,
     getAssetById,
@@ -10,12 +10,6 @@ import {
 } from "../repositories/asset-repository";
 import { getCoinsByUserId, updateCoinsByUserId } from "../repositories/profile-repository";
 import { AppError } from "../lib/errors";
-
-export type PurchaseResult = {
-    success: true;
-    coins: number;
-    assetId: string;
-};
 
 export async function getAssets(): Promise<Asset[]> {
     return listAssets();
@@ -29,6 +23,12 @@ export async function getOwnedAssetIds(userId: string): Promise<string[]> {
 export async function getSelectedAssetIds(userId: string): Promise<string[]> {
     return listSelectedAssetIds(userId);
 }
+
+export type PurchaseResult = {
+    success: true;
+    coins: number;
+    assetId: string;
+};
 
 export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResult> {
     if (!assetId) {

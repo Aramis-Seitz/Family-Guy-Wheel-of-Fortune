@@ -1,7 +1,10 @@
 import { postJson, getAccessToken, ApiError } from "./api-helpers.js";
-import type { AwardCoinsResponse, RandomResponse } from "../shared/types.js";
-import type { Direction } from "../shared/types.js";
+import type { Direction } from "../wheel/spin.js";
 
+export interface RandomResponse {
+  ranNum: number;
+  spinToken: string;
+}
 
 export async function fetchRandomNumber(
   names: string[],
@@ -26,6 +29,12 @@ export async function fetchRandomNumber(
   }
 
   return { ranNum: data.ranNum, spinToken: data.spinToken };
+}
+
+export interface AwardCoinsResponse {
+  spinnerCoins: number;
+  winnerCoins: number;
+  total?: number;
 }
 
 export async function awardCoins(spinToken: string, winnerName: string): Promise<AwardCoinsResponse | null> {

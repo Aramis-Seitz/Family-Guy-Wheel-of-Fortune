@@ -1,5 +1,5 @@
 import { getJson, postJson } from "./api-helpers.js";
-import type { Asset, SavedWheel } from "../shared/types.js";
+import type { Asset } from "../shop/shop-assets.js";
 
 
 type AssetsResponseBody = {
@@ -22,6 +22,13 @@ type DeleteResponseBody = {
 export type SelectAssetResult = {
     success: boolean;
     assetId: string;
+};
+
+export type SavedWheel = {
+    id: string;
+    title: string;
+    link: string | null;
+    created_at: string;
 };
 
 type SavedWheelResponseBody = {

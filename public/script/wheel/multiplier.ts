@@ -1,5 +1,7 @@
-import { multiplierSlider, multiplierValue } from "../shared/dom.js";
-import { DEFAULT_MULTIPLIER } from "../shared/constants.js";
+import { requiredElement } from "../shared/dom-helpers.js";
+
+export const multiplierSlider = requiredElement<HTMLInputElement>("multiplierSlider");
+export const multiplierValue = requiredElement<HTMLSpanElement>("multiplierValue");
 
 export function setMultiplierSlider(multiplier: number): void {
   multiplierSlider.value = `${multiplier}`;
@@ -22,6 +24,8 @@ export function disableMultiplierSlider(): void {
 export function enableMultiplierSlider(): void {
   if (multiplierSlider) multiplierSlider.disabled = false;
 }
+
+export const DEFAULT_MULTIPLIER: number = 1;
 
 export function getMultiplier(): number {
   const value = parseFloat(multiplierSlider.value);

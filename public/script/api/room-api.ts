@@ -1,11 +1,23 @@
 import { postJson } from "./api-helpers.js";
-import type { CreateRoomResponse, JoinRoomResponse, RoomSpinResponse } from "../shared/types.js";
+import type { Direction } from "../wheel/spin.js";
 
+export interface CreateRoomResponse {
+  roomKey: string;
+  players: string[];
+  names: string[];
+}
 
 export async function createRoom(): Promise<CreateRoomResponse> {
     return postJson<CreateRoomResponse>("/api/room/create", undefined, {
         errorFallback: "Room konnte nicht erstellt werden"
     });
+}
+
+export interface JoinRoomResponse {
+  players: string[];
+  multiplier: number;
+  names: string[];
+  hostName: string;
 }
 
 export async function joinRoom(roomKey: string): Promise<JoinRoomResponse> {
@@ -18,6 +30,12 @@ export async function setMultiplier(roomKey: string, multiplier: number): Promis
     await postJson("/api/room/multiplier", { roomKey, multiplier }, {
         errorFallback: "Multiplikator konnte nicht gesetzt werden"
     });
+}
+
+export interface RoomSpinResponse {
+  ranNum: number;
+  spinToken: string;
+  direction: Direction;
 }
 
 export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<RoomSpinResponse> {

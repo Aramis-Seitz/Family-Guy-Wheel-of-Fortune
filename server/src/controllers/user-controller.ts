@@ -1,21 +1,7 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, setUserCoins, subtractUserCoins } from "../services/user-service";
 import { sendUnexpectedError } from "./response";
-import type { HttpRequest, HttpResponse } from "../types/http";
-
-type RegisterRequestBody = {
-    username?: string;
-    email?: string;
-    dateOfBirth?: string;
-};
-
-type CoinsRequestBody = {
-    coins?: number;
-};
-
-type SubtractCoinsRequestBody = {
-    amount?: number;
-};
+import type { HttpRequest, HttpResponse } from "./response";
 
 export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -31,6 +17,12 @@ export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpRespo
         sendUnexpectedError(res, error);
     }
 }
+
+type RegisterRequestBody = {
+    username?: string;
+    email?: string;
+    dateOfBirth?: string;
+};
 
 export async function handleRegisterUser(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -70,6 +62,10 @@ export async function handleGetUserCoins(req: HttpRequest, res: HttpResponse): P
     }
 }
 
+type CoinsRequestBody = {
+    coins?: number;
+};
+
 export async function handleSetUserCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
@@ -105,6 +101,10 @@ export async function handleUserProfile(req: HttpRequest, res: HttpResponse): Pr
         sendUnexpectedError(res, error);
     }
 }
+
+type SubtractCoinsRequestBody = {
+    amount?: number;
+};
 
 export async function handleSubtractCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {

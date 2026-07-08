@@ -1,12 +1,7 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { generateSpin, awardCoins } from "../services/spin-service";
 import { sendUnexpectedError } from "./response";
-import type { HttpRequest, HttpResponse } from "../types/http";
-
-type AwardCoinsBody = {
-    spinToken?: string;
-    winnerName?: string;
-};
+import type { HttpRequest, HttpResponse } from "./response";
 
 export async function handleGenerateSpin(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -22,6 +17,11 @@ export async function handleGenerateSpin(req: HttpRequest, res: HttpResponse): P
         sendUnexpectedError(res, error);
     }
 }
+
+type AwardCoinsBody = {
+    spinToken?: string;
+    winnerName?: string;
+};
 
 export async function handleAwardCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {

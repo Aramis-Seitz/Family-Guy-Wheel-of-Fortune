@@ -5,15 +5,21 @@ import { stopDrumRoll } from "./sound.js";
 import { resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
 import { showToast } from "../shared/toast.js";
-import { winnerModal, closeWinnerModalBtn, removeWinnerBtn, winnerText, confettiCanvas } from "../shared/dom.js";
-import { POINTER_OFFSET_DEG, FULL_CIRCLE_DEG } from "../shared/constants.js";
-import type { SpinConfig } from "../shared/types.js";
+import { requiredElement } from "../shared/dom-helpers.js";
+import type { SpinConfig } from "./spin.js";
+
+export const POINTER_OFFSET_DEG: number = 270;
+export const FULL_CIRCLE_DEG: number = 360;
 
 export function resolveWinner(rotation: number, config: SpinConfig): string {
   const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
   const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
   return config.names[winnerIndex] ?? config.names[0];
 }
+
+export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
+export const winnerText = requiredElement<HTMLParagraphElement>("winnerText");
+export const removeWinnerBtn = requiredElement<HTMLButtonElement>("removeWinner");
 
 export function displayWinnerModal(winnerName: string): void {
   if (!winnerModal || !winnerText) return;
@@ -32,6 +38,8 @@ export function hideWinnerModal(): void {
   if (!winnerModal) return;
   winnerModal.classList.add("hidden");
 }
+
+const confettiCanvas = requiredElement<HTMLCanvasElement>("confettiCanvas");
 
 function startConfetti(): void {
   if (!confettiCanvas) return;
@@ -130,6 +138,8 @@ function removeWinner(): void {
   hideWinnerModal();
   resetWheelRotation();
 }
+
+const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");
 
 export function initWinnerModal(): void {
   if (!winnerModal || !closeWinnerModalBtn) return;

@@ -1,14 +1,16 @@
 import { supabaseClient } from "../shared/supabase-client.js";
-import { profileName, authButton, coinDisplay } from "../shared/dom.js";
-import { ProfileData } from "../shared/types.js";
+import { optionalElement } from "../shared/dom-helpers.js";
 import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { nameState } from "../names/name-state.js";
+import { nameState, MAX_ITEMS } from "../names/name-state.js";
 import { isNameEditingLocked } from "../names/name-list.js";
 import { isSpinning } from "../wheel/spin.js";
 import { showToast } from "../shared/toast.js";
-import { MAX_ITEMS } from "../shared/constants.js";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
 import { notifyAccountChanged } from "../shared/auth-channel.js";
+
+export const profileName = optionalElement<HTMLSpanElement>("profileName");
+export const authButton = optionalElement<HTMLButtonElement>("authButton");
+export const coinDisplay = optionalElement<HTMLSpanElement>("coinDisplay");
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -29,6 +31,11 @@ function applyCoinDisplay(coins: number): void {
   if (!coinDisplay) return;
   coinDisplay.textContent = `🪙 ${coins}`;
   coinDisplay.style.display = "inline";
+}
+
+interface ProfileData {
+  username: string;
+  coins: number;
 }
 
 function applyAuthenticatedState(profile: ProfileData | null): void {

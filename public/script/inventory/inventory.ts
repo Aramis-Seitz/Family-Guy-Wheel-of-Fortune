@@ -1,41 +1,28 @@
-import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS, INVENTORY_CATEGORIES, ASSET_CATEGORIES } from "../shared/constants.js";
-import {
-  addItemModal,
-  addItemInput,
-  cancelAddItemBtn,
-  closeAddItemBtn,
-  confirmAddItemBtn,
-  confirmDeleteBtn,
-  confirmDeleteModal,
-  confirmDeleteName,
-  inventoryBtn,
-  inventoryCloseBtn,
-  inventoryWheelGrid,
-  inventoryModal,
-  cancelDeleteBtn,
-  closeOnBackdropClick,
-  inventoryTabs,
-  inventoryAssetGrid
-} from "../shared/dom.js";
+import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
+import { ASSET_CATEGORIES } from "../shop/shop.js";
+import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
 import { generateShareLink } from "../names/share-name-list.js";
 import { replaceNames } from "../names/name-list.js";
-import { SavedWheel, Asset, InventoryCategory } from "../shared/types.js";
-import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
+import type { SavedWheel } from "../api/inventory-api.js";
+import type { Asset } from "../shop/shop-assets.js";
 import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
-import { getOwnedAssets, deleteSavedWheel, getSavedWheels } from "../api/inventory-api.js";
+import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api.js";
 import { ApiError } from "../api/api-helpers.js"
-import { saveSavedWheels } from "../api/inventory-api.js";
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
 
+const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName");
+const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirmDeleteModal");
 
 function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
   confirmDeleteName.textContent = title;
   confirmDeleteModal.showModal();
 }
+
+const inventoryModal = requiredElement<HTMLDialogElement>("inventoryModal");
 
 async function openInventoryModal(): Promise<void> {
   await loadInventory();
@@ -64,6 +51,9 @@ function cancelDelete(): void {
   pendingDeleteId = null;
 }
 
+const addItemInput = requiredElement<HTMLInputElement>("addItemInput");
+const addItemModal = requiredElement<HTMLDialogElement>("addItemModal");
+
 function openAddItemModal(): void {
   if (!inventoryModal.open) return;
 
@@ -76,6 +66,9 @@ function openAddItemModal(): void {
 function closeAddItemModal(): void {
   addItemModal.close();
 }
+
+const inventoryWheelGrid = requiredElement<HTMLElement>("inventoryWheelGrid");
+const INVENTORY_LIMIT: number = 12;
 
 function renderInventoryWheels(items: SavedWheel[]): void {
   inventoryWheelGrid.innerHTML = "";
@@ -220,6 +213,14 @@ async function submitItem(): Promise<void> {
   });
 }
 
+const inventoryBtn = requiredElement<HTMLButtonElement>("inventoryBtn");
+const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventoryCloseBtn");
+const confirmAddItemBtn = requiredElement<HTMLButtonElement>("confirmAddItemBtn");
+const cancelAddItemBtn = requiredElement<HTMLButtonElement>("cancelAddItemBtn");
+const closeAddItemBtn = requiredElement<HTMLButtonElement>("closeAddItemBtn");
+const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
+const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
+
 export function initInventory(): void {
   inventoryBtn.addEventListener("click", openInventoryModal);
   inventoryCloseBtn.addEventListener("click", () => inventoryModal.close());
@@ -271,6 +272,9 @@ function formatDate(dateString: string): string {
     year: "2-digit",
   }).format(date);
 }
+
+const MINI_CENTER = { x: 100, y: 100 };
+const MINI_RADIUS = 90;
 
 function createMiniSegment(index: number, count: number): SVGPathElement {
   const angleStep = FULL_CIRCLE_RADIANS / count;
@@ -349,6 +353,9 @@ function createMiniLabel(
   return text;
 }
 
+export const inventoryAssetGrid = requiredElement<HTMLElement>("inventoryAssetGrid");
+const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
+
 export function loadInventoryByCategory(): void {
   inventoryAssetGrid.innerHTML = "";
   inventoryWheelGrid.innerHTML = "";
@@ -363,6 +370,9 @@ export function loadInventoryByCategory(): void {
   isWheel ? loadWheelCards() : loadOwnedAssets(activeCategory);
 }
 
+
+export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
+export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
 
 export function getClickedInventoryCategory(inventoryTab: HTMLElement | null): InventoryCategory | null {
   if (inventoryTab?.tagName === "BUTTON" && inventoryTab.dataset.category) {

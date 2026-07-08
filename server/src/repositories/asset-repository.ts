@@ -1,11 +1,15 @@
 import { supabaseClient } from "../lib/supabase-client";
-import type { Asset, AssetCategory } from "../types/asset";
 import { AppError } from "../lib/errors";
 
-type AssetOwnershipRow = {
-    asset?: Asset | Asset[] | null;
-};
+export type AssetCategory = "sound" | "companion";
 
+export type Asset = {
+    readonly id: string;
+    readonly name: string;
+    readonly category: AssetCategory;
+    readonly price_coins: number;
+    readonly asset_url: string;
+};
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient
@@ -31,6 +35,10 @@ export async function getAssetById(assetId: string): Promise<Asset | null> {
 
     return (data ?? null) as Asset | null;
 }
+
+type AssetOwnershipRow = {
+    asset?: Asset | Asset[] | null;
+};
 
 export async function listOwnedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient

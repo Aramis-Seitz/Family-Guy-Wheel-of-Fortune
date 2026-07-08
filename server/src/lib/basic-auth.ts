@@ -1,9 +1,5 @@
 import type { Request as ExpressRequest, Response as ExpressResponse, NextFunction } from 'express';
 
-const REALM = 'Wheeel';
-const WWW_AUTHENTICATE = `Basic realm="${REALM}"`;
-const UNAUTHORIZED_BODY = 'Unauthorized';
-
 function getExpectedCredentials(): { user: string; pass: string } | undefined {
   const user = process.env.AUTH_USER;
   const pass = process.env.AUTH_PWD;
@@ -26,6 +22,10 @@ export function isBasicAuthAuthorized(authHeader: string | undefined): boolean {
 
   return user === expected.user && pass === expected.pass;
 }
+
+const REALM = 'Wheeel';
+const WWW_AUTHENTICATE = `Basic realm="${REALM}"`;
+const UNAUTHORIZED_BODY = 'Unauthorized';
 
 export function requireBasicAuthVercel(request: Request): Response | undefined {
   const authHeader = request.headers.get('authorization') ?? undefined;

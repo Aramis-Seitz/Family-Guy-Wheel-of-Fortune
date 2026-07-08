@@ -1,4 +1,5 @@
-import { input } from "../shared/dom.js";
+import { input } from "./name-list.js";
+import { requiredElement, optionalElement } from "../shared/dom-helpers.js";
 import { showToast } from "../shared/toast.js";
 import {
   NAME_VALIDATION_ERROR,
@@ -9,6 +10,11 @@ import {
 type NameValidationResult = ReturnType<typeof validateName>;
 
 const INVALID_INPUT_CLASS = "name-input-invalid";
+
+export const errorHint = requiredElement<HTMLParagraphElement>("errorHint");
+export const centeredInput = optionalElement<HTMLDivElement>("centeredInput");
+export const inputCentered = optionalElement<HTMLInputElement>("nameInputCentered");
+export const addBtnCentered = optionalElement<HTMLButtonElement>("addBtnCentered");
 
 function getNameValidationMessage(code: NameValidationErrorCode): string {
   switch (code) {

@@ -1,4 +1,4 @@
-import { profileName } from "../shared/dom.js";
+import { profileName } from "../profile/profiles.js";
 import { applyActiveAssets } from "../shared/asset-selection.js";
 import { ensureDefaultAssets } from "../api/user-api.js";
 import { initInventory } from "../inventory/inventory.js";

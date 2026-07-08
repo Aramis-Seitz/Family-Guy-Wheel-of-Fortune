@@ -1,5 +1,5 @@
 import { getJson, postJson } from "./api-helpers.js";
-import type { Asset, AssetCategory } from "../shared/types.js";
+import type { Asset } from "../shop/shop-assets.js";
 
 
 type AssetsResponseBody = {

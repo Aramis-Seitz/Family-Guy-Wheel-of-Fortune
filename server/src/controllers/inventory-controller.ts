@@ -2,22 +2,9 @@ import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { getOwnedAssets, selectAsset, getSavedWheels } from "../services/inventory-service";
 import { getSelectedAssetIds } from "../services/shop-service";
 import { sendUnexpectedError } from "./response";
-import type { HttpRequest, HttpResponse } from "../types/http";
+import type { HttpRequest, HttpResponse } from "./response";
 import { deleteWheel } from "../services/inventory-service";
 import { saveSavedWheels } from "../services/inventory-service";
-
-type SelectRequestBody = {
-    assetId?: string;
-};
-
-type DeleteWheelRequestBody = {
-    wheelId?: string
-};
-
-type SaveSavedWheelRequestBody = {
-    title: string;
-    url: string;
-};
 
 export async function handleGetOwnedAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -49,6 +36,10 @@ export async function handleGetSelectedAssetIds(req: HttpRequest, res: HttpRespo
     }
 }
 
+type SelectRequestBody = {
+    assetId?: string;
+};
+
 export async function handleSelectAsset(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
@@ -65,6 +56,10 @@ export async function handleSelectAsset(req: HttpRequest, res: HttpResponse): Pr
         sendUnexpectedError(res, error);
     }
 }
+
+type DeleteWheelRequestBody = {
+    wheelId?: string
+};
 
 export async function handleDeleteWheel(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -102,6 +97,11 @@ export async function handleGetSavedWheels(req: HttpRequest, res: HttpResponse):
         sendUnexpectedError(res, error);
     }
 }
+
+type SaveSavedWheelRequestBody = {
+    title: string;
+    url: string;
+};
 
 export async function handleSaveSavedWheels(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {

@@ -1,6 +1,4 @@
 import { supabaseClient } from "../lib/supabase-client";
-import { SavedWheel } from "../types/wheel";
-import { INVENTORY_LIMIT } from "../const/inventory";
 
 export async function deleteWheelById(userId: string, wheelId: string): Promise<void> {
     const { error } = await supabaseClient
@@ -11,6 +9,15 @@ export async function deleteWheelById(userId: string, wheelId: string): Promise<
 
     if (error) throw error;
 }
+
+export const INVENTORY_LIMIT: number = 12;
+
+export type SavedWheel = {
+  id: string;
+  title: string;
+  link: string | null;
+  created_at: string;
+};
 
 export async function listSavedWheels(userId: string): Promise<SavedWheel[]> {
     const { data, error } = await supabaseClient

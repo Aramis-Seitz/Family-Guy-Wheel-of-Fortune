@@ -1,11 +1,7 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { getAssets, getOwnedAssetIds, getAssetCategories, purchaseAsset } from "../services/shop-service";
 import { sendUnexpectedError } from "./response";
-import type { HttpRequest, HttpResponse } from "../types/http";
-
-type PurchaseRequestBody = {
-    assetId?: string;
-};
+import type { HttpRequest, HttpResponse } from "./response";
 
 export async function handleGetShopAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -51,6 +47,10 @@ export async function handleGetAssetCategories(req: HttpRequest, res: HttpRespon
         sendUnexpectedError(res, error);
     }
 }
+
+type PurchaseRequestBody = {
+    assetId?: string;
+};
 
 export async function handlePurchaseShopAsset(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {

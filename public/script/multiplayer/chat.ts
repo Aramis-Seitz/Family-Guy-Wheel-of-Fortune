@@ -1,6 +1,5 @@
 import { supabaseClient } from '../shared/supabase-client.js';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { ChatMessage } from '../shared/types.js';
 
 const MAX_LENGTH = 200;
 const SPAM_DELAY_MS = 1000;
@@ -12,6 +11,12 @@ let abortController: AbortController | null = null;
 
 function formatTime(date: Date): string {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+interface ChatMessage {
+  username: string;
+  text: string;
+  timestamp: string;
 }
 
 function appendMessage(msg: ChatMessage, isMine: boolean): void {

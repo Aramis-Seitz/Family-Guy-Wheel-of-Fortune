@@ -1,8 +1,16 @@
-import type { Asset } from "./types.js";
-import { EMPTY_STATE_THUMBNAIL_BY_CATEGORY } from "./constants.js";
+import type { Asset } from "../shop/shop-assets.js";
+import type { AssetCategory } from "../shop/shop.js";
 import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
 
 let activePreviewButton: HTMLButtonElement | null = null;
+
+const EMPTY_STATE_THUMBNAIL_SOUND: string = "../../assets/default-thumbnail-sound-asset.png";
+const EMPTY_STATE_THUMBNAIL_COMPANION: string = "../../assets/default-thumbnail-companion-asset.png";
+
+const EMPTY_STATE_THUMBNAIL_BY_CATEGORY: Partial<Record<AssetCategory, string>> = {
+  sound: EMPTY_STATE_THUMBNAIL_SOUND,
+  companion: EMPTY_STATE_THUMBNAIL_COMPANION,
+};
 
 export function resolveAssetImageSrc(asset: Asset): string {
     return (asset.category === "companion" && asset.asset_url)

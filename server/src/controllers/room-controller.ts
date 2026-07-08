@@ -1,22 +1,7 @@
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
 import { sendUnexpectedError } from "./response";
-import type { HttpRequest, HttpResponse } from "../types/http";
-
-type RoomKeyBody = {
-    roomKey?: string;
-    direction?: string;
-};
-
-type SetMultiplierBody = {
-    roomKey?: string;
-    multiplier?: number;
-};
-
-type SetNamesBody = {
-    roomKey?: string;
-    names?: string[];
-};
+import type { HttpRequest, HttpResponse } from "./response";
 
 export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -32,6 +17,11 @@ export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Pro
         sendUnexpectedError(res, error);
     }
 }
+
+type RoomKeyBody = {
+    roomKey?: string;
+    direction?: string;
+};
 
 export async function handleJoinRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -142,6 +132,11 @@ export async function handleResetRoom(req: HttpRequest, res: HttpResponse): Prom
     }
 }
 
+type SetMultiplierBody = {
+    roomKey?: string;
+    multiplier?: number;
+};
+
 export async function handleSetMultiplier(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
         const userId = await resolveUserIdFromHeaders(req.headers);
@@ -167,6 +162,11 @@ export async function handleSetMultiplier(req: HttpRequest, res: HttpResponse): 
         sendUnexpectedError(res, error);
     }
 }
+
+type SetNamesBody = {
+    roomKey?: string;
+    names?: string[];
+};
 
 export async function handleUpdateNames(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {

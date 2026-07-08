@@ -1,32 +1,26 @@
 import { supabaseClient } from './shared/supabase-client.js';
 import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
-import type { RoomRow } from './shared/types.js';
-import {
-  createRoomBtn, roomKeyInput, joinRoomBtn, leaveRoomBtn,
-  roomKeyDisplay, roomInfo, playersList, copyRoomKeyBtn,
-  leaveRoomConfirmModal, leaveRoomConfirmMessage,
-  confirmLeaveRoomBtn, cancelLeaveRoomBtn,
-  addBtn, input, spinLeftBtn, spinRightBtn, multiplierSlider,
-  bulkAddToWheelBtn, wheelEmptyHint, resetBtn,
-} from "./shared/dom.js";
+import { optionalElement } from "./shared/dom-helpers.js";
 import {
   addName, getNames, replaceNames,
   lockNameEditing, unlockNameEditing, setOnNameRemoved,
-  setMultiplayerMode,
+  setMultiplayerMode, addBtn, input,
 } from "./names/name-list.js";
 import {
   spinWheel, setSpinOverride, setResetOverride, lockSpinButtons,
   unlockSpinButtons, resetWheelRotation, isSpinning,
+  spinLeftBtn, spinRightBtn, resetBtn,
+  MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY,
 } from "./wheel/spin.js";
+import type { Direction } from "./wheel/spin.js";
 import {
   getMultiplier, setMultiplierSlider,
   updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider,
+  multiplierSlider,
 } from "./wheel/multiplier.js";
 import { hideWinnerModal } from "./wheel/winner.js";
 import { initChat, destroyChat } from "./multiplayer/chat.js";
 import { showToast } from "./shared/toast.js";
-import { MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY } from "./shared/constants.js";
-import type { Direction } from "./shared/types.js";
 import {
   createRoom,
   leaveRoom,
@@ -38,25 +32,30 @@ import {
   setMultiplier
 } from './api/room-api.js';
 
-let activeChannel: RealtimeChannel | null = null;
-let lastKnownPlayersJson = '';
-let lastKnownNamesJson = '';
-let lastKnownMultiplier: number | null = null;
-
-export let activeRoomKey: string | null = null;
-let isHost = false;
-let activeRoomHostName = '';
 let myUsername = '';
-let savedNames: string[] = [];
-let currentPlayers: string[] = [];
-let roomNames: string[] = [];
-let nameStateUnsubscribe: (() => void) | null = null;
-let multiplierSyncListener: (() => void) | null = null;
-let pendingRoomAction: (() => Promise<void>) | null = null;
 
 export function setMyUsername(newUsername: string): void {
   myUsername = newUsername;
 }
+
+interface RoomPlayer {
+  id: string;
+  username: string;
+}
+
+interface RoomRow {
+  last_spin: number;
+  spun_at: string;
+  players: RoomPlayer[];
+  wheel_names?: string[];
+  multiplier: number;
+  spin_direction: string | null;
+}
+
+let activeChannel: RealtimeChannel | null = null;
+let lastKnownPlayersJson = '';
+let lastKnownNamesJson = '';
+let lastKnownMultiplier: number | null = null;
 
 export function subscribeToRoom(
   roomKey: string,
@@ -163,6 +162,9 @@ export function handleLocalReset(): void {
   hideWinnerModal();
 }
 
+export let activeRoomKey: string | null = null;
+let isHost = false;
+
 export function initNameControls(): void {
   addBtn.addEventListener("click", async () => {
     if (activeRoomKey && isHost) {
@@ -183,6 +185,10 @@ export function initNameControls(): void {
   });
 }
 
+
+let roomNames: string[] = [];
+let activeRoomHostName = '';
+const playersList = optionalElement<HTMLUListElement>("playersList");
 
 function renderPlayersSidebar(players: string[]): void {
   if (!playersList) return;
@@ -236,16 +242,6 @@ function renderPlayersSidebar(players: string[]): void {
   });
 }
 
-function updateSpinButtonState(activeCount: number): void {
-  if (activeCount < 2) {
-    spinLeftBtn.classList.add('room-solo');
-    spinRightBtn.classList.add('room-solo');
-  } else {
-    spinLeftBtn.classList.remove('room-solo');
-    spinRightBtn.classList.remove('room-solo');
-  }
-}
-
 function syncMultiplayerSpinButtonState(): void {
   if (!activeRoomKey) return;
 
@@ -269,6 +265,8 @@ function syncMultiplayerSpinButtonState(): void {
   });
 }
 
+export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("bulkAddToWheelBtn");
+
 function setHostControlsVisibility(host: boolean): void {
   if (bulkAddToWheelBtn) {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
@@ -283,6 +281,8 @@ function setHostControlsVisibility(host: boolean): void {
   });
 }
 
+export const wheelEmptyHint = optionalElement<HTMLDivElement>("wheelEmptyHint");
+
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
   wheelEmptyHint.classList.toggle('hidden', getNames().length > 0);
@@ -291,6 +291,8 @@ function updateWheelEmptyState(): void {
 // Called once when creating or joining a room — sidebar gets the full player
 // list, the wheel itself starts empty until setNamesFromRoom() applies
 // the room's persisted wheel-item selection.
+let currentPlayers: string[] = [];
+
 export function initRoomPlayers(players: string[]): void {
   currentPlayers = [...players];
   replaceNames([]);
@@ -308,6 +310,9 @@ function syncRoomPlayers(players: string[]): void {
   syncMultiplayerSpinButtonState();
 
 }
+
+const roomKeyDisplay = optionalElement<HTMLSpanElement>("roomKeyDisplay");
+const roomInfo = optionalElement<HTMLDivElement>("roomInfo");
 
 function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
@@ -336,6 +341,10 @@ function setRoomActive(roomKey: string, host: boolean): void {
 
   syncMultiplayerSpinButtonState();
 }
+
+let savedNames: string[] = [];
+let nameStateUnsubscribe: (() => void) | null = null;
+let multiplierSyncListener: (() => void) | null = null;
 
 function clearRoom(): void {
   if (nameStateUnsubscribe) {
@@ -566,11 +575,23 @@ async function executeJoinRoom(roomKey: string): Promise<void> {
   }
 }
 
+let pendingRoomAction: (() => Promise<void>) | null = null;
+const leaveRoomConfirmModal = optionalElement<HTMLDialogElement>("leaveRoomConfirmModal");
+const leaveRoomConfirmMessage = optionalElement<HTMLParagraphElement>("leaveRoomConfirmMessage");
+
 function showSwitchRoomConfirm(message: string, action: () => Promise<void>): void {
   if (leaveRoomConfirmMessage) leaveRoomConfirmMessage.textContent = message;
   pendingRoomAction = action;
   leaveRoomConfirmModal?.showModal();
 }
+
+const createRoomBtn = optionalElement<HTMLButtonElement>("createRoomBtn");
+const roomKeyInput = optionalElement<HTMLInputElement>("roomKeyInput");
+const joinRoomBtn = optionalElement<HTMLButtonElement>("joinRoomBtn");
+const leaveRoomBtn = optionalElement<HTMLButtonElement>("leaveRoomBtn");
+const copyRoomKeyBtn = optionalElement<HTMLButtonElement>("copyRoomKeyBtn");
+const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("confirmLeaveRoomBtn");
+const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("cancelLeaveRoomBtn");
 
 export function initRoomControls(): void {
   setOnNameRemoved(async (removedName: string): Promise<void> => {

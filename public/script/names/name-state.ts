@@ -1,4 +1,5 @@
-import { MAX_ITEMS } from "../shared/constants.js";
+export const MIN_ITEMS: number = 2;
+export const MAX_ITEMS: number = 16;
 
 type NameSubscriber = (names: string[]) => void;
 

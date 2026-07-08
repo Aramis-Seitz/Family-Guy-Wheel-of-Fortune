@@ -1,5 +1,5 @@
 import { supabaseClient } from "../lib/supabase-client";
-import type { HttpHeaders } from "../types/http";
+import type { HttpHeaders } from "../controllers/response";
 
 function headerValue(value: string | string[] | undefined): string {
     if (!value) return "";

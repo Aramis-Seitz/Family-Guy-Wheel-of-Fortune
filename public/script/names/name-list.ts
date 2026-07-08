@@ -1,5 +1,6 @@
-import { MAX_ITEMS, MIN_ITEMS, SPIN_DISABLED_OPACITY } from "../shared/constants.js";
-import { addBtn, emptyHint, input, list, spinLeftBtn, spinRightBtn, wheelEmptyHint } from "../shared/dom.js";
+import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin.js";
+import { wheelEmptyHint } from "../room.js";
+import { requiredElement } from "../shared/dom-helpers.js";
 import { showToast } from "../shared/toast.js";
 import { validateName } from "../shared/validation.js";
 import { generateWheel, getSegmentColor } from "../wheel/renderer.js";
@@ -8,7 +9,7 @@ import {
   initNameInputValidation,
   validateNameInput,
 } from "./name-input-validation.js";
-import { nameState } from "./name-state.js";
+import { nameState, MAX_ITEMS, MIN_ITEMS } from "./name-state.js";
 
 let roomLocked = false;
 let disableAddWhileLocked = true;
@@ -52,6 +53,10 @@ export function clearNames(): void {
   nameState.clear();
 }
 
+export const list = requiredElement<HTMLUListElement>("nameList");
+export const getRemoveBtn = (): NodeListOf<HTMLButtonElement> =>
+  list.querySelectorAll(".btn-remove");
+
 function getInitialNamesFromMarkup(): string[] {
   return Array.from(list.querySelectorAll(".name-text"))
     .map((element) => element.textContent?.trim() ?? "")
@@ -89,6 +94,8 @@ function renderNames(names: string[]): void {
   refreshWheel();
 }
 
+export const emptyHint = requiredElement<HTMLParagraphElement>("emptyHint");
+
 export function updateEmptyState(): void {
   emptyHint.style.display = getSegmentCount() === 0 ? "block" : "none";
   if (wheelEmptyHint) {
@@ -121,6 +128,9 @@ export function syncRemoveButtons(): void {
     btn.style.opacity = disabled ? "0.5" : "1";
   });
 }
+
+export const input = requiredElement<HTMLInputElement>("nameInput");
+export const addBtn = requiredElement<HTMLButtonElement>("addBtn");
 
 export function syncAddElements(): void {
   const disabled = (roomLocked && disableAddWhileLocked) || getSegmentCount() >= MAX_ITEMS;

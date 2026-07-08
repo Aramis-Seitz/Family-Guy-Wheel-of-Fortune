@@ -12,17 +12,17 @@ import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repos
 const MIN_ROTATION_DEGREE = 0;
 const MAX_ROTATION_DEGREE = 359;
 
-export type AwardCoinsResult = {
-    spinnerCoins: number;
-    winnerCoins: number;
-    total?: number;
-};
-
 export async function generateSpin(userId: string): Promise<{ ranNum: number; spinToken: string }> {
     const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
     const spinToken = await insertSpinToken(randomUUID(), userId);
     return { ranNum, spinToken };
 }
+
+export type AwardCoinsResult = {
+    spinnerCoins: number;
+    winnerCoins: number;
+    total?: number;
+};
 
 export async function awardCoins(userId: string, spinToken: string, winnerName: string): Promise<AwardCoinsResult> {
     const isValid = await findValidSpinToken(spinToken, userId);

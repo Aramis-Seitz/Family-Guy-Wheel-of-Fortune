@@ -22,10 +22,6 @@ function generateRoomKey(): string {
     return Array.from(bytes, (b) => chars[b % chars.length]).join("");
 }
 
-function toUsernames(players: RoomPlayer[]): string[] {
-    return players.map((p) => p.username);
-}
-
 export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[]; names: string[] }> {
     const existingRoom = await getActiveRoomForUser(userId);
     if (existingRoom) {
@@ -41,6 +37,10 @@ export async function createRoom(userId: string): Promise<{ roomKey: string; pla
     const roomKey = generateRoomKey();
     await insertRoom(roomKey, userId, hostUsername);
     return { roomKey, players: [hostUsername], names: [] };
+}
+
+function toUsernames(players: RoomPlayer[]): string[] {
+    return players.map((p) => p.username);
 }
 
 export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; names: string[]; hostName: string }> {

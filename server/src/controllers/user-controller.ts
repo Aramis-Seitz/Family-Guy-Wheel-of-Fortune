@@ -1,7 +1,12 @@
+import { z } from "zod";
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, setUserCoins, subtractUserCoins } from "../services/user-service";
 import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
+import {
+    CoinsResponseSchema,
+    ProfileResponseSchema,
+} from "shared";
 
 export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -12,17 +17,17 @@ export async function handleEnsureDefaultAssets(req: HttpRequest, res: HttpRespo
         }
 
         await ensureDefaultAssets(userId);
-        res.status(200).json({ success: true });
+        res.status(200).json({ ok: true });
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
 
-type RegisterRequestBody = {
-    username?: string;
-    email?: string;
-    dateOfBirth?: string;
-};
+const RegisterRequestSchema = z.object({
+    username: z.string().min(1),
+    email: z.string().min(1),
+    dateOfBirth: z.string().min(1),
+});
 
 export async function handleRegisterUser(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -32,16 +37,15 @@ export async function handleRegisterUser(req: HttpRequest, res: HttpResponse): P
             return;
         }
 
-        const body = (req.body ?? {}) as RegisterRequestBody;
-        const { username, email, dateOfBirth } = body;
-
-        if (!username || !email || !dateOfBirth) {
+        const parsedBody = RegisterRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
             res.status(400).json({ error: "username, email und dateOfBirth sind erforderlich" });
             return;
         }
 
+        const { username, email, dateOfBirth } = parsedBody.data;
         await registerUser(userId, username, email, dateOfBirth);
-        res.status(201).json({ success: true });
+        res.status(201).json({ ok: true });
     } catch (error) {
         sendUnexpectedError(res, error);
     }
@@ -56,15 +60,15 @@ export async function handleGetUserCoins(req: HttpRequest, res: HttpResponse): P
         }
 
         const coins = await getUserCoins(userId);
-        res.status(200).json({ coins });
+        res.status(200).json(CoinsResponseSchema.parse({ coins }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
 
-type CoinsRequestBody = {
-    coins?: number;
-};
+const SetCoinsRequestSchema = z.object({
+    coins: z.number(),
+});
 
 export async function handleSetUserCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -74,9 +78,14 @@ export async function handleSetUserCoins(req: HttpRequest, res: HttpResponse): P
             return;
         }
 
-        const body = (req.body ?? {}) as CoinsRequestBody;
-        const coins = await setUserCoins(userId, Number(body.coins));
-        res.status(200).json({ coins });
+        const parsedBody = SetCoinsRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            res.status(400).json({ error: "coins is required" });
+            return;
+        }
+
+        const coins = await setUserCoins(userId, parsedBody.data.coins);
+        res.status(200).json(CoinsResponseSchema.parse({ coins }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
@@ -96,15 +105,15 @@ export async function handleUserProfile(req: HttpRequest, res: HttpResponse): Pr
             return;
         }
 
-        res.status(200).json({ profile });
+        res.status(200).json(ProfileResponseSchema.parse({ profile }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
 
-type SubtractCoinsRequestBody = {
-    amount?: number;
-};
+const SubtractCoinsRequestSchema = z.object({
+    amount: z.number(),
+});
 
 export async function handleSubtractCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -114,10 +123,14 @@ export async function handleSubtractCoins(req: HttpRequest, res: HttpResponse): 
             return;
         }
 
-        const body = (req.body ?? {}) as SubtractCoinsRequestBody;
-        const coins = await subtractUserCoins(userId, Number(body.amount));
+        const parsedBody = SubtractCoinsRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            res.status(400).json({ error: "amount is required" });
+            return;
+        }
 
-        res.status(200).json({ coins });
+        const coins = await subtractUserCoins(userId, parsedBody.data.amount);
+        res.status(200).json(CoinsResponseSchema.parse({ coins }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }

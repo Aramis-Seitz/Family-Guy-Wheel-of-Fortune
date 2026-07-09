@@ -1,6 +1,6 @@
 import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory.js"
 import type { InventoryCategory } from "./inventory.js";
-import type { Asset } from "../shop/shop-assets.js";
+import type { Asset } from "shared";
 import { getSelectedAssetIds, selectAsset } from "../api/inventory-api.js";
 import { showToast } from "../shared/toast.js";
 import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";

@@ -1,4 +1,3 @@
-import type { Asset, AssetCategory } from "../repositories/asset-repository";
 import {
     createAssetOwnership,
     getAssetById,
@@ -10,6 +9,8 @@ import {
 } from "../repositories/asset-repository";
 import { getCoinsByUserId, updateCoinsByUserId } from "../repositories/profile-repository";
 import { AppError } from "../lib/errors";
+import type { Asset, PurchaseResponseBody } from "shared";
+import type { AssetCategory } from "../repositories/asset-repository";
 
 export async function getAssets(): Promise<Asset[]> {
     return listAssets();
@@ -24,13 +25,7 @@ export async function getSelectedAssetIds(userId: string): Promise<string[]> {
     return listSelectedAssetIds(userId);
 }
 
-export type PurchaseResult = {
-    success: true;
-    coins: number;
-    assetId: string;
-};
-
-export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResult> {
+export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResponseBody> {
     if (!assetId) {
         throw new AppError("assetId is required", 400);
     }

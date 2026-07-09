@@ -1,4 +1,3 @@
-import type { Asset } from "../repositories/asset-repository";
 import { AppError } from "../lib/errors";
 import {
     listOwnedAssets,
@@ -7,18 +6,13 @@ import {
     createAssetSelection,
 } from "../repositories/asset-repository";
 import { deleteWheelById, listSavedWheels, insertSavedWheels } from "../repositories/wheel-repository"
-import { SavedWheel } from "../repositories/wheel-repository";
+import type { Asset, SavedWheel, SelectResponseBody } from "shared";
 
 export async function getOwnedAssets(userId: string): Promise<Asset[]> {
     return listOwnedAssets(userId);
 }
 
-export type SelectResult = {
-    success: true;
-    assetId: string;
-};
-
-export async function selectAsset(userId: string, assetId: string): Promise<SelectResult> {
+export async function selectAsset(userId: string, assetId: string): Promise<SelectResponseBody> {
     if (!assetId) {
         throw new AppError("assetId is required", 400);
     }
@@ -41,24 +35,14 @@ export async function selectAsset(userId: string, assetId: string): Promise<Sele
     };
 }
 
-export type DeleteResult = {
-    success: true;
-}
-
-export async function deleteWheel(userId: string, wheelId: string): Promise<DeleteResult> {
+export async function deleteWheel(userId: string, wheelId: string): Promise<void> {
     await deleteWheelById(userId, wheelId);
-    return { success: true };
 }
 
 export async function getSavedWheels(userId: string): Promise<SavedWheel[]> {
     return listSavedWheels(userId);
 }
 
-export type SaveSavedWheelResult = {
-    success: true;
-};
-
-export async function saveSavedWheels(userId: string, title: string, url: string): Promise<SaveSavedWheelResult> {
+export async function saveSavedWheels(userId: string, title: string, url: string): Promise<void> {
     await insertSavedWheels(userId, title, url);
-    return { success: true };
 }

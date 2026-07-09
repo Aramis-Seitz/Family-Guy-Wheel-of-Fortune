@@ -3,8 +3,7 @@ import { ASSET_CATEGORIES } from "../shop/shop.js";
 import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
 import { generateShareLink } from "../names/share-name-list.js";
 import { replaceNames } from "../names/name-list.js";
-import type { SavedWheel } from "../api/inventory-api.js";
-import type { Asset } from "../shop/shop-assets.js";
+import type { SavedWheel, Asset } from "shared";
 import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
 import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api.js";
@@ -36,8 +35,7 @@ async function confirmDeleteWheel(): Promise<void> {
   pendingDeleteId = null;
 
   try {
-    const success = await deleteSavedWheel(id);
-    if (!success) throw new Error("Rad konnte nicht gelöscht werden.");
+    await deleteSavedWheel(id);
     await loadInventory();
     showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
   } catch (error) {
@@ -196,21 +194,18 @@ async function submitItem(): Promise<void> {
     return;
   }
 
-  const success = await saveSavedWheels(name, generateShareLink());
-
-  if (!success) {
+  try {
+    await saveSavedWheels(name, generateShareLink());
+    closeAddItemModal();
+    await loadInventory();
     showToast({
-      message: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
-      type: "error"
+      message: `"${name}" wurde erfolgreich gespeichert.`,
+      type: "success"
     });
-    return;
+  } catch (error) {
+    const message = error instanceof ApiError ? error.message : "Speichern fehlgeschlagen. Bitte versuche es erneut.";
+    showToast({ message, type: "error" });
   }
-  closeAddItemModal();
-  await loadInventory();
-  showToast({
-    message: `"${name}" wurde erfolgreich gespeichert.`,
-    type: "success"
-  });
 }
 
 const inventoryBtn = requiredElement<HTMLButtonElement>("inventoryBtn");

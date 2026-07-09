@@ -1,6 +1,6 @@
 import { supabaseClient } from "../lib/supabase-client";
 
-export type ProfileSummary = {
+export type Profile = {
     username: string;
     coins: number;
 };
@@ -11,7 +11,7 @@ type RawProfile = {
     coins?: number | null;
 };
 
-export async function getProfileByUserId(userId: string): Promise<ProfileSummary | null> {
+export async function getProfileByUserId(userId: string): Promise<Profile | null> {
     const { data, error } = await supabaseClient
         .from("profiles")
         .select("username, coins")

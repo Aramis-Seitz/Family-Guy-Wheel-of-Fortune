@@ -1,9 +1,9 @@
 import { shopTabs, getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop.js";
-import type { AssetCategory } from "./shop.js";
 import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
 import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
 import { requiredElement } from "../shared/dom-helpers.js";
+import type { Asset } from "shared";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -13,14 +13,6 @@ let currentOwnedAssetIds: string[] = [];
 function isAssetOwned(assetId: string): boolean {
     return currentOwnedAssetIds.includes(assetId);
 }
-
-export type Asset = {
-    readonly id: string;
-    readonly name: string;
-    readonly category: AssetCategory;
-    readonly price_coins: number;
-    readonly asset_url: string;
-};
 
 export const shopGrid = requiredElement<HTMLElement>("shop-modal-grid");
 

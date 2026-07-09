@@ -25,6 +25,8 @@ Einmalig im **Root-Verzeichnis** ausführen:
 npm install
 ```
 
+> Baut dabei automatisch das `shared`-Package (geteilte Zod-Schemas/Typen für server + public). Falls du später Änderungen in `shared/src/*.ts` machst, musst du `npm run build --workspace shared` manuell erneut ausführen — es gibt keinen Watch-Modus.
+
 ---
 
 ## Mock-Modus starten

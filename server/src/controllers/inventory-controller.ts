@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { getOwnedAssets, selectAsset, getSavedWheels } from "../services/inventory-service";
 import { getSelectedAssetIds } from "../services/shop-service";
@@ -5,6 +6,12 @@ import { sendUnexpectedError } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import { deleteWheel } from "../services/inventory-service";
 import { saveSavedWheels } from "../services/inventory-service";
+import {
+    SavedWheelResponseSchema,
+    AssetsResponseSchema,
+    AssetIdsResponseSchema,
+    SelectResponseSchema,
+} from "shared";
 
 export async function handleGetOwnedAssets(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -15,7 +22,7 @@ export async function handleGetOwnedAssets(req: HttpRequest, res: HttpResponse):
         }
 
         const assets = await getOwnedAssets(userId);
-        res.status(200).json({ assets });
+        res.status(200).json(AssetsResponseSchema.parse({ assets }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
@@ -30,15 +37,15 @@ export async function handleGetSelectedAssetIds(req: HttpRequest, res: HttpRespo
         }
 
         const assetIds = await getSelectedAssetIds(userId);
-        res.status(200).json({ assetIds });
+        res.status(200).json(AssetIdsResponseSchema.parse({ assetIds }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
 
-type SelectRequestBody = {
-    assetId?: string;
-};
+const SelectRequestSchema = z.object({
+    assetId: z.string().min(1),
+});
 
 export async function handleSelectAsset(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -48,18 +55,23 @@ export async function handleSelectAsset(req: HttpRequest, res: HttpResponse): Pr
             return;
         }
 
-        const body = (req.body ?? {}) as SelectRequestBody;
-        const result = await selectAsset(userId, String(body.assetId ?? ""));
+        const parsedBody = SelectRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            res.status(400).json({ error: "assetId is required" });
+            return;
+        }
 
-        res.status(200).json(result);
+        const result = await selectAsset(userId, parsedBody.data.assetId);
+
+        res.status(200).json(SelectResponseSchema.parse(result));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
 
-type DeleteWheelRequestBody = {
-    wheelId?: string
-};
+const DeleteWheelRequestSchema = z.object({
+    wheelId: z.string().min(1),
+});
 
 export async function handleDeleteWheel(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -69,15 +81,14 @@ export async function handleDeleteWheel(req: HttpRequest, res: HttpResponse): Pr
             return;
         }
 
-        const body = (req.body ?? {}) as DeleteWheelRequestBody;
-        const wheelId = String(body.wheelId ?? "");
-        if (!wheelId) {
+        const parsedBody = DeleteWheelRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
             res.status(400).json({ error: "id is required" });
             return;
         }
-        const result = await deleteWheel(userId, wheelId);
+        await deleteWheel(userId, parsedBody.data.wheelId);
 
-        res.status(200).json(result);
+        res.status(200).json({ ok: true });
     } catch (error) {
         sendUnexpectedError(res, error);
     }
@@ -92,16 +103,16 @@ export async function handleGetSavedWheels(req: HttpRequest, res: HttpResponse):
         }
 
         const savedWheels = await getSavedWheels(userId);
-        res.status(200).json({ savedWheels });
+        res.status(200).json(SavedWheelResponseSchema.parse({ savedWheels }));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
 
-type SaveSavedWheelRequestBody = {
-    title: string;
-    url: string;
-};
+const SaveSavedWheelRequestSchema = z.object({
+    title: z.string().min(1),
+    url: z.string().min(1),
+});
 
 export async function handleSaveSavedWheels(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -111,18 +122,15 @@ export async function handleSaveSavedWheels(req: HttpRequest, res: HttpResponse)
             return;
         }
 
-        const body = (req.body ?? {}) as SaveSavedWheelRequestBody;
-        const title = String(body.title ?? "");
-        const url = String(body.url ?? "");
-
-        if (!title || !url) {
+        const parsedBody = SaveSavedWheelRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
             res.status(400).json({ error: "title and url are required" });
             return;
         }
 
-        const result = await saveSavedWheels(userId, title, url);
+        await saveSavedWheels(userId, parsedBody.data.title, parsedBody.data.url);
 
-        res.status(200).json(result);
+        res.status(200).json({ ok: true });
     } catch (error) {
         sendUnexpectedError(res, error);
     }

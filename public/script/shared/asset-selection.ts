@@ -1,7 +1,7 @@
 import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api.js";
 import { optionalElement } from "./dom-helpers.js";
 import { preloadTickBuffer } from "../wheel/sound.js";
-import type { Asset } from "../shop/shop-assets.js";
+import type { Asset } from "shared";
 
 export async function applyActiveAssets(): Promise<void> {
     try {

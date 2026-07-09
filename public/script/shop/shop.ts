@@ -1,6 +1,6 @@
 import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
-import type { Asset } from "./shop-assets.js";
 import { loadShopAssets } from "./shop-assets.js";
+import type { Asset } from "shared";
 import { getShopAssets } from "../api/shop-api.js";
 import { getUserCoins } from "../api/user-api.js";
 import { supabaseClient } from "../shared/supabase-client.js";

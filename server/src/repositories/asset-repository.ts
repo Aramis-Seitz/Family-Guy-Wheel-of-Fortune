@@ -1,15 +1,10 @@
+import { z } from "zod";
 import { supabaseClient } from "../lib/supabase-client";
 import { AppError } from "../lib/errors";
+import type { Asset } from "shared";
 
-export type AssetCategory = "sound" | "companion";
-
-export type Asset = {
-    readonly id: string;
-    readonly name: string;
-    readonly category: AssetCategory;
-    readonly price_coins: number;
-    readonly asset_url: string;
-};
+export const AssetCategorySchema = z.enum(["sound", "companion"]);
+export type AssetCategory = z.infer<typeof AssetCategorySchema>;
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient

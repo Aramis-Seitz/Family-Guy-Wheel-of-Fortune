@@ -3,8 +3,8 @@ import {
     getProfileByUserId,
     insertProfile,
     updateCoinsByUserId,
-    type ProfileSummary
 } from "../repositories/profile-repository";
+import type { Profile } from "../repositories/profile-repository";
 import { assignDefaultAssets } from "../repositories/asset-repository";
 import { AppError } from "../lib/errors";
 
@@ -12,7 +12,7 @@ export async function getUserCoins(userId: string): Promise<number> {
     return getCoinsByUserId(userId);
 }
 
-export async function getUserProfile(userId: string): Promise<ProfileSummary | null> {
+export async function getUserProfile(userId: string): Promise<Profile | null> {
     return getProfileByUserId(userId);
 }
 

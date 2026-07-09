@@ -20,8 +20,8 @@ export async function loadShopAssets(): Promise<void> {
     currentOwnedAssetIds = await getOwnedAssetIds();
     shopGrid.innerHTML = "";
     const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
-    let activeCategory = getClickedCategory(activeTab) || "all";
-    let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
+    const activeCategory = getClickedCategory(activeTab) || "all";
+    const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
 

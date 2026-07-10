@@ -4,12 +4,12 @@ import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
 
 let activePreviewButton: HTMLButtonElement | null = null;
 
-const EMPTY_STATE_THUMBNAIL_SOUND: string = "../../assets/default-thumbnail-sound-asset.png";
-const EMPTY_STATE_THUMBNAIL_COMPANION: string = "../../assets/default-thumbnail-companion-asset.png";
+const EMPTY_STATE_THUMBNAIL_SOUND: string = "../../resources/default-thumbnail-sound-asset.png";
+const EMPTY_STATE_THUMBNAIL_COMPANION: string = "../../resources/default-thumbnail-companion-asset.png";
 
 const EMPTY_STATE_THUMBNAIL_BY_CATEGORY: Partial<Record<AssetCategory, string>> = {
-  sound: EMPTY_STATE_THUMBNAIL_SOUND,
-  companion: EMPTY_STATE_THUMBNAIL_COMPANION,
+    sound: EMPTY_STATE_THUMBNAIL_SOUND,
+    companion: EMPTY_STATE_THUMBNAIL_COMPANION,
 };
 
 export function resolveAssetImageSrc(asset: Asset): string {

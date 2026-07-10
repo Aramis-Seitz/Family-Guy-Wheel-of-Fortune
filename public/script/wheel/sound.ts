@@ -130,8 +130,8 @@ let cymbalBuffer: AudioBuffer | null = null;
 
 export async function preloadStaticSounds(): Promise<void> {
   [drumrollBuffer, cymbalBuffer] = await Promise.all([
-    loadBuffer("/assets/sounds/drumroll.mp3"),
-    loadBuffer("/assets/sounds/cymbal-crash.mp3"),
+    loadBuffer("/resources/sounds/drumroll.mp3"),
+    loadBuffer("/resources/sounds/cymbal-crash.mp3"),
   ]);
 }
 

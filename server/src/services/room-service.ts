@@ -68,7 +68,7 @@ export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoo
     const hostPlayer = room.players.find((p) => p.id === room.host_id);
     const hostName = hostPlayer?.username ?? (players[0]?.username ?? '');
     const multiplier = room.multiplier ?? 1;
-    const names = room.wheel_names ?? [];
+    const names = room.names_in_wheel ?? [];
     
     return { players: toUsernames(players), multiplier, names, hostName };
 }

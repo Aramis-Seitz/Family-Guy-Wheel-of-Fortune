@@ -47,7 +47,7 @@ interface RoomRow {
   last_spin: number;
   spun_at: string;
   players: RoomPlayer[];
-  wheel_names?: string[];
+  names_in_wheel?: string[];
   multiplier: number;
   spin_direction: string | null;
 }
@@ -96,11 +96,11 @@ export function subscribeToRoom(
           }
         }
 
-        if (Array.isArray(row.wheel_names)) {
-          const wheelJson = JSON.stringify(row.wheel_names);
+        if (Array.isArray(row.names_in_wheel)) {
+          const wheelJson = JSON.stringify(row.names_in_wheel);
           if (wheelJson !== lastKnownNamesJson) {
             lastKnownNamesJson = wheelJson;
-            onNamesUpdate?.(row.wheel_names);
+            onNamesUpdate?.(row.names_in_wheel);
           }
         }
 

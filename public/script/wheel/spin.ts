@@ -31,12 +31,12 @@ export function setResetOverride(handler: (() => void) | null): void {
 
 export function lockSpinButtons(): void {
   setElementsDisabled(getSpinRelatedElements(), true);
-  profileName?.classList.remove("is-clickable");
+  profileName?.classList.remove("user-profile-name--clickable");
 }
 
 export function unlockSpinButtons(): void {
   setElementsDisabled(getSpinRelatedElements(), false);
-  profileName?.classList.add("is-clickable");
+  profileName?.classList.add("user-profile-name--clickable");
 }
 
 let currentRotation = 0;
@@ -51,7 +51,7 @@ export const spinRightBtn = requiredElement<HTMLButtonElement>("spin-right-btn")
 export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
 
 function getSpinRelatedElements(): SpinElement[] {
-  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".player-toggle-btn");
+  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".room__player-toggle-btn");
   const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, playerToggleButtons];
 
   if (bulkAddToWheelBtn) {

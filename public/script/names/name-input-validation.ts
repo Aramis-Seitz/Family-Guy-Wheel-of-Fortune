@@ -9,12 +9,12 @@ import {
 
 type NameValidationResult = ReturnType<typeof validateName>;
 
-const INVALID_INPUT_CLASS = "name-input-invalid";
+const INVALID_INPUT_CLASS = "name-input--invalid";
 
-export const errorHint = requiredElement<HTMLParagraphElement>("errorHint");
-export const centeredInput = optionalElement<HTMLDivElement>("centeredInput");
-export const inputCentered = optionalElement<HTMLInputElement>("nameInputCentered");
-export const addBtnCentered = optionalElement<HTMLButtonElement>("addBtnCentered");
+export const errorHint = requiredElement<HTMLParagraphElement>("name-error-hint");
+export const centeredInput = optionalElement<HTMLDivElement>("name-centered-input");
+export const inputCentered = optionalElement<HTMLInputElement>("name-input-centered");
+export const addBtnCentered = optionalElement<HTMLButtonElement>("add-name-btn-centered");
 
 function getNameValidationMessage(code: NameValidationErrorCode): string {
   switch (code) {
@@ -28,7 +28,6 @@ function getNameValidationMessage(code: NameValidationErrorCode): string {
 }
 
 function setInputInvalidState(isInvalid: boolean): void {
-  input.classList.toggle("invalid", isInvalid);
   input.classList.toggle(INVALID_INPUT_CLASS, isInvalid);
 
   if (isInvalid) {

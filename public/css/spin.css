@@ -1,4 +1,4 @@
-.spin-btn {
+.spin__btn {
     background-color: #ffb800;
     color: black;
     font-weight: bold;
@@ -9,8 +9,8 @@
     cursor: pointer;
 }
 
-.spin-btn:hover { background-color: #ffa500; }
-.spin-btn:active { background-color: #e59400; }
+.spin__btn:hover { background-color: #ffa500; }
+.spin__btn:active { background-color: #e59400; }
 
 #reset-btn {
     background-color: #888;

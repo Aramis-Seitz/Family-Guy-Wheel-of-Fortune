@@ -17,9 +17,9 @@ export function resolveWinner(rotation: number, config: SpinConfig): string {
   return config.names[winnerIndex] ?? config.names[0];
 }
 
-export const winnerModal = requiredElement<HTMLDivElement>("winnerModal");
-export const winnerText = requiredElement<HTMLParagraphElement>("winnerText");
-export const removeWinnerBtn = requiredElement<HTMLButtonElement>("removeWinner");
+export const winnerModal = requiredElement<HTMLDivElement>("winner-modal");
+export const winnerText = requiredElement<HTMLParagraphElement>("winner-modal-text");
+export const removeWinnerBtn = requiredElement<HTMLButtonElement>("winner-modal-remove-btn");
 
 export function displayWinnerModal(winnerName: string): void {
   if (!winnerModal || !winnerText) return;
@@ -39,7 +39,7 @@ export function hideWinnerModal(): void {
   winnerModal.classList.add("hidden");
 }
 
-const confettiCanvas = requiredElement<HTMLCanvasElement>("confettiCanvas");
+const confettiCanvas = requiredElement<HTMLCanvasElement>("winner-modal-confetti-canvas");
 
 function startConfetti(): void {
   if (!confettiCanvas) return;
@@ -139,7 +139,7 @@ function removeWinner(): void {
   resetWheelRotation();
 }
 
-const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("closeModal");
+const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("winner-modal-close-btn");
 
 export function initWinnerModal(): void {
   if (!winnerModal || !closeWinnerModalBtn) return;

@@ -1,5 +1,5 @@
 /* ── Confirm Delete Modal ── */
-#confirmDeleteModal {
+#confirm-delete-modal {
     border: none;
     border-radius: 14px;
     background: #1a1f2e;
@@ -13,40 +13,40 @@
     transform: translate(-50%, -50%);
 }
 
-#confirmDeleteModal::backdrop {
+#confirm-delete-modal::backdrop {
     background: rgba(0, 0, 0, .5);
     backdrop-filter: blur(3px);
 }
 
-#confirmDeleteInner {
+.confirm-delete-modal__inner {
     display: flex;
     flex-direction: column;
 }
 
-#confirmDeleteHeader {
+.confirm-delete-modal__header {
     padding: 16px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-#confirmDeleteHeader h3 {
+.confirm-delete-modal__header h3 {
     font-size: 1rem;
     font-weight: 700;
     margin: 0;
 }
 
-#confirmDeleteBody {
+.confirm-delete-modal__body {
     padding: 20px;
     font-size: 0.9rem;
     color: #aaa;
     line-height: 1.5;
 }
 
-#confirmDeleteBody strong {
+.confirm-delete-modal__body strong {
     color: #fff;
     font-weight: 700;
 }
 
-#confirmDeleteFooter {
+.confirm-delete-modal__footer {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -54,7 +54,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-#cancelDeleteBtn {
+#confirm-delete-modal-cancel-btn {
     background: none;
     border: 1px solid #444;
     border-radius: 8px;
@@ -66,12 +66,12 @@
     transition: all .15s;
 }
 
-#cancelDeleteBtn:hover {
+#confirm-delete-modal-cancel-btn:hover {
     color: #fff;
     border-color: #888;
 }
 
-#confirmDeleteBtn {
+#confirm-delete-modal-confirm-btn {
     background: #dc2626;
     color: #fff;
     border: none;
@@ -84,11 +84,11 @@
     transition: filter .15s, transform .15s;
 }
 
-#confirmDeleteBtn:hover {
+#confirm-delete-modal-confirm-btn:hover {
     filter: brightness(1.15);
     transform: translateY(-1px);
 }
 
-#confirmDeleteBtn:active {
+#confirm-delete-modal-confirm-btn:active {
     transform: translateY(0);
 }

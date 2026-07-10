@@ -13,46 +13,46 @@
     <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
-<div class="wrapper">
+<div class="auth-widget">
     <main>
-        <section aria-label="Signup Form" class="form-wrapper">
-            <form id="signupForm" action="login.html" method="post" autocomplete="on">
+        <section aria-label="Signup Form" class="auth-widget__form auth-widget__form--signup">
+            <form id="signup-form" action="login.html" method="post" autocomplete="on">
                 <h2>Signup</h2>
 
-                <div class="input-field">
-                    <label for="signupUser">Username</label>
-                    <input type="text" id="signupUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
+                <div class="auth-widget__input-field">
+                    <label for="signup-user">Username</label>
+                    <input type="text" id="signup-user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
                 </div>
 
-                <div class="input-field">
-                    <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" name="email" autocomplete="email" inputmode="email" required />
+                <div class="auth-widget__input-field">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email" required />
                 </div>
 
-                <div class="input-field">
-                    <label for="signupDateOfBirth">Geburtsdatum</label>
-                    <input type="date" id="signupDateOfBirth" name="bday" autocomplete="bday" required />
+                <div class="auth-widget__input-field">
+                    <label for="signup-date-of-birth">Geburtsdatum</label>
+                    <input type="date" id="signup-date-of-birth" name="bday" autocomplete="bday" required />
                 </div>
 
-                <div class="input-field">
-                    <label for="signupPassword">Passwort</label>
-                    <input type="password" id="signupPassword" name="password" autocomplete="new-password" required />
+                <div class="auth-widget__input-field">
+                    <label for="signup-password">Passwort</label>
+                    <input type="password" id="signup-password" name="password" autocomplete="new-password" required />
                 </div>
 
-                <div class="input-field">
-                    <label for="signupConfirmPassword">Confirm Passwort</label>
-                    <input type="password" id="signupConfirmPassword" name="password_confirmation" autocomplete="new-password" required />
+                <div class="auth-widget__input-field">
+                    <label for="signup-confirm-password">Confirm Passwort</label>
+                    <input type="password" id="signup-confirm-password" name="password_confirmation" autocomplete="new-password" required />
                 </div>
 
                 <button type="submit">Sign Up</button>
 
-                <div class="register">
+                <div class="auth-widget__register-link">
                     <p>Already have an account? <a href="login.html">Login</a></p>
                 </div>
 
-                <div class="Rechtliches">
-                    <a href="imprint.html" class="btn-ImP">Impressum</a>
-                    <a href="privacy.html" class="btn-DaS">Datenschutz</a>
+                <div class="legal-links">
+                    <a href="imprint.html" class="legal-links__link--imprint">Impressum</a>
+                    <a href="privacy.html" class="legal-links__link--privacy">Datenschutz</a>
                 </div>
             </form>
         </section>

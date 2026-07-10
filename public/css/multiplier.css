@@ -1,4 +1,4 @@
-.multiplier-container {
+.multiplier {
     position: fixed;
     top: 20px;
     left: 10px;
@@ -8,14 +8,14 @@
     border-radius: 8px;
 }
 
-.multiplier-container label {
+.multiplier label {
     color: white;
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
 }
 
-.multiplier-header {
+.multiplier__header {
     display: flex;
     align-items: left;
     gap: 8px;

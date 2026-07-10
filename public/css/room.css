@@ -1,4 +1,4 @@
-#roomPanel {
+#room-panel {
   position: fixed;
   top: 80px;
   right: 20px;
@@ -13,7 +13,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-#roomPanel h3 {
+#room-panel h3 {
   margin: 0 0 10px 0;
   font-size: 0.85rem;
   font-weight: bold;
@@ -22,18 +22,18 @@
   color: #333;
 }
 
-.room-controls {
+.room__controls {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.room-join {
+.room__join {
   display: flex;
   gap: 6px;
 }
 
-#roomKeyInput {
+#room-key-input {
   flex: 1;
   padding: 7px 10px;
   font-size: 0.85rem;
@@ -46,11 +46,11 @@
   outline: none;
 }
 
-#roomKeyInput:focus {
+#room-key-input:focus {
   border-color: #00a2ff;
 }
 
-.room-btn {
+.room__btn {
   padding: 7px 14px;
   font-size: 0.85rem;
   font-weight: bold;
@@ -61,40 +61,40 @@
   transition: background var(--transition), transform var(--transition);
 }
 
-.room-btn:active {
+.room__btn:active {
   transform: scale(0.96);
 }
 
-#createRoomBtn {
+#room-create-btn {
   background: #ffb800;
   color: black;
 }
 
-#createRoomBtn:hover {
+#room-create-btn:hover {
   background: #ffa500;
 }
 
-#joinRoomBtn {
+#room-join-btn {
   background: #00a2ff;
   color: black;
 }
 
-#joinRoomBtn:hover {
+#room-join-btn:hover {
   background: #0090e0;
 }
 
-#leaveRoomBtn {
+#room-leave-btn {
   background: #e0e0e0;
   color: #333;
   font-size: 0.78rem;
   padding: 5px 10px;
 }
 
-#leaveRoomBtn:hover {
+#room-leave-btn:hover {
   background: #c8c8c8;
 }
 
-.room-btn--copy {
+.room__btn--copy {
   padding: 5px 8px;
   font-size: 0.85rem;
   background: #f0f0f0;
@@ -102,22 +102,22 @@
   line-height: 1;
 }
 
-.room-btn--copy:hover {
+.room__btn--copy:hover {
   background: #ddd;
 }
 
-.room-btn--copy.copied {
+.room__btn--copy.room__btn--copied {
   background: #d4edda;
   color: #155724;
 }
 
-#roomInfo {
+#room-info {
   margin-top: 10px;
   border-top: 1.5px solid #f0f0f0;
   padding-top: 10px;
 }
 
-#bulkAddToWheelBtn {
+#room-bulk-add-btn {
   margin-top: 10px;
   width: 100%;
   background: #1c1c1e; /* Fancy Apple-Grey */
@@ -127,17 +127,17 @@
   padding: 8px 12px;
 }
 
-#bulkAddToWheelBtn:hover {
+#room-bulk-add-btn:hover {
   background: #2c2c2e;
 }
 
 /* Bulk remove variant (when all players present) */
-#bulkAddToWheelBtn.bulk-remove {
+#room-bulk-add-btn.room__btn--remove {
   background: #111;
 }
 
 /* Player toggle button styling */
-.player-toggle-btn {
+.room__player-toggle-btn {
   margin-left: 8px;
   padding: 4px 8px;
   border-radius: 999px;
@@ -154,15 +154,15 @@
   transition: background 0.18s ease, transform 0.12s ease;
 }
 
-.player-toggle-btn.added {
+.room__player-toggle-btn--added {
   background: #111;
   color: white;
 }
 
-.player-toggle-btn:active { transform: scale(0.96); }
+.room__player-toggle-btn:active { transform: scale(0.96); }
 
 /* Centered input when wheel is empty */
-.centered-input-overlay {
+.name-centered-input {
   position: fixed;
   left: 50%;
   top: 50%;
@@ -173,17 +173,17 @@
   align-items: center;
 }
 
-.centered-input-overlay .add-row { background: transparent; box-shadow: none; }
+.name-centered-input .names__add-row { background: transparent; box-shadow: none; }
 
-.centered-input-hidden { display: none !important; }
+.name-centered-input--hidden { display: none !important; }
 
 .hidden {
   display: none !important;
 }
 
-#roomInfo.hidden { display: none; }
+#room-info.hidden { display: none; }
 
-.room-key-row {
+.room__key-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -191,13 +191,13 @@
   margin-bottom: 8px;
 }
 
-.room-key-label {
+.room__key-label {
   font-size: 0.78rem;
   color: #666;
   flex-shrink: 0;
 }
 
-#roomKeyDisplay {
+#room-key-display {
   font-family: monospace;
   font-size: 1rem;
   font-weight: bold;
@@ -207,7 +207,7 @@
   border-radius: 100px;
 }
 
-.players-label {
+.room__players-label {
   font-size: 0.75rem;
   color: #666;
   font-weight: bold;
@@ -216,7 +216,7 @@
   margin-bottom: 6px;
 }
 
-#playersList {
+#room-players-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -227,7 +227,7 @@
   gap: 3px;
 }
 
-#playersList li {
+#room-players-list li {
   font-size: 0.85rem;
   padding: 4px 10px;
   background: #f7f7f7;
@@ -236,7 +236,7 @@
   text-align: center;
 }
 
-.host-tag {
+.room__host-tag {
   font-size: 0.85rem;
   border: 1.5px solid rgba(0,0,0,0.4);
   padding: 1px 6px;
@@ -248,8 +248,8 @@
   color: rgba(0,0,0,0.6);
 }
 
-.spin-btn.room-guest,
-.spin-btn.room-solo {
+.spin__btn--room-guest,
+.spin__btn--room-solo {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;

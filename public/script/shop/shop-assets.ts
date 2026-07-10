@@ -32,8 +32,8 @@ function createAssetCard(asset: Asset): HTMLElement {
     const assetCard = document.createElement("div");
     assetCard.className = "shop-modal__asset-card";
 
-    if (owned) assetCard.classList.add("shop-modal__asset-card__owned");
-    if (tooExpensive && !owned) assetCard.classList.add("shop-modal__asset-card__too-expensive");
+    if (owned) assetCard.classList.add("shop-modal__asset-card--owned");
+    if (tooExpensive && !owned) assetCard.classList.add("shop-modal__asset-card--too-expensive");
 
     assetCard.appendChild(createAssetHeader(asset));
     assetCard.appendChild(createAssetFooter(asset, owned, tooExpensive));

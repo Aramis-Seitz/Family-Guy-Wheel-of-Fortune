@@ -99,14 +99,14 @@
     background: rgba(255, 255, 255, 0.08);
 }
 
-.shop-modal__asset-card__owned .shop-modal__buy-btn {
+.shop-modal__asset-card--owned .shop-modal__buy-btn {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.1);
     color: #aaa;
     pointer-events: none;
 }
 
-.shop-modal__asset-card__too-expensive .shop-modal__buy-btn {
+.shop-modal__asset-card--too-expensive .shop-modal__buy-btn {
     color: red;
     pointer-events: none;
 }

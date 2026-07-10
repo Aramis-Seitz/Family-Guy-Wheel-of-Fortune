@@ -188,7 +188,7 @@ export function initNameControls(): void {
 
 let roomNames: string[] = [];
 let activeRoomHostName = '';
-const playersList = optionalElement<HTMLUListElement>("playersList");
+const playersList = optionalElement<HTMLUListElement>("room-players-list");
 
 function renderPlayersSidebar(players: string[]): void {
   if (!playersList) return;
@@ -197,27 +197,27 @@ function renderPlayersSidebar(players: string[]): void {
 
   players.forEach((name) => {
     const li = document.createElement('li');
-    li.className = 'player-item';
+    li.className = 'room__player-item';
 
     const label = document.createElement('span');
-    label.className = 'player-name';
+    label.className = 'room__player-name';
     label.textContent = name;
     li.appendChild(label);
 
     if (name === activeRoomHostName) {
       const tag = document.createElement('span');
       tag.textContent = 'Host';
-      tag.className = 'host-tag';
+      tag.className = 'room__host-tag';
       li.appendChild(tag);
     }
 
     if (isHost) {
       const toggle = document.createElement('button');
       toggle.type = 'button';
-      toggle.className = 'player-toggle-btn';
+      toggle.className = 'room__player-toggle-btn';
       const inWheel = (roomNames ?? []).includes(name);
       toggle.textContent = inWheel ? '−' : '+';
-      if (inWheel) toggle.classList.add('added');
+      if (inWheel) toggle.classList.add('room__player-toggle-btn--added');
       toggle.title = inWheel ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
 
       toggle.addEventListener('click', async () => {
@@ -250,8 +250,8 @@ function syncMultiplayerSpinButtonState(): void {
 
   [spinLeftBtn, spinRightBtn].forEach((btn) => {
     btn.disabled = disabled;
-    btn.classList.toggle('room-solo', !hasEnoughItems);
-    btn.classList.toggle('room-guest', !isHost);
+    btn.classList.toggle('spin__btn--room-solo', !hasEnoughItems);
+    btn.classList.toggle('spin__btn--room-guest', !isHost);
 
     if (disabled) {
       btn.style.setProperty('opacity', SPIN_DISABLED_OPACITY);
@@ -265,7 +265,7 @@ function syncMultiplayerSpinButtonState(): void {
   });
 }
 
-export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("bulkAddToWheelBtn");
+export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("room-bulk-add-btn");
 
 function setHostControlsVisibility(host: boolean): void {
   if (bulkAddToWheelBtn) {
@@ -281,7 +281,7 @@ function setHostControlsVisibility(host: boolean): void {
   });
 }
 
-export const wheelEmptyHint = optionalElement<HTMLDivElement>("wheelEmptyHint");
+export const wheelEmptyHint = optionalElement<HTMLDivElement>("wheel-empty-hint");
 
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
@@ -311,8 +311,8 @@ function syncRoomPlayers(players: string[]): void {
 
 }
 
-const roomKeyDisplay = optionalElement<HTMLSpanElement>("roomKeyDisplay");
-const roomInfo = optionalElement<HTMLDivElement>("roomInfo");
+const roomKeyDisplay = optionalElement<HTMLSpanElement>("room-key-display");
+const roomInfo = optionalElement<HTMLDivElement>("room-info");
 
 function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
@@ -328,14 +328,14 @@ function setRoomActive(roomKey: string, host: boolean): void {
   if (roomInfo) roomInfo.classList.remove('hidden');
 
   if (!host) {
-    spinLeftBtn.classList.add('room-guest');
-    spinRightBtn.classList.add('room-guest');
+    spinLeftBtn.classList.add('spin__btn--room-guest');
+    spinRightBtn.classList.add('spin__btn--room-guest');
     resetBtn.disabled = true;
     resetBtn.style.setProperty('opacity', '0.4');
     resetBtn.style.setProperty('cursor', 'not-allowed');
   } else {
-    spinLeftBtn.classList.remove('room-guest');
-    spinRightBtn.classList.remove('room-guest');
+    spinLeftBtn.classList.remove('spin__btn--room-guest');
+    spinRightBtn.classList.remove('spin__btn--room-guest');
     setResetOverride(() => { void handleRoomResetClick(); });
   }
 
@@ -363,8 +363,8 @@ function clearRoom(): void {
   activeRoomHostName = '';
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
-  spinLeftBtn.classList.remove('room-guest', 'room-solo');
-  spinRightBtn.classList.remove('room-guest', 'room-solo');
+  spinLeftBtn.classList.remove('spin__btn--room-guest', 'spin__btn--room-solo');
+  spinRightBtn.classList.remove('spin__btn--room-guest', 'spin__btn--room-solo');
   resetBtn.disabled = false;
   resetBtn.style.removeProperty('opacity');
   resetBtn.style.removeProperty('cursor');
@@ -496,10 +496,10 @@ function updateBulkButtonState(players: string[]): void {
   const anyMissing = players.some((p) => !(roomNames ?? []).includes(p));
   if (anyMissing) {
     bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
-    bulkAddToWheelBtn.classList.remove('bulk-remove');
+    bulkAddToWheelBtn.classList.remove('room__btn--remove');
   } else {
     bulkAddToWheelBtn.textContent = 'Alle vom Rad entfernen';
-    bulkAddToWheelBtn.classList.add('bulk-remove');
+    bulkAddToWheelBtn.classList.add('room__btn--remove');
   }
 }
 
@@ -576,8 +576,8 @@ async function executeJoinRoom(roomKey: string): Promise<void> {
 }
 
 let pendingRoomAction: (() => Promise<void>) | null = null;
-const leaveRoomConfirmModal = optionalElement<HTMLDialogElement>("leaveRoomConfirmModal");
-const leaveRoomConfirmMessage = optionalElement<HTMLParagraphElement>("leaveRoomConfirmMessage");
+const leaveRoomConfirmModal = optionalElement<HTMLDialogElement>("leave-room-confirm-modal");
+const leaveRoomConfirmMessage = optionalElement<HTMLParagraphElement>("leave-room-confirm-message");
 
 function showSwitchRoomConfirm(message: string, action: () => Promise<void>): void {
   if (leaveRoomConfirmMessage) leaveRoomConfirmMessage.textContent = message;
@@ -585,13 +585,13 @@ function showSwitchRoomConfirm(message: string, action: () => Promise<void>): vo
   leaveRoomConfirmModal?.showModal();
 }
 
-const createRoomBtn = optionalElement<HTMLButtonElement>("createRoomBtn");
-const roomKeyInput = optionalElement<HTMLInputElement>("roomKeyInput");
-const joinRoomBtn = optionalElement<HTMLButtonElement>("joinRoomBtn");
-const leaveRoomBtn = optionalElement<HTMLButtonElement>("leaveRoomBtn");
-const copyRoomKeyBtn = optionalElement<HTMLButtonElement>("copyRoomKeyBtn");
-const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("confirmLeaveRoomBtn");
-const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("cancelLeaveRoomBtn");
+const createRoomBtn = optionalElement<HTMLButtonElement>("room-create-btn");
+const roomKeyInput = optionalElement<HTMLInputElement>("room-key-input");
+const joinRoomBtn = optionalElement<HTMLButtonElement>("room-join-btn");
+const leaveRoomBtn = optionalElement<HTMLButtonElement>("room-leave-btn");
+const copyRoomKeyBtn = optionalElement<HTMLButtonElement>("room-copy-key-btn");
+const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-confirm-btn");
+const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-cancel-btn");
 
 export function initRoomControls(): void {
   setOnNameRemoved(async (removedName: string): Promise<void> => {
@@ -600,7 +600,7 @@ export function initRoomControls(): void {
 
   bulkAddToWheelBtn?.addEventListener('click', async () => {
     if (!activeRoomKey || !isHost) return;
-    const players = Array.from(playersList?.querySelectorAll('.player-name') ?? [])
+    const players = Array.from(playersList?.querySelectorAll('.room__player-name') ?? [])
       .map((node) => node.textContent?.trim() ?? '');
     await addAllPlayersToWheel(players);
   });
@@ -678,10 +678,10 @@ export function initRoomControls(): void {
     const key = roomKeyDisplay?.textContent ?? '';
     if (!key) return;
     void navigator.clipboard.writeText(key).then(() => {
-      btn.classList.add('copied');
+      btn.classList.add('room__btn--copied');
       btn.textContent = '✓';
       setTimeout(() => {
-        btn.classList.remove('copied');
+        btn.classList.remove('room__btn--copied');
         btn.innerHTML = '&#128203;';
       }, 1500);
       showToast({ message: 'Code in die Zwischenablage kopiert', type: 'success' });

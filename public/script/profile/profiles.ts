@@ -8,9 +8,9 @@ import { showToast } from "../shared/toast.js";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
 import { notifyAccountChanged } from "../shared/auth-channel.js";
 
-export const profileName = optionalElement<HTMLSpanElement>("profileName");
-export const authButton = optionalElement<HTMLButtonElement>("authButton");
-export const coinDisplay = optionalElement<HTMLSpanElement>("coinDisplay");
+export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
+export const authButton = optionalElement<HTMLButtonElement>("auth-button");
+export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -47,7 +47,7 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
     applyCoinDisplay(profile.coins ?? 0);
   }
 
-  profileName.classList.add("is-clickable");
+  profileName.classList.add("user-profile-name--clickable");
   profileName.title = "Klick — zum Rad hinzufügen";
   profileName.addEventListener("click", () => {
     if (isNameEditingLocked() || isSpinning()) return;

@@ -43,7 +43,7 @@
 }
 
 .shop-modal__grid,
-.inventory-asset-grid {
+.inventory-modal__asset-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 32px;

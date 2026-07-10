@@ -13,30 +13,30 @@
     <link rel="stylesheet" href="../css/toast.css">
 </head>
 <body>
-<div class="wrapper"> 
-    <input type="checkbox" id="check" class="hidden-checkbox" aria-hidden="true" />
+<div class="auth-widget">
+    <input type="checkbox" id="auth-widget-toggle" class="auth-widget__toggle-checkbox" aria-hidden="true" />
 
     <main>
 
-        <section aria-label="Login Form" class="form-wrapper login">
-            <form action="main.html" method="post" id="loginForm" autocomplete="on">
+        <section aria-label="Login Form" class="auth-widget__form auth-widget__form--login">
+            <form action="main.html" method="post" id="login-form" autocomplete="on">
                 <h2>Login</h2>
-                <div class="input-field">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" name="email" autocomplete="username" inputmode="email" required aria-required="true" />
+                <div class="auth-widget__input-field">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" name="email" autocomplete="username" inputmode="email" required aria-required="true" />
                 </div>
-                <div class="input-field">
-                    <label for="loginPassword">Passwort</label>
-                    <input type="password" id="loginPassword" name="password" autocomplete="current-password" required aria-required="true" />
+                <div class="auth-widget__input-field">
+                    <label for="login-password">Passwort</label>
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" required aria-required="true" />
                 </div>
                 <button type="submit">Log In</button>
-                <div class="register">
+                <div class="auth-widget__register-link">
                     <a href="signup.html">Sign Up</a>
                     <p>Don't have an account?</p>
                 </div>
-                    <div class="Rechtliches">
-        <a href="imprint.html" class="btn-ImP">Impressum</a>
-        <a href="privacy.html" class="btn-DaS">Datenschutz</a>
+                    <div class="legal-links">
+        <a href="imprint.html" class="legal-links__link--imprint">Impressum</a>
+        <a href="privacy.html" class="legal-links__link--privacy">Datenschutz</a>
     </div>
             </form>
         </section>

@@ -12,8 +12,8 @@ import { ApiError } from "../api/api-helpers.js"
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
 
-const confirmDeleteName = requiredElement<HTMLElement>("confirmDeleteName");
-const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirmDeleteModal");
+const confirmDeleteName = requiredElement<HTMLElement>("confirm-delete-modal-name");
+const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirm-delete-modal");
 
 function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
@@ -21,7 +21,7 @@ function openDeleteModal(id: string, title: string): void {
   confirmDeleteModal.showModal();
 }
 
-const inventoryModal = requiredElement<HTMLDialogElement>("inventoryModal");
+const inventoryModal = requiredElement<HTMLDialogElement>("inventory-modal");
 
 async function openInventoryModal(): Promise<void> {
   await loadInventory();
@@ -49,8 +49,8 @@ function cancelDelete(): void {
   pendingDeleteId = null;
 }
 
-const addItemInput = requiredElement<HTMLInputElement>("addItemInput");
-const addItemModal = requiredElement<HTMLDialogElement>("addItemModal");
+const addItemInput = requiredElement<HTMLInputElement>("add-item-input");
+const addItemModal = requiredElement<HTMLDialogElement>("add-item-modal");
 
 function openAddItemModal(): void {
   if (!inventoryModal.open) return;
@@ -65,7 +65,7 @@ function closeAddItemModal(): void {
   addItemModal.close();
 }
 
-const inventoryWheelGrid = requiredElement<HTMLElement>("inventoryWheelGrid");
+const inventoryWheelGrid = requiredElement<HTMLElement>("inventory-modal-wheel-grid");
 const INVENTORY_LIMIT: number = 12;
 
 function renderInventoryWheels(items: SavedWheel[]): void {
@@ -87,8 +87,8 @@ function renderInventoryWheels(items: SavedWheel[]): void {
 
 function createAddCard(): HTMLDivElement {
   const card = document.createElement("div");
-  card.className = "inventory-card add";
-  card.id = "addCardBtn";
+  card.className = "inventory-modal__card inventory-modal__card--add";
+  card.id = "inventory-modal-add-card-btn";
   card.textContent = "+";
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
@@ -104,14 +104,14 @@ function createAddCard(): HTMLDivElement {
 
 function createEmptyCard(): HTMLDivElement {
   const card = document.createElement("div");
-  card.className = "inventory-card empty";
+  card.className = "inventory-modal__card inventory-modal__card--empty";
   return card;
 }
 
 function createItemCard(item: SavedWheel): HTMLElement {
   const hasValidLink = (item.link ?? "").trim() !== "";
   const card = document.createElement("div");
-  card.classList.add("inventory-card");
+  card.classList.add("inventory-modal__card");
 
   if (hasValidLink) {
     card.setAttribute("role", "button");
@@ -142,7 +142,7 @@ function createItemCard(item: SavedWheel): HTMLElement {
 
 function buildCardContent(item: SavedWheel): HTMLDivElement {
   const content = document.createElement("div");
-  content.className = "inventory-card-content";
+  content.className = "inventory-modal__card-content";
 
   const names = extractNamesFromLink(item.link);
   if (names.length >= 2) {
@@ -156,7 +156,7 @@ function buildCardContent(item: SavedWheel): HTMLDivElement {
   content.appendChild(heading);
 
   const date = document.createElement("p");
-  date.className = "inventory-date";
+  date.className = "inventory-modal__card-date";
   date.textContent = formatDate(item.created_at);
 
   content.appendChild(date);
@@ -166,7 +166,7 @@ function buildCardContent(item: SavedWheel): HTMLDivElement {
 
 function createDeleteButton(item: SavedWheel): HTMLButtonElement {
   const btn = document.createElement("button");
-  btn.className = "inventory-delete-btn";
+  btn.className = "inventory-modal__card-delete-btn";
   btn.setAttribute("aria-label", "Eintrag löschen");
   btn.textContent = "🗑️";
   btn.addEventListener("click", (e: MouseEvent) => {
@@ -208,19 +208,19 @@ async function submitItem(): Promise<void> {
   }
 }
 
-const inventoryBtn = requiredElement<HTMLButtonElement>("inventoryBtn");
-const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventoryCloseBtn");
-const confirmAddItemBtn = requiredElement<HTMLButtonElement>("confirmAddItemBtn");
-const cancelAddItemBtn = requiredElement<HTMLButtonElement>("cancelAddItemBtn");
-const closeAddItemBtn = requiredElement<HTMLButtonElement>("closeAddItemBtn");
-const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirmDeleteBtn");
-const cancelDeleteBtn = requiredElement<HTMLButtonElement>("cancelDeleteBtn");
+const inventoryBtn = requiredElement<HTMLButtonElement>("inventory-btn");
+const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventory-modal-close-btn");
+const confirmAddItemBtn = requiredElement<HTMLButtonElement>("add-item-modal-confirm-btn");
+const cancelAddItemBtn = requiredElement<HTMLButtonElement>("add-item-modal-cancel-btn");
+const closeAddItemBtn = requiredElement<HTMLButtonElement>("add-item-modal-close-btn");
+const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-confirm-btn");
+const cancelDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-cancel-btn");
 
 export function initInventory(): void {
   inventoryBtn.addEventListener("click", openInventoryModal);
   inventoryCloseBtn.addEventListener("click", () => inventoryModal.close());
   inventoryModal.addEventListener("click", (e) => {
-    const inner = inventoryModal.querySelector(".inventory-content");
+    const inner = inventoryModal.querySelector(".inventory-modal__content");
     if (inner && !inner.contains(e.target as Node)) {
       inventoryModal.close();
     }
@@ -348,7 +348,7 @@ function createMiniLabel(
   return text;
 }
 
-export const inventoryAssetGrid = requiredElement<HTMLElement>("inventoryAssetGrid");
+export const inventoryAssetGrid = requiredElement<HTMLElement>("inventory-modal-asset-grid");
 const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
 
 export function loadInventoryByCategory(): void {

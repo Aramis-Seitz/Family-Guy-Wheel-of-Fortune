@@ -8,7 +8,7 @@ import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
 
-export const shopModal = requiredElement<HTMLDialogElement>("shopModal");
+export const shopModal = requiredElement<HTMLDialogElement>("shop-modal");
 
 async function openShop(): Promise<void> {
     shopModal.showModal();
@@ -19,7 +19,7 @@ function closeShop(): void {
     shopModal.close();
 }
 
-export const shopBtn = requiredElement<HTMLButtonElement>("shopBtn");
+export const shopBtn = requiredElement<HTMLButtonElement>("shop-btn");
 export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
 
 export function initShop(): void {
@@ -47,7 +47,7 @@ async function refreshShop(): Promise<void> {
 
 export let balance = 0;
 
-export const shopCoinBalance = requiredElement<HTMLDivElement>("shop-coin-balance");
+export const shopCoinBalance = requiredElement<HTMLDivElement>("shop-modal-coin-balance");
 
 export function renderCoinBalance(): void {
     if (!shopCoinBalance) return;

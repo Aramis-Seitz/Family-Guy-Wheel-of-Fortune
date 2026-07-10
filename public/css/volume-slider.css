@@ -1,4 +1,4 @@
-.volume-container {
+.volume {
     position: fixed;
     top: 100px;
     left: 10px;
@@ -8,21 +8,21 @@
     border-radius: 8px;
 }
 
-.volume-header {
+.volume__header {
     display: flex;
     align-items: left;
     gap: 8px;
     margin-bottom: 5px;
 }
 
-.volume-container label {
+.volume label {
     color: white;
     font-weight: bold;
     display: block;
     margin-bottom: 0;
 }
 
-.volume-icon-btn {
+.volume__icon-btn {
     background: none;
     border: none;
     font-size: 20px;
@@ -33,10 +33,10 @@
     flex-shrink: 0;
 }
 
-.volume-icon-btn:hover {
+.volume__icon-btn:hover {
     transform: scale(1.15);
 }
 
-.volume-icon-btn:active {
+.volume__icon-btn:active {
     transform: scale(0.95);
 }

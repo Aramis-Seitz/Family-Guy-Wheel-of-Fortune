@@ -28,7 +28,7 @@ function createInventoryAssetCard(asset: Asset): HTMLElement {
     const selected = isAssetSelected(asset.id);
     const assetCard = document.createElement("div");
     assetCard.className = "inventory-modal__asset-card";
-    if (selected) assetCard.classList.add("inventory-modal__asset-card__selected");
+    if (selected) assetCard.classList.add("inventory-modal__asset-card--selected");
 
     assetCard.appendChild(createInventoryAssetHeader(asset));
     assetCard.appendChild(createInventoryAssetFooter(asset, selected));

@@ -38,7 +38,7 @@ export function loadInformationFromUrl(): void {
     updateMultiplierDisplay();
 }
 
-const shareBtn = requiredElement<HTMLButtonElement>("shareBtn");
+const shareBtn = requiredElement<HTMLButtonElement>("share-name-list-btn");
 
 export function initShareFeature(): void {
     console.log("initShareFeature loaded");

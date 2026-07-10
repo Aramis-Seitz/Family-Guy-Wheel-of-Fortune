@@ -28,7 +28,7 @@ export function applySelectedAsset(asset: Asset): void {
     if (asset.category === "companion") applyActiveCompanion(asset.asset_url);
 }
 
-const companionImage = optionalElement<HTMLImageElement>("companion-image");
+const companionImage = optionalElement<HTMLImageElement>("wheel-companion-image");
 
 function applyActiveCompanion(url: string): void {
     if (companionImage) companionImage.src = url;

@@ -1,5 +1,5 @@
 /* ── Add Item Modal ── */
-#addItemModal {
+#add-item-modal {
     border: none;
     border-radius: 14px;
     background: #1a1f2e;
@@ -13,17 +13,17 @@
     transform: translate(-50%, -50%);
 }
 
-#addItemModal::backdrop {
+#add-item-modal::backdrop {
     background: rgba(0, 0, 0, .5);
     backdrop-filter: blur(3px);
 }
 
-#addItemInner {
+.add-item-modal__inner {
     display: flex;
     flex-direction: column;
 }
 
-#addItemHeader {
+.add-item-modal__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -31,12 +31,12 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-#addItemHeader h3 {
+.add-item-modal__header h3 {
     font-size: 1rem;
     font-weight: 700;
 }
 
-#closeAddItemBtn {
+#add-item-modal-close-btn {
     background: none;
     border: 1px solid #444;
     border-radius: 8px;
@@ -47,22 +47,22 @@
     transition: color .15s, border-color .15s;
 }
 
-#closeAddItemBtn:hover {
+#add-item-modal-close-btn:hover {
     color: #fff;
     border-color: #888;
 }
 
-#addItemBody {
+.add-item-modal__body {
     padding: 20px;
 }
 
-.add-item-form-group {
+.add-item-modal__form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.add-item-label {
+.add-item-modal__label {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -70,7 +70,7 @@
     color: #888;
 }
 
-#addItemInput {
+#add-item-input {
     background: #2a2a2a;
     border: 1px solid #3a3a3a;
     border-radius: 8px;
@@ -83,12 +83,12 @@
     transition: border-color .15s, box-shadow .15s;
 }
 
-#addItemInput:focus {
+#add-item-input:focus {
     border-color: #00a2ff;
     box-shadow: 0 0 0 3px rgba(0, 162, 255, .18);
 }
 
-#addItemFooter {
+.add-item-modal__footer {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -96,7 +96,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-#cancelAddItemBtn {
+#add-item-modal-cancel-btn {
     background: none;
     border: 1px solid #444;
     border-radius: 8px;
@@ -108,12 +108,12 @@
     transition: all .15s;
 }
 
-#cancelAddItemBtn:hover {
+#add-item-modal-cancel-btn:hover {
     color: #fff;
     border-color: #888;
 }
 
-#confirmAddItemBtn {
+#add-item-modal-confirm-btn {
     background: #00a2ff;
     color: #111;
     border: none;
@@ -126,11 +126,11 @@
     transition: filter .15s, transform .15s;
 }
 
-#confirmAddItemBtn:hover {
+#add-item-modal-confirm-btn:hover {
     filter: brightness(1.1);
     transform: translateY(-1px);
 }
 
-#confirmAddItemBtn:active {
+#add-item-modal-confirm-btn:active {
     transform: translateY(0);
 }

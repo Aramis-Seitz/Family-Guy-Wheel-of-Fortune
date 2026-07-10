@@ -1,9 +1,9 @@
 import { requiredElement } from "../shared/dom-helpers.js";
 import { masterGain } from "./sound.js";
 
-export const volumeSlider = requiredElement<HTMLInputElement>("volumeSlider");
-export const volumeValue = requiredElement<HTMLSpanElement>("volumeValue");
-export const volumeIcon = requiredElement<HTMLButtonElement>("volumeIcon");
+export const volumeSlider = requiredElement<HTMLInputElement>("volume-slider");
+export const volumeValue = requiredElement<HTMLSpanElement>("volume-value");
+export const volumeIcon = requiredElement<HTMLButtonElement>("volume-icon");
 
 export function updateVolumeDisplay(): void {
     if (!volumeSlider || !volumeValue || !volumeIcon) return;

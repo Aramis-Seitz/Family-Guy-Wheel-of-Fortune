@@ -53,27 +53,27 @@ export function clearNames(): void {
   nameState.clear();
 }
 
-export const list = requiredElement<HTMLUListElement>("nameList");
+export const list = requiredElement<HTMLUListElement>("name-list");
 export const getRemoveBtn = (): NodeListOf<HTMLButtonElement> =>
-  list.querySelectorAll(".btn-remove");
+  list.querySelectorAll(".names__remove-btn");
 
 function getInitialNamesFromMarkup(): string[] {
-  return Array.from(list.querySelectorAll(".name-text"))
+  return Array.from(list.querySelectorAll(".names__text"))
     .map((element) => element.textContent?.trim() ?? "")
     .filter((name) => validateName(name).valid);
 }
 
 function createNameItem(name: string, index: number): HTMLLIElement {
   const li = document.createElement("li");
-  li.className = "name-item";
+  li.className = "names__item";
   li.style.backgroundColor = getSegmentColor(index);
 
   const span = document.createElement("span");
-  span.className = "name-text";
+  span.className = "names__text";
   span.textContent = name;
 
   const btn = document.createElement("button");
-  btn.className = "btn-remove";
+  btn.className = "names__remove-btn";
   btn.type = "button";
   btn.textContent = "-";
   btn.addEventListener("click", async () => {
@@ -94,7 +94,7 @@ function renderNames(names: string[]): void {
   refreshWheel();
 }
 
-export const emptyHint = requiredElement<HTMLParagraphElement>("emptyHint");
+export const emptyHint = requiredElement<HTMLParagraphElement>("name-empty-hint");
 
 export function updateEmptyState(): void {
   emptyHint.style.display = getSegmentCount() === 0 ? "block" : "none";
@@ -120,7 +120,7 @@ function updateSpinButtonState(): void {
 }
 
 export function syncRemoveButtons(): void {
-  const buttons = list.querySelectorAll(".btn-remove") as NodeListOf<HTMLButtonElement>;
+  const buttons = list.querySelectorAll(".names__remove-btn") as NodeListOf<HTMLButtonElement>;
   const disabled = roomLocked && disableRemoveWhileLocked;
   buttons.forEach((btn) => {
     btn.disabled = disabled;
@@ -129,8 +129,8 @@ export function syncRemoveButtons(): void {
   });
 }
 
-export const input = requiredElement<HTMLInputElement>("nameInput");
-export const addBtn = requiredElement<HTMLButtonElement>("addBtn");
+export const input = requiredElement<HTMLInputElement>("name-input");
+export const addBtn = requiredElement<HTMLButtonElement>("add-name-btn");
 
 export function syncAddElements(): void {
   const disabled = (roomLocked && disableAddWhileLocked) || getSegmentCount() >= MAX_ITEMS;
@@ -163,18 +163,18 @@ export function refreshWheel(): void {
 }
 
 function shakeItem(item: HTMLLIElement): void {
-  item.classList.remove("shake");
+  item.classList.remove("names__item--shake");
   void item.offsetWidth;
-  item.classList.add("shake");
-  item.addEventListener("animationend", () => item.classList.remove("shake"), { once: true });
+  item.classList.add("names__item--shake");
+  item.addEventListener("animationend", () => item.classList.remove("names__item--shake"), { once: true });
 }
 
 async function handleRemove(index: number, item: HTMLLIElement): Promise<void> {
   if (roomLocked && disableRemoveWhileLocked) return;
 
-  const nameText = item.querySelector(".name-text")?.textContent?.trim() ?? "";
+  const nameText = item.querySelector(".names__text")?.textContent?.trim() ?? "";
   if (onNameRemoved && nameText) {
-    const button = item.querySelector(".btn-remove") as HTMLButtonElement | null;
+    const button = item.querySelector(".names__remove-btn") as HTMLButtonElement | null;
     if (button) button.disabled = true;
     try {
       await onNameRemoved(nameText, index);
@@ -208,7 +208,7 @@ export function addName(rawName: string): void {
 }
 
 export function removeNameByIndex(index: number): void {
-  const item = list.querySelectorAll(".name-item")[index] as HTMLLIElement | undefined;
+  const item = list.querySelectorAll(".names__item")[index] as HTMLLIElement | undefined;
 
   if (item) {
     handleRemove(index, item);

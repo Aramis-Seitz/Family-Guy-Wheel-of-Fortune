@@ -20,18 +20,18 @@ interface ChatMessage {
 }
 
 function appendMessage(msg: ChatMessage, isMine: boolean): void {
-  const list = document.getElementById('chatMessages');
+  const list = document.getElementById('chat-messages');
   if (!list) return;
 
   const li = document.createElement('li');
-  li.className = isMine ? 'chat-message chat-message--mine' : 'chat-message';
+  li.className = isMine ? 'chat__message chat__message--mine' : 'chat__message';
 
   const meta = document.createElement('span');
-  meta.className = 'chat-meta';
+  meta.className = 'chat__meta';
   meta.textContent = `${msg.username} · ${msg.timestamp}`;
 
   const text = document.createElement('p');
-  text.className = 'chat-text';
+  text.className = 'chat__text';
   text.textContent = msg.text;
 
   li.appendChild(meta);
@@ -53,11 +53,11 @@ export function initChat(roomKey: string, username: string): void {
     })
     .subscribe();
 
-  const sendBtn = document.getElementById('chatSendBtn') as HTMLButtonElement | null;
-  const chatInput = document.getElementById('chatInput') as HTMLInputElement | null;
-  const toggleBtn = document.getElementById('chatToggleBtn') as HTMLElement | null;
-  const chatHeader = document.getElementById('chatHeader') as HTMLDivElement | null;
-  const chatBody = document.getElementById('chatBody') as HTMLDivElement | null;
+  const sendBtn = document.getElementById('chat-send-btn') as HTMLButtonElement | null;
+  const chatInput = document.getElementById('chat-input') as HTMLInputElement | null;
+  const toggleBtn = document.getElementById('chat-toggle-btn') as HTMLElement | null;
+  const chatHeader = document.getElementById('chat-header') as HTMLDivElement | null;
+  const chatBody = document.getElementById('chat-body') as HTMLDivElement | null;
 
   function sendMessage(): void {
     if (!chatInput || !chatChannel) return;
@@ -85,7 +85,7 @@ export function initChat(roomKey: string, username: string): void {
   }, { signal });
 
   function toggleChat(): void {
-    const collapsed = chatBody?.classList.toggle('chat-body--collapsed');
+    const collapsed = chatBody?.classList.toggle('chat__body--collapsed');
     if (toggleBtn) toggleBtn.textContent = collapsed ? '▼' : '▲';
   }
 
@@ -104,12 +104,12 @@ export function destroyChat(): void {
   myUsername = '';
   lastSentAt = 0;
 
-  const list = document.getElementById('chatMessages');
+  const list = document.getElementById('chat-messages');
   if (list) list.innerHTML = '';
 
-  const chatBody = document.getElementById('chatBody');
-  chatBody?.classList.add('chat-body--collapsed');
+  const chatBody = document.getElementById('chat-body');
+  chatBody?.classList.add('chat__body--collapsed');
 
-  const toggleBtn = document.getElementById('chatToggleBtn') as HTMLElement | null;
+  const toggleBtn = document.getElementById('chat-toggle-btn') as HTMLElement | null;
   if (toggleBtn) toggleBtn.textContent = '▼';
 }

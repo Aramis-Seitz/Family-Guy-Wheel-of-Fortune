@@ -1,7 +1,7 @@
 import { requiredElement } from "../shared/dom-helpers.js";
 
-export const multiplierSlider = requiredElement<HTMLInputElement>("multiplierSlider");
-export const multiplierValue = requiredElement<HTMLSpanElement>("multiplierValue");
+export const multiplierSlider = requiredElement<HTMLInputElement>("multiplier-slider");
+export const multiplierValue = requiredElement<HTMLSpanElement>("multiplier-value");
 
 export function setMultiplierSlider(multiplier: number): void {
   multiplierSlider.value = `${multiplier}`;

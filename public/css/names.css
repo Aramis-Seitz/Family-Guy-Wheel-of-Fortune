@@ -1,4 +1,4 @@
-.share-btn {
+.names__share-btn {
     background-color: #E20074;
     color: black;
     font-weight: bold;
@@ -9,10 +9,10 @@
     cursor: pointer;
 }
 
-.share-btn:hover { background-color: #cc0066; }
-.share-btn:active { background-color: #a30055; }
+.names__share-btn:hover { background-color: #cc0066; }
+.names__share-btn:active { background-color: #a30055; }
 
-.btn-add {
+.names__add-btn {
     width: 44px;
     height: 44px;
     flex-shrink: 0;
@@ -29,10 +29,10 @@
     transition: background var(--transition);
 }
 
-.btn-add:hover { background: #e0b030; }
-.btn-add:active { background: #c89a20; }
+.names__add-btn:hover { background: #e0b030; }
+.names__add-btn:active { background: #c89a20; }
 
-.btn-remove {
+.names__remove-btn {
     width: 28px;
     height: 28px;
     border-radius: var(--radius-md);
@@ -50,16 +50,16 @@
     transition: background var(--transition), opacity var(--transition);
 }
 
-.btn-remove:hover:not(:disabled) { background: rgba(0, 0, 0, 0.32); }
-.btn-remove:active:not(:disabled) { background: rgba(0, 0, 0, 0.45); }
-.btn-remove:disabled { opacity: 0.35; cursor: not-allowed; }
+.names__remove-btn:hover:not(:disabled) { background: rgba(0, 0, 0, 0.32); }
+.names__remove-btn:active:not(:disabled) { background: rgba(0, 0, 0, 0.45); }
+.names__remove-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-.add-row {
+.names__add-row {
     display: flex;
     gap: var(--space-2);
 }
 
-.add-row input {
+.names__add-row input {
     flex: 1;
     padding: var(--space-2) var(--space-3);
     background: #fff;
@@ -70,12 +70,12 @@
     outline: none;
 }
 
-.add-row input:focus {
+.names__add-row input:focus {
     outline: 2px solid #f0c040;
     outline-offset: 2px;
 }
 
-.name-list {
+.names__list {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -91,15 +91,15 @@
     scrollbar-color: rgba(255, 255, 255, .4) transparent;
 }
 
-.name-list::-webkit-scrollbar {
+.names__list::-webkit-scrollbar {
     width: 12px;    /* für Chrome */
 }
 
-.name-list::-webkit-scrollbar-track {
+.names__list::-webkit-scrollbar-track {
     background: transparent;   /* für Edge  */
 }
 
-.name-item {
+.names__item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -111,22 +111,22 @@
     transition: transform var(--transition);
 }
 
-.name-item:hover {
+.names__item:hover {
     transform: translateX(-2px);
 }
 
-.name-text {
+.names__text {
     flex: 1;
 }
 
-.empty-hint {
+.names__empty-hint {
     text-align: center;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     padding: var(--space-3);
 }
 
-.error-hint {
+.names__error-hint {
     font-size: var(--text-sm);
     color: var(--color-error);
     text-align: center;
@@ -134,7 +134,7 @@
     transition: opacity var(--transition);
 }
 
-.error-hint.hidden {
+.names__error-hint.hidden {
     opacity: 0;
 }
 
@@ -162,6 +162,6 @@
     }
 }
 
-.name-item.shake {
+.names__item--shake {
     animation: shake 0.4s ease;
 }

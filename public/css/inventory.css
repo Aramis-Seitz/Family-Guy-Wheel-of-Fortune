@@ -13,7 +13,7 @@
 .inventory-btn:active { background-color: #006699; }
 
 /* ── Inventory Modal ── */
-#inventoryCloseBtn {
+#inventory-modal-close-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -25,12 +25,12 @@
     transition: color 180ms ease, background 180ms ease;
 }
 
-#inventoryCloseBtn:hover {
+#inventory-modal-close-btn:hover {
     color: #28251d;
     background: #edeae5;
 }
 
-#inventoryModal {
+#inventory-modal {
     border: none;
     padding: 0;
     background: transparent;
@@ -44,19 +44,19 @@
     overflow: hidden;
 }
 
-#inventoryModal::backdrop {
+#inventory-modal::backdrop {
     background: rgba(10, 15, 25, 0.75);
     backdrop-filter: blur(12px);
 }
 
-#inventoryModal[open] {
+#inventory-modal[open] {
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
 
-.inventory-content {
+.inventory-modal__content {
     width: 90%;
     max-width: 1100px;
     max-height: 85vh;
@@ -70,13 +70,13 @@
     transition: transform 0.25s ease;
 }
 
-.inventory-header {
+.inventory-modal__header {
     position: relative;
     text-align: center;
     margin-bottom: 20px;
 }
 
-.inventory-header button {
+.inventory-modal__header button {
     position: absolute;
     right: 0;
     top: 0;
@@ -88,7 +88,7 @@
 }
 
 /* ── Inventory Grid & Cards ── */
-.inventory-wheel-grid {
+.inventory-modal__wheel-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -96,7 +96,7 @@
     height: calc(2 * 275px + 1 * 32px);
 }
 
-.inventory-card {
+.inventory-modal__card {
     height: 100%;
     border-radius: 14px;
     background: rgba(0, 162, 255, 0.18);
@@ -112,16 +112,16 @@
     text-decoration: none;
 }
 
-.inventory-card[role="button"] {
+.inventory-modal__card[role="button"] {
     cursor: pointer;
 }
 
-.inventory-card:hover {
+.inventory-modal__card:hover {
     background: rgba(0, 162, 255, 0.28);
     transform: translateY(-2px);
 }
 
-.inventory-card.add {
+.inventory-modal__card--add {
     border: 2px dashed rgba(0, 162, 255, 0.25);
     color: #aaa;
     font-size: 42px;
@@ -130,50 +130,50 @@
     background: transparent;
 }
 
-.inventory-card.add:hover {
+.inventory-modal__card--add:hover {
     border-color: #00a2ff;
     color: #00a2ff;
     background: rgba(0, 162, 255, 0.07);
     transform: translateY(-2px);
 }
 
-.inventory-card.empty {
+.inventory-modal__card--empty {
     background: rgba(255, 255, 255, 0.02);
     border: 1px dashed rgba(255, 255, 255, 0.07);
 }
 
-.inventory-card.empty:hover {
+.inventory-modal__card--empty:hover {
     transform: none;
     background: rgba(255, 255, 255, 0.02);
 }
 
-.inventory-card-content {
+.inventory-modal__card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.inventory-card-content svg {
+.inventory-modal__card-content svg {
     width: 65px;
     height: 65px;
     margin-bottom: 6px;
 }
 
-.inventory-card h3 {
+.inventory-modal__card h3 {
     font-size: 12px;
     text-align: center;
     margin: 0;
 }
 
-.inventory-date {
+.inventory-modal__card-date {
     font-size: 11px;
     opacity: 0.7;
     margin: 2px 0 0;
     text-align: center;
 }
 
-.inventory-delete-btn {
+.inventory-modal__card-delete-btn {
     position: absolute;
     top: 8px;
     right: 8px;
@@ -191,23 +191,23 @@
     transition: opacity 160ms ease, background 160ms ease, transform 120ms ease;
 }
 
-.inventory-card:hover .inventory-delete-btn {
+.inventory-modal__card:hover .inventory-modal__card-delete-btn {
     opacity: 1;
 }
 
-.inventory-delete-btn:hover {
+.inventory-modal__card-delete-btn:hover {
     background: rgba(220, 38, 38, 0.25);
     border-color: rgba(220, 38, 38, 0.5);
     transform: scale(1.1);
 }
 
-.inventory-delete-btn:active {
+.inventory-modal__card-delete-btn:active {
     transform: scale(0.95);
 }
 
 /* ----- INVENTORY ASSETS ----- */
 
-.inventory-modal__asset-card__selected .inventory-modal__select-btn {
+.inventory-modal__asset-card--selected .inventory-modal__select-btn {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgb(1, 163, 9);
     color: rgb(174, 253, 178);

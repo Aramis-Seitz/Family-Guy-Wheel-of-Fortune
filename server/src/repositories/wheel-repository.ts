@@ -18,7 +18,7 @@ export async function listSavedWheels(userId: string): Promise<SavedWheel[]> {
         .from("saved_wheels")
         .select(`
   id,
-  title:link_name,
+  title:wheel_title,
   link:url,
   created_at
  `)
@@ -39,7 +39,7 @@ export async function insertSavedWheels(userId: string, title: string, url: stri
         .from("saved_wheels")
         .insert({
             user_id: userId,
-            link_name: title,
+            wheel_title: title,
             url
         });
 

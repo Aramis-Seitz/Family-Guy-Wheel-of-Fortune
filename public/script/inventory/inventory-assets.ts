@@ -20,7 +20,7 @@ function isAssetSelected(assetId: string): boolean {
 }
 
 export function loadOwnedAssets(activeCategory: InventoryCategory): void {
-    let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
+    const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => inventoryAssetGrid.appendChild(createInventoryAssetCard(asset)));
 }
 

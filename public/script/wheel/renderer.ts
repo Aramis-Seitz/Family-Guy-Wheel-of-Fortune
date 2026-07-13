@@ -1,16 +1,28 @@
-import type { Point } from "../shared/types.js";
-import {
-  WHEEL_CENTER,
-  WHEEL_RADIUS,
-  FULL_CIRCLE_RADIANS,
-  SEGMENT_COLORS,
-} from "../shared/constants.js";
-import { wheelElement } from "../shared/dom.js";
+import { requiredElement } from "../shared/dom-helpers.js";
 
-const SVG_NS = "http://www.w3.org/2000/svg";
+export const SEGMENT_COLORS: string[] = [
+  "#f4d87e",
+  "#f4a96b",
+  "#f4a0a0",
+  "#a8d8f0",
+  "#c5b8f0",
+  "#ae945d",
+  "#8a78c5",
+  "#745bc6",
+  "#312260",
+  "#1f1542",
+  "#3c287b",
+  "rgb(141, 116, 225)",
+  "#504672",
+];
 
 export function getSegmentColor(index: number): string {
   return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
+}
+
+export interface Point {
+  x: number;
+  y: number;
 }
 
 export function getPointOnCircle(center: Point, radius: number, angleRadians: number): Point {
@@ -19,6 +31,11 @@ export function getPointOnCircle(center: Point, radius: number, angleRadians: nu
     y: center.y + radius * Math.sin(angleRadians - Math.PI / 2),
   };
 }
+
+export const WHEEL_CENTER: Point = { x: 100, y: 100 };
+export const WHEEL_RADIUS: number = 100;
+export const FULL_CIRCLE_RADIANS: number = Math.PI * 2;
+export const SVG_NS = "http://www.w3.org/2000/svg";
 
 function createWheelSegmentPath(
   segmentIndex: number,
@@ -76,6 +93,8 @@ function createWheelLabel(
   text.textContent = name;
   return text;
 }
+
+export const wheelElement = requiredElement<SVGGElement>("wheel");
 
 export function clearWheel(): void {
   wheelElement.innerHTML = "";

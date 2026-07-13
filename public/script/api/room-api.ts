@@ -1,17 +1,23 @@
 import { postJson } from "./api-helpers.js";
-import type { CreateRoomResponse, JoinRoomResponse, RoomSpinResponse } from "../shared/types.js";
+import {
+    CreateRoomResponseSchema,
+    JoinRoomResponseSchema,
+    SpinRandomResponseSchema,
+} from "shared";
+import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
-
-export async function createRoom(): Promise<CreateRoomResponse> {
-    return postJson<CreateRoomResponse>("/api/room/create", undefined, {
+export async function createRoom(): Promise<CreateRoomResponseBody> {
+    const rawBody = await postJson("/api/room/create", undefined, {
         errorFallback: "Room konnte nicht erstellt werden"
     });
+    return CreateRoomResponseSchema.parse(rawBody);
 }
 
-export async function joinRoom(roomKey: string): Promise<JoinRoomResponse> {
-    return postJson<JoinRoomResponse>("/api/room/join", { roomKey }, {
+export async function joinRoom(roomKey: string): Promise<JoinRoomResponseBody> {
+    const rawBody = await postJson("/api/room/join", { roomKey }, {
         errorFallback: "Beitritt zum Room fehlgeschlagen"
     });
+    return JoinRoomResponseSchema.parse(rawBody);
 }
 
 export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
@@ -20,10 +26,11 @@ export async function setMultiplier(roomKey: string, multiplier: number): Promis
     });
 }
 
-export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<RoomSpinResponse> {
-    return postJson<RoomSpinResponse>("/api/room/spin", { roomKey, names, direction }, {
+export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<SpinRandomResponseBody> {
+    const rawBody = await postJson("/api/room/spin", { roomKey, names, direction }, {
         errorFallback: "Spin fehlgeschlagen"
     });
+    return SpinRandomResponseSchema.parse(rawBody);
 }
 
 export async function leaveRoom(roomKey: string): Promise<void> {

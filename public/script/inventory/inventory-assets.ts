@@ -1,6 +1,6 @@
-import { inventoryAssetGrid } from "../shared/dom.js";
-import { Asset, InventoryCategory } from "../shared/types.js";
-import { filterAssetsByCategory, loadInventoryByCategory } from "./inventory.js"
+import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory.js"
+import type { InventoryCategory } from "./inventory.js";
+import type { Asset } from "shared";
 import { getSelectedAssetIds, selectAsset } from "../api/inventory-api.js";
 import { showToast } from "../shared/toast.js";
 import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
@@ -20,7 +20,7 @@ function isAssetSelected(assetId: string): boolean {
 }
 
 export function loadOwnedAssets(activeCategory: InventoryCategory): void {
-    let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
+    const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => inventoryAssetGrid.appendChild(createInventoryAssetCard(asset)));
 }
 
@@ -28,7 +28,7 @@ function createInventoryAssetCard(asset: Asset): HTMLElement {
     const selected = isAssetSelected(asset.id);
     const assetCard = document.createElement("div");
     assetCard.className = "inventory-modal__asset-card";
-    if (selected) assetCard.classList.add("inventory-modal__asset-card__selected");
+    if (selected) assetCard.classList.add("inventory-modal__asset-card--selected");
 
     assetCard.appendChild(createInventoryAssetHeader(asset));
     assetCard.appendChild(createInventoryAssetFooter(asset, selected));

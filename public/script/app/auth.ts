@@ -3,17 +3,17 @@ import { showToast } from "../shared/toast.js";
 import { apiUrl } from "../shared/api-base.js";
 import { notifyAccountChanged } from "../shared/auth-channel.js";
 
-const loginForm = document.getElementById('loginForm') as HTMLFormElement | null;
-const signupForm = document.getElementById('signupForm') as HTMLFormElement | null;
+const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
 
-const loginEmailInput = document.getElementById('loginEmail') as HTMLInputElement | null;
-const loginPasswordInput = document.getElementById('loginPassword') as HTMLInputElement | null;
+const loginEmailInput = document.getElementById('login-email') as HTMLInputElement | null;
+const loginPasswordInput = document.getElementById('login-password') as HTMLInputElement | null;
 
-const signupUserInput = document.getElementById('signupUser') as HTMLInputElement | null;
-const signupEmailInput = document.getElementById('signupEmail') as HTMLInputElement | null;
-const signupDateOfBirthInput = document.getElementById('signupDateOfBirth') as HTMLInputElement | null;
-const signupPasswordInput = document.getElementById('signupPassword') as HTMLInputElement | null;
-const signupConfirmPasswordInput = document.getElementById('signupConfirmPassword') as HTMLInputElement | null;
+const signupUserInput = document.getElementById('signup-user') as HTMLInputElement | null;
+const signupEmailInput = document.getElementById('signup-email') as HTMLInputElement | null;
+const signupDateOfBirthInput = document.getElementById('signup-date-of-birth') as HTMLInputElement | null;
+const signupPasswordInput = document.getElementById('signup-password') as HTMLInputElement | null;
+const signupConfirmPasswordInput = document.getElementById('signup-confirm-password') as HTMLInputElement | null;
 
 if (loginForm) {
     loginForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {

@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background: #000; 
+    background: #000;
     color: #f0f0f0;
     display: flex;
     justify-content: center;
@@ -10,7 +10,7 @@ body {
     height: 100vh;
 }
 
-.wrapper {
+.auth-widget {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,11 +19,11 @@ body {
 
 main {
     display: flex;
-    gap: 40px; 
+    gap: 40px;
 }
 
-.form-wrapper {
-    background: #161618; 
+.auth-widget__form {
+    background: #161618;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
@@ -31,23 +31,23 @@ main {
     box-sizing: border-box;
 }
 
-.form-wrapper h2 {
+.auth-widget__form h2 {
     margin-bottom: 20px;
     text-align: center;
 }
 
-.input-field {
+.auth-widget__input-field {
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
 }
 
-.input-field label {
+.auth-widget__input-field label {
     margin-bottom: 5px;
     font-size: 14px;
 }
 
-.input-field input {
+.auth-widget__input-field input {
     padding: 10px;
     border: 1px solid #333;
     border-radius: 8px;
@@ -56,12 +56,12 @@ main {
     font-size: 14px;
 }
 
-.input-field input:focus {
+.auth-widget__input-field input:focus {
     outline: none;
     border-color: #555;
 }
 
-.forget {
+.auth-widget__forget-link {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -69,19 +69,19 @@ main {
     font-size: 14px;
 }
 
-.forget label {
+.auth-widget__forget-link label {
     display: flex;
     align-items: center;
     gap: 5px;
     cursor: pointer;
 }
 
-.forget a {
+.auth-widget__forget-link a {
     color: #bbb;
     text-decoration: none;
 }
 
-.forget a:hover {
+.auth-widget__forget-link a:hover {
     text-decoration: underline;
 }
 
@@ -100,19 +100,19 @@ button:hover {
     background: #444;
 }
 
-.register {
+.auth-widget__register-link {
     text-align: center;
     margin-top: 15px;
     font-size: 14px;
 }
 
-.hidden-checkbox {
+.auth-widget__toggle-checkbox {
     display: none;
 }
 
-#check:checked ~ main .login {
+#auth-widget-toggle:checked ~ main .auth-widget__form--login {
     display: none;
 }
-#check:not(:checked) ~ main .signup {
+#auth-widget-toggle:not(:checked) ~ main .auth-widget__form--signup {
     display: none;
 }

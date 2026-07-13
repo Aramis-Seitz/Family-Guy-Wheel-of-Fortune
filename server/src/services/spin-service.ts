@@ -8,23 +8,18 @@ import {
     getUserIdByUsername,
 } from "../repositories/profile-repository";
 import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
+import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 const MIN_ROTATION_DEGREE = 0;
 const MAX_ROTATION_DEGREE = 359;
 
-export type AwardCoinsResult = {
-    spinnerCoins: number;
-    winnerCoins: number;
-    total?: number;
-};
-
-export async function generateSpin(userId: string): Promise<{ ranNum: number; spinToken: string }> {
+export async function generateSpin(userId: string): Promise<SpinRandomResponseBody> {
     const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
     const spinToken = await insertSpinToken(randomUUID(), userId);
     return { ranNum, spinToken };
 }
 
-export async function awardCoins(userId: string, spinToken: string, winnerName: string): Promise<AwardCoinsResult> {
+export async function awardCoins(userId: string, spinToken: string, winnerName: string): Promise<AwardCoinsResponseBody> {
     const isValid = await findValidSpinToken(spinToken, userId);
     if (!isValid) {
         throw new AppError("Invalid or already used spin token", 403);

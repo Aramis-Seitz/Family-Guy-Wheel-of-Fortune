@@ -6,11 +6,6 @@
     --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
     --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-theme="dark"] {
-    --color-bg: #2b2b2b;
-    --color-text: #f0f0f0;
     --color-text-muted: #aaa;
     --color-error: #f87171;
 }

@@ -15,6 +15,7 @@ import {
     type RoomPlayer,
 } from "../repositories/room-repository";
 import { AppError } from "../lib/errors";
+import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
 function generateRoomKey(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -22,11 +23,7 @@ function generateRoomKey(): string {
     return Array.from(bytes, (b) => chars[b % chars.length]).join("");
 }
 
-function toUsernames(players: RoomPlayer[]): string[] {
-    return players.map((p) => p.username);
-}
-
-export async function createRoom(userId: string): Promise<{ roomKey: string; players: string[]; names: string[] }> {
+export async function createRoom(userId: string): Promise<CreateRoomResponseBody> {
     const existingRoom = await getActiveRoomForUser(userId);
     if (existingRoom) {
         if (existingRoom.host_id === userId) {
@@ -43,7 +40,11 @@ export async function createRoom(userId: string): Promise<{ roomKey: string; pla
     return { roomKey, players: [hostUsername], names: [] };
 }
 
-export async function joinRoom(userId: string, roomKey: string): Promise<{ players: string[]; multiplier: number; names: string[]; hostName: string }> {
+function toUsernames(players: RoomPlayer[]): string[] {
+    return players.map((p) => p.username);
+}
+
+export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoomResponseBody> {
     const existingRoom = await getActiveRoomForUser(userId);
     if (existingRoom && existingRoom.room_key !== roomKey) {
         if (existingRoom.host_id === userId) {
@@ -67,7 +68,7 @@ export async function joinRoom(userId: string, roomKey: string): Promise<{ playe
     const hostPlayer = room.players.find((p) => p.id === room.host_id);
     const hostName = hostPlayer?.username ?? (players[0]?.username ?? '');
     const multiplier = room.multiplier ?? 1;
-    const names = room.wheel_names ?? [];
+    const names = room.names_in_wheel ?? [];
     
     return { players: toUsernames(players), multiplier, names, hostName };
 }
@@ -92,7 +93,7 @@ export async function closeRoom(userId: string, roomKey: string): Promise<void> 
     await clearRoomPlayers(roomKey);
 }
 
-export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<{ ranNum: number; spinToken: string }> {
+export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<SpinRandomResponseBody> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError("Only the host may spin", 403);

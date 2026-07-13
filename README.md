@@ -29,7 +29,7 @@ cd <repo-name>
 
 ### 2. Abhängigkeiten installieren
 
-Einmalig im **Root-Verzeichnis** ausführen — installiert alle Workspaces (`api` + `public`):
+Einmalig im **Root-Verzeichnis** ausführen — installiert alle Workspaces (`server`, `public`, `shared`) und baut dabei automatisch `shared` (Postinstall-Skript):
 
 ```powershell
 npm install
@@ -72,9 +72,26 @@ Für die Entwicklung einen neuen Branch von `main` erstellen.
 /
 ├── server/     # Express-Backend (TypeScript) — Port 3000
 ├── public/     # Vite-Frontend (TypeScript)
+├── shared/     # Geteilte Zod-Schemas/Typen für Request-/Response-Bodies (server + public)
 ├── api/        # Vercel-Adapter (re-exportiert server/)
-└── package.json  # Root-Workspace (verwaltet server + public)
+└── package.json  # Root-Workspace (verwaltet server + public + shared)
 ```
+
+---
+
+## App starten (Entwicklung)
+
+Im **Root-Verzeichnis**:
+
+```powershell
+npm run dev
+```
+
+Das baut zuerst `shared`, startet danach Backend (`server`, Port 3000) und Frontend-Build (`public`) parallel. Es ist **ein einziger Befehl** — kein separates Starten pro Workspace nötig.
+
+> Änderungen an `shared/src/*.ts` werden nicht automatisch neu gebaut (kein Watch-Modus). Nach Änderungen dort einmal `npm run build --workspace shared` ausführen und den Dev-Server neu starten.
+
+Für alternative lokale Testszenarien (Mock-Modus, Test-Supabase-DB) siehe die Anleitungen unter [Lokales Testing](#lokales-testing).
 
 ---
 

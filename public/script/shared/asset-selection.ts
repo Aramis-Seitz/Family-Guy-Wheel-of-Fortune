@@ -1,7 +1,7 @@
 import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api.js";
-import { companionImage } from "./dom.js";
+import { optionalElement } from "./dom-helpers.js";
 import { preloadTickBuffer } from "../wheel/sound.js";
-import type { Asset } from "./types.js";
+import type { Asset } from "shared";
 
 export async function applyActiveAssets(): Promise<void> {
     try {
@@ -27,6 +27,8 @@ export function applySelectedAsset(asset: Asset): void {
     if (asset.category === "sound") void preloadTickBuffer(asset.asset_url);
     if (asset.category === "companion") applyActiveCompanion(asset.asset_url);
 }
+
+const companionImage = optionalElement<HTMLImageElement>("wheel-companion-image");
 
 function applyActiveCompanion(url: string): void {
     if (companionImage) companionImage.src = url;

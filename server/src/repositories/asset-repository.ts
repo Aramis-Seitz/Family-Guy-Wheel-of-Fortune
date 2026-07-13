@@ -1,11 +1,10 @@
+import { z } from "zod";
 import { supabaseClient } from "../lib/supabase-client";
-import type { Asset, AssetCategory } from "../types/asset";
 import { AppError } from "../lib/errors";
+import type { Asset } from "shared";
 
-type AssetOwnershipRow = {
-    asset?: Asset | Asset[] | null;
-};
-
+export const AssetCategorySchema = z.enum(["sound", "companion"]);
+export type AssetCategory = z.infer<typeof AssetCategorySchema>;
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient
@@ -31,6 +30,10 @@ export async function getAssetById(assetId: string): Promise<Asset | null> {
 
     return (data ?? null) as Asset | null;
 }
+
+type AssetOwnershipRow = {
+    asset?: Asset | Asset[] | null;
+};
 
 export async function listOwnedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient

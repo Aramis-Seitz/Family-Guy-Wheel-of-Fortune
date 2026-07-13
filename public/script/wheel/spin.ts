@@ -1,48 +1,29 @@
-import {
-  addBtn,
-  getRemoveBtn,
-  input,
-  multiplierSlider,
-  resetBtn,
-  spinLeftBtn,
-  spinRightBtn,
-  wheelElement,
-  bulkAddToWheelBtn,
-} from "../shared/dom.js";
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/spin-api.js";
-import { getNames } from "../names/name-list.js";
-import { announceWinner, resolveWinner } from "./winner.js";
-import { getMultiplier } from "./multiplier.js";
-import {
-  FULL_CIRCLE_DEG,
-  POINTER_OFFSET_DEG,
-  MIN_ITEMS,
-  DRUMROLL_LEAD_IN_STEPS,
-  MAX_SPIN_VELOCITY,
-  MIN_SPIN_VELOCITY,
-  SPIN_FAST_PHASE_RATIO,
-  SPIN_EASE_EXPONENT,
-  SPIN_DISABLED_OPACITY,
-  MIN_SPIN_ROTATIONS,
-} from "../shared/constants.js";
-import { profileName } from "../shared/dom.js";
-import type { Direction, SpinConfig, SpinHandler, SpinElement, SpinFrameState } from "../shared/types.js";
+import { getNamesInWheelList, input, addBtn, getRemoveBtn } from "../names/names-in-wheel-list.js";
+import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner.js";
+import { getMultiplier, multiplierSlider } from "./multiplier.js";
+import { wheelElement } from "./renderer.js";
+import { bulkAddToWheelBtn } from "../room.js";
+import { profileName } from "../profile/profiles.js";
+import { MIN_ITEMS } from "../names/names-in-wheel-list-state.js";
+import { requiredElement } from "../shared/dom-helpers.js";
 
-let currentRotation = 0;
-let lastTickRotation = 0;
-let spinCancelled = false;
-let activeSpinOverride: SpinHandler | null = null;
-let activeResetOverride: (() => void) | null = null;
 let spinning = false;
 
 export function isSpinning(): boolean {
   return spinning;
 }
 
+export type Direction = "left" | "right";
+export type SpinHandler = (direction: Direction) => Promise<void>;
+let activeSpinOverride: SpinHandler | null = null;
+
 export function setSpinOverride(handler: SpinHandler | null): void {
   activeSpinOverride = handler;
 }
+
+let activeResetOverride: (() => void) | null = null;
 
 export function setResetOverride(handler: (() => void) | null): void {
   activeResetOverride = handler;
@@ -50,20 +31,27 @@ export function setResetOverride(handler: (() => void) | null): void {
 
 export function lockSpinButtons(): void {
   setElementsDisabled(getSpinRelatedElements(), true);
-  profileName?.classList.remove("is-clickable");
+  profileName?.classList.remove("user-profile-name--clickable");
 }
 
 export function unlockSpinButtons(): void {
   setElementsDisabled(getSpinRelatedElements(), false);
-  profileName?.classList.add("is-clickable");
+  profileName?.classList.add("user-profile-name--clickable");
 }
+
+let currentRotation = 0;
 
 function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
+export const spinLeftBtn = requiredElement<HTMLButtonElement>("spin-left-btn");
+export const spinRightBtn = requiredElement<HTMLButtonElement>("spin-right-btn");
+
+export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
+
 function getSpinRelatedElements(): SpinElement[] {
-  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".player-toggle-btn");
+  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".room__player-toggle-btn");
   const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, playerToggleButtons];
 
   if (bulkAddToWheelBtn) {
@@ -72,6 +60,8 @@ function getSpinRelatedElements(): SpinElement[] {
 
   return elements;
 }
+
+export const SPIN_DISABLED_OPACITY: string = "0.5";
 
 function applyDisabledStyle(el: HTMLButtonElement | HTMLInputElement, disabled: boolean): void {
   el.disabled = disabled;
@@ -100,16 +90,35 @@ function getSegmentIndex(rotation: number, stepAngle: number): number {
   return Math.floor(normalizedRotation / stepAngle);
 }
 
+let lastTickRotation = 0;
+
 function hasEnteredNewSegment(stepAngle: number): boolean {
   const previous = getSegmentIndex(lastTickRotation, stepAngle);
   const current = getSegmentIndex(currentRotation, stepAngle);
   return previous !== current;
 }
 
+export const MAX_SPIN_VELOCITY: number = 15;
+export const MIN_SPIN_VELOCITY: number = 0.5;
+export const SPIN_FAST_PHASE_RATIO: number = 0.15;
+export const SPIN_EASE_EXPONENT: number = 1.4;
+export const SPIN_START_DELAY: number = 5;
+export const SPIN_END_DELAY: number = 65;
+export const DRUMROLL_DELAY_THRESHOLD = 30;
+
 function computeVelocity(progress: number): number {
   if (progress < SPIN_FAST_PHASE_RATIO) return MAX_SPIN_VELOCITY;
   const decelRatio = (progress - SPIN_FAST_PHASE_RATIO) / (1 - SPIN_FAST_PHASE_RATIO);
   return MIN_SPIN_VELOCITY + (MAX_SPIN_VELOCITY - MIN_SPIN_VELOCITY) * Math.pow(1 - decelRatio, SPIN_EASE_EXPONENT);
+}
+
+export interface SpinConfig {
+  totalSteps: number;
+  direction: Direction;
+  stepAngle: number;
+  segmentCount: number;
+  spinToken: string;
+  names: string[];
 }
 
 function finishSpin(config: SpinConfig): void {
@@ -119,6 +128,15 @@ function finishSpin(config: SpinConfig): void {
   unlockSpinButtons();
   announceWinner(config.spinToken, resolveWinner(currentRotation, config));
 }
+
+export const DRUMROLL_LEAD_IN_STEPS: number = 321;
+
+export interface SpinFrameState {
+  distanceTravelled: number;
+  readonly sign: number;
+}
+
+let spinCancelled = false;
 
 function runSpinFrame(state: SpinFrameState, config: SpinConfig): void {
   if (spinCancelled) { stopDrumRoll(); return; }
@@ -147,6 +165,8 @@ function animateSpin(config: SpinConfig): void {
   requestAnimationFrame(() => runSpinFrame(state, config));
 }
 
+export const MIN_SPIN_ROTATIONS: number = 5 * 360;
+
 export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[]): void {
   spinCancelled = false;
   if (names.length < MIN_ITEMS) {
@@ -170,7 +190,7 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
-  const names = getNames();
+  const names = getNamesInWheelList();
   if (names.length < MIN_ITEMS) return;
 
   lockSpinButtons();
@@ -198,6 +218,8 @@ export function resetWheelRotation(): void {
 export function getCurrentRotation(): number {
   return currentRotation;
 }
+
+export const resetBtn = requiredElement<HTMLButtonElement>("reset-btn");
 
 export function initWheelControls(): void {
   spinLeftBtn.addEventListener("click", () => {

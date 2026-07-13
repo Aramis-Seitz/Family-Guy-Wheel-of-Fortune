@@ -1,18 +1,4 @@
-.authButton {
-    background-color: #48484883;
-    color: black;
-    font-weight: bold;
-    font-size: 1.2rem;
-    padding: 15px;
-    border: none;
-    border-radius: 100px;
-    cursor: pointer;
-}
-
-.authButton:hover  { background-color: #2a2929; }
-.authButton:active { background-color: #1a1918; }
-
-#userArea {
+#user-area {
     position: fixed;
     top: 20px;
     right: 20px;
@@ -27,23 +13,23 @@
     align-items: center;
 }
 
-#authButton {
+#auth-button {
     padding: 6px 10px;
     cursor: pointer;
 }
 
-#profileName.is-clickable {
+#user-profile-name.user-profile-name--clickable {
     cursor: pointer;
 }
 
-#profileName.is-clickable:hover {
+#user-profile-name.user-profile-name--clickable:hover {
     text-decoration: underline;
 }
 
-#check:checked ~ main .login     { display: none; }
-#check:not(:checked) ~ main .signup { display: none; }
+#auth-widget-toggle:checked ~ main .auth-widget__form--login     { display: none; }
+#auth-widget-toggle:not(:checked) ~ main .auth-widget__form--signup { display: none; }
 
-.forget {
+.auth-widget__forget-link {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,28 +37,28 @@
     font-size: 14px;
 }
 
-.forget label {
+.auth-widget__forget-link label {
     display: flex;
     align-items: center;
     gap: 5px;
     cursor: pointer;
 }
 
-.forget a { color: #bbb; text-decoration: none; }
-.forget a:hover { text-decoration: underline; }
+.auth-widget__forget-link a { color: #bbb; text-decoration: none; }
+.auth-widget__forget-link a:hover { text-decoration: underline; }
 
-.input-field {
+.auth-widget__input-field {
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
 }
 
-.input-field label {
+.auth-widget__input-field label {
     margin-bottom: 5px;
     font-size: 14px;
 }
 
-.input-field input {
+.auth-widget__input-field input {
     padding: 10px;
     border: 1px solid #333;
     border-radius: 8px;
@@ -81,7 +67,7 @@
     font-size: 14px;
 }
 
-.input-field input:focus {
+.auth-widget__input-field input:focus {
     outline: none;
     border-color: #555;
 }

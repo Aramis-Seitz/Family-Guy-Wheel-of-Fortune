@@ -19,7 +19,7 @@ export interface SpinToken {
 export interface SavedLink {
   id: string;
   user_id: string;
-  link_name: string;
+  wheel_title: string;
   url: string;
   created_at: string;
 }

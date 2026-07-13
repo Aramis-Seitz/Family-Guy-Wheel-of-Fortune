@@ -1,19 +1,25 @@
 import { isMultiplayerActive } from "../room.js";
 import { awardCoins } from "../api/spin-api.js";
-import { getNames, removeNameByIndex } from "../names/name-list.js";
+import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
 import { showToast } from "../shared/toast.js";
-import { winnerModal, closeWinnerModalBtn, removeWinnerBtn, winnerText, confettiCanvas } from "../shared/dom.js";
-import { POINTER_OFFSET_DEG, FULL_CIRCLE_DEG } from "../shared/constants.js";
-import type { SpinConfig } from "../shared/types.js";
+import { requiredElement } from "../shared/dom-helpers.js";
+import type { SpinConfig } from "./spin.js";
+
+export const POINTER_OFFSET_DEG: number = 270;
+export const FULL_CIRCLE_DEG: number = 360;
 
 export function resolveWinner(rotation: number, config: SpinConfig): string {
   const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
   const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
   return config.names[winnerIndex] ?? config.names[0];
 }
+
+export const winnerModal = requiredElement<HTMLDivElement>("winner-modal");
+export const winnerText = requiredElement<HTMLParagraphElement>("winner-modal-text");
+export const removeWinnerBtn = requiredElement<HTMLButtonElement>("winner-modal-remove-btn");
 
 export function displayWinnerModal(winnerName: string): void {
   if (!winnerModal || !winnerText) return;
@@ -32,6 +38,8 @@ export function hideWinnerModal(): void {
   if (!winnerModal) return;
   winnerModal.classList.add("hidden");
 }
+
+const confettiCanvas = requiredElement<HTMLCanvasElement>("winner-modal-confetti-canvas");
 
 function startConfetti(): void {
   if (!confettiCanvas) return;
@@ -110,7 +118,7 @@ export function announceWinner(spinToken: string, winnerName: string): void {
 function removeWinner(): void {
   if (!lastWinnerName) return;
   const removedName = lastWinnerName;
-  const names = getNames();
+  const names = getNamesInWheelList();
   const index = names.indexOf(removedName);
 
   if (index < 0) {
@@ -126,10 +134,12 @@ function removeWinner(): void {
     });
   }
 
-  removeNameByIndex(index);
+  removeNameFromListByIndex(index);
   hideWinnerModal();
   resetWheelRotation();
 }
+
+const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("winner-modal-close-btn");
 
 export function initWinnerModal(): void {
   if (!winnerModal || !closeWinnerModalBtn) return;

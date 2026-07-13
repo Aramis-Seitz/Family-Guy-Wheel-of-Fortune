@@ -1,4 +1,4 @@
-.Rechtliches {
+.legal-links {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -8,7 +8,7 @@
     z-index: 9999;
 }
 
-.btn-Imp, .btn-DaS {
+.legal-links__link--imprint, .legal-links__link--privacy {
     background: transparent;
     border: 1px solid rgba(255,255,255,0.3);
     color: rgba(255,255,255,0.6);
@@ -20,7 +20,7 @@
     transition: all 0.2s;
 }
 
-.btn-Imp:hover, .btn-DaS:hover {
+.legal-links__link--imprint:hover, .legal-links__link--privacy:hover {
     border-color: rgba(255,255,255,0.8);
     color: white;
 }

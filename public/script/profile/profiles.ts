@@ -1,14 +1,16 @@
 import { supabaseClient } from "../shared/supabase-client.js";
-import { profileName, authButton, coinDisplay } from "../shared/dom.js";
-import { ProfileData } from "../shared/types.js";
+import { optionalElement } from "../shared/dom-helpers.js";
 import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { nameState } from "../names/name-state.js";
-import { isNameEditingLocked } from "../names/name-list.js";
+import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-state.js";
+import { isNameEditingLocked } from "../names/names-in-wheel-list.js";
 import { isSpinning } from "../wheel/spin.js";
 import { showToast } from "../shared/toast.js";
-import { MAX_ITEMS } from "../shared/constants.js";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
 import { notifyAccountChanged } from "../shared/auth-channel.js";
+
+export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
+export const authButton = optionalElement<HTMLButtonElement>("auth-button");
+export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -31,6 +33,11 @@ function applyCoinDisplay(coins: number): void {
   coinDisplay.style.display = "inline";
 }
 
+interface ProfileData {
+  username: string;
+  coins: number;
+}
+
 function applyAuthenticatedState(profile: ProfileData | null): void {
   if (!profileName || !authButton) return;
   const username = profile?.username ?? "Eingeloggt";
@@ -40,11 +47,11 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
     applyCoinDisplay(profile.coins ?? 0);
   }
 
-  profileName.classList.add("is-clickable");
+  profileName.classList.add("user-profile-name--clickable");
   profileName.title = "Klick — zum Rad hinzufügen";
   profileName.addEventListener("click", () => {
     if (isNameEditingLocked() || isSpinning()) return;
-    if (!nameState.addName(username)) {
+    if (!namesInWheelListState.addNameToWheelList(username)) {
       showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: "error" });
       return;
     }

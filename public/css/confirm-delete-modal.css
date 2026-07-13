@@ -1,0 +1,94 @@
+/* ── Confirm Delete Modal ── */
+#confirm-delete-modal {
+    border: none;
+    border-radius: 14px;
+    background: #1a1f2e;
+    color: #fff;
+    padding: 0;
+    width: min(360px, 92vw);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#confirm-delete-modal::backdrop {
+    background: rgba(0, 0, 0, .5);
+    backdrop-filter: blur(3px);
+}
+
+.confirm-delete-modal__inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.confirm-delete-modal__header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.confirm-delete-modal__header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.confirm-delete-modal__body {
+    padding: 20px;
+    font-size: 0.9rem;
+    color: #aaa;
+    line-height: 1.5;
+}
+
+.confirm-delete-modal__body strong {
+    color: #fff;
+    font-weight: 700;
+}
+
+.confirm-delete-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#confirm-delete-modal-cancel-btn {
+    background: none;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #aaa;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-family: 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+#confirm-delete-modal-cancel-btn:hover {
+    color: #fff;
+    border-color: #888;
+}
+
+#confirm-delete-modal-confirm-btn {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: filter .15s, transform .15s;
+}
+
+#confirm-delete-modal-confirm-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+#confirm-delete-modal-confirm-btn:active {
+    transform: translateY(0);
+}

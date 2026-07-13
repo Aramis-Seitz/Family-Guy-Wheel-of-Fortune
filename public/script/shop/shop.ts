@@ -1,16 +1,14 @@
-import { closeOnBackdropClick, shopBtn, shopCloseBtn, shopModal, shopCoinBalance, shopTabs } from "../shared/dom.js";
-import { Asset, AssetCategory } from "../shared/types.js";
-import { ASSET_CATEGORIES } from "../shared/constants.js";
+import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
 import { loadShopAssets } from "./shop-assets.js";
+import type { Asset } from "shared";
 import { getShopAssets } from "../api/shop-api.js";
 import { getUserCoins } from "../api/user-api.js";
 import { supabaseClient } from "../shared/supabase-client.js";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
-let currentAssets: Asset[] = [];
-
-
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
+
+export const shopModal = requiredElement<HTMLDialogElement>("shop-modal");
 
 async function openShop(): Promise<void> {
     shopModal.showModal();
@@ -21,12 +19,20 @@ function closeShop(): void {
     shopModal.close();
 }
 
+export const shopBtn = requiredElement<HTMLButtonElement>("shop-btn");
+export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
+
 export function initShop(): void {
     shopBtn.addEventListener("click", openShop);
     shopCloseBtn.addEventListener("click", closeShop);
     closeOnBackdropClick(shopModal, closeShop);
     subscribeToCoinUpdates();
 }
+
+export const ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;
+export type AssetCategory = typeof ASSET_CATEGORIES[number];
+
+let currentAssets: Asset[] = [];
 
 async function refreshShop(): Promise<void> {
     currentAssets = await getShopAssets();
@@ -40,6 +46,8 @@ async function refreshShop(): Promise<void> {
 // ----- COIN BALANCE -----
 
 export let balance = 0;
+
+export const shopCoinBalance = requiredElement<HTMLDivElement>("shop-modal-coin-balance");
 
 export function renderCoinBalance(): void {
     if (!shopCoinBalance) return;
@@ -76,6 +84,8 @@ async function subscribeToCoinUpdates(): Promise<void> {
 
 
 // ----- CATEGORY-TABS UND FILTER-FUNKTIONALITÄT -----
+
+export const shopTabs = requiredElement<HTMLElement>("shop-modal-tabs");
 
 function createShopTabButton(category: AssetCategory | "all"): HTMLButtonElement {
     const button = document.createElement("button");

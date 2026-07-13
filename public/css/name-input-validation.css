@@ -1,4 +1,4 @@
-#nameInput.name-input-invalid {
+#name-input.name-input--invalid {
     border: 1px solid var(--color-error, #e74c3c);
     box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.14);
 }

@@ -1,9 +1,6 @@
-import { volumeSlider } from "../shared/dom.js";
+import { volumeSlider } from "./volume.js";
 
-let drumrollStarted = false;
 let tickBuffer: AudioBuffer | null = null;
-let drumrollBuffer: AudioBuffer | null = null;
-let cymbalBuffer: AudioBuffer | null = null;
 
 export let masterGain: GainNode | null = null;
 
@@ -128,10 +125,13 @@ function getCurrentVolume(): number {
   return volumeSlider ? parseInt(volumeSlider.value) / 100 : 1;
 }
 
+let drumrollBuffer: AudioBuffer | null = null;
+let cymbalBuffer: AudioBuffer | null = null;
+
 export async function preloadStaticSounds(): Promise<void> {
   [drumrollBuffer, cymbalBuffer] = await Promise.all([
-    loadBuffer("/assets/sounds/drumroll.mp3"),
-    loadBuffer("/assets/sounds/cymbal-crash.mp3"),
+    loadBuffer("/resources/sounds/drumroll.mp3"),
+    loadBuffer("/resources/sounds/cymbal-crash.mp3"),
   ]);
 }
 
@@ -139,6 +139,8 @@ export async function preloadStaticSounds(): Promise<void> {
 const DRUMROLL_FADE = 0.2;
 let drumrollSource: AudioBufferSourceNode | null = null;
 let drumrollGain: GainNode | null = null;
+let drumrollStarted = false;
+
 
 export function playDrumRoll(): void {
   if (!drumrollBuffer || drumrollStarted) return;

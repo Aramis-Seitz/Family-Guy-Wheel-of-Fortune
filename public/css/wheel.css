@@ -1,9 +1,9 @@
-#svg {
+#wheel-svg {
     width: 500px;
     height: 500px;
 }
 
-#wheelEmptyHint {
+#wheel-empty-hint {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -22,7 +22,7 @@
     z-index: 2;
 }
 
-#wheelEmptyHint::after {
+#wheel-empty-hint::after {
     content: "";
     position: absolute;
     left: -10px;
@@ -39,20 +39,20 @@
     position: relative;
 }
 
-.centered-input-overlay.host-disabled {
+.name-centered-input.name-centered-input--host-disabled {
     opacity: 0.6;
 }
 
-.centered-input-overlay.host-disabled input,
-.centered-input-overlay.host-disabled button {
+.name-centered-input.name-centered-input--host-disabled input,
+.name-centered-input.name-centered-input--host-disabled button {
     cursor: not-allowed;
 }
 
-#wheelEmptyHint.hidden {
+#wheel-empty-hint.hidden {
     display: none;
 }
 
-#companion-image {
+#wheel-companion-image {
     justify-self: end;
     height: 350px;
 }
@@ -60,78 +60,4 @@
 #wheel {
     transform-box: fill-box;
     transform-origin: center;
-}
-
-#winner {
-    margin-top: 20px;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-}
-
-.multiplier-container {
-    position: fixed;
-    top: 20px;
-    left: 10px;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10px;
-    border-radius: 8px;
-}
-
-.multiplier-container label {
-    color: white;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.multiplier-header {
-    display: flex;
-    align-items: left;
-    gap: 8px;
-    margin-bottom: 5px;
-}
-
-.volume-container {
-    position: fixed;
-    top: 100px;
-    left: 10px;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10px;
-    border-radius: 8px;
-}
-
-.volume-header {
-    display: flex;
-    align-items: left;
-    gap: 8px;
-    margin-bottom: 5px;
-}
-
-.volume-container label {
-    color: white;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 0;
-}
-
-.volume-icon-btn {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0;
-    min-width: 24px;
-    transition: transform 0.1s;
-    flex-shrink: 0;
-}
-
-.volume-icon-btn:hover {
-    transform: scale(1.15);
-}
-
-.volume-icon-btn:active {
-    transform: scale(0.95);
 }

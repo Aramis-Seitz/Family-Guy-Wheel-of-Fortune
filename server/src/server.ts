@@ -7,10 +7,10 @@ dotenv.config({ path: path.join(envDir, '.env') });
 
 import express from "express";
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
-import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { mockRouter } from "./mock/routes";
 import { apiRoutes } from "./routes";
+import { requireBasicAuthExpress } from "./lib/basic-auth";
 
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
@@ -30,36 +30,10 @@ const corsOptions = {
   credentials: true,
 };
 
-function requireBasicAuth(req: Request, res: Response, next: NextFunction): void {
-  const validUser = process.env.AUTH_USER;
-  const validPwd = process.env.AUTH_PWD;
-
-  if (!validUser || !validPwd) {
-    next();
-    return;
-  }
-
-  const header = req.headers.authorization ?? '';
-  const b64 = header.replace(/^Basic\s+/i, '');
-
-  if (b64) {
-    const decoded = Buffer.from(b64, 'base64').toString('utf-8');
-    const colonIndex = decoded.indexOf(':');
-    const inputUser = decoded.slice(0, colonIndex);
-    const inputPwd = decoded.slice(colonIndex + 1);
-    if (inputUser === validUser && inputPwd === validPwd) {
-      return next();
-    }
-  }
-
-  res.setHeader('WWW-Authenticate', 'Basic realm="Wheeel"');
-  res.status(401).send('Unauthorized');
-}
-
 app.use(express.json());
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
-app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuth);
+app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthExpress);
 app.use(express.static(path.resolve(__dirname, "../../public/dist/html")));
 app.use(express.static(path.resolve(__dirname, "../../public/dist")));
 app.use('/api', apiRoutes);
@@ -67,7 +41,6 @@ app.use('/api', apiRoutes);
 if (USE_MOCK) {
   app.use('/api/mock', mockRouter);
 }
-
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {

@@ -84,8 +84,8 @@ mockRouter.get('/saved_wheels/:userId', (req, res) => {
 });
 
 mockRouter.post('/saved_wheels', (req, res) => {
-  const { user_id, link_name, url } = req.body ?? {};
-  const link = createSavedLink({ user_id, link_name, url });
+  const { user_id, wheel_title, url } = req.body ?? {};
+  const link = createSavedLink({ user_id, wheel_title, url });
   res.json(link);
 });
 

@@ -1,9 +1,9 @@
-import { profileName } from "../shared/dom.js";
+import { profileName } from "../profile/profiles.js";
 import { applyActiveAssets } from "../shared/asset-selection.js";
 import { ensureDefaultAssets } from "../api/user-api.js";
 import { initInventory } from "../inventory/inventory.js";
-import { initNameList } from "../names/name-list.js";
-import { initShareFeature } from "../names/share-name-list.js";
+import { initNamesInWheelList } from "../names/names-in-wheel-list.js";
+import { initShareFeature } from "../names/share-names-in-wheel-list.js";
 import { initProfileUI } from "../profile/profiles.js";
 import { initWheelControls, setResetOverride } from "../wheel/spin.js";
 import { initMultiplierSlider } from "../wheel/multiplier.js";
@@ -18,7 +18,7 @@ import { initAuthChannelListener } from "../shared/auth-channel.js";
 async function initApp(): Promise<void> {
   if (await redirectIfNoSession()) return;
   initRoomUnloadGuard(() => activeRoomKey);
-  initNameList();
+  initNamesInWheelList();
   initNameControls();
   initMultiplierSlider();
   initVolumeSlider();

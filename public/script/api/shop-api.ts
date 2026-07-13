@@ -1,21 +1,6 @@
 import { getJson, postJson } from "./api-helpers.js";
-import type { Asset, AssetCategory } from "../shared/types.js";
-
-
-type AssetsResponseBody = {
-    assets?: Asset[];
-};
-
-type OwnedAssetIdsResponseBody = {
-    assetIds?: string[];
-};
-
-type PurchaseResponseBody = {
-    success?: boolean;
-    coins?: number;
-    assetId?: string;
-};
-
+import { AssetsResponseSchema, AssetIdsResponseSchema, PurchaseResponseSchema } from "shared";
+import type { Asset } from "shared";
 
 export type PurchaseAssetResult = {
     success: boolean;
@@ -24,17 +9,19 @@ export type PurchaseAssetResult = {
 };
 
 export async function getShopAssets(): Promise<Asset[]> {
-    const body = await getJson<AssetsResponseBody>("/api/shop/assets", {
+    const rawBody = await getJson("/api/shop/assets", {
         errorFallback: "Shop-Assets konnten nicht geladen werden"
     });
-    return Array.isArray(body.assets) ? body.assets : [];
+    const body = AssetsResponseSchema.parse(rawBody);
+    return body.assets;
 }
 
 export async function getOwnedAssetIds(): Promise<string[]> {
-    const body = await getJson<OwnedAssetIdsResponseBody>("/api/shop/owned-asset-ids", {
+    const rawBody = await getJson("/api/shop/owned-asset-ids", {
         errorFallback: "Asset-IDs konnten nicht geladen werden"
     });
-    return Array.isArray(body.assetIds) ? body.assetIds : [];
+    const body = AssetIdsResponseSchema.parse(rawBody);
+    return body.assetIds;
 }
 
 export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResult> {
@@ -42,13 +29,14 @@ export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResul
         throw new Error("assetId is required");
     }
 
-    const body = await postJson<PurchaseResponseBody>("/api/shop/purchase", { assetId }, {
+    const rawBody = await postJson("/api/shop/purchase", { assetId }, {
         errorFallback: "Asset konnte nicht gekauft werden"
     });
+    const body = PurchaseResponseSchema.parse(rawBody);
 
     return {
-        success: body.success === true,
-        coins: typeof body.coins === "number" ? body.coins : null,
-        assetId: typeof body.assetId === "string" && body.assetId ? body.assetId : assetId
+        success: body.success,
+        coins: body.coins,
+        assetId: body.assetId,
     };
 }

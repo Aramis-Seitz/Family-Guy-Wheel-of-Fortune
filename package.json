@@ -3,17 +3,22 @@
   "private": true,
   "workspaces": [
     "public",
-    "server"
+    "server",
+    "shared"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace server\" \"npm run build --workspace public\"",
-    "build": "npm run build --workspace server && npm run build --workspace public",
+    "postinstall": "npm run build --workspace shared",
+    "dev": "concurrently \"npm run dev --workspace shared\" \"npm run dev --workspace server\" \"npm run build --workspace public\"",
+    "build": "npm run build --workspace shared && npm run build --workspace server && npm run build --workspace public",
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "concurrently": "^8.0.0",
+    "eslint": "^10.6.0",
+    "typescript-eslint": "^8.63.0",
     "vitest": "^4.1.8"
   },
   "dependencies": {

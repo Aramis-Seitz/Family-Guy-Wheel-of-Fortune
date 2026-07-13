@@ -1,5 +1,4 @@
 import { supabaseClient } from "../shared/supabase-client.js";
-import { HttpMethod, RequestOptions } from "../shared/types.js";
 import { apiUrl } from "../shared/api-base.js";
 
 
@@ -32,6 +31,14 @@ export async function getAccessToken(): Promise<string> {
     const { data: { session } } = await supabaseClient.auth.getSession();
     return session?.access_token ?? '';
 }
+
+type HttpMethod = 'GET' | 'POST';
+
+type RequestOptions = {
+    token?: string;
+    keepalive?: boolean;
+    errorFallback?: string;
+};
 
 async function request<T>(method: HttpMethod,
     path: string,

@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { handleEnsureDefaultAssets, handleRegisterUser, handleSubtractCoins, handleGetUserCoins, handleSetUserCoins, handleUserProfile } from "../controllers/user-controller";
+import {
+    handleEnsureDefaultAssets,
+    handleRegisterUser,
+    handleSubtractCoins,
+    handleGetUserCoins,
+    handleSetUserCoins,
+    handleUserProfile
+} from "../controllers/user-controller";
 
 export const userRoutes = Router();
 

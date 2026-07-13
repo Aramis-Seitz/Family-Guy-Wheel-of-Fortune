@@ -1,42 +1,27 @@
-import { FULL_CIRCLE_RADIANS, INVENTORY_LIMIT, SVG_NS, MINI_CENTER, MINI_RADIUS, INVENTORY_CATEGORIES, ASSET_CATEGORIES } from "../shared/constants.js";
-import {
-  addItemModal,
-  addItemInput,
-  cancelAddItemBtn,
-  closeAddItemBtn,
-  confirmAddItemBtn,
-  confirmDeleteBtn,
-  confirmDeleteModal,
-  confirmDeleteName,
-  inventoryBtn,
-  inventoryCloseBtn,
-  inventoryWheelGrid,
-  inventoryModal,
-  cancelDeleteBtn,
-  closeOnBackdropClick,
-  inventoryTabs,
-  inventoryAssetGrid
-} from "../shared/dom.js";
-import { supabaseClient, fetchCurrentUser } from "../shared/supabase-client.js";
-import { generateShareLink } from "../names/share-name-list.js";
-import { replaceNames } from "../names/name-list.js";
-import { SavedWheel, Asset, InventoryCategory } from "../shared/types.js";
-import { getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
+import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
+import { ASSET_CATEGORIES } from "../shop/shop.js";
+import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
+import { generateShareLink } from "../names/share-names-in-wheel-list.js";
+import { replaceNames } from "../names/names-in-wheel-list.js";
+import type { SavedWheel, Asset } from "shared";
 import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
-import { getOwnedAssets, deleteSavedWheel, getSavedWheels } from "../api/inventory-api.js";
+import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api.js";
 import { ApiError } from "../api/api-helpers.js"
-
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
 
+const confirmDeleteName = requiredElement<HTMLElement>("confirm-delete-modal-name");
+const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirm-delete-modal");
 
 function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
   confirmDeleteName.textContent = title;
   confirmDeleteModal.showModal();
 }
+
+const inventoryModal = requiredElement<HTMLDialogElement>("inventory-modal");
 
 async function openInventoryModal(): Promise<void> {
   await loadInventory();
@@ -50,8 +35,7 @@ async function confirmDeleteWheel(): Promise<void> {
   pendingDeleteId = null;
 
   try {
-    const success = await deleteSavedWheel(id);
-    if (!success) throw new Error("Rad konnte nicht gelöscht werden.");
+    await deleteSavedWheel(id);
     await loadInventory();
     showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
   } catch (error) {
@@ -65,6 +49,9 @@ function cancelDelete(): void {
   pendingDeleteId = null;
 }
 
+const addItemInput = requiredElement<HTMLInputElement>("add-item-input");
+const addItemModal = requiredElement<HTMLDialogElement>("add-item-modal");
+
 function openAddItemModal(): void {
   if (!inventoryModal.open) return;
 
@@ -77,6 +64,9 @@ function openAddItemModal(): void {
 function closeAddItemModal(): void {
   addItemModal.close();
 }
+
+const inventoryWheelGrid = requiredElement<HTMLElement>("inventory-modal-wheel-grid");
+const INVENTORY_LIMIT: number = 12;
 
 function renderInventoryWheels(items: SavedWheel[]): void {
   inventoryWheelGrid.innerHTML = "";
@@ -97,8 +87,8 @@ function renderInventoryWheels(items: SavedWheel[]): void {
 
 function createAddCard(): HTMLDivElement {
   const card = document.createElement("div");
-  card.className = "inventory-card add";
-  card.id = "addCardBtn";
+  card.className = "inventory-modal__card inventory-modal__card--add";
+  card.id = "inventory-modal-add-card-btn";
   card.textContent = "+";
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
@@ -114,14 +104,14 @@ function createAddCard(): HTMLDivElement {
 
 function createEmptyCard(): HTMLDivElement {
   const card = document.createElement("div");
-  card.className = "inventory-card empty";
+  card.className = "inventory-modal__card inventory-modal__card--empty";
   return card;
 }
 
 function createItemCard(item: SavedWheel): HTMLElement {
   const hasValidLink = (item.link ?? "").trim() !== "";
   const card = document.createElement("div");
-  card.classList.add("inventory-card");
+  card.classList.add("inventory-modal__card");
 
   if (hasValidLink) {
     card.setAttribute("role", "button");
@@ -152,7 +142,7 @@ function createItemCard(item: SavedWheel): HTMLElement {
 
 function buildCardContent(item: SavedWheel): HTMLDivElement {
   const content = document.createElement("div");
-  content.className = "inventory-card-content";
+  content.className = "inventory-modal__card-content";
 
   const names = extractNamesFromLink(item.link);
   if (names.length >= 2) {
@@ -166,7 +156,7 @@ function buildCardContent(item: SavedWheel): HTMLDivElement {
   content.appendChild(heading);
 
   const date = document.createElement("p");
-  date.className = "inventory-date";
+  date.className = "inventory-modal__card-date";
   date.textContent = formatDate(item.created_at);
 
   content.appendChild(date);
@@ -176,7 +166,7 @@ function buildCardContent(item: SavedWheel): HTMLDivElement {
 
 function createDeleteButton(item: SavedWheel): HTMLButtonElement {
   const btn = document.createElement("button");
-  btn.className = "inventory-delete-btn";
+  btn.className = "inventory-modal__card-delete-btn";
   btn.setAttribute("aria-label", "Eintrag löschen");
   btn.textContent = "🗑️";
   btn.addEventListener("click", (e: MouseEvent) => {
@@ -204,39 +194,33 @@ async function submitItem(): Promise<void> {
     return;
   }
 
-  const user = await fetchCurrentUser();
-  if (!user) return;
-
-  const { error } = await supabaseClient
-    .from("saved_wheels")
-    .insert({
-      user_id: user.id,
-      link_name: name,
-      url: generateShareLink()
-    });
-
-  if (error) {
-    console.error("Fehler beim Speichern:", error);
+  try {
+    await saveSavedWheels(name, generateShareLink());
+    closeAddItemModal();
+    await loadInventory();
     showToast({
-      message: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
-      type: "error"
+      message: `"${name}" wurde erfolgreich gespeichert.`,
+      type: "success"
     });
-    return;
+  } catch (error) {
+    const message = error instanceof ApiError ? error.message : "Speichern fehlgeschlagen. Bitte versuche es erneut.";
+    showToast({ message, type: "error" });
   }
-
-  closeAddItemModal();
-  await loadInventory();
-  showToast({
-    message: `"${name}" wurde erfolgreich gespeichert.`,
-    type: "success"
-  });
 }
+
+const inventoryBtn = requiredElement<HTMLButtonElement>("inventory-btn");
+const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventory-modal-close-btn");
+const confirmAddItemBtn = requiredElement<HTMLButtonElement>("add-item-modal-confirm-btn");
+const cancelAddItemBtn = requiredElement<HTMLButtonElement>("add-item-modal-cancel-btn");
+const closeAddItemBtn = requiredElement<HTMLButtonElement>("add-item-modal-close-btn");
+const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-confirm-btn");
+const cancelDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-cancel-btn");
 
 export function initInventory(): void {
   inventoryBtn.addEventListener("click", openInventoryModal);
   inventoryCloseBtn.addEventListener("click", () => inventoryModal.close());
   inventoryModal.addEventListener("click", (e) => {
-    const inner = inventoryModal.querySelector(".inventory-content");
+    const inner = inventoryModal.querySelector(".inventory-modal__content");
     if (inner && !inner.contains(e.target as Node)) {
       inventoryModal.close();
     }
@@ -283,6 +267,9 @@ function formatDate(dateString: string): string {
     year: "2-digit",
   }).format(date);
 }
+
+const MINI_CENTER = { x: 100, y: 100 };
+const MINI_RADIUS = 90;
 
 function createMiniSegment(index: number, count: number): SVGPathElement {
   const angleStep = FULL_CIRCLE_RADIANS / count;
@@ -361,6 +348,9 @@ function createMiniLabel(
   return text;
 }
 
+export const inventoryAssetGrid = requiredElement<HTMLElement>("inventory-modal-asset-grid");
+const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
+
 export function loadInventoryByCategory(): void {
   inventoryAssetGrid.innerHTML = "";
   inventoryWheelGrid.innerHTML = "";
@@ -375,6 +365,9 @@ export function loadInventoryByCategory(): void {
   isWheel ? loadWheelCards() : loadOwnedAssets(activeCategory);
 }
 
+
+export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
+export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
 
 export function getClickedInventoryCategory(inventoryTab: HTMLElement | null): InventoryCategory | null {
   if (inventoryTab?.tagName === "BUTTON" && inventoryTab.dataset.category) {

@@ -1,12 +1,9 @@
+import { z } from "zod";
 import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { generateSpin, awardCoins } from "../services/spin-service";
 import { sendUnexpectedError } from "./response";
-import type { HttpRequest, HttpResponse } from "../types/http";
-
-type AwardCoinsBody = {
-    spinToken?: string;
-    winnerName?: string;
-};
+import type { HttpRequest, HttpResponse } from "./response";
+import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 
 export async function handleGenerateSpin(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -17,11 +14,16 @@ export async function handleGenerateSpin(req: HttpRequest, res: HttpResponse): P
         }
 
         const result = await generateSpin(userId);
-        res.status(200).json(result);
+        res.status(200).json(SpinRandomResponseSchema.parse(result));
     } catch (error) {
         sendUnexpectedError(res, error);
     }
 }
+
+const AwardCoinsRequestSchema = z.object({
+    spinToken: z.string().min(1),
+    winnerName: z.string().min(1),
+});
 
 export async function handleAwardCoins(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
@@ -31,14 +33,14 @@ export async function handleAwardCoins(req: HttpRequest, res: HttpResponse): Pro
             return;
         }
 
-        const { spinToken, winnerName } = (req.body ?? {}) as AwardCoinsBody;
-        if (!spinToken || !winnerName) {
+        const parsedBody = AwardCoinsRequestSchema.safeParse(req.body);
+        if (!parsedBody.success) {
             res.status(400).json({ error: "Missing spinToken or winnerName" });
             return;
         }
 
-        const result = await awardCoins(userId, spinToken, winnerName);
-        res.status(200).json(result);
+        const result = await awardCoins(userId, parsedBody.data.spinToken, parsedBody.data.winnerName);
+        res.status(200).json(AwardCoinsResponseSchema.parse(result));
     } catch (error) {
         sendUnexpectedError(res, error);
     }

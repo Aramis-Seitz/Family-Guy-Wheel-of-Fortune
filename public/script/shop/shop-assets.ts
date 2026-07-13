@@ -1,9 +1,9 @@
-import { shopTabs, shopGrid } from "../shared/dom.js";
-import { Asset } from "../shared/types.js";
-import { getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop.js"
+import { shopTabs, getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop.js";
 import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api.js";
 import { showToast } from "../shared/toast.js";
 import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
+import { requiredElement } from "../shared/dom-helpers.js";
+import type { Asset } from "shared";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -14,12 +14,14 @@ function isAssetOwned(assetId: string): boolean {
     return currentOwnedAssetIds.includes(assetId);
 }
 
+export const shopGrid = requiredElement<HTMLElement>("shop-modal-grid");
+
 export async function loadShopAssets(): Promise<void> {
     currentOwnedAssetIds = await getOwnedAssetIds();
     shopGrid.innerHTML = "";
     const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
-    let activeCategory = getClickedCategory(activeTab) || "all";
-    let filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
+    const activeCategory = getClickedCategory(activeTab) || "all";
+    const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => shopGrid.appendChild(createAssetCard(asset)));
 }
 
@@ -30,8 +32,8 @@ function createAssetCard(asset: Asset): HTMLElement {
     const assetCard = document.createElement("div");
     assetCard.className = "shop-modal__asset-card";
 
-    if (owned) assetCard.classList.add("shop-modal__asset-card__owned");
-    if (tooExpensive && !owned) assetCard.classList.add("shop-modal__asset-card__too-expensive");
+    if (owned) assetCard.classList.add("shop-modal__asset-card--owned");
+    if (tooExpensive && !owned) assetCard.classList.add("shop-modal__asset-card--too-expensive");
 
     assetCard.appendChild(createAssetHeader(asset));
     assetCard.appendChild(createAssetFooter(asset, owned, tooExpensive));

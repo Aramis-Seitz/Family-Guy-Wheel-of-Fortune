@@ -1,9 +1,9 @@
-import { volumeSlider, volumeValue, volumeIcon } from "../shared/dom.js";
+import { requiredElement } from "../shared/dom-helpers.js";
 import { masterGain } from "./sound.js";
 
-const VOLUME_STORAGE_KEY = "wheelOfFortune_volume";
-const PREVIOUS_VOLUME_KEY = "wheelOfFortune_previousVolume";
-let previousVolume: number | null = null;
+export const volumeSlider = requiredElement<HTMLInputElement>("volume-slider");
+export const volumeValue = requiredElement<HTMLSpanElement>("volume-value");
+export const volumeIcon = requiredElement<HTMLButtonElement>("volume-icon");
 
 export function updateVolumeDisplay(): void {
     if (!volumeSlider || !volumeValue || !volumeIcon) return;
@@ -24,10 +24,15 @@ export function updateVolumeDisplay(): void {
     applyVolumeToAudio(volume / 100);
 }
 
+let previousVolume: number | null = null;
+const PREVIOUS_VOLUME_KEY = "wheelOfFortune_previousVolume";
+
 function savePreviousVolume(volume: number): void {
     previousVolume = volume;
     localStorage.setItem(PREVIOUS_VOLUME_KEY, volume.toString());
 }
+
+const VOLUME_STORAGE_KEY = "wheelOfFortune_volume";
 
 function onSliderChange(): void {
     if (!volumeSlider) return;

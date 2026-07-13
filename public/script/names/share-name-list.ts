@@ -1,10 +1,10 @@
+import { shareBtn } from "../shared/dom";
 import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier";
-import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list";
+import { getNames, replaceNames } from "./name-list";
 import { showToast } from "../shared/toast";
-import { requiredElement } from "../shared/dom-helpers";
 
 export function generateShareLink(): string {
-    const names = getNamesInWheelList();
+    const names = getNames();
     const encodedNames = encodeURIComponent(JSON.stringify(names));
     const sliderValue = getMultiplier()
     return `${window.location.origin}${window.location.pathname}?names=${encodedNames}&power=${sliderValue}`;
@@ -37,8 +37,6 @@ export function loadInformationFromUrl(): void {
     setMultiplierSlider(powerValue);
     updateMultiplierDisplay();
 }
-
-const shareBtn = requiredElement<HTMLButtonElement>("share-names-in-wheel-list-btn");
 
 export function initShareFeature(): void {
     console.log("initShareFeature loaded");

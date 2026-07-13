@@ -1,26 +1,26 @@
-import { supabaseClient } from './shared/supabase-client.js';
+import { supabaseClient } from './shared/supabase-client';
 import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { optionalElement } from "./shared/dom-helpers.js";
+import { optionalElement } from "./shared/dom-helpers";
 import {
   addNameToList, getNamesInWheelList, replaceNames,
   lockNameEditing, unlockNameEditing, setOnNameInWheelListRemoved,
   setMultiplayerMode, addBtn, input,
-} from "./names/names-in-wheel-list.js";
+} from "./names/names-in-wheel-list";
 import {
   spinWheel, setSpinOverride, setResetOverride, lockSpinButtons,
   unlockSpinButtons, resetWheelRotation, isSpinning,
   spinLeftBtn, spinRightBtn, resetBtn,
   MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY,
-} from "./wheel/spin.js";
-import type { Direction } from "./wheel/spin.js";
+} from "./wheel/spin";
+import type { Direction } from "./wheel/spin";
 import {
   getMultiplier, setMultiplierSlider,
   updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider,
   multiplierSlider,
-} from "./wheel/multiplier.js";
-import { hideWinnerModal } from "./wheel/winner.js";
-import { initChat, destroyChat } from "./multiplayer/chat.js";
-import { showToast } from "./shared/toast.js";
+} from "./wheel/multiplier";
+import { hideWinnerModal } from "./wheel/winner";
+import { initChat, destroyChat } from "./multiplayer/chat";
+import { showToast } from "./shared/toast";
 import {
   createRoom,
   leaveRoom,
@@ -30,7 +30,7 @@ import {
   resetRoom,
   updateRoomNames,
   setMultiplier
-} from './api/room-api.js';
+} from './api/room-api';
 
 let myUsername = '';
 

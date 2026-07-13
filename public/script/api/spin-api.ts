@@ -1,5 +1,5 @@
-import { postJson, getAccessToken, ApiError } from "./api-helpers.js";
-import type { Direction } from "../wheel/spin.js";
+import { postJson, getAccessToken, ApiError } from "./api-helpers";
+import type { Direction } from "../wheel/spin";
 import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 

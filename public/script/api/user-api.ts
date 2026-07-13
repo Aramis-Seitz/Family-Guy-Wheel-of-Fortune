@@ -1,4 +1,4 @@
-import { getJson, postJson, ApiError } from "./api-helpers.js";
+import { getJson, postJson, ApiError } from "./api-helpers";
 import { CoinsResponseSchema, ProfileResponseSchema } from "shared";
 
 export async function getUserCoins(): Promise<number> {

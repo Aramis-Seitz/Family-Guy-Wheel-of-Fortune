@@ -1,12 +1,12 @@
-import { isMultiplayerActive } from "../room.js";
-import { awardCoins } from "../api/spin-api.js";
-import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list.js";
-import { stopDrumRoll } from "./sound.js";
-import { resetWheelRotation } from "./spin.js";
-import { refreshCoinDisplay } from "../profile/profiles.js";
-import { showToast } from "../shared/toast.js";
-import { requiredElement } from "../shared/dom-helpers.js";
-import type { SpinConfig } from "./spin.js";
+import { isMultiplayerActive } from "../room";
+import { awardCoins } from "../api/spin-api";
+import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list";
+import { stopDrumRoll } from "./sound";
+import { resetWheelRotation } from "./spin";
+import { refreshCoinDisplay } from "../profile/profiles";
+import { showToast } from "../shared/toast";
+import { requiredElement } from "../shared/dom-helpers";
+import type { SpinConfig } from "./spin";
 
 export const POINTER_OFFSET_DEG: number = 270;
 export const FULL_CIRCLE_DEG: number = 360;

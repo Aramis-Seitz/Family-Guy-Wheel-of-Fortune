@@ -1,18 +1,18 @@
-import { profileName } from "../profile/profiles.js";
-import { applyActiveAssets } from "../shared/asset-selection.js";
-import { ensureDefaultAssets } from "../api/user-api.js";
-import { initInventory } from "../inventory/inventory.js";
-import { initNamesInWheelList } from "../names/names-in-wheel-list.js";
-import { initShareFeature } from "../names/share-names-in-wheel-list.js";
-import { initProfileUI } from "../profile/profiles.js";
-import { initWheelControls, setResetOverride } from "../wheel/spin.js";
-import { initMultiplierSlider } from "../wheel/multiplier.js";
-import { initVolumeSlider } from "../wheel/volume.js";
-import { preloadStaticSounds } from "../wheel/sound.js";
-import { initWinnerModal } from "../wheel/winner.js";
-import { initRoomUnloadGuard, activeRoomKey, initRoomControls, handleLocalReset, initNameControls, setMyUsername, redirectIfNoSession } from "../room.js";
-import { initShop } from "../shop/shop.js";
-import { initAuthChannelListener } from "../shared/auth-channel.js";
+import { profileName } from "../profile/profiles";
+import { applyActiveAssets } from "../shared/asset-selection";
+import { ensureDefaultAssets } from "../api/user-api";
+import { initInventory } from "../inventory/inventory";
+import { initNamesInWheelList } from "../names/names-in-wheel-list";
+import { initShareFeature } from "../names/share-names-in-wheel-list";
+import { initProfileUI } from "../profile/profiles";
+import { initWheelControls, setResetOverride } from "../wheel/spin";
+import { initMultiplierSlider } from "../wheel/multiplier";
+import { initVolumeSlider } from "../wheel/volume";
+import { preloadStaticSounds } from "../wheel/sound";
+import { initWinnerModal } from "../wheel/winner";
+import { initRoomUnloadGuard, activeRoomKey, initRoomControls, handleLocalReset, initNameControls, setMyUsername, redirectIfNoSession } from "../room";
+import { initShop } from "../shop/shop";
+import { initAuthChannelListener } from "../shared/auth-channel";
 
 
 async function initApp(): Promise<void> {

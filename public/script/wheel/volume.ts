@@ -1,5 +1,5 @@
-import { requiredElement } from "../shared/dom-helpers.js";
-import { masterGain } from "./sound.js";
+import { requiredElement } from "../shared/dom-helpers";
+import { masterGain } from "./sound";
 
 export const volumeSlider = requiredElement<HTMLInputElement>("volume-slider");
 export const volumeValue = requiredElement<HTMLSpanElement>("volume-value");

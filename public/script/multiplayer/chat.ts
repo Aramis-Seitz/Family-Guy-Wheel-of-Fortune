@@ -1,4 +1,4 @@
-import { supabaseClient } from '../shared/supabase-client.js';
+import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 const MAX_LENGTH = 200;

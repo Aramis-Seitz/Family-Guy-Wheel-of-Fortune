@@ -1,10 +1,10 @@
-import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory.js"
-import type { InventoryCategory } from "./inventory.js";
+import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory"
+import type { InventoryCategory } from "./inventory";
 import type { Asset } from "shared";
-import { getSelectedAssetIds, selectAsset } from "../api/inventory-api.js";
-import { showToast } from "../shared/toast.js";
-import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
-import { applySelectedAsset } from "../shared/asset-selection.js";
+import { getSelectedAssetIds, selectAsset } from "../api/inventory-api";
+import { showToast } from "../shared/toast";
+import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview";
+import { applySelectedAsset } from "../shared/asset-selection";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----

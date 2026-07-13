@@ -1,7 +1,7 @@
-import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier.js";
-import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list.js";
-import { showToast } from "../shared/toast.js";
-import { requiredElement } from "../shared/dom-helpers.js";
+import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier";
+import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list";
+import { showToast } from "../shared/toast";
+import { requiredElement } from "../shared/dom-helpers";
 
 export function generateShareLink(): string {
     const names = getNamesInWheelList();

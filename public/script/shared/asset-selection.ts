@@ -1,6 +1,6 @@
-import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api.js";
-import { optionalElement } from "./dom-helpers.js";
-import { preloadTickBuffer } from "../wheel/sound.js";
+import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api";
+import { optionalElement } from "./dom-helpers";
+import { preloadTickBuffer } from "../wheel/sound";
 import type { Asset } from "shared";
 
 export async function applyActiveAssets(): Promise<void> {

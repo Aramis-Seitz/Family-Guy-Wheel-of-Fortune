@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireAuth } from "../middleware/require-auth";
 import {
     handleEnsureDefaultAssets,
     handleRegisterUser,
@@ -9,6 +10,8 @@ import {
 } from "../controllers/user-controller";
 
 export const userRoutes = Router();
+
+userRoutes.use(requireAuth);
 
 userRoutes.post("/register", handleRegisterUser);
 userRoutes.post("/ensure-defaults", handleEnsureDefaultAssets);

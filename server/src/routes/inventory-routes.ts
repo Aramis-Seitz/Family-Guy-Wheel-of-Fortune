@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireAuth } from "../middleware/require-auth";
 import {
     handleGetOwnedAssets,
     handleGetSelectedAssetIds,
@@ -9,6 +10,8 @@ import {
 } from "../controllers/inventory-controller";
 
 export const inventoryRoutes = Router();
+
+inventoryRoutes.use(requireAuth);
 
 inventoryRoutes.get("/assets", handleGetOwnedAssets);
 inventoryRoutes.get("/selected-asset-ids", handleGetSelectedAssetIds);

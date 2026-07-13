@@ -8,6 +8,7 @@ export interface HttpRequest {
     body?: unknown;
     query?: unknown;
     params?: Record<string, string | undefined>;
+    userId?: string;
 }
 
 export interface HttpResponse {
@@ -26,4 +27,14 @@ export function sendMethodNotAllowed(res: HttpResponse, allow: string): void {
 export function sendUnexpectedError(res: HttpResponse, error: unknown): void {
     const appError = asAppError(error);
     res.status(appError.statusCode).json({ error: appError.message });
+}
+
+export function asyncHandler(handler: (req: HttpRequest, res: HttpResponse) => Promise<void>) {
+    return async (req: HttpRequest, res: HttpResponse): Promise<void> => {
+        try {
+            await handler(req, res);
+        } catch (error) {
+            sendUnexpectedError(res, error);
+        }
+    };
 }

@@ -2,10 +2,10 @@ import { supabaseClient } from './shared/supabase-client.js';
 import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { optionalElement } from "./shared/dom-helpers.js";
 import {
-  addName, getNames, replaceNames,
-  lockNameEditing, unlockNameEditing, setOnNameRemoved,
+  addNameToList, getNamesInWheelList, replaceNames,
+  lockNameEditing, unlockNameEditing, setOnNameInWheelListRemoved,
   setMultiplayerMode, addBtn, input,
-} from "./names/name-list.js";
+} from "./names/names-in-wheel-list.js";
 import {
   spinWheel, setSpinOverride, setResetOverride, lockSpinButtons,
   unlockSpinButtons, resetWheelRotation, isSpinning,
@@ -168,18 +168,18 @@ let isHost = false;
 export function initNameControls(): void {
   addBtn.addEventListener("click", async () => {
     if (activeRoomKey && isHost) {
-      await addCustomWheelItem(input.value);
+      await addCustomNameToWheel(input.value);
     } else {
-      addName(input.value);
+      addNameToList(input.value);
     }
   });
 
   input.addEventListener("keydown", async (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       if (activeRoomKey && isHost) {
-        await addCustomWheelItem(input.value);
+        await addCustomNameToWheel(input.value);
       } else {
-        addName(input.value);
+        addNameToList(input.value);
       }
     }
   });
@@ -224,9 +224,9 @@ function renderPlayersSidebar(players: string[]): void {
         toggle.disabled = true;
         try {
           if ((roomNames ?? []).includes(name)) {
-            await removePlayerFromWheelItem(name);
+            await removePlayerNameFromWheel(name);
           } else {
-            await addPlayerToWheelItem(name);
+            await addPlayerNameToWheel(name);
           }
         } catch (err) {
           console.error('[ROOM] toggle player failed', err);
@@ -245,7 +245,7 @@ function renderPlayersSidebar(players: string[]): void {
 function syncMultiplayerSpinButtonState(): void {
   if (!activeRoomKey) return;
 
-  const hasEnoughItems = getNames().length >= 2;
+  const hasEnoughItems = getNamesInWheelList().length >= 2;
   const disabled = !hasEnoughItems || !isHost;
 
   [spinLeftBtn, spinRightBtn].forEach((btn) => {
@@ -285,7 +285,7 @@ export const wheelEmptyHint = optionalElement<HTMLDivElement>("wheel-empty-hint"
 
 function updateWheelEmptyState(): void {
   if (!wheelEmptyHint) return;
-  wheelEmptyHint.classList.toggle('hidden', getNames().length > 0);
+  wheelEmptyHint.classList.toggle('hidden', getNamesInWheelList().length > 0);
 }
 
 // Called once when creating or joining a room — sidebar gets the full player
@@ -354,7 +354,7 @@ function clearRoom(): void {
   currentPlayers = [];
   roomNames = [];
   setMultiplayerMode(false);
-  setOnNameRemoved(null);
+  setOnNameInWheelListRemoved(null);
   unlockNameEditing();
   unsubscribeFromRoom();
   setSpinOverride(null);
@@ -385,7 +385,7 @@ function clearRoom(): void {
 function handleRoomSpinEvent(lastSpin: number, multiplier: number, direction: string): void {
   if (isHost) return; // host already spun directly from POST response
   lockSpinButtons();
-  const names = getNames();
+  const names = getNamesInWheelList();
   const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + lastSpin;
   spinWheel(totalSteps, direction as Direction, '', names);
 }
@@ -395,7 +395,7 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   lockSpinButtons();
   try {
-    const names = getNames();
+    const names = getNamesInWheelList();
     const { ranNum, spinToken } = await spinRoom(activeRoomKey, names, direction);
     const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
     spinWheel(totalSteps, direction, spinToken, names);
@@ -428,9 +428,9 @@ function onRoomClosed(): void {
   showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
 }
 
-function setNamesFromRoom(items: string[]): void {
-  roomNames = [...items];
-  replaceNames(items);
+function setNamesFromRoom(names: string[]): void {
+  roomNames = [...names];
+  replaceNames(names);
   updateWheelEmptyState();
   // refresh player sidebar buttons so their toggle state updates
   if (currentPlayers.length > 0) renderPlayersSidebar(currentPlayers);
@@ -438,11 +438,11 @@ function setNamesFromRoom(items: string[]): void {
   syncMultiplayerSpinButtonState();
 }
 
-async function addCustomWheelItem(rawName: string): Promise<void> {
-  const trimmed = rawName.trim();
+async function addCustomNameToWheel(customName: string): Promise<void> {
+  const trimmed = customName.trim();
   if (!trimmed) return;
   if (!activeRoomKey || !isHost) {
-    addName(trimmed);
+    addNameToList(trimmed);
     input.value = '';
     return;
   }
@@ -452,22 +452,22 @@ async function addCustomWheelItem(rawName: string): Promise<void> {
   input.value = '';
 }
 
-async function addPlayerToWheelItem(playerName: string): Promise<void> {
+async function addPlayerNameToWheel(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   const updatedItems = [...(roomNames ?? []), playerName];
   await updateRoomNames(activeRoomKey, updatedItems);
 }
 
-async function removeNameFromWheelItem(itemName: string): Promise<void> {
+async function removeNameFromWheel(name: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   const items = roomNames ?? [];
-  const index = items.findIndex((item) => item === itemName);
+  const index = items.findIndex((item) => item === name);
   if (index < 0) return;
   const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
   await updateRoomNames(activeRoomKey, updatedItems);
 }
 
-async function removePlayerFromWheelItem(playerName: string): Promise<void> {
+async function removePlayerNameFromWheel(playerName: string): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   const items = roomNames ?? [];
   const index = items.findIndex((item) => item === playerName);
@@ -594,8 +594,8 @@ const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confi
 const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-cancel-btn");
 
 export function initRoomControls(): void {
-  setOnNameRemoved(async (removedName: string): Promise<void> => {
-    await removeNameFromWheelItem(removedName);
+  setOnNameInWheelListRemoved(async (removedName: string): Promise<void> => {
+    await removeNameFromWheel(removedName);
   });
 
   bulkAddToWheelBtn?.addEventListener('click', async () => {
@@ -610,7 +610,7 @@ export function initRoomControls(): void {
       showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
       return;
     }
-    if (!activeRoomKey) savedNames = getNames();
+    if (!activeRoomKey) savedNames = getNamesInWheelList();
     if (activeRoomKey) {
       showSwitchRoomConfirm(
         `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
@@ -628,7 +628,7 @@ export function initRoomControls(): void {
       showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
       return;
     }
-    if (!activeRoomKey) savedNames = getNames();
+    if (!activeRoomKey) savedNames = getNamesInWheelList();
     if (activeRoomKey) {
       showSwitchRoomConfirm(
         `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,

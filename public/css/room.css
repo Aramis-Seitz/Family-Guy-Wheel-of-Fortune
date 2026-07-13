@@ -173,7 +173,7 @@
   align-items: center;
 }
 
-.name-centered-input .names__add-row { background: transparent; box-shadow: none; }
+.name-centered-input .names-in-wheel-list__add-row { background: transparent; box-shadow: none; }
 
 .name-centered-input--hidden { display: none !important; }
 

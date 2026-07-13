@@ -1,12 +1,12 @@
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
 import { fetchRandomNumber } from "../api/spin-api.js";
-import { getNames, input, addBtn, getRemoveBtn } from "../names/name-list.js";
+import { getNamesInWheelList, input, addBtn, getRemoveBtn } from "../names/names-in-wheel-list.js";
 import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner.js";
 import { getMultiplier, multiplierSlider } from "./multiplier.js";
 import { wheelElement } from "./renderer.js";
 import { bulkAddToWheelBtn } from "../room.js";
 import { profileName } from "../profile/profiles.js";
-import { MIN_ITEMS } from "../names/name-state.js";
+import { MIN_ITEMS } from "../names/names-in-wheel-list-state.js";
 import { requiredElement } from "../shared/dom-helpers.js";
 
 let spinning = false;
@@ -190,7 +190,7 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {
-  const names = getNames();
+  const names = getNamesInWheelList();
   if (names.length < MIN_ITEMS) return;
 
   lockSpinButtons();

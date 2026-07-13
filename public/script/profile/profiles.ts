@@ -1,8 +1,8 @@
 import { supabaseClient } from "../shared/supabase-client.js";
 import { optionalElement } from "../shared/dom-helpers.js";
 import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { nameState, MAX_ITEMS } from "../names/name-state.js";
-import { isNameEditingLocked } from "../names/name-list.js";
+import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-state.js";
+import { isNameEditingLocked } from "../names/names-in-wheel-list.js";
 import { isSpinning } from "../wheel/spin.js";
 import { showToast } from "../shared/toast.js";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
@@ -51,7 +51,7 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   profileName.title = "Klick — zum Rad hinzufügen";
   profileName.addEventListener("click", () => {
     if (isNameEditingLocked() || isSpinning()) return;
-    if (!nameState.addName(username)) {
+    if (!namesInWheelListState.addNameToWheelList(username)) {
       showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: "error" });
       return;
     }

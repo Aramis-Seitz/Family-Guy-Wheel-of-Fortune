@@ -1,8 +1,8 @@
 import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
 import { ASSET_CATEGORIES } from "../shop/shop.js";
 import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
-import { generateShareLink } from "../names/share-name-list.js";
-import { replaceNames } from "../names/name-list.js";
+import { generateShareLink } from "../names/share-names-in-wheel-list.js";
+import { replaceNames } from "../names/names-in-wheel-list.js";
 import type { SavedWheel, Asset } from "shared";
 import { showToast } from "../shared/toast.js";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"

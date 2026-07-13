@@ -1,6 +1,6 @@
 import { isMultiplayerActive } from "../room.js";
 import { awardCoins } from "../api/spin-api.js";
-import { getNames, removeNameByIndex } from "../names/name-list.js";
+import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list.js";
 import { stopDrumRoll } from "./sound.js";
 import { resetWheelRotation } from "./spin.js";
 import { refreshCoinDisplay } from "../profile/profiles.js";
@@ -118,7 +118,7 @@ export function announceWinner(spinToken: string, winnerName: string): void {
 function removeWinner(): void {
   if (!lastWinnerName) return;
   const removedName = lastWinnerName;
-  const names = getNames();
+  const names = getNamesInWheelList();
   const index = names.indexOf(removedName);
 
   if (index < 0) {
@@ -134,7 +134,7 @@ function removeWinner(): void {
     });
   }
 
-  removeNameByIndex(index);
+  removeNameFromListByIndex(index);
   hideWinnerModal();
   resetWheelRotation();
 }

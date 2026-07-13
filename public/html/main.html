@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../css/volume-slider.css">
     <link rel="stylesheet" href="../css/winner-modal.css">
     <link rel="stylesheet" href="../css/spin.css">
-    <link rel="stylesheet" href="../css/names.css">
+    <link rel="stylesheet" href="../css/names-in-wheel-list.css">
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/asset-card.css">
     <link rel="stylesheet" href="../css/inventory.css">
@@ -34,7 +34,7 @@
     <button class="spin__btn" id="spin-left-btn" type="button">SPIN LEFT</button>
     <button class="spin__btn" id="spin-right-btn" type="button">SPIN RIGHT</button>
     <button id="reset-btn" type="button">RESET</button>
-    <button class="names__share-btn" id="share-name-list-btn">Share >3</button>
+    <button class="names-in-wheel-list__share-btn" id="share-names-in-wheel-list-btn">Share >3</button>
     <button class="inventory-btn" id="inventory-btn">INVENTORY</button>
     <button class="shop-btn" id="shop-btn">SHOP</button>
 
@@ -191,25 +191,25 @@
         </div>
 
         <div class="panel">
-            <div class="names__add-row" id="name-sidebar-add-row">
+            <div class="names-in-wheel-list__add-row" id="name-sidebar-add-row">
                 <input type="text" id="name-input" placeholder="Enter name …" />
-                <button class="names__add-btn" id="add-name-btn">+</button>
+                <button class="names-in-wheel-list__add-btn" id="add-name-btn">+</button>
             </div>
 
-            <ul class="names__list" id="name-list">
-                <li class="names__item"><span class="names__text">Lois</span><button class="names__remove-btn">−</button></li>
-                <li class="names__item"><span class="names__text">Meg</span><button class="names__remove-btn">−</button></li>
+            <ul class="names-in-wheel-list" id="names-in-wheel-list">
+                <li class="names-in-wheel-list-element"><span class="names-in-wheel-list-element__text">Lois</span><button class="names-in-wheel-list-element__remove-btn">−</button></li>
+                <li class="names-in-wheel-list-element"><span class="names-in-wheel-list-element__text">Meg</span><button class="names-in-wheel-list-element__remove-btn">−</button></li>
             </ul>
 
-            <p class="names__error-hint hidden" id="name-error-hint">At least 2 entries required.</p>
-            <p class="names__empty-hint" id="name-empty-hint" style="display:none">No names yet. Add some!</p>
+            <p class="names-in-wheel-list__error-hint hidden" id="name-error-hint">At least 2 entries required.</p>
+            <p class="names-in-wheel-list__empty-hint" id="name-empty-hint" style="display:none">No names yet. Add some!</p>
         </div>
 
         <!-- centered input shown when wheel empty -->
         <div id="name-centered-input" class="name-centered-input name-centered-input--hidden">
-            <div class="names__add-row">
+            <div class="names-in-wheel-list__add-row">
                 <input type="text" id="name-input-centered" placeholder="Enter name …" />
-                <button class="names__add-btn" id="add-name-btn-centered">+</button>
+                <button class="names-in-wheel-list__add-btn" id="add-name-btn-centered">+</button>
             </div>
         </div>
 

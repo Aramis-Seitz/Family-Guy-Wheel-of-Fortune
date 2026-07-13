@@ -1,4 +1,4 @@
-import { input } from "./name-list.js";
+import { input } from "./names-in-wheel-list.js";
 import { requiredElement, optionalElement } from "../shared/dom-helpers.js";
 import { showToast } from "../shared/toast.js";
 import {

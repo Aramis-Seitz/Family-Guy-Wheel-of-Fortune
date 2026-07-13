@@ -1,4 +1,4 @@
-import { requiredElement } from "../shared/dom-helpers.js";
+import { requiredElement } from "../shared/dom-helpers";
 
 export const multiplierSlider = requiredElement<HTMLInputElement>("multiplier-slider");
 export const multiplierValue = requiredElement<HTMLSpanElement>("multiplier-value");

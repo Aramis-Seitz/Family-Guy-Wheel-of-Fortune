@@ -1,7 +1,7 @@
-import { supabaseClient } from "../shared/supabase-client.js";
-import { showToast } from "../shared/toast.js";
-import { apiUrl } from "../shared/api-base.js";
-import { notifyAccountChanged } from "../shared/auth-channel.js";
+import { supabaseClient } from "../shared/supabase-client";
+import { showToast } from "../shared/toast";
+import { apiUrl } from "../shared/api-base";
+import { notifyAccountChanged } from "../shared/auth-channel";
 
 const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;

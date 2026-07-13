@@ -1,4 +1,4 @@
-import { apiUrl } from './shared/api-base.js';
+import { apiUrl } from './shared/api-base';
 
 const SESSION_KEY = 'mock_session';
 

@@ -1,11 +1,11 @@
-import { input } from "./name-list.js";
-import { requiredElement, optionalElement } from "../shared/dom-helpers.js";
-import { showToast } from "../shared/toast.js";
+import { input } from "./name-list";
+import { requiredElement, optionalElement } from "../shared/dom-helpers";
+import { showToast } from "../shared/toast";
 import {
   NAME_VALIDATION_ERROR,
   type NameValidationErrorCode,
   validateName,
-} from "../shared/validation.js";
+} from "../shared/validation";
 
 type NameValidationResult = ReturnType<typeof validateName>;
 

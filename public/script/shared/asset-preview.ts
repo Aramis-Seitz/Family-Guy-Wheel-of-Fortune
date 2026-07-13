@@ -1,6 +1,6 @@
-import type { AssetCategory } from "../shop/shop.js";
+import type { AssetCategory } from "../shop/shop";
 import type { Asset } from "shared";
-import { playAssetSound, stopAssetSound } from "../wheel/sound.js";
+import { playAssetSound, stopAssetSound } from "../wheel/sound";
 
 let activePreviewButton: HTMLButtonElement | null = null;
 

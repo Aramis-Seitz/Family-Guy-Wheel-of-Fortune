@@ -1,13 +1,13 @@
-import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer.js";
-import { ASSET_CATEGORIES } from "../shop/shop.js";
-import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers.js";
-import { generateShareLink } from "../names/share-name-list.js";
-import { replaceNames } from "../names/name-list.js";
+import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer";
+import { ASSET_CATEGORIES } from "../shop/shop";
+import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers";
+import { generateShareLink } from "../names/share-name-list";
+import { replaceNames } from "../names/name-list";
 import type { SavedWheel, Asset } from "shared";
-import { showToast } from "../shared/toast.js";
-import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets.js"
-import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api.js";
-import { ApiError } from "../api/api-helpers.js"
+import { showToast } from "../shared/toast";
+import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets"
+import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api";
+import { ApiError } from "../api/api-helpers"
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];

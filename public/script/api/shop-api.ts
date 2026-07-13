@@ -1,4 +1,4 @@
-import { getJson, postJson } from "./api-helpers.js";
+import { getJson, postJson } from "./api-helpers";
 import { AssetsResponseSchema, AssetIdsResponseSchema, PurchaseResponseSchema } from "shared";
 import type { Asset } from "shared";
 

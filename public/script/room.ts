@@ -1,6 +1,6 @@
-import { supabaseClient } from './shared/supabase-client.js';
+import { supabaseClient } from './shared/supabase-client';
 import type { RealtimeChannel, AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { optionalElement } from "./shared/dom-helpers.js";
+import { optionalElement } from "./shared/dom-helpers";
 import {
   addName, getNames, replaceNames,
   lockNameEditing, unlockNameEditing, setOnNameRemoved,

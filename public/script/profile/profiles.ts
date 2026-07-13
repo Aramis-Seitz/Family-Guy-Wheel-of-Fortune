@@ -1,12 +1,12 @@
-import { supabaseClient } from "../shared/supabase-client.js";
-import { optionalElement } from "../shared/dom-helpers.js";
+import { supabaseClient } from "../shared/supabase-client";
+import { optionalElement } from "../shared/dom-helpers";
 import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { nameState, MAX_ITEMS } from "../names/name-state.js";
-import { isNameEditingLocked } from "../names/name-list.js";
-import { isSpinning } from "../wheel/spin.js";
-import { showToast } from "../shared/toast.js";
-import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api.js";
-import { notifyAccountChanged } from "../shared/auth-channel.js";
+import { nameState, MAX_ITEMS } from "../names/name-state";
+import { isNameEditingLocked } from "../names/name-list";
+import { isSpinning } from "../wheel/spin";
+import { showToast } from "../shared/toast";
+import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api";
+import { notifyAccountChanged } from "../shared/auth-channel";
 
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");

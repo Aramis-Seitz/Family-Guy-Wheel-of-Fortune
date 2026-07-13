@@ -1,15 +1,15 @@
-import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin.js";
-import { wheelEmptyHint } from "../room.js";
-import { requiredElement } from "../shared/dom-helpers.js";
-import { showToast } from "../shared/toast.js";
-import { validateName } from "../shared/validation.js";
-import { generateWheel, getSegmentColor } from "../wheel/renderer.js";
+import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin";
+import { wheelEmptyHint } from "../room";
+import { requiredElement } from "../shared/dom-helpers";
+import { showToast } from "../shared/toast";
+import { validateName } from "../shared/validation";
+import { generateWheel, getSegmentColor } from "../wheel/renderer";
 import {
   clearNameInputError,
   initNameInputValidation,
   validateNameInput,
-} from "./name-input-validation.js";
-import { nameState, MAX_ITEMS, MIN_ITEMS } from "./name-state.js";
+} from "./name-input-validation";
+import { nameState, MAX_ITEMS, MIN_ITEMS } from "./name-state";
 
 let roomLocked = false;
 let disableAddWhileLocked = true;

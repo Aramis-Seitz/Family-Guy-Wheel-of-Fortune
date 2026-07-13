@@ -1,12 +1,12 @@
-import { postJson, getAccessToken, ApiError } from "./api-helpers.js";
-import type { Direction } from "../wheel/spin.js";
+import { postJson, getAccessToken, ApiError } from "./api-helpers";
+import type * as spin from "../wheel/spin";
 import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 export async function fetchRandomNumber(
   names: string[],
   currentRotation: number,
-  direction: Direction,
+  direction: spin.Direction,
   multiplier: number
 ): Promise<SpinRandomResponseBody> {
 

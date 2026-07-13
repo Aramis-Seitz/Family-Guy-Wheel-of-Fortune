@@ -1,8 +1,8 @@
-import { shopTabs, getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop.js";
-import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api.js";
-import { showToast } from "../shared/toast.js";
-import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview.js";
-import { requiredElement } from "../shared/dom-helpers.js";
+import { shopTabs, getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop";
+import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api";
+import { showToast } from "../shared/toast";
+import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview";
+import { requiredElement } from "../shared/dom-helpers";
 import type { Asset } from "shared";
 
 

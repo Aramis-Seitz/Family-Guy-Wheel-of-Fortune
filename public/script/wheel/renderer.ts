@@ -1,4 +1,4 @@
-import { requiredElement } from "../shared/dom-helpers.js";
+import { requiredElement } from "../shared/dom-helpers";
 
 export const SEGMENT_COLORS: string[] = [
   "#f4d87e",

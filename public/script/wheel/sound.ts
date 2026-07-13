@@ -1,4 +1,4 @@
-import { volumeSlider } from "./volume.js";
+import { volumeSlider } from "./volume";
 
 let tickBuffer: AudioBuffer | null = null;
 

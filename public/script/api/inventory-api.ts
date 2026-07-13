@@ -1,4 +1,4 @@
-import { getJson, postJson } from "./api-helpers.js";
+import { getJson, postJson } from "./api-helpers";
 import {
     SelectResponseSchema,
     SavedWheelResponseSchema,

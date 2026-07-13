@@ -1,5 +1,5 @@
-import { supabaseClient } from "../shared/supabase-client.js";
-import { apiUrl } from "../shared/api-base.js";
+import { supabaseClient } from "../shared/supabase-client";
+import { apiUrl } from "../shared/api-base";
 
 
 type ApiErrorBody = {

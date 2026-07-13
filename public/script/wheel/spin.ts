@@ -1,13 +1,13 @@
-import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound.js";
-import { fetchRandomNumber } from "../api/spin-api.js";
-import { getNamesInWheelList, input, addBtn, getRemoveBtn } from "../names/names-in-wheel-list.js";
-import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner.js";
-import { getMultiplier, multiplierSlider } from "./multiplier.js";
-import { wheelElement } from "./renderer.js";
-import { bulkAddToWheelBtn } from "../room.js";
-import { profileName } from "../profile/profiles.js";
-import { MIN_ITEMS } from "../names/names-in-wheel-list-state.js";
-import { requiredElement } from "../shared/dom-helpers.js";
+import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound";
+import { fetchRandomNumber } from "../api/spin-api";
+import { getNamesInWheelList, input, addBtn, getRemoveBtn } from "../names/names-in-wheel-list";
+import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
+import { getMultiplier, multiplierSlider } from "./multiplier";
+import { wheelElement } from "./renderer";
+import { bulkAddToWheelBtn } from "../room";
+import { profileName } from "../profile/profiles";
+import { MIN_ITEMS } from "../names/names-in-wheel-list-state";
+import { requiredElement } from "../shared/dom-helpers";
 
 let spinning = false;
 

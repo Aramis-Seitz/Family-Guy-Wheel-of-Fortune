@@ -1,4 +1,4 @@
-import { postJson } from "./api-helpers.js";
+import { postJson } from "./api-helpers";
 import {
     CreateRoomResponseSchema,
     JoinRoomResponseSchema,

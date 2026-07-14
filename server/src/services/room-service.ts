@@ -7,6 +7,7 @@ import {
     updateRoomPlayers,
     updateRoomNames,
     clearRoomPlayers,
+    deleteRoomByKey,
     removePlayerFromRoom,
     updateRoomSpin,
     updateRoomMultiplier,
@@ -26,11 +27,7 @@ function generateRoomKey(): string {
 export async function createRoom(userId: string): Promise<CreateRoomResponseBody> {
     const existingRoom = await getActiveRoomForUser(userId);
     if (existingRoom) {
-        if (existingRoom.host_id === userId) {
-            await clearRoomPlayers(existingRoom.room_key);
-        } else {
-            await removePlayerFromRoom(existingRoom.room_key, userId);
-        }
+        await leaveRoom(userId, existingRoom.room_key);
     }
 
     const profile = await getProfileByUserId(userId);
@@ -47,11 +44,7 @@ function toUsernames(players: RoomPlayer[]): string[] {
 export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoomResponseBody> {
     const existingRoom = await getActiveRoomForUser(userId);
     if (existingRoom && existingRoom.room_key !== roomKey) {
-        if (existingRoom.host_id === userId) {
-            await clearRoomPlayers(existingRoom.room_key);
-        } else {
-            await removePlayerFromRoom(existingRoom.room_key, userId);
-        }
+        await leaveRoom(userId, existingRoom.room_key);
     }
 
     const room = await getRoomByKey(roomKey);
@@ -69,7 +62,7 @@ export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoo
     const hostName = hostPlayer?.username ?? (players[0]?.username ?? '');
     const multiplier = room.multiplier ?? 1;
     const names = room.names_in_wheel ?? [];
-    
+
     return { players: toUsernames(players), multiplier, names, hostName };
 }
 
@@ -78,19 +71,15 @@ export async function leaveRoom(userId: string, roomKey: string): Promise<void> 
     if (!room) throw new AppError("Room not found", 404);
 
     if (room.host_id === userId) {
-        // Host verlässt → Raum schließen
+        // Host verlässt -> Room schließen
+        // Erst leeren, damit verbundene Gäste das Realtime-"Room geschlossen"-Signal erhalten,
+        // dann den Datensatz löschen, damit der roomKey nicht mehr joinbar bleibt.
         await clearRoomPlayers(roomKey);
+        await deleteRoomByKey(roomKey);
     } else {
-        // Gast verlässt → nur diesen Spieler nach userId entfernen
+        // Guest verlässt -> nur diesen User entfernen
         await removePlayerFromRoom(roomKey, userId);
     }
-}
-
-export async function closeRoom(userId: string, roomKey: string): Promise<void> {
-    const room = await getRoomByKey(roomKey);
-    if (!room) throw new AppError("Room not found", 404);
-    if (room.host_id !== userId) throw new AppError("Only the host may close the room", 403);
-    await clearRoomPlayers(roomKey);
 }
 
 export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<SpinRandomResponseBody> {

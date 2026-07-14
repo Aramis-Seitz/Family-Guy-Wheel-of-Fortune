@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { requireAuth } from "../middleware/require-auth";
 import {
     handleCreateRoom,
     handleJoinRoom,
@@ -12,8 +11,6 @@ import {
 } from "../controllers/room-controller";
 
 export const roomRoutes = Router();
-
-roomRoutes.use(requireAuth);
 
 roomRoutes.post("/create", handleCreateRoom);
 roomRoutes.post("/join", handleJoinRoom);

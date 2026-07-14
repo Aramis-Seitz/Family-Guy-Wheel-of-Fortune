@@ -77,43 +77,30 @@ function renderInventoryWheels(items: SavedWheel[]): void {
   for (let i = 0; i < INVENTORY_LIMIT; i++) {
     const item = items[i];
 
-    let card = inventoryWheelGrid.children[i] as HTMLElement | undefined;
+    const existingCard = inventoryWheelGrid.children[i] as HTMLElement | undefined;
 
-    if (!card) {
-      card = document.createElement("div");
-      inventoryWheelGrid.appendChild(card);
-    }
-
-    card.replaceChildren();
-    card.className = "inventory-modal__card";
-    card.removeAttribute("id");
+    let newCard: HTMLElement;
 
     if (!item) {
       if (!addCardPlaced) {
-        const addCard = createAddCard();
-        card.className = addCard.className;
-        card.id = addCard.id;
-        card.replaceChildren(...Array.from(addCard.childNodes));
-
-        // Events übernehmen
-        card.onclick = addCard.onclick;
-        card.onkeydown = addCard.onkeydown;
-
+        newCard = createAddCard();
         addCardPlaced = true;
       } else {
-        card.className = "inventory-modal__card inventory-modal__card--empty";
+        newCard = createEmptyCard();
       }
-
-      continue;
+    } else {
+      newCard = createItemCard(item);
     }
 
-    const itemCard = createItemCard(item);
+    if (existingCard) {
+      inventoryWheelGrid.replaceChild(newCard, existingCard);
+    } else {
+      inventoryWheelGrid.appendChild(newCard);
+    }
+  }
 
-    card.className = itemCard.className;
-    card.replaceChildren(...Array.from(itemCard.childNodes));
-
-    card.onclick = itemCard.onclick;
-    card.onkeydown = itemCard.onkeydown;
+  while (inventoryWheelGrid.children.length > INVENTORY_LIMIT) {
+    inventoryWheelGrid.removeChild(inventoryWheelGrid.lastElementChild!);
   }
 }
 
@@ -229,7 +216,8 @@ async function submitItem(): Promise<void> {
   try {
     await saveSavedWheels(name, generateShareLink());
     closeAddItemModal();
-    await loadInventory();
+    currentSavedWheels = await fetchInventoryWheels();
+    renderInventoryWheels(currentSavedWheels);
     showToast({
       message: `"${name}" wurde erfolgreich gespeichert.`,
       type: "success"

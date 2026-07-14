@@ -46,7 +46,12 @@ SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 USE_MOCK=false
 CORS_ORIGIN=http://localhost:5173
+AUTH_USER=
+AUTH_PWD=
 ```
+
+> `AUTH_USER`/`AUTH_PWD` schützen `/login.html`, `/main.html` und `/signup.html` per Basic Auth. Ohne diese Werte ist Basic Auth lokal deaktiviert. 
+> Basic Auth wird ohne HTTPS ausgeführt, weshalb es von Microsoft Edge geblockt wird. Lösung hierfür wäre einen anderen Browser zu benutzen oder die Credentials leer zu lassen.
 
 **`public/.env`** anlegen:
 

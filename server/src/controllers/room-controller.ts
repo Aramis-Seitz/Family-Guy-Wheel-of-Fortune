@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { resolveUserIdFromHeaders } from "../services/auth-service";
 import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
-import { sendUnexpectedError } from "./response";
+import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
     CreateRoomResponseSchema,
@@ -9,183 +8,103 @@ import {
     SpinRandomResponseSchema,
 } from "shared";
 
-export async function handleCreateRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
-
-        const result = await createRoom(userId);
-        res.status(200).json(CreateRoomResponseSchema.parse(result));
-    } catch (error) {
-        sendUnexpectedError(res, error);
-    }
-}
+export const handleCreateRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const result = await createRoom(req.userId!);
+    res.status(200).json(CreateRoomResponseSchema.parse(result));
+});
 
 const RoomKeyRequestSchema = z.object({
     roomKey: z.string().min(1),
 });
 
-export async function handleJoinRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
-
-        const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey" });
-            return;
-        }
-
-        const result = await joinRoom(userId, parsedBody.data.roomKey);
-        res.status(200).json(JoinRoomResponseSchema.parse(result));
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleJoinRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey" });
+        return;
     }
-}
 
-export async function handleLeaveRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
+    const result = await joinRoom(req.userId!, parsedBody.data.roomKey);
+    res.status(200).json(JoinRoomResponseSchema.parse(result));
+});
 
-        const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey" });
-            return;
-        }
-
-        await leaveRoom(userId, parsedBody.data.roomKey);
-        res.status(200).json({ ok: true });
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleLeaveRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey" });
+        return;
     }
-}
 
-export async function handleCloseRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
+    await leaveRoom(req.userId!, parsedBody.data.roomKey);
+    res.status(200).json({ ok: true });
+});
 
-        const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey" });
-            return;
-        }
-
-        await closeRoom(userId, parsedBody.data.roomKey);
-        res.status(200).json({ ok: true });
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleCloseRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey" });
+        return;
     }
-}
+
+    await closeRoom(req.userId!, parsedBody.data.roomKey);
+    res.status(200).json({ ok: true });
+});
 
 const RoomSpinRequestSchema = z.object({
     roomKey: z.string().min(1),
     direction: z.enum(["left", "right"]),
 });
 
-export async function handleSpinRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
-
-        const parsedBody = RoomSpinRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey or invalid direction" });
-            return;
-        }
-
-        const result = await spinRoom(userId, parsedBody.data.roomKey, parsedBody.data.direction);
-        res.status(200).json(SpinRandomResponseSchema.parse(result));
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleSpinRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = RoomSpinRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey or invalid direction" });
+        return;
     }
-}
 
-export async function handleResetRoom(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
+    const result = await spinRoom(req.userId!, parsedBody.data.roomKey, parsedBody.data.direction);
+    res.status(200).json(SpinRandomResponseSchema.parse(result));
+});
 
-        const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey" });
-            return;
-        }
-
-        await resetRoom(userId, parsedBody.data.roomKey);
-        res.status(200).json({ ok: true });
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleResetRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey" });
+        return;
     }
-}
+
+    await resetRoom(req.userId!, parsedBody.data.roomKey);
+    res.status(200).json({ ok: true });
+});
 
 const SetMultiplierRequestSchema = z.object({
     roomKey: z.string().min(1),
     multiplier: z.number(),
 });
 
-export async function handleSetMultiplier(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
-
-        const parsedBody = SetMultiplierRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey or multiplier" });
-            return;
-        }
-
-        await setMultiplier(userId, parsedBody.data.roomKey, parsedBody.data.multiplier);
-        res.status(200).json({ ok: true });
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleSetMultiplier = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = SetMultiplierRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey or multiplier" });
+        return;
     }
-}
+
+    await setMultiplier(req.userId!, parsedBody.data.roomKey, parsedBody.data.multiplier);
+    res.status(200).json({ ok: true });
+});
 
 const SetNamesRequestSchema = z.object({
     roomKey: z.string().min(1),
     names: z.array(z.string()),
 });
 
-export async function handleUpdateNames(req: HttpRequest, res: HttpResponse): Promise<void> {
-    try {
-        const userId = await resolveUserIdFromHeaders(req.headers);
-        if (!userId) {
-            res.status(401).json({ error: "Unauthorized" });
-            return;
-        }
-
-        const parsedBody = SetNamesRequestSchema.safeParse(req.body);
-        if (!parsedBody.success) {
-            res.status(400).json({ error: "Missing roomKey or names" });
-            return;
-        }
-
-        await setRoomNames(userId, parsedBody.data.roomKey, parsedBody.data.names);
-        res.status(200).json({ ok: true });
-    } catch (error) {
-        sendUnexpectedError(res, error);
+export const handleUpdateNames = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = SetNamesRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing roomKey or names" });
+        return;
     }
-}
+
+    await setRoomNames(req.userId!, parsedBody.data.roomKey, parsedBody.data.names);
+    res.status(200).json({ ok: true });
+});

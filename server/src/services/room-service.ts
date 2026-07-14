@@ -70,7 +70,8 @@ export async function leaveRoom(userId: string, roomKey: string): Promise<void> 
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
-    if (room.host_id === userId) {
+    const hostId = room.host_id;
+    if (userId === hostId) {
         // Host verlässt -> Room schließen
         // Erst leeren, damit verbundene Gäste das Realtime-"Room geschlossen"-Signal erhalten,
         // dann den Datensatz löschen, damit der roomKey nicht mehr joinbar bleibt.

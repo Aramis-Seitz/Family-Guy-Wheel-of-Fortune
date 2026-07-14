@@ -8,6 +8,7 @@ import { showToast } from "../shared/toast";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets"
 import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api";
 import { ApiError } from "../api/api-helpers"
+import { isMultiplayerActive } from "../room";
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
@@ -385,13 +386,13 @@ export function filterAssetsByCategory(category: InventoryCategory): Asset[] {
   return currentOwnedAssets.filter(asset => asset.category === category);
 }
 
-function createInventoryTabButton(category: InventoryCategory): HTMLButtonElement {
+function createInventoryTabButton(category: InventoryCategory, activeCategory: InventoryCategory): HTMLButtonElement {
   const button = document.createElement("button");
   button.className = "inventory-modal__tab";
   button.dataset.category = category;
   button.textContent = `${category}s`.toUpperCase();
 
-  if (category === "wheel") button.classList.add("inventory-modal__tab--active");
+  if (category === activeCategory) button.classList.add("inventory-modal__tab--active");
 
   button.onclick = () => {
 
@@ -404,12 +405,14 @@ function createInventoryTabButton(category: InventoryCategory): HTMLButtonElemen
 
 function renderInventoryTabs(categories: (InventoryCategory)[]): void {
   inventoryTabs.innerHTML = "";
+  const activeCategory = categories[0];
   categories.forEach(category => {
-    inventoryTabs.appendChild(createInventoryTabButton(category));
+    inventoryTabs.appendChild(createInventoryTabButton(category, activeCategory));
   });
 }
 
 async function loadInventoryTabs(): Promise<void> {
-  const categories = INVENTORY_CATEGORIES;
-  renderInventoryTabs(categories as InventoryCategory[]);
+  const categories = isMultiplayerActive() ? INVENTORY_CATEGORIES.filter(category => category !== "wheel") : INVENTORY_CATEGORIES;
+
+  renderInventoryTabs(categories);
 }

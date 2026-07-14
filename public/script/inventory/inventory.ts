@@ -8,6 +8,7 @@ import { showToast } from "../shared/toast";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets"
 import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api";
 import { ApiError } from "../api/api-helpers"
+import { isMultiplayerActive } from "../room";
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
@@ -410,6 +411,7 @@ function renderInventoryTabs(categories: (InventoryCategory)[]): void {
 }
 
 async function loadInventoryTabs(): Promise<void> {
-  const categories = INVENTORY_CATEGORIES;
+  const categories = isMultiplayerActive() ? INVENTORY_CATEGORIES.filter((category): category is InventoryCategory => category !== "wheel") : INVENTORY_CATEGORIES;
+
   renderInventoryTabs(categories as InventoryCategory[]);
 }

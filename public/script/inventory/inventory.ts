@@ -12,6 +12,7 @@ import { isMultiplayerActive } from "../room";
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
+let currentSavedWheels: SavedWheel[] = [];
 
 const confirmDeleteName = requiredElement<HTMLElement>("confirm-delete-modal-name");
 const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirm-delete-modal");
@@ -37,7 +38,8 @@ async function confirmDeleteWheel(): Promise<void> {
 
   try {
     await deleteSavedWheel(id);
-    await loadInventory();
+    currentSavedWheels = currentSavedWheels.filter(wheel => wheel.id !== id);
+    renderInventoryWheels(currentSavedWheels);
     showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
   } catch (error) {
     const message = error instanceof ApiError ? error.message : "Rad konnte nicht gelöscht werden.";
@@ -70,19 +72,48 @@ const inventoryWheelGrid = requiredElement<HTMLElement>("inventory-modal-wheel-g
 const INVENTORY_LIMIT: number = 12;
 
 function renderInventoryWheels(items: SavedWheel[]): void {
-  inventoryWheelGrid.innerHTML = "";
   let addCardPlaced = false;
 
   for (let i = 0; i < INVENTORY_LIMIT; i++) {
     const item = items[i];
 
+    let card = inventoryWheelGrid.children[i] as HTMLElement | undefined;
+
+    if (!card) {
+      card = document.createElement("div");
+      inventoryWheelGrid.appendChild(card);
+    }
+
+    card.replaceChildren();
+    card.className = "inventory-modal__card";
+    card.removeAttribute("id");
+
     if (!item) {
-      inventoryWheelGrid.appendChild(addCardPlaced ? createEmptyCard() : createAddCard());
-      addCardPlaced = true;
+      if (!addCardPlaced) {
+        const addCard = createAddCard();
+        card.className = addCard.className;
+        card.id = addCard.id;
+        card.replaceChildren(...Array.from(addCard.childNodes));
+
+        // Events übernehmen
+        card.onclick = addCard.onclick;
+        card.onkeydown = addCard.onkeydown;
+
+        addCardPlaced = true;
+      } else {
+        card.className = "inventory-modal__card inventory-modal__card--empty";
+      }
+
       continue;
     }
 
-    inventoryWheelGrid.appendChild(createItemCard(item));
+    const itemCard = createItemCard(item);
+
+    card.className = itemCard.className;
+    card.replaceChildren(...Array.from(itemCard.childNodes));
+
+    card.onclick = itemCard.onclick;
+    card.onkeydown = itemCard.onkeydown;
   }
 }
 
@@ -379,7 +410,8 @@ export function getClickedInventoryCategory(inventoryTab: HTMLElement | null): I
 
 
 export async function loadWheelCards(): Promise<void> {
-  renderInventoryWheels(await fetchInventoryWheels());
+  currentSavedWheels = await fetchInventoryWheels();
+  renderInventoryWheels(currentSavedWheels);
 }
 
 export function filterAssetsByCategory(category: InventoryCategory): Asset[] {

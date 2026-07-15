@@ -5,12 +5,12 @@ import { initInventory } from "../inventory/inventory";
 import { initNamesInWheelList } from "../names/names-in-wheel-list";
 import { initShareFeature } from "../names/share-names-in-wheel-list";
 import { initProfileUI } from "../profile/profiles";
-import { initWheelControls, setResetOverride } from "../wheel/spin";
+import { initWheelControls } from "../wheel/spin";
 import { initMultiplierSlider } from "../wheel/multiplier";
 import { initVolumeSlider } from "../wheel/volume";
 import { preloadStaticSounds } from "../wheel/sound";
 import { initWinnerModal } from "../wheel/winner";
-import { initRoomUnloadGuard, activeRoomKey, initRoomControls, handleLocalReset, initNameControls, setMyUsername, redirectIfNoSession } from "../room";
+import { initRoomUnloadGuard, activeRoomKey, initRoomControls, initNameControls, setMyUsername, redirectIfNoSession } from "../room";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 
@@ -24,7 +24,6 @@ async function initApp(): Promise<void> {
   initVolumeSlider();
   void preloadStaticSounds();
   initWheelControls();
-  setResetOverride(handleLocalReset);
   initShareFeature();
   initAuthChannelListener();
   await initProfileUI();

@@ -18,7 +18,7 @@ import {
   updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider,
   multiplierSlider,
 } from "./wheel/multiplier";
-import { hideWinnerModal } from "./wheel/winner";
+import { hideWinnerModal, setWinnerModalCloseOverride } from "./wheel/winner";
 import { initChat, destroyChat } from "./multiplayer/chat";
 import { showToast } from "./shared/toast";
 import {
@@ -50,12 +50,16 @@ interface RoomRow {
   names_in_wheel?: string[];
   multiplier: number;
   spin_direction: string | null;
+  wheel_reset_at?: string | null;
+  winner_modal_close_at?: string | null;
 }
 
 let activeChannel: RealtimeChannel | null = null;
 let lastKnownPlayersJson = '';
 let lastKnownNamesJson = '';
 let lastKnownMultiplier: number | null = null;
+let lastKnownWheelResetAt = '';
+let lastKnownWinnerModalCloseAt = '';
 
 export function subscribeToRoom(
   roomKey: string,
@@ -64,7 +68,8 @@ export function subscribeToRoom(
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
   onNamesUpdate?: (names: string[]) => void,
-  onReset?: () => void,
+  onWheelReset?: () => void,
+  onWinnerModalClose?: () => void,
 ): void {
   unsubscribeFromRoom();
 
@@ -111,14 +116,20 @@ export function subscribeToRoom(
           onMultiplierUpdate?.(newMultiplier);
         }
 
+        // Jede Spalte trägt genau ein Ereignis und wird unabhängig von den anderen ausgewertet.
+        if (row.wheel_reset_at && row.wheel_reset_at !== lastKnownWheelResetAt) {
+          lastKnownWheelResetAt = row.wheel_reset_at;
+          onWheelReset?.();
+        }
+
+        if (row.winner_modal_close_at && row.winner_modal_close_at !== lastKnownWinnerModalCloseAt) {
+          lastKnownWinnerModalCloseAt = row.winner_modal_close_at;
+          onWinnerModalClose?.();
+        }
+
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();
         if (ageMs > 5000) return;
-
-        if (row.last_spin === -1) {
-          onReset?.();
-          return;
-        }
 
         onSpin(row.last_spin, newMultiplier, row.spin_direction ?? 'right');
 
@@ -135,6 +146,8 @@ export function unsubscribeFromRoom(): void {
   lastKnownPlayersJson = '';
   lastKnownNamesJson = '';
   lastKnownMultiplier = null;
+  lastKnownWheelResetAt = '';
+  lastKnownWinnerModalCloseAt = '';
 }
 
 export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void {
@@ -156,11 +169,6 @@ export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void
   });
 }
 
-
-export function handleLocalReset(): void {
-  resetWheelRotation();
-  hideWinnerModal();
-}
 
 export let activeRoomKey: string | null = null;
 let isHost = false;
@@ -336,7 +344,8 @@ function setRoomActive(roomKey: string, host: boolean): void {
   } else {
     spinLeftBtn.classList.remove('spin__btn--room-guest');
     spinRightBtn.classList.remove('spin__btn--room-guest');
-    setResetOverride(() => { void handleRoomResetClick(); });
+    setResetOverride(() => { void handleRoomReset(false); });
+    setWinnerModalCloseOverride(() => { void handleRoomReset(true); });
   }
 
   syncMultiplayerSpinButtonState();
@@ -368,7 +377,8 @@ function clearRoom(): void {
   resetBtn.disabled = false;
   resetBtn.style.removeProperty('opacity');
   resetBtn.style.removeProperty('cursor');
-  setResetOverride(handleLocalReset);
+  setResetOverride(null);
+  setWinnerModalCloseOverride(null);
   if (multiplierSyncListener) {
     multiplierSlider?.removeEventListener('input', multiplierSyncListener);
     multiplierSyncListener = null;
@@ -406,20 +416,28 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
   }
 }
 
-async function handleRoomResetClick(): Promise<void> {
+// closeWinnerModal=false → "Reset"-Button: nur die Rad-Rotation wird für alle zurückgesetzt.
+// closeWinnerModal=true → OK im WinnerModal: Rad-Rotation UND Modal werden für alle zurückgesetzt.
+async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
   if (!activeRoomKey || !isHost) return;
   try {
-    await resetRoom(activeRoomKey);
-    handleLocalReset();
+    await resetRoom(activeRoomKey, closeWinnerModal);
+    // Lokal passiert nichts hier direkt — das übernehmen handleWheelResetEvent()/
+    // handleWinnerModalCloseEvent(), sobald das Realtime-Update zurückkommt,
+    // damit der Host synchron mit allen anderen Spielern zurücksetzt statt
+    // vorzupreschen.
   } catch (error) {
     console.error('[ROOM] Reset fehlgeschlagen:', error);
     showToast({ message: 'Reset fehlgeschlagen', type: 'error' });
   }
 }
 
-function handleRoomResetEvent(): void {
-  if (isHost) return; // host already reset locally after POST
-  handleLocalReset();
+function handleWheelResetEvent(): void {
+  resetWheelRotation();
+}
+
+function handleWinnerModalCloseEvent(): void {
+  hideWinnerModal();
 }
 
 function onRoomClosed(): void {
@@ -532,7 +550,8 @@ async function executeCreateRoom(): Promise<void> {
       onRoomClosed,
       (m) => { setMultiplierSlider(m); updateMultiplierDisplay(); },
       setNamesFromRoom,
-      handleRoomResetEvent
+      handleWheelResetEvent,
+      handleWinnerModalCloseEvent
     );
     initChat(roomKey, myUsername);
     multiplierSyncListener = () => {
@@ -565,7 +584,8 @@ async function executeJoinRoom(roomKey: string): Promise<void> {
       onRoomClosed,
       (m) => { setMultiplierSlider(m); updateMultiplierDisplay(); },
       setNamesFromRoom,
-      handleRoomResetEvent
+      handleWheelResetEvent,
+      handleWinnerModalCloseEvent
     );
     initChat(roomKey, myUsername);
     showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });

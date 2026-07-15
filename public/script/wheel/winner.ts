@@ -141,11 +141,21 @@ function removeWinner(): void {
 
 const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("winner-modal-close-btn");
 
+let activeCloseOverride: (() => void) | null = null;
+
+export function setWinnerModalCloseOverride(handler: (() => void) | null): void {
+  activeCloseOverride = handler;
+}
+
+function closeWinnerModalLocally(): void {
+  hideWinnerModal();
+  resetWheelRotation();
+}
+
 export function initWinnerModal(): void {
   if (!winnerModal || !closeWinnerModalBtn) return;
 
   closeWinnerModalBtn.addEventListener("click", () => {
-    hideWinnerModal();
-    resetWheelRotation();
+    (activeCloseOverride ?? closeWinnerModalLocally)();
   });
 }

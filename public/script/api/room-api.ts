@@ -55,8 +55,8 @@ export async function updateRoomNames(roomKey: string, names: string[]): Promise
     });
 }
 
-export async function resetRoom(roomKey: string): Promise<void> {
-    await postJson("/api/room/reset", { roomKey }, {
+export async function resetRoom(roomKey: string, closeWinnerModal = false): Promise<void> {
+    await postJson("/api/room/reset", { roomKey, closeWinnerModal }, {
         errorFallback: "Room konnte nicht zurückgesetzt werden"
     });
 }

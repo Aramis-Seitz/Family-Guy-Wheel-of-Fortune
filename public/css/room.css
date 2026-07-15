@@ -1,7 +1,7 @@
 #room-panel {
   position: fixed;
-  top: 80px;
-  right: 20px;
+  top: 270px;      
+  left: 20px;      
   z-index: 9000;
   background: white;
   color: black;
@@ -10,7 +10,7 @@
   border-radius: 16px;
   min-width: 210px;
   font-family: inherit;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
 }
 
 #room-panel h3 {
@@ -120,7 +120,8 @@
 #room-bulk-add-btn {
   margin-top: 10px;
   width: 100%;
-  background: #1c1c1e; /* Fancy Apple-Grey */
+  background: #1c1c1e;
+  /* Fancy Apple-Grey */
   color: white;
   font-size: 0.85rem;
   border-radius: 100px;
@@ -159,7 +160,9 @@
   color: white;
 }
 
-.room__player-toggle-btn:active { transform: scale(0.96); }
+.room__player-toggle-btn:active {
+  transform: scale(0.96);
+}
 
 /* Centered input when wheel is empty */
 .name-centered-input {
@@ -173,15 +176,22 @@
   align-items: center;
 }
 
-.name-centered-input .names-in-wheel-list__add-row { background: transparent; box-shadow: none; }
+.name-centered-input .names-in-wheel-list__add-row {
+  background: transparent;
+  box-shadow: none;
+}
 
-.name-centered-input--hidden { display: none !important; }
+.name-centered-input--hidden {
+  display: none !important;
+}
 
 .hidden {
   display: none !important;
 }
 
-#room-info.hidden { display: none; }
+#room-info.hidden {
+  display: none;
+}
 
 .room__key-row {
   display: flex;
@@ -238,14 +248,14 @@
 
 .room__host-tag {
   font-size: 0.85rem;
-  border: 1.5px solid rgba(0,0,0,0.4);
+  border: 1.5px solid rgba(0, 0, 0, 0.4);
   padding: 1px 6px;
   border-radius: 100px;
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .spin__btn--room-guest,

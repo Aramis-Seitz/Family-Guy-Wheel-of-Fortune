@@ -1,5 +1,5 @@
 -- =========================================================
--- FILE: supabase/migrations/20_rooms_wheel_reset_and_winner_modal_close.sql
+-- FILE: supabase/migrations/21_rooms_wheel_reset_and_winner_modal_close.sql
 -- PURPOSE: Replace the overloaded last_spin sentinel values (-1, -2) used
 --          to signal a wheel reset / winner-modal close with two dedicated
 --          timestamp columns. Each column is bumped to now() only when its

@@ -12,6 +12,7 @@ import { isMultiplayerActive } from "../room";
 
 let pendingDeleteId: string | null = null;
 let currentOwnedAssets: Asset[] = [];
+let currentSavedWheels: SavedWheel[] = [];
 
 const confirmDeleteName = requiredElement<HTMLElement>("confirm-delete-modal-name");
 const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirm-delete-modal");
@@ -37,7 +38,7 @@ async function confirmDeleteWheel(): Promise<void> {
 
   try {
     await deleteSavedWheel(id);
-    await loadInventory();
+    loadWheelCards();
     showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
   } catch (error) {
     const message = error instanceof ApiError ? error.message : "Rad konnte nicht gelöscht werden.";
@@ -70,22 +71,23 @@ const inventoryWheelGrid = requiredElement<HTMLElement>("inventory-modal-wheel-g
 const INVENTORY_LIMIT: number = 12;
 
 function renderInventoryWheels(items: SavedWheel[]): void {
-  inventoryWheelGrid.innerHTML = "";
-  let addCardPlaced = false;
-
   for (let i = 0; i < INVENTORY_LIMIT; i++) {
-    const item = items[i];
+    const card = createCardForSlot(items, i);
+    const existing = inventoryWheelGrid.children[i];
+    existing ? existing.replaceWith(card) : inventoryWheelGrid.appendChild(card);
+  }
 
-    if (!item) {
-      inventoryWheelGrid.appendChild(addCardPlaced ? createEmptyCard() : createAddCard());
-      addCardPlaced = true;
-      continue;
-    }
-
-    inventoryWheelGrid.appendChild(createItemCard(item));
+  while (inventoryWheelGrid.children.length > INVENTORY_LIMIT) {
+    inventoryWheelGrid.lastElementChild!.remove();
   }
 }
 
+function createCardForSlot(items: SavedWheel[], index: number): HTMLElement {
+  const item = items[index];
+  if (item) return createItemCard(item);
+  return index === items.length ? createAddCard() : createEmptyCard();
+}
+ 
 function createAddCard(): HTMLDivElement {
   const card = document.createElement("div");
   card.className = "inventory-modal__card inventory-modal__card--add";
@@ -198,7 +200,7 @@ async function submitItem(): Promise<void> {
   try {
     await saveSavedWheels(name, generateShareLink());
     closeAddItemModal();
-    await loadInventory();
+    loadWheelCards();
     showToast({
       message: `"${name}" wurde erfolgreich gespeichert.`,
       type: "success"
@@ -379,7 +381,8 @@ export function getClickedInventoryCategory(inventoryTab: HTMLElement | null): I
 
 
 export async function loadWheelCards(): Promise<void> {
-  renderInventoryWheels(await fetchInventoryWheels());
+  currentSavedWheels = await fetchInventoryWheels();
+  renderInventoryWheels(currentSavedWheels);
 }
 
 export function filterAssetsByCategory(category: InventoryCategory): Asset[] {

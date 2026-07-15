@@ -150,3 +150,11 @@ export async function markSpinTokenUsed(token: string): Promise<void> {
         .eq("token", token);
     if (error) throw error;
 }
+
+export async function deleteRoomByKey(roomKey: string): Promise<void> {
+    const { error } = await supabaseClient
+        .from("rooms")
+        .delete()
+        .eq("room_key", roomKey);
+    if (error) throw error;
+}

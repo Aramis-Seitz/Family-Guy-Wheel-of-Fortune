@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
+import { createRoom, joinRoom, leaveRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
@@ -36,17 +36,6 @@ export const handleLeaveRoom = asyncHandler(async (req: HttpRequest, res: HttpRe
     }
 
     await leaveRoom(req.userId!, parsedBody.data.roomKey);
-    res.status(200).json({ ok: true });
-});
-
-export const handleCloseRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
-        return;
-    }
-
-    await closeRoom(req.userId!, parsedBody.data.roomKey);
     res.status(200).json({ ok: true });
 });
 

@@ -43,12 +43,6 @@ export function leaveRoomOnUnload(roomKey: string, token: string): void {
     void postJson("/api/room/leave", { roomKey }, { token, keepalive: true });
 }
 
-export async function closeRoom(roomKey: string): Promise<void> {
-    await postJson("/api/room/close", { roomKey }, {
-        errorFallback: "Room konnte nicht geschlossen werden"
-    });
-}
-
 export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
     await postJson("/api/room/wheel-items", { roomKey, names }, {
         errorFallback: "Wheel-Items konnten nicht aktualisiert werden"

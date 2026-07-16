@@ -545,6 +545,9 @@ async function executeLeaveRoom(): Promise<void> {
 
 async function executeCreateRoom(): Promise<void> {
   try {
+    if (activeRoomKey) {
+      clearRoom();
+    }
     const { roomKey, players, names } = await createRoom();
     activeRoomHostName = players[0] ?? '';
     setRoomActive(roomKey, true);
@@ -576,6 +579,9 @@ async function executeCreateRoom(): Promise<void> {
 
 async function executeJoinRoom(roomKey: string): Promise<void> {
   try {
+    if (activeRoomKey) {
+      clearRoom();
+    }
     const { players, multiplier, names, hostName } = await joinRoom(roomKey);
     activeRoomHostName = hostName;
     setRoomActive(roomKey, false);

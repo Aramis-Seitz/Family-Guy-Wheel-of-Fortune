@@ -529,7 +529,7 @@ function updateBulkButtonState(players: string[]): void {
   }
 }
 
-export async function executeLeaveRoom(): Promise<void> {
+async function executeLeaveRoom(): Promise<void> {
   const wasHost = isHost;
   const roomKey = activeRoomKey;
   clearRoom(); // unsubscribe first so we don't receive our own close event

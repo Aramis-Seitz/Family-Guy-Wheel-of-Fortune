@@ -7,7 +7,6 @@ import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api";
 import { notifyAccountChanged } from "../shared/auth-channel";
-import { activeRoomKey, executeLeaveRoom } from "../room";
 
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");
@@ -61,7 +60,6 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
 
   authButton.textContent = "Logout";
   authButton.addEventListener("click", async () => {
-    if (activeRoomKey) await executeLeaveRoom();
     await supabaseClient.auth.signOut();
     notifyAccountChanged();
     window.location.href = "/login.html";

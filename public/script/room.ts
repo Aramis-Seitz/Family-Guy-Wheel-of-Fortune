@@ -143,6 +143,18 @@ export function subscribeToRoom(
 
       },
     )
+    .on(
+      'postgres_changes',
+      {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'rooms',
+        filter: `room_key=eq.${roomKey}`,
+      },
+      // Host-Leave löscht die Zeile direkt nach dem players=[]-Update; das DELETE
+      // ist das verlässliche, endgültige Signal und braucht kein Racing gegen das UPDATE.
+      () => { onClose?.(); },
+    )
     .subscribe();
 }
 

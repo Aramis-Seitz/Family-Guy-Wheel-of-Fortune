@@ -41,6 +41,7 @@ function appendMessage(msg: ChatMessage, isMine: boolean): void {
 }
 
 export function initChat(roomKey: string, username: string): void {
+  destroyChat();
   myUsername = username;
   lastSentAt = 0;
   abortController = new AbortController();

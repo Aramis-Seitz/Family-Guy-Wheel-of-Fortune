@@ -529,7 +529,7 @@ function updateBulkButtonState(players: string[]): void {
   }
 }
 
-async function executeLeaveRoom(): Promise<void> {
+export async function executeLeaveRoom(): Promise<void> {
   const wasHost = isHost;
   const roomKey = activeRoomKey;
   clearRoom(); // unsubscribe first so we don't receive our own close event
@@ -613,7 +613,7 @@ let pendingRoomAction: (() => Promise<void>) | null = null;
 const leaveRoomConfirmModal = optionalElement<HTMLDialogElement>("leave-room-confirm-modal");
 const leaveRoomConfirmMessage = optionalElement<HTMLParagraphElement>("leave-room-confirm-message");
 
-function showSwitchRoomConfirm(message: string, action: () => Promise<void>): void {
+export function showSwitchRoomConfirm(message: string, action: () => Promise<void>): void {
   if (leaveRoomConfirmMessage) leaveRoomConfirmMessage.textContent = message;
   pendingRoomAction = action;
   leaveRoomConfirmModal?.showModal();

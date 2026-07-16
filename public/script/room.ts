@@ -117,15 +117,23 @@ export function subscribeToRoom(
         }
 
         // Jede Spalte trägt genau ein Ereignis und wird unabhängig von den anderen ausgewertet.
+        // Ein Reset-Write fasst last_spin/spun_at nie an — ein solches Update darf also nie
+        // als Spin interpretiert werden, sonst spielen Gäste die Rad-Animation erneut ab.
+        let resetHappened = false;
+
         if (row.wheel_reset_at && row.wheel_reset_at !== lastKnownWheelResetAt) {
           lastKnownWheelResetAt = row.wheel_reset_at;
           onWheelReset?.();
+          resetHappened = true;
         }
 
         if (row.winner_modal_close_at && row.winner_modal_close_at !== lastKnownWinnerModalCloseAt) {
           lastKnownWinnerModalCloseAt = row.winner_modal_close_at;
           onWinnerModalClose?.();
+          resetHappened = true;
         }
+
+        if (resetHappened) return;
 
         if (!row.spun_at) return;
         const ageMs = Date.now() - new Date(row.spun_at).getTime();

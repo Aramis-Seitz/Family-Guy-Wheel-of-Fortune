@@ -114,10 +114,13 @@ export async function updateRoomMultiplier(roomKey: string, multiplier: number):
     if (error) throw error;
 }
 
-export async function updateRoomReset(roomKey: string): Promise<void> {
+export async function updateRoomReset(roomKey: string, closeWinnerModal: boolean): Promise<void> {
+    const now = new Date().toISOString();
     const { error } = await supabaseClient
         .from("rooms")
-        .update({ last_spin: -1, spun_at: new Date().toISOString() })
+        .update(closeWinnerModal
+            ? { wheel_reset_at: now, winner_modal_close_at: now }
+            : { wheel_reset_at: now })
         .eq("room_key", roomKey);
     if (error) throw error;
 }

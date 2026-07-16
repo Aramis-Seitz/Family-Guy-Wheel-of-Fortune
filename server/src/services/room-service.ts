@@ -104,11 +104,11 @@ export async function setRoomNames(userId: string, roomKey: string, names: strin
     await updateRoomNames(roomKey, names);
 }
 
-export async function resetRoom(userId: string, roomKey: string): Promise<void> {
+export async function resetRoom(userId: string, roomKey: string, closeWinnerModal: boolean): Promise<void> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError("Only the host may reset", 403);
-    await updateRoomReset(roomKey);
+    await updateRoomReset(roomKey, closeWinnerModal);
 }
 
 export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {

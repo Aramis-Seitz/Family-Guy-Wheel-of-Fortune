@@ -55,14 +55,19 @@ export const handleSpinRoom = asyncHandler(async (req: HttpRequest, res: HttpRes
     res.status(200).json(SpinRandomResponseSchema.parse(result));
 });
 
+const ResetRoomRequestSchema = z.object({
+    roomKey: z.string().min(1),
+    closeWinnerModal: z.boolean().optional(),
+});
+
 export const handleResetRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
+    const parsedBody = ResetRoomRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
         res.status(400).json({ error: "Missing roomKey" });
         return;
     }
 
-    await resetRoom(req.userId!, parsedBody.data.roomKey);
+    await resetRoom(req.userId!, parsedBody.data.roomKey, parsedBody.data.closeWinnerModal ?? false);
     res.status(200).json({ ok: true });
 });
 

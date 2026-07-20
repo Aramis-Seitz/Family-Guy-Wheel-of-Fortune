@@ -1,5 +1,5 @@
 /* ── Add Item Modal ── */
-#add-item-modal {
+#save-wheel-modal {
     border: none;
     border-radius: 14px;
     background: #1a1f2e;
@@ -13,17 +13,17 @@
     transform: translate(-50%, -50%);
 }
 
-#add-item-modal::backdrop {
+#save-wheel-modal::backdrop {
     background: rgba(0, 0, 0, .5);
     backdrop-filter: blur(3px);
 }
 
-.add-item-modal__inner {
+.save-wheel-modal__inner {
     display: flex;
     flex-direction: column;
 }
 
-.add-item-modal__header {
+.save-wheel-modal__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -31,12 +31,12 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.add-item-modal__header h3 {
+.save-wheel-modal__header h3 {
     font-size: 1rem;
     font-weight: 700;
 }
 
-#add-item-modal-close-btn {
+#save-wheel-modal-close-btn {
     background: none;
     border: 1px solid #444;
     border-radius: 8px;
@@ -47,22 +47,22 @@
     transition: color .15s, border-color .15s;
 }
 
-#add-item-modal-close-btn:hover {
+#save-wheel-modal-close-btn:hover {
     color: #fff;
     border-color: #888;
 }
 
-.add-item-modal__body {
+.save-wheel-modal__body {
     padding: 20px;
 }
 
-.add-item-modal__form-group {
+.save-wheel-modal__form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.add-item-modal__label {
+.save-wheel-modal__label {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -70,7 +70,7 @@
     color: #888;
 }
 
-#add-item-input {
+#save-wheel-input {
     background: #2a2a2a;
     border: 1px solid #3a3a3a;
     border-radius: 8px;
@@ -83,12 +83,12 @@
     transition: border-color .15s, box-shadow .15s;
 }
 
-#add-item-input:focus {
+#save-wheel-input:focus {
     border-color: #00a2ff;
     box-shadow: 0 0 0 3px rgba(0, 162, 255, .18);
 }
 
-.add-item-modal__footer {
+.save-wheel-modal__footer {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -96,7 +96,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-#add-item-modal-cancel-btn {
+#save-wheel-modal-cancel-btn {
     background: none;
     border: 1px solid #444;
     border-radius: 8px;
@@ -108,12 +108,12 @@
     transition: all .15s;
 }
 
-#add-item-modal-cancel-btn:hover {
+#save-wheel-modal-cancel-btn:hover {
     color: #fff;
     border-color: #888;
 }
 
-#add-item-modal-confirm-btn {
+#save-wheel-modal-confirm-btn {
     background: #00a2ff;
     color: #111;
     border: none;
@@ -126,11 +126,11 @@
     transition: filter .15s, transform .15s;
 }
 
-#add-item-modal-confirm-btn:hover {
+#save-wheel-modal-confirm-btn:hover {
     filter: brightness(1.1);
     transform: translateY(-1px);
 }
 
-#add-item-modal-confirm-btn:active {
+#save-wheel-modal-confirm-btn:active {
     transform: translateY(0);
 }

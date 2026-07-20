@@ -21,7 +21,8 @@ async function openInventoryModal(): Promise<void> {
 }
 
 async function loadInventory(): Promise<void> {
-  await Promise.all([getOwnedAssets().then(a => { currentOwnedAssets = a; }), refreshSelectedAssetIds()]);
+  const [assets] = await Promise.all([getOwnedAssets(), refreshSelectedAssetIds()]);
+  currentOwnedAssets = assets;
   loadInventoryTabs();
   loadInventoryByCategory();
 }

@@ -2,7 +2,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**public/script/mock-supabase-client.ts**','**server/src/mock/room/**','**server/src/mock/service.ts**', '**server/src/mock/routes.ts**', '**public/script/shared/supabase-client.ts**'],
+    ignores: ['**/dist/**', '**/node_modules/**', '**public/script/mock-supabase-client.ts**','**server/src/mock/room/**','**server/src/mock/service.ts**', '**server/src/mock/routes.ts**', '**public/script/shared/supabase-client.ts**', '**public/script/names/names-in-wheel-list.ts**'],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],

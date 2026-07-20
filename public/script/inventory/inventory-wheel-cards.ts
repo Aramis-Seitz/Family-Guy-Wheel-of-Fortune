@@ -13,12 +13,8 @@ export const inventoryWheelGrid = requiredElement<HTMLElement>("inventory-modal-
 const INVENTORY_LIMIT: number = 12;
 
 export async function loadWheelCards(): Promise<void> {
-  currentSavedWheels = await fetchInventoryWheels();
+  currentSavedWheels = await getSavedWheels();
   renderInventoryWheels(currentSavedWheels);
-}
-
-async function fetchInventoryWheels(): Promise<SavedWheel[]> {
-  return await getSavedWheels();
 }
 
 function renderInventoryWheels(savedWheels: SavedWheel[]): void {

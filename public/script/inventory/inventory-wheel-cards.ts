@@ -34,8 +34,8 @@ function renderInventoryWheels(savedWheels: SavedWheel[]): void {
 }
 
 function createCardForSlot(savedWheels: SavedWheel[], index: number): HTMLElement {
-  const savedWHeel = savedWheels[index];
-  if (savedWHeel) return createSavedWheelCard(savedWHeel);
+  const savedWheel = savedWheels[index];
+  if (savedWheel) return createSavedWheelCard(savedWheel);
   return index === savedWheels.length ? createAddCard() : createEmptyCard();
 }
 

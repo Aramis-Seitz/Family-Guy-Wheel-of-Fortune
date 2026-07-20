@@ -1,7 +1,9 @@
-import { shopTabs, getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop";
+import { shopTabs, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop";
+import type { AssetCategory } from "./shop";
 import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api";
 import { showToast } from "../shared/toast";
 import { createAssetCard } from "../shared/asset-card";
+import { getActiveCategory } from "../shared/category-tabs";
 import { requiredElement } from "../shared/dom-helpers";
 import type { Asset } from "shared";
 
@@ -16,8 +18,7 @@ export const shopGrid = requiredElement<HTMLElement>("shop-modal-grid");
 export async function loadShopAssets(): Promise<void> {
     currentOwnedAssetIds = await getOwnedAssetIds();
     shopGrid.innerHTML = "";
-    const activeTab = shopTabs.querySelector(".shop-modal__tab--active") as HTMLElement;
-    const activeCategory = getClickedCategory(activeTab) || "all";
+    const activeCategory = getActiveCategory<AssetCategory | "all">(shopTabs, "shop-modal") ?? "all";
     const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => shopGrid.appendChild(createShopAssetCard(asset)));
 }

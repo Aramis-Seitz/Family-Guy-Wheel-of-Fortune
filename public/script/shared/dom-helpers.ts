@@ -19,3 +19,13 @@ export function closeOnBackdropClick(modal: HTMLDialogElement, onClose?: () => v
     }
   });
 }
+
+export function onActivate(element: HTMLElement, handler: () => void): void {
+  element.addEventListener("click", handler);
+  element.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handler();
+    }
+  });
+}

@@ -1,4 +1,4 @@
-import { requiredElement } from "../shared/dom-helpers";
+import { requiredElement, onActivate } from "../shared/dom-helpers";
 import { replaceNames } from "../names/names-in-wheel-list";
 import type { SavedWheel } from "shared";
 import { getSavedWheels } from "../api/inventory-api";
@@ -46,13 +46,7 @@ function createAddCard(): HTMLDivElement {
   card.textContent = "+";
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
-  card.addEventListener("click", openSaveWheelModal);
-  card.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      openSaveWheelModal();
-    }
-  });
+  onActivate(card, openSaveWheelModal);
   return card;
 }
 
@@ -76,13 +70,7 @@ function createSavedWheelCard(savedWheel: SavedWheel): HTMLElement {
       if (names.length > 0) replaceNames(names);
       inventoryModal.close();
     };
-    card.addEventListener("click", handleLoad);
-    card.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleLoad();
-      }
-    });
+    onActivate(card, handleLoad);
   }
 
   card.appendChild(buildCardContent(savedWheel));

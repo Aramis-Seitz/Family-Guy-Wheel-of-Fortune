@@ -29,3 +29,14 @@ export function onActivate(element: HTMLElement, handler: () => void): void {
     }
   });
 }
+
+export function initToggleModal(
+  modal: HTMLDialogElement,
+  openBtn: HTMLElement,
+  closeBtn: HTMLElement,
+  onOpen: () => void
+): void {
+  openBtn.addEventListener("click", onOpen);
+  closeBtn.addEventListener("click", () => modal.close());
+  closeOnBackdropClick(modal);
+}

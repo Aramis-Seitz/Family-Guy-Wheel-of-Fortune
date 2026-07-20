@@ -1,4 +1,4 @@
-import { requiredElement } from "../shared/dom-helpers";
+import { requiredElement, initToggleModal } from "../shared/dom-helpers";
 import type { Asset } from "shared";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets";
 import { getOwnedAssets } from "../api/inventory-api";
@@ -44,14 +44,7 @@ export function filterAssetsByCategory(category: InventoryCategory): Asset[] {
 }
 
 export function initInventory(): void {
-  inventoryBtn.addEventListener("click", openInventoryModal);
-  inventoryCloseBtn.addEventListener("click", () => inventoryModal.close());
-  inventoryModal.addEventListener("click", (e) => {
-    const inner = inventoryModal.querySelector(".inventory-modal__content");
-    if (inner && !inner.contains(e.target as Node)) {
-      inventoryModal.close();
-    }
-  });
+  initToggleModal(inventoryModal, inventoryBtn, inventoryCloseBtn, openInventoryModal);
 
   initSaveWheelModal();
   initDeleteModal();

@@ -1,4 +1,4 @@
-import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers";
+import { requiredElement, initToggleModal } from "../shared/dom-helpers";
 import { loadShopAssets } from "./shop-assets";
 import type { Asset } from "shared";
 import { getShopAssets } from "../api/shop-api";
@@ -16,17 +16,11 @@ async function openShop(): Promise<void> {
     await refreshShop();
 }
 
-function closeShop(): void {
-    shopModal.close();
-}
-
 export const shopBtn = requiredElement<HTMLButtonElement>("shop-btn");
 export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
 
 export function initShop(): void {
-    shopBtn.addEventListener("click", openShop);
-    shopCloseBtn.addEventListener("click", closeShop);
-    closeOnBackdropClick(shopModal, closeShop);
+    initToggleModal(shopModal, shopBtn, shopCloseBtn, openShop);
     subscribeToCoinUpdates();
 }
 

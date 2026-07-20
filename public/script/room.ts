@@ -358,12 +358,14 @@ function setRoomActive(roomKey: string, host: boolean): void {
   if (!host) {
     spinLeftBtn.classList.add('spin__btn--room-guest');
     spinRightBtn.classList.add('spin__btn--room-guest');
+    multiplierSlider.classList.add('multiplier-slider--room-guest');
     resetBtn.disabled = true;
     resetBtn.style.setProperty('opacity', '0.4');
     resetBtn.style.setProperty('cursor', 'not-allowed');
   } else {
     spinLeftBtn.classList.remove('spin__btn--room-guest');
     spinRightBtn.classList.remove('spin__btn--room-guest');
+    multiplierSlider.classList.remove('multiplier-slider--room-guest');
     setResetOverride(() => { void handleRoomReset(false); });
     setWinnerModalCloseOverride(() => { void handleRoomReset(true); });
   }
@@ -394,6 +396,7 @@ function clearRoom(): void {
   if (roomInfo) roomInfo.classList.add('hidden');
   spinLeftBtn.classList.remove('spin__btn--room-guest', 'spin__btn--room-solo');
   spinRightBtn.classList.remove('spin__btn--room-guest', 'spin__btn--room-solo');
+  multiplierSlider.classList.remove('multiplier-slider--room-guest');
   resetBtn.disabled = false;
   resetBtn.style.removeProperty('opacity');
   resetBtn.style.removeProperty('cursor');
@@ -454,6 +457,9 @@ async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
 
 function handleWheelResetEvent(): void {
   resetWheelRotation();
+  if (activeRoomKey && !isHost) {
+    disableMultiplierSlider();
+  }
 }
 
 function handleWinnerModalCloseEvent(): void {
@@ -737,6 +743,10 @@ export function initRoomControls(): void {
 
 export function isMultiplayerActive(): boolean {
   return !!activeRoomKey;
+}
+
+export function isRoomHost(): boolean {
+  return isHost;
 }
 
 async function hasActiveSession(): Promise<boolean> {

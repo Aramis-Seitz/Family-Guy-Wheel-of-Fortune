@@ -1,8 +1,9 @@
-import { isMultiplayerActive } from "../room";
+import { isMultiplayerActive, isRoomHost } from "../room";
 import { awardCoins } from "../api/spin-api";
 import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list";
 import { stopDrumRoll } from "./sound";
 import { resetWheelRotation } from "./spin";
+import { disableMultiplierSlider } from "./multiplier";
 import { refreshCoinDisplay } from "../profile/profiles";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
@@ -150,6 +151,9 @@ export function setWinnerModalCloseOverride(handler: (() => void) | null): void 
 function closeWinnerModalLocally(): void {
   hideWinnerModal();
   resetWheelRotation();
+  if (isMultiplayerActive() && !isRoomHost()) {
+    disableMultiplierSlider();
+  }
 }
 
 export function initWinnerModal(): void {

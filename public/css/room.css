@@ -264,3 +264,9 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.multiplier-slider--room-guest {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}

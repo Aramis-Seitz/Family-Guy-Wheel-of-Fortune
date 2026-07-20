@@ -4,10 +4,10 @@ import { isMultiplayerActive } from "../room";
 import { loadInventoryByCategory } from "./inventory";
 import { renderCategoryTabs, getActiveCategory } from "../shared/category-tabs";
 
-const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
-
 export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
 export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
+
+const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");
 
 export function getActiveInventoryCategory(): InventoryCategory | null {
   return getActiveCategory<InventoryCategory>(inventoryTabs, "inventory-modal");

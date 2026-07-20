@@ -8,8 +8,6 @@ let pendingDeleteId: string | null = null;
 
 const confirmDeleteName = requiredElement<HTMLElement>("confirm-delete-modal-name");
 const confirmDeleteModal = requiredElement<HTMLDialogElement>("confirm-delete-modal");
-const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-confirm-btn");
-const cancelDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-cancel-btn");
 
 export function openDeleteModal(id: string, title: string): void {
   pendingDeleteId = id;
@@ -37,6 +35,9 @@ function cancelDelete(): void {
   confirmDeleteModal.close();
   pendingDeleteId = null;
 }
+
+const confirmDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-confirm-btn");
+const cancelDeleteBtn = requiredElement<HTMLButtonElement>("confirm-delete-modal-cancel-btn");
 
 export function initDeleteModal(): void {
   confirmDeleteBtn.addEventListener("click", confirmDeleteWheel);

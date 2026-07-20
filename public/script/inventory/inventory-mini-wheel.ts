@@ -1,8 +1,5 @@
 import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer";
 
-const MINI_CENTER = { x: 100, y: 100 };
-const MINI_RADIUS = 90;
-
 export function createMiniWheel(names: string[], size = 70): SVGSVGElement {
   const svg = document.createElementNS(SVG_NS, "svg");
 
@@ -19,6 +16,9 @@ export function createMiniWheel(names: string[], size = 70): SVGSVGElement {
 
   return svg;
 }
+
+const MINI_CENTER = { x: 100, y: 100 };
+const MINI_RADIUS = 90;
 
 function createMiniSegment(index: number, count: number): SVGPathElement {
   const angleStep = FULL_CIRCLE_RADIANS / count;
@@ -47,6 +47,8 @@ function createMiniSegment(index: number, count: number): SVGPathElement {
   return path;
 }
 
+const MINI_LABEL_RADIUS = MINI_RADIUS * 0.6;
+
 function createMiniLabel(
   index: number,
   count: number,
@@ -55,8 +57,7 @@ function createMiniLabel(
   const angleStep = FULL_CIRCLE_RADIANS / count;
   const middleAngle = (index + 0.5) * angleStep;
 
-  const labelRadius = MINI_RADIUS * 0.6;
-  const point = getPointOnCircle(MINI_CENTER, labelRadius, middleAngle);
+  const point = getPointOnCircle(MINI_CENTER, MINI_LABEL_RADIUS, middleAngle);
 
   const text = document.createElementNS(SVG_NS, "text");
 

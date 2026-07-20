@@ -10,12 +10,13 @@ import { inventoryModal } from "./inventory";
 let currentSavedWheels: SavedWheel[] = [];
 
 export const inventoryWheelGrid = requiredElement<HTMLElement>("inventory-modal-wheel-grid");
-const INVENTORY_LIMIT: number = 12;
 
 export async function loadWheelCards(): Promise<void> {
   currentSavedWheels = await getSavedWheels();
   renderInventoryWheels(currentSavedWheels);
 }
+
+const INVENTORY_LIMIT: number = 12;
 
 function renderInventoryWheels(savedWheels: SavedWheel[]): void {
   for (let i = 0; i < INVENTORY_LIMIT; i++) {
@@ -131,12 +132,12 @@ function extractNamesFromLink(link: string | null): string[] {
   }
 }
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
+const DATE_FORMATTER = new Intl.DateTimeFormat("de-DE", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "2-digit",
+});
 
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  }).format(date);
+function formatDate(dateString: string): string {
+  return DATE_FORMATTER.format(new Date(dateString));
 }

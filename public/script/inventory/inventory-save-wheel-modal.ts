@@ -8,9 +8,6 @@ import { inventoryModal } from "./inventory";
 
 const saveWheelInput = requiredElement<HTMLInputElement>("save-wheel-input");
 const saveWheelModal = requiredElement<HTMLDialogElement>("save-wheel-modal");
-const confirmSaveWheelBtn = requiredElement<HTMLButtonElement>("save-wheel-modal-confirm-btn");
-const cancelSaveWheelBtn = requiredElement<HTMLButtonElement>("save-wheel-modal-cancel-btn");
-const closeSaveWheelBtn = requiredElement<HTMLButtonElement>("save-wheel-modal-close-btn");
 
 export function openSaveWheelModal(): void {
   if (!inventoryModal.open) return;
@@ -45,6 +42,10 @@ async function submitSavedWheel(): Promise<void> {
     showToast({ message, type: "error" });
   }
 }
+
+const confirmSaveWheelBtn = requiredElement<HTMLButtonElement>("save-wheel-modal-confirm-btn");
+const cancelSaveWheelBtn = requiredElement<HTMLButtonElement>("save-wheel-modal-cancel-btn");
+const closeSaveWheelBtn = requiredElement<HTMLButtonElement>("save-wheel-modal-close-btn");
 
 export function initSaveWheelModal(): void {
   confirmSaveWheelBtn.addEventListener("click", submitSavedWheel);

@@ -1,5 +1,5 @@
 import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory"
-import type { InventoryCategory } from "./inventory";
+import type { InventoryCategory } from "./inventory-tabs";
 import type { Asset } from "shared";
 import { getSelectedAssetIds, selectAsset } from "../api/inventory-api";
 import { showToast } from "../shared/toast";

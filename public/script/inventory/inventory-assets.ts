@@ -16,7 +16,7 @@ function isAssetSelected(assetId: string): boolean {
     return currentSelectedAssetIds.includes(assetId);
 }
 
-export function loadOwnedAssets(activeCategory: InventoryCategory): void {
+export function renderOwnedAssetCards(activeCategory: InventoryCategory): void {
     const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => inventoryAssetGrid.appendChild(createInventoryAssetCard(asset)));
 }

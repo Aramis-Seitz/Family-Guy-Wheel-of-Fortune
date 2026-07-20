@@ -25,8 +25,8 @@ function createMiniSegment(index: number, count: number): SVGPathElement {
   const start = index * angleStep;
   const end = (index + 1) * angleStep;
 
-  const p1 = getPointOnCircle(MINI_CENTER, MINI_RADIUS, start);
-  const p2 = getPointOnCircle(MINI_CENTER, MINI_RADIUS, end);
+  const startPoint = getPointOnCircle(MINI_CENTER, MINI_RADIUS, start);
+  const endPoint = getPointOnCircle(MINI_CENTER, MINI_RADIUS, end);
 
   const largeArc = angleStep > Math.PI ? 1 : 0;
 
@@ -35,8 +35,8 @@ function createMiniSegment(index: number, count: number): SVGPathElement {
   path.setAttribute(
     "d",
     `M ${MINI_CENTER.x} ${MINI_CENTER.y}
-     L ${p1.x} ${p1.y}
-     A ${MINI_RADIUS} ${MINI_RADIUS} 0 ${largeArc} 1 ${p2.x} ${p2.y}
+     L ${startPoint.x} ${startPoint.y}
+     A ${MINI_RADIUS} ${MINI_RADIUS} 0 ${largeArc} 1 ${endPoint.x} ${endPoint.y}
      Z`
   );
 

@@ -16,16 +16,16 @@ export async function loadWheelCards(): Promise<void> {
   renderInventoryWheels(currentSavedWheels);
 }
 
-const INVENTORY_LIMIT: number = 12;
+const MAX_WHEEL_CARDS: number = 12;
 
 function renderInventoryWheels(savedWheels: SavedWheel[]): void {
-  for (let i = 0; i < INVENTORY_LIMIT; i++) {
+  for (let i = 0; i < MAX_WHEEL_CARDS; i++) {
     const card = createCardForSlot(savedWheels, i);
     const existing = inventoryWheelGrid.children[i];
     existing ? existing.replaceWith(card) : inventoryWheelGrid.appendChild(card);
   }
 
-  while (inventoryWheelGrid.children.length > INVENTORY_LIMIT) {
+  while (inventoryWheelGrid.children.length > MAX_WHEEL_CARDS) {
     inventoryWheelGrid.lastElementChild!.remove();
   }
 }
@@ -55,6 +55,7 @@ function createEmptyCard(): HTMLDivElement {
 
 function createSavedWheelCard(savedWheel: SavedWheel): HTMLElement {
   const hasValidLink = (savedWheel.link ?? "").trim() !== "";
+  const names = extractNamesFromLink(savedWheel.link);
   const card = document.createElement("div");
   card.classList.add("inventory-modal__card");
 
@@ -62,7 +63,6 @@ function createSavedWheelCard(savedWheel: SavedWheel): HTMLElement {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
 
-    const names = extractNamesFromLink(savedWheel.link);
     const handleLoad = () => {
       if (names.length > 0) replaceNames(names);
       inventoryModal.close();
@@ -70,7 +70,7 @@ function createSavedWheelCard(savedWheel: SavedWheel): HTMLElement {
     onActivate(card, handleLoad);
   }
 
-  card.appendChild(buildCardContent(savedWheel));
+  card.appendChild(buildCardContent(savedWheel, names));
 
   if (hasValidLink) {
     card.appendChild(createDeleteButton(savedWheel));
@@ -79,11 +79,10 @@ function createSavedWheelCard(savedWheel: SavedWheel): HTMLElement {
   return card;
 }
 
-function buildCardContent(savedWheel: SavedWheel): HTMLDivElement {
+function buildCardContent(savedWheel: SavedWheel, names: string[]): HTMLDivElement {
   const content = document.createElement("div");
   content.className = "inventory-modal__card-content";
 
-  const names = extractNamesFromLink(savedWheel.link);
   if (names.length >= 2) {
     const miniWheel = createMiniWheel(names, 65);
     miniWheel.style.transform = `rotate(${Math.random() * 360}deg)`;

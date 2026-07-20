@@ -1,6 +1,6 @@
 import { requiredElement, initToggleModal } from "../shared/dom-helpers";
 import type { Asset } from "shared";
-import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets";
+import { renderOwnedAssetCards, refreshSelectedAssetIds } from "./inventory-assets";
 import { getOwnedAssets } from "../api/inventory-api";
 import { loadWheelCards, inventoryWheelGrid } from "./inventory-wheel-cards";
 import { initDeleteModal } from "./inventory-delete-modal";
@@ -37,7 +37,7 @@ export function loadInventoryByCategory(): void {
   inventoryWheelGrid.style.display = isWheel ? "" : "none";
   inventoryAssetGrid.style.display = isWheel ? "none" : "";
 
-  isWheel ? loadWheelCards() : loadOwnedAssets(activeCategory);
+  isWheel ? loadWheelCards() : renderOwnedAssetCards(activeCategory);
 }
 
 export function filterAssetsByCategory(category: InventoryCategory): Asset[] {

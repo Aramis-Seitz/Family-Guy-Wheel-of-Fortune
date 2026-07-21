@@ -1,4 +1,4 @@
-import { getNamesInWheelList, replaceNames, lockNameEditing, unlockNameEditing, setOnNameInWheelListRemoved } from "../names/names-in-wheel-list";
+import { getNamesInWheelList, replaceNames, lockNameEditing, unlockNameEditing } from "../names/names-in-wheel-list";
 import {
   spinWheel, lockAllSpinElements, applyGameModeLock,
   resetWheelRotation,
@@ -59,7 +59,6 @@ function clearRoom(): void {
   }
   setActiveRoomPlayers([]);
   setActiveRoomNamesInWheelList([]);
-  setOnNameInWheelListRemoved(null);
   unlockNameEditing();
   unsubscribeFromRoom();
   setCurrentMode(new SoloModeStrategy());

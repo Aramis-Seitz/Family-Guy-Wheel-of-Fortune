@@ -33,3 +33,7 @@ export function setActiveRoomHostName(hostName: string): void {
 export function isMultiplayerActive(): boolean {
   return !!activeRoomKey;
 }
+
+export function getMissingPlayers(players: string[], namesInWheelList: string[]): string[] {
+  return players.filter((player) => !namesInWheelList.includes(player));
+}

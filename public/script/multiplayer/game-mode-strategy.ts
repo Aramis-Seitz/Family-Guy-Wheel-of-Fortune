@@ -13,7 +13,7 @@ import {
 } from "../names/names-in-wheel-list";
 import { showToast } from "../shared/toast";
 import { spinRoom, updateRoomNames, resetRoom } from "../api/room-api";
-import { activeRoomKey, activeRoomNamesInWheelList } from "./room-state";
+import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
 
 export interface GameModeStrategy {
   onSpinClick(direction: Direction): Promise<void>;
@@ -22,9 +22,8 @@ export interface GameModeStrategy {
   getRoleLockedElements(): SpinElement[];
   addCustomNameToWheel(rawName: string): Promise<void>;
   addPlayerNameToWheel(playerName: string): Promise<void>;
-  removeNameFromWheel(name: string): Promise<void>;
-  removePlayerNameFromWheel(playerName: string): Promise<void>;
-  addAllPlayersToWheel(players: string[]): Promise<void>;
+  removeNameFromWheel(index: number): Promise<void>;
+  toggleAllPlayersInWheel(players: string[]): Promise<void>;
   canManagePlayers(): boolean;
   getLeaveConfirmMessage(guestCount: number): string;
   getLeaveResultMessage(success: boolean): string;
@@ -60,11 +59,7 @@ export class SoloModeStrategy implements GameModeStrategy {
     // no-op — lokales Entfernen läuft direkt über die Namensliste, nicht über den Raum-Callback
   }
 
-  async removePlayerNameFromWheel(): Promise<void> {
-    // no-op — es gibt keine Mitspielerliste ohne Raum
-  }
-
-  async addAllPlayersToWheel(): Promise<void> {
+  async toggleAllPlayersInWheel(): Promise<void> {
     // no-op — es gibt keine Mitspielerliste ohne Raum
   }
 
@@ -143,28 +138,18 @@ export class HostModeStrategy implements GameModeStrategy {
     await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
   }
 
-  async removeNameFromWheel(name: string): Promise<void> {
+  async removeNameFromWheel(index: number): Promise<void> {
     if (!activeRoomKey) return;
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
-    const index = existingNamesInWheelList.findIndex((existingName) => existingName === name);
-    if (index < 0) return;
+    if (index < 0 || index >= existingNamesInWheelList.length) return;
     const updatedNamesInWheelList = [...existingNamesInWheelList.slice(0, index), ...existingNamesInWheelList.slice(index + 1)];
     await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
   }
 
-  async removePlayerNameFromWheel(playerName: string): Promise<void> {
+  async toggleAllPlayersInWheel(players: string[]): Promise<void> {
     if (!activeRoomKey) return;
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
-    const index = existingNamesInWheelList.findIndex((existingName) => existingName === playerName);
-    if (index < 0) return;
-    const updatedNamesInWheelList = [...existingNamesInWheelList.slice(0, index), ...existingNamesInWheelList.slice(index + 1)];
-    await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
-  }
-
-  async addAllPlayersToWheel(players: string[]): Promise<void> {
-    if (!activeRoomKey) return;
-    const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
-    const missingPlayers = players.filter((player) => !existingNamesInWheelList.includes(player));
+    const missingPlayers = getMissingPlayers(players, existingNamesInWheelList);
 
     if (missingPlayers.length > 0) {
       const updatedNamesInWheelList = [...existingNamesInWheelList, ...missingPlayers];
@@ -226,11 +211,7 @@ export class GuestModeStrategy implements GameModeStrategy {
     // no-op — nur der Host verwaltet die Namensliste
   }
 
-  async removePlayerNameFromWheel(): Promise<void> {
-    // no-op — nur der Host verwaltet die Mitspielerliste
-  }
-
-  async addAllPlayersToWheel(): Promise<void> {
+  async toggleAllPlayersInWheel(): Promise<void> {
     // no-op — nur der Host verwaltet die Mitspielerliste
   }
 

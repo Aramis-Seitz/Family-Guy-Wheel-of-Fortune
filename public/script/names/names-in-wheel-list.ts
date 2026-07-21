@@ -1,5 +1,6 @@
 import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin";
 import { wheelEmptyHint } from "../multiplayer/room-players-sidebar";
+import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { requiredElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
 import { validateName } from "../shared/validation";
@@ -14,11 +15,6 @@ import { namesInWheelListState, MAX_ITEMS, MIN_ITEMS } from "./names-in-wheel-li
 let roomLocked = false;
 let disableAddWhileLocked = true;
 let disableRemoveWhileLocked = true;
-let onNameInWheelListRemoved: ((removedName: string, index: number) => Promise<void> | void) | null = null;
-
-export function setOnNameInWheelListRemoved(callback: ((removedName: string, index: number) => Promise<void> | void) | null): void {
-  onNameInWheelListRemoved = callback;
-}
 
 export function lockNameEditing(disableAdd = true, disableRemove = true): void {
   roomLocked = true;
@@ -157,17 +153,15 @@ export function refreshWheel(): void {
 async function handleRemoveNameElementFromWheelList(index: number, wheelListNameElement: HTMLLIElement): Promise<void> {
   if (roomLocked && disableRemoveWhileLocked) return;
 
-  const nameText = wheelListNameElement.querySelector(".names-in-wheel-list-element__text")?.textContent?.trim() ?? "";
-  if (onNameInWheelListRemoved && nameText) {
-    const button = wheelListNameElement.querySelector(".names-in-wheel-list-element__remove-btn") as HTMLButtonElement | null;
-    if (button) button.disabled = true;
-    try {
-      await onNameInWheelListRemoved(nameText, index);
-    } catch (error) {
-      if (button) button.disabled = false;
-      console.error("Failed to remove name from room wheel names:", error);
-      return;
-    }
+  const button = wheelListNameElement.querySelector(".names-in-wheel-list-element__remove-btn") as HTMLButtonElement | null;
+  if (button) button.disabled = true;
+  try {
+    await getCurrentMode().removeNameFromWheel(index);
+  } catch (error) {
+    if (button) button.disabled = false;
+    console.error("Failed to remove name from room wheel names:", error);
+    showErrorToast("Entfernen fehlgeschlagen");
+    return;
   }
 
   namesInWheelListState.removeNameInWheelListAt(index);

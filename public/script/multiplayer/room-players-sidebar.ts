@@ -1,6 +1,6 @@
 import { optionalElement } from "../shared/dom-helpers";
 import { getNamesInWheelList, addBtn, input } from "../names/names-in-wheel-list";
-import { activeRoomHostName, activeRoomNamesInWheelList } from "./room-state";
+import { activeRoomHostName, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
 import { getCurrentMode } from "./game-mode-strategy";
 
 export const playersList = optionalElement<HTMLUListElement>("room-players-list");
@@ -38,8 +38,9 @@ export function renderPlayersSidebar(players: string[]): void {
       togglePlayerInWheelListBtn.addEventListener('click', async () => {
         togglePlayerInWheelListBtn.disabled = true;
         try {
-          if ((activeRoomNamesInWheelList ?? []).includes(name)) {
-            await getCurrentMode().removePlayerNameFromWheel(name);
+          const index = (activeRoomNamesInWheelList ?? []).indexOf(name);
+          if (index >= 0) {
+            await getCurrentMode().removeNameFromWheel(index);
           } else {
             await getCurrentMode().addPlayerNameToWheel(name);
           }
@@ -82,7 +83,7 @@ export function updateWheelEmptyState(): void {
 
 export function updateBulkButtonState(players: string[]): void {
   if (!bulkAddToWheelBtn) return;
-  const anyMissing = players.some((player) => !(activeRoomNamesInWheelList ?? []).includes(player));
+  const anyMissing = getMissingPlayers(players, activeRoomNamesInWheelList ?? []).length > 0;
   if (anyMissing) {
     bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
     bulkAddToWheelBtn.classList.remove('room__btn--remove');

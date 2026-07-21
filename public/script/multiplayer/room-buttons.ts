@@ -1,5 +1,5 @@
 import { optionalElement } from "../shared/dom-helpers";
-import { addBtn, input, setOnNameInWheelListRemoved } from "../names/names-in-wheel-list";
+import { addBtn, input } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
 import { activeRoomKey, activeRoomPlayers, roomKeyDisplay } from "./room-state";
@@ -38,14 +38,10 @@ const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confi
 const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-cancel-btn");
 
 export function initRoomButtons(): void {
-  setOnNameInWheelListRemoved(async (removedName: string): Promise<void> => {
-    await getCurrentMode().removeNameFromWheel(removedName);
-  });
-
   bulkAddToWheelBtn?.addEventListener('click', async () => {
     const players = Array.from(playersList?.querySelectorAll('.room__player-name') ?? [])
       .map((nameElement) => nameElement.textContent?.trim() ?? '');
-    await getCurrentMode().addAllPlayersToWheel(players);
+    await getCurrentMode().toggleAllPlayersInWheel(players);
   });
 
   createRoomBtn?.addEventListener('click', () => {

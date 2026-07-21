@@ -1,10 +1,10 @@
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound";
 import { fetchRandomNumber } from "../api/spin-api";
-import { getNamesInWheelList, input, addBtn, getRemoveBtn } from "../names/names-in-wheel-list";
+import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked } from "../names/names-in-wheel-list";
 import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
 import { getMultiplier, multiplierSlider } from "./multiplier";
 import { wheelElement } from "./renderer";
-import { bulkAddToWheelBtn } from "../room";
+import { bulkAddToWheelBtn, getCurrentMode } from "../room";
 import { profileName } from "../profile/profiles";
 import { MIN_ITEMS } from "../names/names-in-wheel-list-state";
 import { requiredElement } from "../shared/dom-helpers";
@@ -16,27 +16,13 @@ export function isSpinning(): boolean {
 }
 
 export type Direction = "left" | "right";
-export type SpinHandler = (direction: Direction) => Promise<void>;
-let activeSpinOverride: SpinHandler | null = null;
 
-export function setSpinOverride(handler: SpinHandler | null): void {
-  activeSpinOverride = handler;
-}
-
-let activeResetOverride: (() => void) | null = null;
-
-export function setResetOverride(handler: (() => void) | null): void {
-  activeResetOverride = handler;
-}
-
-export function lockSpinButtons(): void {
+// Sperrt pauschal ALLE spin-relevanten Elemente für die Dauer eines Spins —
+// rollenunabhängig, kein automatisches Gegenstück. Der Zustand danach wird
+// bewusst über applyGameModeLock() neu hergeleitet, nicht einfach umgekehrt.
+export function lockAllSpinElements(): void {
   setElementsDisabled(getSpinRelatedElements(), true);
   profileName?.classList.remove("user-profile-name--clickable");
-}
-
-export function unlockSpinButtons(): void {
-  setElementsDisabled(getSpinRelatedElements(), false);
-  profileName?.classList.add("user-profile-name--clickable");
 }
 
 let currentRotation = 0;
@@ -125,7 +111,7 @@ function finishSpin(config: SpinConfig): void {
   spinning = false;
   stopDrumRoll();
   playCymbalCrash();
-  unlockSpinButtons();
+  applyGameModeLock();
   announceWinner(config.spinToken, resolveWinner(currentRotation, config));
 }
 
@@ -193,7 +179,7 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
   const names = getNamesInWheelList();
   if (names.length < MIN_ITEMS) return;
 
-  lockSpinButtons();
+  lockAllSpinElements();
 
   try {
     const multiplier = getMultiplier();
@@ -201,7 +187,7 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
     spinWheel(Math.round(MIN_SPIN_ROTATIONS * multiplier) + rawSteps, direction, spinToken, names);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);
-    unlockSpinButtons();
+    applyGameModeLock();
   }
 }
 
@@ -211,7 +197,7 @@ export function resetWheelRotation(): void {
   currentRotation = 0;
   lastTickRotation = 0;
   updateWheelRotation();
-  unlockSpinButtons();
+  applyGameModeLock();
   stopDrumRoll();
 }
 
@@ -221,16 +207,42 @@ export function getCurrentRotation(): number {
 
 export const resetBtn = requiredElement<HTMLButtonElement>("reset-btn");
 
+// Das Universum, das nach einem Spin/Reset/Rollenwechsel neu aus currentMode
+// hergeleitet wird — die Spin-relevanten Elemente PLUS resetBtn, der bewusst
+// NICHT Teil von getSpinRelatedElements() ist (während eines laufenden Spins
+// soll Reset weiterhin klickbar bleiben, unverändertes Verhalten).
+function getRoleLockableElements(): SpinElement[] {
+  return [...getSpinRelatedElements(), resetBtn];
+}
+
+// Stellt den Sperrzustand her, der laut aktuellem Spielmodus (Solo/Host/Gast)
+// gerade gelten soll. Kein "unlock" im klassischen Sinn — leitet sich immer
+// neu aus currentMode her, statt eine vorherige Sperre nur umzukehren.
+export function applyGameModeLock(): void {
+  const hasEnoughItems = getNamesInWheelList().length >= MIN_ITEMS;
+  const locked: SpinElement[] = [...getCurrentMode().getRoleLockedElements()];
+  if (!hasEnoughItems) {
+    locked.push(spinLeftBtn, spinRightBtn);
+  }
+
+  setElementsDisabled(getRoleLockableElements(), false);
+  setElementsDisabled(locked, true);
+  // profileName ist ein <span>, kein Button/Input — kann nicht über
+  // setElementsDisabled() laufen. Folgt stattdessen demselben Berechtigungs-
+  // Flag wie input/addBtn (isNameEditingLocked), statt blind "klickbar" zu setzen.
+  profileName?.classList.toggle("user-profile-name--clickable", !isNameEditingLocked());
+}
+
 export function initWheelControls(): void {
   spinLeftBtn.addEventListener("click", () => {
-    void (activeSpinOverride ? activeSpinOverride("left") : spinWheelWithRandomSteps("left"));
+    void getCurrentMode().onSpinClick("left");
   });
 
   spinRightBtn.addEventListener("click", () => {
-    void (activeSpinOverride ? activeSpinOverride("right") : spinWheelWithRandomSteps("right"));
+    void getCurrentMode().onSpinClick("right");
   });
 
   resetBtn.addEventListener("click", () => {
-    (activeResetOverride ?? resetWheelRotation)();
+    getCurrentMode().onReset();
   });
 }

@@ -4,21 +4,21 @@ import { optionalElement } from "./shared/dom-helpers";
 import {
   addNameToList, getNamesInWheelList, replaceNames,
   lockNameEditing, unlockNameEditing, setOnNameInWheelListRemoved,
-  setMultiplayerMode, addBtn, input,
+  addBtn, input, getRemoveBtn,
 } from "./names/names-in-wheel-list";
 import {
-  spinWheel, setSpinOverride, setResetOverride, lockSpinButtons,
-  unlockSpinButtons, resetWheelRotation, isSpinning,
+  spinWheel, spinWheelWithRandomSteps, lockAllSpinElements, applyGameModeLock,
+  resetWheelRotation, isSpinning,
   spinLeftBtn, spinRightBtn, resetBtn,
-  MIN_SPIN_ROTATIONS, SPIN_DISABLED_OPACITY,
+  MIN_SPIN_ROTATIONS,
 } from "./wheel/spin";
-import type { Direction } from "./wheel/spin";
+import type { Direction, SpinElement } from "./wheel/spin";
 import {
   getMultiplier, setMultiplierSlider,
-  updateMultiplierDisplay, disableMultiplierSlider, enableMultiplierSlider,
+  updateMultiplierDisplay,
   multiplierSlider,
 } from "./wheel/multiplier";
-import { hideWinnerModal, setWinnerModalCloseOverride } from "./wheel/winner";
+import { hideWinnerModal } from "./wheel/winner";
 import { initChat, destroyChat } from "./multiplayer/chat";
 import { showToast } from "./shared/toast";
 import {
@@ -191,24 +191,236 @@ export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void
 
 
 export let activeRoomKey: string | null = null;
-let isHost = false;
+
+interface GameModeStrategy {
+  onSpinClick(direction: Direction): Promise<void>;
+  onReset(): void;
+  onWinnerModalClose(): void;
+  getRoleLockedElements(): SpinElement[];
+  addCustomNameToWheel(rawName: string): Promise<void>;
+  addPlayerNameToWheel(playerName: string): Promise<void>;
+  removeNameFromWheel(name: string): Promise<void>;
+  removePlayerNameFromWheel(playerName: string): Promise<void>;
+  addAllPlayersToWheel(players: string[]): Promise<void>;
+  canManagePlayers(): boolean;
+  getLeaveConfirmMessage(guestCount: number): string;
+  getLeaveResultMessage(success: boolean): string;
+}
+
+class SoloModeStrategy implements GameModeStrategy {
+  async onSpinClick(direction: Direction): Promise<void> {
+    await spinWheelWithRandomSteps(direction);
+  }
+
+  onReset(): void {
+    resetWheelRotation();
+  }
+
+  onWinnerModalClose(): void {
+    hideWinnerModal();
+    resetWheelRotation();
+  }
+
+  getRoleLockedElements(): SpinElement[] {
+    return [];
+  }
+
+  async addCustomNameToWheel(rawName: string): Promise<void> {
+    addNameToList(rawName);
+  }
+
+  async addPlayerNameToWheel(): Promise<void> {
+    // no-op — es gibt keine Mitspielerliste ohne Raum
+  }
+
+  async removeNameFromWheel(): Promise<void> {
+    // no-op — lokales Entfernen läuft direkt über die Namensliste, nicht über den Raum-Callback
+  }
+
+  async removePlayerNameFromWheel(): Promise<void> {
+    // no-op — es gibt keine Mitspielerliste ohne Raum
+  }
+
+  async addAllPlayersToWheel(): Promise<void> {
+    // no-op — es gibt keine Mitspielerliste ohne Raum
+  }
+
+  canManagePlayers(): boolean {
+    return false;
+  }
+
+  // Unerreichbar in der Praxis — #room-info (enthält den Leave-Button) ist
+  // versteckt, solange currentMode SoloModeStrategy ist. Nur wegen des
+  // GameModeStrategy-Interfaces Pflicht, siehe GuestModeStrategy.addName().
+  getLeaveConfirmMessage(): string {
+    return 'Raum wirklich verlassen?';
+  }
+
+  getLeaveResultMessage(success: boolean): string {
+    return success ? 'Raum verlassen' : 'Raum konnte nicht verlassen werden';
+  }
+}
+
+class HostModeStrategy implements GameModeStrategy {
+  async onSpinClick(direction: Direction): Promise<void> {
+    if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
+    lockAllSpinElements();
+    try {
+      const names = getNamesInWheelList();
+      const { ranNum, spinToken } = await spinRoom(activeRoomKey, names, direction);
+      const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
+      spinWheel(totalSteps, direction, spinToken, names);
+    } catch (error) {
+      console.error('[ROOM] Spin fehlgeschlagen:', error);
+      applyGameModeLock();
+      showToast({ message: 'Spin fehlgeschlagen', type: 'error' });
+    }
+  }
+
+  onReset(): void {
+    void handleRoomReset(false);
+  }
+
+  onWinnerModalClose(): void {
+    void handleRoomReset(true);
+  }
+
+  getRoleLockedElements(): SpinElement[] {
+    return [];
+  }
+
+  async addCustomNameToWheel(rawName: string): Promise<void> {
+    const trimmed = rawName.trim();
+    if (!trimmed || !activeRoomKey) return;
+    const updatedItems = [...(roomNames ?? []), trimmed];
+    await updateRoomNames(activeRoomKey, updatedItems);
+    input.value = '';
+  }
+
+  async addPlayerNameToWheel(playerName: string): Promise<void> {
+    if (!activeRoomKey) return;
+    const updatedItems = [...(roomNames ?? []), playerName];
+    await updateRoomNames(activeRoomKey, updatedItems);
+  }
+
+  async removeNameFromWheel(name: string): Promise<void> {
+    if (!activeRoomKey) return;
+    const items = roomNames ?? [];
+    const index = items.findIndex((item) => item === name);
+    if (index < 0) return;
+    const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
+    await updateRoomNames(activeRoomKey, updatedItems);
+  }
+
+  async removePlayerNameFromWheel(playerName: string): Promise<void> {
+    if (!activeRoomKey) return;
+    const items = roomNames ?? [];
+    const index = items.findIndex((item) => item === playerName);
+    if (index < 0) return;
+    const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
+    await updateRoomNames(activeRoomKey, updatedItems);
+  }
+
+  async addAllPlayersToWheel(players: string[]): Promise<void> {
+    if (!activeRoomKey) return;
+    const current = roomNames ?? [];
+    const missingPlayers = players.filter((player) => !current.includes(player));
+
+    if (missingPlayers.length > 0) {
+      const updatedItems = [...current, ...missingPlayers];
+      await updateRoomNames(activeRoomKey, updatedItems);
+      return;
+    }
+
+    const updatedItems = current.filter((item) => !players.includes(item));
+    await updateRoomNames(activeRoomKey, updatedItems);
+  }
+
+  canManagePlayers(): boolean {
+    return true;
+  }
+
+  getLeaveConfirmMessage(guestCount: number): string {
+    if (guestCount > 0) {
+      return `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
+    }
+    return 'Raum wirklich schließen?';
+  }
+
+  getLeaveResultMessage(success: boolean): string {
+    return success ? 'Raum geschlossen' : 'Raum konnte nicht geschlossen werden';
+  }
+}
+
+// Gast kann weder spinnen noch resetten noch die Namensliste verwalten — all das
+// läuft ausschließlich über den Host und erreicht den Gast als Realtime-Event
+// (handleRoomSpinEvent, handleWheelResetEvent, setNamesFromRoom).
+class GuestModeStrategy implements GameModeStrategy {
+  async onSpinClick(): Promise<void> {
+    // no-op — Spin-Buttons sind für Gäste ohnehin dauerhaft gesperrt
+  }
+
+  onReset(): void {
+    // no-op — Gast wartet auf das Realtime-Event vom Host
+  }
+
+  onWinnerModalClose(): void {
+    // no-op — Gast wartet auf das Realtime-Event vom Host
+  }
+
+  getRoleLockedElements(): SpinElement[] {
+    return [multiplierSlider, resetBtn, spinLeftBtn, spinRightBtn, input, addBtn, getRemoveBtn()];
+  }
+
+  async addCustomNameToWheel(rawName: string): Promise<void> {
+    // unerreichbar in der Praxis (Eingabefeld ist für Gäste gesperrt) —
+    // Fallback identisch zu Solo, falls der Guard doch mal umgangen wird
+    addNameToList(rawName);
+  }
+
+  async addPlayerNameToWheel(): Promise<void> {
+    // no-op — nur der Host verwaltet die Mitspielerliste
+  }
+
+  async removeNameFromWheel(): Promise<void> {
+    // no-op — nur der Host verwaltet die Namensliste
+  }
+
+  async removePlayerNameFromWheel(): Promise<void> {
+    // no-op — nur der Host verwaltet die Mitspielerliste
+  }
+
+  async addAllPlayersToWheel(): Promise<void> {
+    // no-op — nur der Host verwaltet die Mitspielerliste
+  }
+
+  canManagePlayers(): boolean {
+    return false;
+  }
+
+  getLeaveConfirmMessage(): string {
+    return 'Raum wirklich verlassen?';
+  }
+
+  getLeaveResultMessage(success: boolean): string {
+    return success ? 'Raum verlassen' : 'Raum konnte nicht verlassen werden';
+  }
+}
+
+let currentMode: GameModeStrategy = new SoloModeStrategy();
+
+export function getCurrentMode(): GameModeStrategy {
+  return currentMode;
+}
 
 export function initNameControls(): void {
   addBtn.addEventListener("click", async () => {
-    if (activeRoomKey && isHost) {
-      await addCustomNameToWheel(input.value);
-    } else {
-      addNameToList(input.value);
-    }
+    await currentMode.addCustomNameToWheel(input.value);
   });
 
   input.addEventListener("keydown", async (event: KeyboardEvent) => {
     if (event.key === "Enter") {
-      if (activeRoomKey && isHost) {
-        await addCustomNameToWheel(input.value);
-      } else {
-        addNameToList(input.value);
-      }
+      await currentMode.addCustomNameToWheel(input.value);
     }
   });
 }
@@ -239,7 +451,7 @@ function renderPlayersSidebar(players: string[]): void {
       li.appendChild(tag);
     }
 
-    if (isHost) {
+    if (currentMode.canManagePlayers()) {
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'room__player-toggle-btn';
@@ -252,9 +464,9 @@ function renderPlayersSidebar(players: string[]): void {
         toggle.disabled = true;
         try {
           if ((roomNames ?? []).includes(name)) {
-            await removePlayerNameFromWheel(name);
+            await currentMode.removePlayerNameFromWheel(name);
           } else {
-            await addPlayerNameToWheel(name);
+            await currentMode.addPlayerNameToWheel(name);
           }
         } catch (err) {
           console.error('[ROOM] toggle player failed', err);
@@ -267,29 +479,6 @@ function renderPlayersSidebar(players: string[]): void {
     }
 
     list.appendChild(li);
-  });
-}
-
-function syncMultiplayerSpinButtonState(): void {
-  if (!activeRoomKey) return;
-
-  const hasEnoughItems = getNamesInWheelList().length >= 2;
-  const disabled = !hasEnoughItems || !isHost;
-
-  [spinLeftBtn, spinRightBtn].forEach((btn) => {
-    btn.disabled = disabled;
-    btn.classList.toggle('spin__btn--room-solo', !hasEnoughItems);
-    btn.classList.toggle('spin__btn--room-guest', !isHost);
-
-    if (disabled) {
-      btn.style.setProperty('opacity', SPIN_DISABLED_OPACITY);
-      btn.style.setProperty('cursor', 'not-allowed');
-      btn.style.setProperty('pointer-events', 'none');
-    } else {
-      btn.style.removeProperty('opacity');
-      btn.style.removeProperty('cursor');
-      btn.style.removeProperty('pointer-events');
-    }
   });
 }
 
@@ -326,7 +515,7 @@ export function initRoomPlayers(players: string[]): void {
   replaceNames([]);
   renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
-  syncMultiplayerSpinButtonState();
+  applyGameModeLock();
 }
 
 // Called on Realtime player-list updates.
@@ -335,8 +524,7 @@ function syncRoomPlayers(players: string[]): void {
   currentPlayers = [...players];
   renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
-  syncMultiplayerSpinButtonState();
-
+  applyGameModeLock();
 }
 
 const roomKeyDisplay = optionalElement<HTMLSpanElement>("room-key-display");
@@ -344,8 +532,7 @@ const roomInfo = optionalElement<HTMLDivElement>("room-info");
 
 function setRoomActive(roomKey: string, host: boolean): void {
   activeRoomKey = roomKey;
-  isHost = host;
-  setMultiplayerMode(true);
+  currentMode = host ? new HostModeStrategy() : new GuestModeStrategy();
   if (host) {
     lockNameEditing(false, false);
   } else {
@@ -355,22 +542,7 @@ function setRoomActive(roomKey: string, host: boolean): void {
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
   if (roomInfo) roomInfo.classList.remove('hidden');
 
-  if (!host) {
-    spinLeftBtn.classList.add('spin__btn--room-guest');
-    spinRightBtn.classList.add('spin__btn--room-guest');
-    multiplierSlider.classList.add('multiplier-slider--room-guest');
-    resetBtn.disabled = true;
-    resetBtn.style.setProperty('opacity', '0.4');
-    resetBtn.style.setProperty('cursor', 'not-allowed');
-  } else {
-    spinLeftBtn.classList.remove('spin__btn--room-guest');
-    spinRightBtn.classList.remove('spin__btn--room-guest');
-    multiplierSlider.classList.remove('multiplier-slider--room-guest');
-    setResetOverride(() => { void handleRoomReset(false); });
-    setWinnerModalCloseOverride(() => { void handleRoomReset(true); });
-  }
-
-  syncMultiplayerSpinButtonState();
+  applyGameModeLock();
 }
 
 let savedNames: string[] = [];
@@ -384,29 +556,19 @@ function clearRoom(): void {
   }
   currentPlayers = [];
   roomNames = [];
-  setMultiplayerMode(false);
   setOnNameInWheelListRemoved(null);
   unlockNameEditing();
   unsubscribeFromRoom();
-  setSpinOverride(null);
+  currentMode = new SoloModeStrategy();
   activeRoomKey = null;
-  isHost = false;
   activeRoomHostName = '';
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
-  spinLeftBtn.classList.remove('spin__btn--room-guest', 'spin__btn--room-solo');
-  spinRightBtn.classList.remove('spin__btn--room-guest', 'spin__btn--room-solo');
-  multiplierSlider.classList.remove('multiplier-slider--room-guest');
-  resetBtn.disabled = false;
-  resetBtn.style.removeProperty('opacity');
-  resetBtn.style.removeProperty('cursor');
-  setResetOverride(null);
-  setWinnerModalCloseOverride(null);
   if (multiplierSyncListener) {
     multiplierSlider?.removeEventListener('input', multiplierSyncListener);
     multiplierSyncListener = null;
   }
-  enableMultiplierSlider();
+  applyGameModeLock();
   setHostControlsVisibility(false);
   renderPlayersSidebar([]);
   replaceNames(savedNames);
@@ -416,33 +578,17 @@ function clearRoom(): void {
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
 function handleRoomSpinEvent(lastSpin: number, multiplier: number, direction: string): void {
-  if (isHost) return; // host already spun directly from POST response
-  lockSpinButtons();
+  if (currentMode instanceof HostModeStrategy) return; // host already spun directly from POST response
+  lockAllSpinElements();
   const names = getNamesInWheelList();
   const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + lastSpin;
   spinWheel(totalSteps, direction as Direction, '', names);
 }
 
-// Host only: POST → spin directly (token guaranteed, no race condition)
-async function handleRoomSpinClick(direction: Direction): Promise<void> {
-  if (!activeRoomKey || !isHost) return;
-  lockSpinButtons();
-  try {
-    const names = getNamesInWheelList();
-    const { ranNum, spinToken } = await spinRoom(activeRoomKey, names, direction);
-    const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
-    spinWheel(totalSteps, direction, spinToken, names);
-  } catch (error) {
-    console.error('[ROOM] Spin fehlgeschlagen:', error);
-    unlockSpinButtons();
-    showToast({ message: 'Spin fehlgeschlagen', type: 'error' });
-  }
-}
-
 // closeWinnerModal=false → "Reset"-Button: nur die Rad-Rotation wird für alle zurückgesetzt.
 // closeWinnerModal=true → OK im WinnerModal: Rad-Rotation UND Modal werden für alle zurückgesetzt.
 async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
-  if (!activeRoomKey || !isHost) return;
+  if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
   try {
     await resetRoom(activeRoomKey, closeWinnerModal);
     // Lokal passiert nichts hier direkt — das übernehmen handleWheelResetEvent()/
@@ -456,10 +602,7 @@ async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
 }
 
 function handleWheelResetEvent(): void {
-  resetWheelRotation();
-  if (activeRoomKey && !isHost) {
-    disableMultiplierSlider();
-  }
+  resetWheelRotation(); // ruft intern applyGameModeLock() auf — Rollen-Sperre wird dabei automatisch neu hergestellt
 }
 
 function handleWinnerModalCloseEvent(): void {
@@ -467,7 +610,7 @@ function handleWinnerModalCloseEvent(): void {
 }
 
 function onRoomClosed(): void {
-  if (isHost) return; // host handles its own leave flow
+  if (currentMode instanceof HostModeStrategy) return; // host handles its own leave flow
   clearRoom();
   showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
 }
@@ -479,60 +622,7 @@ function setNamesFromRoom(names: string[]): void {
   // refresh player sidebar buttons so their toggle state updates
   if (currentPlayers.length > 0) renderPlayersSidebar(currentPlayers);
   updateBulkButtonState(currentPlayers);
-  syncMultiplayerSpinButtonState();
-}
-
-async function addCustomNameToWheel(customName: string): Promise<void> {
-  const trimmed = customName.trim();
-  if (!trimmed) return;
-  if (!activeRoomKey || !isHost) {
-    addNameToList(trimmed);
-    input.value = '';
-    return;
-  }
-
-  const updatedItems = [...(roomNames ?? []), trimmed];
-  await updateRoomNames(activeRoomKey, updatedItems);
-  input.value = '';
-}
-
-async function addPlayerNameToWheel(playerName: string): Promise<void> {
-  if (!activeRoomKey || !isHost) return;
-  const updatedItems = [...(roomNames ?? []), playerName];
-  await updateRoomNames(activeRoomKey, updatedItems);
-}
-
-async function removeNameFromWheel(name: string): Promise<void> {
-  if (!activeRoomKey || !isHost) return;
-  const items = roomNames ?? [];
-  const index = items.findIndex((item) => item === name);
-  if (index < 0) return;
-  const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
-  await updateRoomNames(activeRoomKey, updatedItems);
-}
-
-async function removePlayerNameFromWheel(playerName: string): Promise<void> {
-  if (!activeRoomKey || !isHost) return;
-  const items = roomNames ?? [];
-  const index = items.findIndex((item) => item === playerName);
-  if (index < 0) return;
-  const updatedItems = [...items.slice(0, index), ...items.slice(index + 1)];
-  await updateRoomNames(activeRoomKey, updatedItems);
-}
-
-async function addAllPlayersToWheel(players: string[]): Promise<void> {
-  if (!activeRoomKey || !isHost) return;
-  const current = roomNames ?? [];
-  const missingPlayers = players.filter((player) => !current.includes(player));
-
-  if (missingPlayers.length > 0) {
-    const updatedItems = [...current, ...missingPlayers];
-    await updateRoomNames(activeRoomKey, updatedItems);
-    return;
-  }
-
-  const updatedItems = current.filter((item) => !players.includes(item));
-  await updateRoomNames(activeRoomKey, updatedItems);
+  applyGameModeLock();
 }
 
 function updateBulkButtonState(players: string[]): void {
@@ -548,15 +638,15 @@ function updateBulkButtonState(players: string[]): void {
 }
 
 export async function executeLeaveRoom(): Promise<void> {
-  const wasHost = isHost;
+  const leavingMode = currentMode;
   const roomKey = activeRoomKey;
   clearRoom(); // unsubscribe first so we don't receive our own close event
   if (roomKey) {
     try {
       await leaveRoom(roomKey);
-      showToast({ message: wasHost ? 'Raum geschlossen' : 'Raum verlassen', type: 'success' });
+      showToast({ message: leavingMode.getLeaveResultMessage(true), type: 'success' });
     } catch {
-      showToast({ message: wasHost ? 'Raum konnte nicht geschlossen werden' : 'Raum konnte nicht verlassen werden', type: 'error' });
+      showToast({ message: leavingMode.getLeaveResultMessage(false), type: 'error' });
     }
   }
 }
@@ -569,7 +659,6 @@ async function executeCreateRoom(): Promise<void> {
     const { roomKey, players, names } = await createRoom();
     activeRoomHostName = players[0] ?? '';
     setRoomActive(roomKey, true);
-    setSpinOverride(handleRoomSpinClick);
     initRoomPlayers(players);
     setNamesFromRoom(names ?? []);
     subscribeToRoom(
@@ -603,12 +692,10 @@ async function executeJoinRoom(roomKey: string): Promise<void> {
     const { players, multiplier, names, hostName } = await joinRoom(roomKey);
     activeRoomHostName = hostName;
     setRoomActive(roomKey, false);
-    setSpinOverride(handleRoomSpinClick);
     initRoomPlayers(players);
     setNamesFromRoom(names ?? []);
     setMultiplierSlider(multiplier);
     updateMultiplierDisplay();
-    disableMultiplierSlider();
     subscribeToRoom(
       roomKey,
       handleRoomSpinEvent,
@@ -647,14 +734,13 @@ const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confir
 
 export function initRoomControls(): void {
   setOnNameInWheelListRemoved(async (removedName: string): Promise<void> => {
-    await removeNameFromWheel(removedName);
+    await currentMode.removeNameFromWheel(removedName);
   });
 
   bulkAddToWheelBtn?.addEventListener('click', async () => {
-    if (!activeRoomKey || !isHost) return;
     const players = Array.from(playersList?.querySelectorAll('.room__player-name') ?? [])
       .map((node) => node.textContent?.trim() ?? '');
-    await addAllPlayersToWheel(players);
+    await currentMode.addAllPlayersToWheel(players);
   });
 
   createRoomBtn?.addEventListener('click', () => {
@@ -697,13 +783,8 @@ export function initRoomControls(): void {
       return;
     }
     if (leaveRoomConfirmMessage) {
-      if (isHost && currentPlayers.length > 1) {
-        const guestCount = currentPlayers.length - 1;
-        leaveRoomConfirmMessage.textContent =
-          `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
-      } else {
-        leaveRoomConfirmMessage.textContent = isHost ? 'Raum wirklich schließen?' : 'Raum wirklich verlassen?';
-      }
+      const guestCount = currentPlayers.length - 1;
+      leaveRoomConfirmMessage.textContent = currentMode.getLeaveConfirmMessage(guestCount);
     }
     leaveRoomConfirmModal?.showModal();
   });
@@ -743,10 +824,6 @@ export function initRoomControls(): void {
 
 export function isMultiplayerActive(): boolean {
   return !!activeRoomKey;
-}
-
-export function isRoomHost(): boolean {
-  return isHost;
 }
 
 async function hasActiveSession(): Promise<boolean> {

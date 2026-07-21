@@ -1,9 +1,8 @@
-import { isMultiplayerActive, isRoomHost } from "../room";
+import { isMultiplayerActive, getCurrentMode } from "../room";
 import { awardCoins } from "../api/spin-api";
 import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list";
 import { stopDrumRoll } from "./sound";
 import { resetWheelRotation } from "./spin";
-import { disableMultiplierSlider } from "./multiplier";
 import { refreshCoinDisplay } from "../profile/profiles";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
@@ -142,24 +141,10 @@ function removeWinner(): void {
 
 const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("winner-modal-close-btn");
 
-let activeCloseOverride: (() => void) | null = null;
-
-export function setWinnerModalCloseOverride(handler: (() => void) | null): void {
-  activeCloseOverride = handler;
-}
-
-function closeWinnerModalLocally(): void {
-  hideWinnerModal();
-  resetWheelRotation();
-  if (isMultiplayerActive() && !isRoomHost()) {
-    disableMultiplierSlider();
-  }
-}
-
 export function initWinnerModal(): void {
   if (!winnerModal || !closeWinnerModalBtn) return;
 
   closeWinnerModalBtn.addEventListener("click", () => {
-    (activeCloseOverride ?? closeWinnerModalLocally)();
+    getCurrentMode().onWinnerModalClose();
   });
 }

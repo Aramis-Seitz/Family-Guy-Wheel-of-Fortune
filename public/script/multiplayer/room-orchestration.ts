@@ -78,24 +78,25 @@ function clearRoom(): void {
   destroyChat();
 }
 
-// Called once when creating or joining a room — sidebar gets the full player
-// list, the wheel itself starts empty until setNamesFromRoom() applies
-// the room's persisted names-in-wheel-list selection.
-export function initRoomPlayers(players: string[]): void {
+function updateRoomPlayers(players: string[]): void {
   setActiveRoomPlayers([...players]);
-  replaceNames([]);
   renderPlayersSidebar(activeRoomPlayers);
   updateBulkButtonState(activeRoomPlayers);
   applyGameModeLock();
 }
 
+// Called once when creating or joining a room — sidebar gets the full player
+// list, the wheel itself starts empty until setNamesFromRoom() applies
+// the room's persisted names-in-wheel-list selection.
+export function initRoomPlayers(players: string[]): void {
+  replaceNames([]);
+  updateRoomPlayers(players);
+}
+
 // Called on Realtime player-list updates.
 function syncRoomPlayers(players: string[]): void {
   if (!activeRoomKey) return;
-  setActiveRoomPlayers([...players]);
-  renderPlayersSidebar(activeRoomPlayers);
-  updateBulkButtonState(activeRoomPlayers);
-  applyGameModeLock();
+  updateRoomPlayers(players);
 }
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
@@ -131,6 +132,22 @@ function setNamesFromRoom(names: string[]): void {
   applyGameModeLock();
 }
 
+// Gemeinsamer Schlussteil von executeCreateRoom/executeJoinRoom: Realtime-
+// Abo (identisch für Host und Gast) + Chat-Start.
+function finishRoomSetup(roomKey: string): void {
+  subscribeToRoom(
+    roomKey,
+    handleRoomSpinEvent,
+    syncRoomPlayers,
+    onRoomClosed,
+    (multiplier) => { setMultiplierSlider(multiplier); updateMultiplierDisplay(); },
+    setNamesFromRoom,
+    handleWheelResetEvent,
+    handleWinnerModalCloseEvent
+  );
+  initChat(roomKey, myUsername);
+}
+
 export async function executeLeaveRoom(): Promise<void> {
   const leavingMode = getCurrentMode();
   const roomKey = activeRoomKey;
@@ -155,17 +172,7 @@ export async function executeCreateRoom(): Promise<void> {
     setRoomActive(roomKey, true);
     initRoomPlayers(players);
     setNamesFromRoom(names ?? []);
-    subscribeToRoom(
-      roomKey,
-      handleRoomSpinEvent,
-      syncRoomPlayers,
-      onRoomClosed,
-      (multiplier) => { setMultiplierSlider(multiplier); updateMultiplierDisplay(); },
-      setNamesFromRoom,
-      handleWheelResetEvent,
-      handleWinnerModalCloseEvent
-    );
-    initChat(roomKey, myUsername);
+    finishRoomSetup(roomKey);
     multiplierSyncListener = () => {
       if (!activeRoomKey) return;
       void setMultiplier(activeRoomKey, getMultiplier());
@@ -190,17 +197,7 @@ export async function executeJoinRoom(roomKey: string): Promise<void> {
     setNamesFromRoom(names ?? []);
     setMultiplierSlider(multiplier);
     updateMultiplierDisplay();
-    subscribeToRoom(
-      roomKey,
-      handleRoomSpinEvent,
-      syncRoomPlayers,
-      onRoomClosed,
-      (multiplier) => { setMultiplierSlider(multiplier); updateMultiplierDisplay(); },
-      setNamesFromRoom,
-      handleWheelResetEvent,
-      handleWinnerModalCloseEvent
-    );
-    initChat(roomKey, myUsername);
+    finishRoomSetup(roomKey);
     showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
   } catch (error) {
     console.error('[ROOM] Beitreten fehlgeschlagen:', error);

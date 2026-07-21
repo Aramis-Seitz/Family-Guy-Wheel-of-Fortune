@@ -1,5 +1,6 @@
 import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { optionalElement } from '../shared/dom-helpers';
 
 const MAX_LENGTH = 200;
 const SPAM_DELAY_MS = 1000;
@@ -19,9 +20,10 @@ interface ChatMessage {
   timestamp: string;
 }
 
+const chatMessagesList = optionalElement<HTMLUListElement>('chat-messages');
+
 function appendMessage(msg: ChatMessage, isMine: boolean): void {
-  const list = document.getElementById('chat-messages');
-  if (!list) return;
+  if (!chatMessagesList) return;
 
   const li = document.createElement('li');
   li.className = isMine ? 'chat__message chat__message--mine' : 'chat__message';
@@ -36,9 +38,15 @@ function appendMessage(msg: ChatMessage, isMine: boolean): void {
 
   li.appendChild(meta);
   li.appendChild(text);
-  list.appendChild(li);
-  list.scrollTop = list.scrollHeight;
+  chatMessagesList.appendChild(li);
+  chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
 }
+
+const sendBtn = optionalElement<HTMLButtonElement>('chat-send-btn');
+const chatInput = optionalElement<HTMLInputElement>('chat-input');
+const toggleBtn = optionalElement<HTMLElement>('chat-toggle-btn');
+const chatHeader = optionalElement<HTMLDivElement>('chat-header');
+const chatBody = optionalElement<HTMLDivElement>('chat-body');
 
 export function initChat(roomKey: string, username: string): void {
   destroyChat();
@@ -53,12 +61,6 @@ export function initChat(roomKey: string, username: string): void {
       appendMessage(payload, payload.username === myUsername);
     })
     .subscribe();
-
-  const sendBtn = document.getElementById('chat-send-btn') as HTMLButtonElement | null;
-  const chatInput = document.getElementById('chat-input') as HTMLInputElement | null;
-  const toggleBtn = document.getElementById('chat-toggle-btn') as HTMLElement | null;
-  const chatHeader = document.getElementById('chat-header') as HTMLDivElement | null;
-  const chatBody = document.getElementById('chat-body') as HTMLDivElement | null;
 
   function sendMessage(): void {
     if (!chatInput || !chatChannel) return;
@@ -105,12 +107,9 @@ export function destroyChat(): void {
   myUsername = '';
   lastSentAt = 0;
 
-  const list = document.getElementById('chat-messages');
-  if (list) list.innerHTML = '';
+  if (chatMessagesList) chatMessagesList.innerHTML = '';
 
-  const chatBody = document.getElementById('chat-body');
   chatBody?.classList.add('chat__body--collapsed');
 
-  const toggleBtn = document.getElementById('chat-toggle-btn') as HTMLElement | null;
   if (toggleBtn) toggleBtn.textContent = '▼';
 }

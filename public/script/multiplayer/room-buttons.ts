@@ -29,6 +29,25 @@ export function showSwitchRoomConfirm(message: string, action: () => Promise<voi
   leaveRoomConfirmModal?.showModal();
 }
 
+// true, wenn gerade gespinnt wird — zeigt dabei zugleich den Warn-Toast,
+// der erklärt, warum die Raum-Aktion gerade nicht ausgeführt werden darf.
+function isBlockedBySpinning(): boolean {
+  if (!isSpinning()) return false;
+  showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+  return true;
+}
+
+// Sichert die lokalen Solo-Namen und führt die Aktion entweder direkt aus
+// oder holt vorher eine Bestätigung ein, falls schon ein anderer Raum aktiv ist.
+function startRoomAction(confirmMessage: string, action: () => Promise<void>): void {
+  backupNamesBeforeJoiningRoom();
+  if (activeRoomKey) {
+    showSwitchRoomConfirm(confirmMessage, action);
+    return;
+  }
+  void action();
+}
+
 const createRoomBtn = optionalElement<HTMLButtonElement>("room-create-btn");
 const roomKeyInput = optionalElement<HTMLInputElement>("room-key-input");
 const joinRoomBtn = optionalElement<HTMLButtonElement>("room-join-btn");
@@ -45,44 +64,25 @@ export function initRoomButtons(): void {
   });
 
   createRoomBtn?.addEventListener('click', () => {
-    if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
-      return;
-    }
-    backupNamesBeforeJoiningRoom();
-    if (activeRoomKey) {
-      showSwitchRoomConfirm(
-        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
-        executeCreateRoom,
-      );
-      return;
-    }
-    void executeCreateRoom();
+    if (isBlockedBySpinning()) return;
+    startRoomAction(
+      `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
+      executeCreateRoom,
+    );
   });
 
   joinRoomBtn?.addEventListener('click', () => {
     const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
     if (!roomKey) return;
-    if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
-      return;
-    }
-    backupNamesBeforeJoiningRoom();
-    if (activeRoomKey) {
-      showSwitchRoomConfirm(
-        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,
-        () => executeJoinRoom(roomKey),
-      );
-      return;
-    }
-    void executeJoinRoom(roomKey);
+    if (isBlockedBySpinning()) return;
+    startRoomAction(
+      `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,
+      () => executeJoinRoom(roomKey),
+    );
   });
 
   leaveRoomBtn?.addEventListener('click', () => {
-    if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
-      return;
-    }
+    if (isBlockedBySpinning()) return;
     if (leaveRoomConfirmMessage) {
       const guestCount = activeRoomPlayers.length - 1;
       leaveRoomConfirmMessage.textContent = getCurrentMode().getLeaveConfirmMessage(guestCount);

@@ -17,14 +17,6 @@ export function initMultiplierSlider(): void {
   updateMultiplierDisplay();
 }
 
-export function disableMultiplierSlider(): void {
-  if (multiplierSlider) multiplierSlider.disabled = true;
-}
-
-export function enableMultiplierSlider(): void {
-  if (multiplierSlider) multiplierSlider.disabled = false;
-}
-
 export const DEFAULT_MULTIPLIER: number = 1;
 
 export function getMultiplier(): number {

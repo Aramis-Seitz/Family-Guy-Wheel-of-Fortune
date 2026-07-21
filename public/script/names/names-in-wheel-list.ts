@@ -14,7 +14,6 @@ import { namesInWheelListState, MAX_ITEMS, MIN_ITEMS } from "./names-in-wheel-li
 let roomLocked = false;
 let disableAddWhileLocked = true;
 let disableRemoveWhileLocked = true;
-let multiplayerMode = false;
 let onNameInWheelListRemoved: ((removedName: string, index: number) => Promise<void> | void) | null = null;
 
 export function setOnNameInWheelListRemoved(callback: ((removedName: string, index: number) => Promise<void> | void) | null): void {
@@ -142,13 +141,6 @@ export function syncAddElements(): void {
   addBtn.style.cursor = disabled ? "not-allowed" : "pointer";
   input.style.opacity = disabled ? "0.5" : "1";
   input.style.cursor = disabled ? "not-allowed" : "text";
-}
-
-export function setMultiplayerMode(active: boolean): void {
-  multiplayerMode = active;
-  if (!active) {
-    updateSpinButtonState();
-  }
 }
 
 function showErrorToast(message: string): void {

@@ -1,5 +1,5 @@
 import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin";
-import { wheelEmptyHint } from "../multiplayer/room";
+import { wheelEmptyHint } from "../multiplayer/room-players-sidebar";
 import { requiredElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
 import { validateName } from "../shared/validation";

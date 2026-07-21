@@ -10,7 +10,10 @@ import { initMultiplierSlider } from "../wheel/multiplier";
 import { initVolumeSlider } from "../wheel/volume";
 import { preloadStaticSounds } from "../wheel/sound";
 import { initWinnerModal } from "../wheel/winner";
-import { initRoomUnloadGuard, activeRoomKey, initRoomButtons, initAddNameInput, setMyUsername, redirectIfNoSession } from "../multiplayer/room";
+import { initRoomUnloadGuard, redirectIfNoSession } from "../multiplayer/room-session-guard";
+import { activeRoomKey } from "../multiplayer/room-state";
+import { initRoomButtons, initAddNameInput } from "../multiplayer/room-buttons";
+import { setMyUsername } from "../multiplayer/room-orchestration";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 

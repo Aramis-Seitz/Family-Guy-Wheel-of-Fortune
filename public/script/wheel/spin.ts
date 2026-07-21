@@ -4,7 +4,8 @@ import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked }
 import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
 import { getMultiplier, multiplierSlider } from "./multiplier";
 import { wheelElement } from "./renderer";
-import { bulkAddToWheelBtn, getCurrentMode } from "../multiplayer/room";
+import { bulkAddToWheelBtn } from "../multiplayer/room-players-sidebar";
+import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { profileName } from "../profile/profiles";
 import { MIN_ITEMS } from "../names/names-in-wheel-list-state";
 import { requiredElement } from "../shared/dom-helpers";

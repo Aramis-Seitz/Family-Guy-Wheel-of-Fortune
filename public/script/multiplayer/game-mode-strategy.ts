@@ -20,8 +20,7 @@ export interface GameModeStrategy {
   onReset(): void;
   onWinnerModalClose(): void;
   getRoleLockedElements(): SpinElement[];
-  addCustomNameToWheel(rawName: string): Promise<void>;
-  addPlayerNameToWheel(playerName: string): Promise<void>;
+  addNameToWheel(rawName: string): Promise<void>;
   removeNameFromWheel(index: number): Promise<void>;
   toggleAllPlayersInWheel(players: string[]): Promise<void>;
   canManagePlayers(): boolean;
@@ -47,12 +46,8 @@ export class SoloModeStrategy implements GameModeStrategy {
     return [];
   }
 
-  async addCustomNameToWheel(rawName: string): Promise<void> {
+  async addNameToWheel(rawName: string): Promise<void> {
     addNameToList(rawName);
-  }
-
-  async addPlayerNameToWheel(): Promise<void> {
-    // no-op — es gibt keine Mitspielerliste ohne Raum
   }
 
   async removeNameFromWheel(): Promise<void> {
@@ -124,18 +119,12 @@ export class HostModeStrategy implements GameModeStrategy {
     return [];
   }
 
-  async addCustomNameToWheel(rawName: string): Promise<void> {
+  async addNameToWheel(rawName: string): Promise<void> {
     const trimmed = rawName.trim();
     if (!trimmed || !activeRoomKey) return;
     const updatedNamesInWheelList = [...(activeRoomNamesInWheelList ?? []), trimmed];
     await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
     input.value = '';
-  }
-
-  async addPlayerNameToWheel(playerName: string): Promise<void> {
-    if (!activeRoomKey) return;
-    const updatedNamesInWheelList = [...(activeRoomNamesInWheelList ?? []), playerName];
-    await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
   }
 
   async removeNameFromWheel(index: number): Promise<void> {
@@ -197,14 +186,10 @@ export class GuestModeStrategy implements GameModeStrategy {
     return [multiplierSlider, resetBtn, spinLeftBtn, spinRightBtn, input, addBtn, getRemoveBtn()];
   }
 
-  async addCustomNameToWheel(rawName: string): Promise<void> {
+  async addNameToWheel(rawName: string): Promise<void> {
     // unerreichbar in der Praxis (Eingabefeld ist für Gäste gesperrt) —
     // Fallback identisch zu Solo, falls der Guard doch mal umgangen wird
     addNameToList(rawName);
-  }
-
-  async addPlayerNameToWheel(): Promise<void> {
-    // no-op — nur der Host verwaltet die Mitspielerliste
   }
 
   async removeNameFromWheel(): Promise<void> {

@@ -42,7 +42,7 @@ export function renderPlayersSidebar(players: string[]): void {
           if (index >= 0) {
             await getCurrentMode().removeNameFromWheel(index);
           } else {
-            await getCurrentMode().addPlayerNameToWheel(name);
+            await getCurrentMode().addNameToWheel(name);
           }
         } catch (error) {
           console.error('[ROOM] toggle player failed', error);

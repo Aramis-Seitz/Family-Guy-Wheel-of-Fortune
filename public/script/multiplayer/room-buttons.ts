@@ -9,12 +9,12 @@ import { executeCreateRoom, executeJoinRoom, executeLeaveRoom, backupNamesBefore
 
 export function initAddNameInput(): void {
   addBtn.addEventListener("click", async () => {
-    await getCurrentMode().addCustomNameToWheel(input.value);
+    await getCurrentMode().addNameToWheel(input.value);
   });
 
   input.addEventListener("keydown", async (event: KeyboardEvent) => {
     if (event.key === "Enter") {
-      await getCurrentMode().addCustomNameToWheel(input.value);
+      await getCurrentMode().addNameToWheel(input.value);
     }
   });
 }

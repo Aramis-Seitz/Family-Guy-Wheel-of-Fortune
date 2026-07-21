@@ -2,7 +2,6 @@ import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface RoomPlayer {
-  id: string;
   username: string;
 }
 

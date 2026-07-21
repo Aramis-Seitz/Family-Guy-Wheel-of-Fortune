@@ -43,7 +43,6 @@ function setRoomActive(roomKey: string, host: boolean): void {
 }
 
 let namesBeforeJoiningRoom: string[] = [];
-let nameStateUnsubscribe: (() => void) | null = null;
 let multiplierSyncListener: (() => void) | null = null;
 
 // Merkt sich den lokalen Solo-Wheel-Stand, bevor ein Raum erstellt/betreten
@@ -53,10 +52,6 @@ export function backupNamesBeforeJoiningRoom(): void {
 }
 
 function clearRoom(): void {
-  if (nameStateUnsubscribe) {
-    nameStateUnsubscribe();
-    nameStateUnsubscribe = null;
-  }
   setActiveRoomPlayers([]);
   setActiveRoomNamesInWheelList([]);
   unlockNameEditing();
@@ -88,7 +83,7 @@ function updateRoomPlayers(players: string[]): void {
 // Called once when creating or joining a room — sidebar gets the full player
 // list, the wheel itself starts empty until setNamesFromRoom() applies
 // the room's persisted names-in-wheel-list selection.
-export function initRoomPlayers(players: string[]): void {
+function initRoomPlayers(players: string[]): void {
   replaceNames([]);
   updateRoomPlayers(players);
 }

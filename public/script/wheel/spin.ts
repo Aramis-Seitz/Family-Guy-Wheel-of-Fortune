@@ -4,7 +4,7 @@ import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked }
 import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
 import { getMultiplier, multiplierSlider } from "./multiplier";
 import { wheelElement } from "./renderer";
-import { bulkAddToWheelBtn, getCurrentMode } from "../room";
+import { bulkAddToWheelBtn, getCurrentMode } from "../multiplayer/room";
 import { profileName } from "../profile/profiles";
 import { MIN_ITEMS } from "../names/names-in-wheel-list-state";
 import { requiredElement } from "../shared/dom-helpers";

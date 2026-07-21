@@ -10,7 +10,7 @@ import { initMultiplierSlider } from "../wheel/multiplier";
 import { initVolumeSlider } from "../wheel/volume";
 import { preloadStaticSounds } from "../wheel/sound";
 import { initWinnerModal } from "../wheel/winner";
-import { initRoomUnloadGuard, activeRoomKey, initRoomControls, initNameControls, setMyUsername, redirectIfNoSession } from "../room";
+import { initRoomUnloadGuard, activeRoomKey, initRoomControls, initNameControls, setMyUsername, redirectIfNoSession } from "../multiplayer/room";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 

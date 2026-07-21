@@ -1,4 +1,4 @@
-import { isMultiplayerActive, getCurrentMode } from "../room";
+import { isMultiplayerActive, getCurrentMode } from "../multiplayer/room";
 import { awardCoins } from "../api/spin-api";
 import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list";
 import { stopDrumRoll } from "./sound";

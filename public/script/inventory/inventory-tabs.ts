@@ -1,6 +1,6 @@
 import { requiredElement } from "../shared/dom-helpers";
 import { ASSET_CATEGORIES } from "../shop/shop";
-import { isMultiplayerActive } from "../room";
+import { isMultiplayerActive } from "../multiplayer/room";
 import { loadInventoryByCategory } from "./inventory";
 import { renderCategoryTabs, getActiveCategory } from "../shared/category-tabs";
 

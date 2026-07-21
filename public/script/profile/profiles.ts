@@ -7,7 +7,7 @@ import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api";
 import { notifyAccountChanged } from "../shared/auth-channel";
-import { activeRoomKey, executeLeaveRoom, showSwitchRoomConfirm } from "../room";
+import { activeRoomKey, executeLeaveRoom, showSwitchRoomConfirm } from "../multiplayer/room";
 
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");

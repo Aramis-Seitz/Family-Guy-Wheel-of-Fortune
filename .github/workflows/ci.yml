@@ -26,6 +26,9 @@ jobs:
  
       - name: Fix optional dependencies
         run: npm install --ignore-scripts
+      
+      - name: ESLint
+        run: npm run lint
  
       - name: Unit Tests
         run: npm run test

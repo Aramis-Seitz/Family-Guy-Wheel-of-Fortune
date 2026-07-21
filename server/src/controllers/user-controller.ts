@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, setUserCoins, subtractUserCoins } from "../services/user-service";
-import { asyncHandler } from "./response";
+import { asyncHandler, sendCodedError } from "./response";
+import { ERROR_CODES } from "../lib/error-codes";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
     CoinsResponseSchema,
@@ -21,7 +22,7 @@ const RegisterRequestSchema = z.object({
 export const handleRegisterUser = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RegisterRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "username, email und dateOfBirth sind erforderlich" });
+        sendCodedError(res, 400, "username, email and dateOfBirth are required", ERROR_CODES.VALIDATION, { fields: ["username", "email", "dateOfBirth"] });
         return;
     }
 
@@ -42,7 +43,7 @@ const SetCoinsRequestSchema = z.object({
 export const handleSetUserCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SetCoinsRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "coins is required" });
+        sendCodedError(res, 400, "coins is required", ERROR_CODES.VALIDATION, { field: "coins" });
         return;
     }
 
@@ -53,7 +54,7 @@ export const handleSetUserCoins = asyncHandler(async (req: HttpRequest, res: Htt
 export const handleUserProfile = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const profile = await getUserProfile(req.userId!);
     if (!profile) {
-        res.status(404).json({ error: "Profile not found" });
+        sendCodedError(res, 404, "Profile not found", ERROR_CODES.NOT_FOUND, { resource: "profile" });
         return;
     }
 
@@ -67,7 +68,7 @@ const SubtractCoinsRequestSchema = z.object({
 export const handleSubtractCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SubtractCoinsRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "amount is required" });
+        sendCodedError(res, 400, "amount is required", ERROR_CODES.VALIDATION, { field: "amount" });
         return;
     }
 

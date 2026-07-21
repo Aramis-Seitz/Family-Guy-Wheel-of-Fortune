@@ -1,0 +1,87 @@
+.app-header {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10000;
+}
+
+.app-header__language-switcher {
+    display: flex;
+    gap: 0.5rem;
+}
+
+header:not(.app-header)>.app-header__language-switcher {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10000;
+}
+
+.app-header__language-switcher--main {
+    position: fixed;
+    top: 0.4rem;
+    right: 1rem;
+    z-index: 10000;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.app-header__language-switcher--main .lang-btn {
+    color: white;
+    border-color: #666;
+    background-color: #171717;
+}
+
+.app-header__language-switcher--main .lang-btn:hover,
+.app-header__language-switcher--main .lang-btn--active {
+    color: black;
+    background-color: #f5a623;
+    border-color: #f5a623;
+}
+
+.lang-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lang-btn:hover {
+    background-color: var(--accent);
+    transform: scale(1.05);
+}
+
+.lang-btn--active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    font-weight: bold;
+}
+
+.lang-btn:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+
+    .app-header,
+    header:not(.app-header)>.app-header__language-switcher {
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+
+    .app-header__language-switcher--main {
+        gap: 0.25rem;
+    }
+
+    .app-header__language-switcher--main {
+        top: 0.4rem;
+        right: 0.75rem;
+    }
+}

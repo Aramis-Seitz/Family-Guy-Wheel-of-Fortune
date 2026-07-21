@@ -10,7 +10,7 @@ export type PurchaseAssetResult = {
 
 export async function getShopAssets(): Promise<Asset[]> {
     const rawBody = await getJson("/api/shop/assets", {
-        errorFallback: "Shop-Assets konnten nicht geladen werden"
+        errorFallbackKey: "api.shop.loadAssetsFailed"
     });
     const body = AssetsResponseSchema.parse(rawBody);
     return body.assets;
@@ -18,7 +18,7 @@ export async function getShopAssets(): Promise<Asset[]> {
 
 export async function getOwnedAssetIds(): Promise<string[]> {
     const rawBody = await getJson("/api/shop/owned-asset-ids", {
-        errorFallback: "Asset-IDs konnten nicht geladen werden"
+        errorFallbackKey: "api.shop.loadOwnedFailed"
     });
     const body = AssetIdsResponseSchema.parse(rawBody);
     return body.assetIds;
@@ -30,7 +30,7 @@ export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResul
     }
 
     const rawBody = await postJson("/api/shop/purchase", { assetId }, {
-        errorFallback: "Asset konnte nicht gekauft werden"
+        errorFallbackKey: "shop.purchaseFailed"
     });
     const body = PurchaseResponseSchema.parse(rawBody);
 

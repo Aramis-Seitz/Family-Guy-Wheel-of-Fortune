@@ -64,17 +64,17 @@ npm run dev
 
 Auf die URL die Vite anzeigt gehen — meistens:
 ```
-http://localhost:5173/login.html
+http://localhost:5173/html/login.html
 ```
 
-> ⚠️ **`/login.html` ist wichtig** — direkt auf die Login-Seite gehen.
+> ⚠️ **`/html/login.html` ist wichtig** — direkt auf die Login-Seite gehen.
 
 ### Schritt 5 — Einloggen
 
 Mit den Mock-Zugangsdaten anmelden:
 ```
-Benutzername: admin
-Passwort:     admin
+E-Mail:   admin@admin.de
+Passwort: admin
 ```
 
 Danach landet man automatisch auf der Wheel-Seite.

@@ -2,6 +2,7 @@ import { isMultiplayerActive } from "../room";
 import { awardCoins } from "../api/spin-api";
 import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list";
 import { stopDrumRoll } from "./sound";
+import { t } from "../app/i18n";
 import { resetWheelRotation } from "./spin";
 import { refreshCoinDisplay } from "../profile/profiles";
 import { showToast } from "../shared/toast";
@@ -129,7 +130,7 @@ function removeWinner(): void {
 
   if (names.length > 2) {
     showToast({
-      message: `"${removedName}" wurde erfolgreich aus dem Rad entfernt.`,
+      message: t("wheel.removedFromWheelSuccess", { name: removedName }),
       type: "success"
     });
   }

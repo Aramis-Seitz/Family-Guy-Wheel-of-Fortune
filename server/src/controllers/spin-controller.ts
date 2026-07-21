@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { generateSpin, awardCoins } from "../services/spin-service";
-import { asyncHandler } from "./response";
+import { asyncHandler, sendCodedError } from "./response";
+import { ERROR_CODES } from "../lib/error-codes";
 import type { HttpRequest, HttpResponse } from "./response";
 import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 
@@ -17,7 +18,7 @@ const AwardCoinsRequestSchema = z.object({
 export const handleAwardCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = AwardCoinsRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing spinToken or winnerName" });
+        sendCodedError(res, 400, "Missing spinToken or winnerName", ERROR_CODES.VALIDATION, { fields: ["spinToken", "winnerName"] });
         return;
     }
 

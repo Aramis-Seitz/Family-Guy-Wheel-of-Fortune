@@ -8,10 +8,11 @@
   ],
   "scripts": {
     "postinstall": "npm run build --workspace shared",
-    "dev": "concurrently \"npm run dev --workspace shared\" \"npm run dev --workspace server\" \"npm run build --workspace public\"",
+    "dev": "concurrently \"npm run dev --workspace shared\" \"npm run dev --workspace server\" \"npm run dev --workspace public\"",
     "build": "npm run build --workspace shared && npm run build --workspace server && npm run build --workspace public",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "check:i18n": "node scripts/check-locales.mjs",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -23,6 +24,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "i18next": "^26.3.6",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "i18next-http-backend": "^4.0.0"
   }
 }

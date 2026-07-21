@@ -2,6 +2,7 @@ import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin"
 import { wheelEmptyHint } from "../room";
 import { requiredElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import { validateName } from "../shared/validation";
 import { generateWheel, getSegmentColor } from "../wheel/renderer";
 import {
@@ -191,7 +192,7 @@ export function addNameToList(rawName: string): void {
   }
 
   if (!namesInWheelListState.addNameToWheelList(validation.value)) {
-    showErrorToast(`Maximal ${MAX_ITEMS} Einträge erlaubt.`);
+    showErrorToast(t("names.maxItemsError", { max: MAX_ITEMS }));
     return;
   }
 

@@ -2,6 +2,9 @@ import { supabaseClient } from "../shared/supabase-client";
 import { showToast } from "../shared/toast";
 import { apiUrl } from "../shared/api-base";
 import { notifyAccountChanged } from "../shared/auth-channel";
+import { initI18n, t } from "./i18n";
+import { localizeHtmlElements } from "./html-localization";
+import { initLanguageSwitcher } from "./language-switcher";
 
 const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
@@ -15,13 +18,21 @@ const signupDateOfBirthInput = document.getElementById('signup-date-of-birth') a
 const signupPasswordInput = document.getElementById('signup-password') as HTMLInputElement | null;
 const signupConfirmPasswordInput = document.getElementById('signup-confirm-password') as HTMLInputElement | null;
 
+async function initAuthPage(): Promise<void> {
+    await initI18n();
+    localizeHtmlElements();
+    initLanguageSwitcher();
+}
+
+void initAuthPage();
+
 if (loginForm) {
     loginForm.addEventListener('submit', async (event: SubmitEvent): Promise<void> => {
         event.preventDefault();
 
         if (!loginEmailInput || !loginPasswordInput) {
             showToast({
-                message: "Login-Felder wurden nicht gefunden.",
+                message: t('auth.loginFieldsNotFound'),
                 type: "error"
             });
             return;
@@ -39,7 +50,7 @@ if (loginForm) {
             if (error) {
                 console.error('Login Error:', error);
                 showToast({
-                    message: `Login fehlgeschlagen: ${error.message}`,
+                    message: t('auth.loginFailed', { message: error.message }),
                     type: "error"
                 });
                 return;
@@ -52,9 +63,9 @@ if (loginForm) {
 
             window.location.href = 'main.html';
         } catch (err: unknown) {
-            console.error('Netzwerkfehler beim Login:', err);
+            console.error('Network error during login:', err);
             showToast({
-                message: "Netzwerkfehler. Bitte versuchen Sie es später erneut.",
+                message: t('auth.networkError'),
                 type: "error"
             });
         }
@@ -67,7 +78,7 @@ if (signupForm) {
 
         if (!signupUserInput || !signupEmailInput || !signupDateOfBirthInput || !signupPasswordInput || !signupConfirmPasswordInput) {
             showToast({
-                message: "Registrierungs-Felder wurden nicht gefunden.",
+                message: t('auth.registrationFieldsNotFound'),
                 type: "error"
             });
             return;
@@ -81,7 +92,7 @@ if (signupForm) {
 
         if (!username) {
             showToast({
-                message: "Bitte Username eingeben",
+                message: t('auth.enterUsername'),
                 type: "error"
             });
             return;
@@ -89,7 +100,7 @@ if (signupForm) {
 
         if (!dateOfBirth) {
             showToast({
-                message: "Bitte Geburtsdatum eingeben.",
+                message: t('auth.enterDateOfBirth'),
                 type: "error"
             });
             return;
@@ -98,7 +109,7 @@ if (signupForm) {
         const today = new Date().toISOString().slice(0, 10);
         if (dateOfBirth > today) {
             showToast({
-                message: "Geburtsdatum darf nicht in der Zukunft liegen.",
+                message: t('auth.dobInFuture'),
                 type: "error"
             });
             return;
@@ -106,7 +117,7 @@ if (signupForm) {
 
         if (password !== confirmPassword) {
             showToast({
-                message: "Passwörter stimmen nicht überein!",
+                message: t('auth.passwordsMismatch'),
                 type: "error"
             });
             return;
@@ -127,7 +138,7 @@ if (signupForm) {
             if (error) {
                 console.error('Signup Error:', error);
                 showToast({
-                    message: `Registrierung fehlgeschlagen: ${error.message}`,
+                    message: t('auth.registrationFailed', { message: error.message }),
                     type: "error"
                 });
                 return;
@@ -135,7 +146,7 @@ if (signupForm) {
 
             if (!data.user || !data.session) {
                 showToast({
-                    message: "Benutzer konnte nicht erstellt werden.",
+                    message: t('auth.userCreationFailed'),
                     type: "error"
                 });
                 return;
@@ -153,7 +164,7 @@ if (signupForm) {
             if (!registerResponse.ok) {
                 const body = await registerResponse.json().catch(() => ({})) as { error?: string };
                 showToast({
-                    message: `Registrierung fehlgeschlagen: ${body.error ?? registerResponse.statusText}`,
+                    message: t('auth.registrationFailed', { message: body.error ?? registerResponse.statusText }),
                     type: "error"
                 });
                 return;
@@ -162,9 +173,9 @@ if (signupForm) {
             window.location.href = "login.html"
 
         } catch (err: unknown) {
-            console.error('Netzwerkfehler bei der Registrierung:', err);
+            console.error('Network error during registration:', err);
             showToast({
-                message: "Netzwerkfehler. Bitte versuchen Sie es später erneut.",
+                message: t('auth.networkError'),
                 type: "error"
             });
         }

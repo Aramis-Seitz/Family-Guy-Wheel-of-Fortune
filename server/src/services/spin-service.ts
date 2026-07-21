@@ -51,7 +51,7 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
         return { spinnerCoins, winnerCoins };
     }
 
-    console.log(`[coins] Winner: ${winnerName} → nicht im System, keine Coins`);
+    console.log(`[coins] Winner: ${winnerName} → not registered, no coins awarded`);
     return { spinnerCoins, winnerCoins: 0 };
 }
 

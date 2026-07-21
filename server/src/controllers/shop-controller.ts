@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getAssets, getOwnedAssetIds, getAssetCategories, purchaseAsset } from "../services/shop-service";
-import { asyncHandler } from "./response";
+import { asyncHandler, sendCodedError } from "./response";
+import { ERROR_CODES } from "../lib/error-codes";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
     AssetsResponseSchema,
@@ -35,7 +36,7 @@ const PurchaseRequestSchema = z.object({
 export const handlePurchaseShopAsset = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = PurchaseRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "assetId is required" });
+        sendCodedError(res, 400, "assetId is required", ERROR_CODES.VALIDATION, { field: "assetId" });
         return;
     }
 

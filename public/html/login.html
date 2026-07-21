@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login & Registration!</title>
+    <title data-i18n="html.loginPageTitle">Login & Registration!</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/logo.png" />
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/auth-widget.css">
@@ -11,39 +12,51 @@
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/legal-links.css">
     <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/language-switcher.css">
 </head>
+
 <body>
-<div class="auth-widget">
-    <input type="checkbox" id="auth-widget-toggle" class="auth-widget__toggle-checkbox" aria-hidden="true" />
+    <header class="app-header">
+        <div class="app-header__language-switcher">
+            <button id="lang-de-btn" class="lang-btn" type="button" title="Deutsch">DE</button>
+            <button id="lang-en-btn" class="lang-btn" type="button" title="English">EN</button>
+        </div>
+    </header>
+    <div class="auth-widget">
+        <input type="checkbox" id="auth-widget-toggle" class="auth-widget__toggle-checkbox" aria-hidden="true" />
 
-    <main>
+        <main>
 
-        <section aria-label="Login Form" class="auth-widget__form auth-widget__form--login">
-            <form action="main.html" method="post" id="login-form" autocomplete="on">
-                <h2>Login</h2>
-                <div class="auth-widget__input-field">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" name="email" autocomplete="username" inputmode="email" required aria-required="true" />
-                </div>
-                <div class="auth-widget__input-field">
-                    <label for="login-password">Passwort</label>
-                    <input type="password" id="login-password" name="password" autocomplete="current-password" required aria-required="true" />
-                </div>
-                <button type="submit">Log In</button>
-                <div class="auth-widget__register-link">
-                    <a href="signup.html">Sign Up</a>
-                    <p>Don't have an account?</p>
-                </div>
+            <section aria-label="Login Form" class="auth-widget__form auth-widget__form--login">
+                <form action="main.html" method="post" id="login-form" autocomplete="on">
+                    <h2 id="login-title" data-i18n="html.login">Login</h2>
+                    <div class="auth-widget__input-field">
+                        <label for="login-email" data-i18n="html.email">Email</label>
+                        <input type="email" id="login-email" name="email" autocomplete="username" inputmode="email"
+                            required aria-required="true" data-i18n-placeholder="html.email" />
+                    </div>
+                    <div class="auth-widget__input-field">
+                        <label for="login-password" data-i18n="html.password">Passwort</label>
+                        <input type="password" id="login-password" name="password" autocomplete="current-password"
+                            required aria-required="true" data-i18n-placeholder="html.password" />
+                    </div>
+                    <button type="submit" id="login-submit-btn" data-i18n="html.login">Log In</button>
+                    <div class="auth-widget__register-link">
+                        <a href="signup.html" id="signup-link" data-i18n="html.signUp">Sign Up</a>
+                        <p id="login-help-text" data-i18n="html.dontHaveAccount">Don't have an account?</p>
+                    </div>
                     <div class="legal-links">
-        <a href="imprint.html" class="legal-links__link--imprint">Impressum</a>
-        <a href="privacy.html" class="legal-links__link--privacy">Datenschutz</a>
+                        <a href="imprint.html" class="legal-links__link--imprint" data-i18n="html.imprint">Impressum</a>
+                        <a href="privacy.html" class="legal-links__link--privacy"
+                            data-i18n="html.privacy">Datenschutz</a>
+                    </div>
+                </form>
+            </section>
+        </main>
     </div>
-            </form>
-        </section>
-    </main>
-</div>
 
 
-<script type="module" src="../script/app/auth.ts"></script>
+    <script type="module" src="../script/app/auth.ts"></script>
 </body>
+
 </html>

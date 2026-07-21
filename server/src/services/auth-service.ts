@@ -1,5 +1,8 @@
 import { supabaseClient } from "../lib/supabase-client";
+import { decodeMockJwt } from "../mock/routes";
 import type { HttpHeaders } from "../controllers/response";
+
+const USE_MOCK = process.env.USE_MOCK === "true";
 
 function headerValue(value: string | string[] | undefined): string {
     if (!value) return "";
@@ -14,6 +17,8 @@ export function extractBearerToken(headers?: HttpHeaders): string {
 
 export async function resolveUserIdFromToken(token: string): Promise<string | null> {
     if (!token) return null;
+
+    if (USE_MOCK) return decodeMockJwt(token)?.id ?? null;
 
     const { data: { user }, error } = await supabaseClient.auth.getUser(token);
     if (error || !user) return null;

@@ -5,6 +5,8 @@ import { generateShareLink } from "../names/share-names-in-wheel-list";
 import { replaceNames } from "../names/names-in-wheel-list";
 import type { SavedWheel, Asset } from "shared";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
+import { formatDate as formatLocalizedDate } from "../app/format";
 import { loadOwnedAssets, refreshSelectedAssetIds } from "./inventory-assets"
 import { getOwnedAssets, deleteSavedWheel, getSavedWheels, saveSavedWheels } from "../api/inventory-api";
 import { ApiError } from "../api/api-helpers"
@@ -38,9 +40,9 @@ async function confirmDeleteWheel(): Promise<void> {
   try {
     await deleteSavedWheel(id);
     await loadInventory();
-    showToast({ message: "Eintrag erfolgreich gelöscht.", type: "success" });
+    showToast({ message: t('inventory.deleted'), type: "success" });
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "Rad konnte nicht gelöscht werden.";
+    const message = error instanceof ApiError ? error.message : t('inventory.deleteFailed');
     showToast({ message, type: "error" });
   }
 }
@@ -168,7 +170,7 @@ function buildCardContent(item: SavedWheel): HTMLDivElement {
 function createDeleteButton(item: SavedWheel): HTMLButtonElement {
   const btn = document.createElement("button");
   btn.className = "inventory-modal__card-delete-btn";
-  btn.setAttribute("aria-label", "Eintrag löschen");
+  btn.setAttribute("aria-label", t('inventory.deleteAria'));
   btn.textContent = "🗑️";
   btn.addEventListener("click", (e: MouseEvent) => {
     e.preventDefault();
@@ -200,11 +202,11 @@ async function submitItem(): Promise<void> {
     closeAddItemModal();
     await loadInventory();
     showToast({
-      message: `"${name}" wurde erfolgreich gespeichert.`,
+      message: t('inventory.savedSuccess', { name }),
       type: "success"
     });
   } catch (error) {
-    const message = error instanceof ApiError ? error.message : "Speichern fehlgeschlagen. Bitte versuche es erneut.";
+    const message = error instanceof ApiError ? error.message : t('inventory.saveFailed');
     showToast({ message, type: "error" });
   }
 }
@@ -260,13 +262,7 @@ function extractNamesFromLink(link: string | null): string[] {
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  }).format(date);
+  return formatLocalizedDate(dateString);
 }
 
 const MINI_CENTER = { x: 100, y: 100 };
@@ -390,7 +386,7 @@ function createInventoryTabButton(category: InventoryCategory, activeCategory: I
   const button = document.createElement("button");
   button.className = "inventory-modal__tab";
   button.dataset.category = category;
-  button.textContent = `${category}s`.toUpperCase();
+  button.textContent = t(`categories.${category}`).toUpperCase();
 
   if (category === activeCategory) button.classList.add("inventory-modal__tab--active");
 

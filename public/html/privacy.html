@@ -1,112 +1,143 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Datenschutzerklärung – Family Guy Wheel of Fortune</title>
+  <title data-i18n="html.privacyPageTitle">Datenschutzerklärung – Family Guy Wheel of Fortune</title>
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/privacy.css">
   <link rel="stylesheet" href="../css/legal-links.css">
+  <link rel="stylesheet" href="../css/language-switcher.css">
 </head>
+
 <body>
 
-<header>
-  <a href="/">← Zurück zur App</a>
-</header>
+  <header>
+    <a id="back-to-app-link" href="/html/main.html" data-i18n="html.backToApp">← Zurück zur App</a>
+    <div class="app-header__language-switcher">
+      <button id="lang-de-btn" class="lang-btn" type="button" title="Deutsch">DE</button>
+      <button id="lang-en-btn" class="lang-btn" type="button" title="English">EN</button>
+    </div>
+  </header>
 
-<main>
-  <h1>Datenschutzerklärung</h1>
-  <p class="legal-page__subtitle">Gemäß DSGVO &amp; BDSG</p>
+  <main>
+    <h1 id="privacy-title" data-i18n="html.privacyPolicy">Datenschutzerklärung</h1>
+    <p class="legal-page__subtitle" id="privacy-subtitle" data-i18n="html.privacySubtitle">Gemäß DSGVO &amp; BDSG</p>
 
-  <!-- 1 -->
-  <section>
-    <h2>1. Verantwortlicher</h2>
-    <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist:</p>
-    <span class="legal-page__label">XYZ</span>
-    <p><span class="legal-page__placeholder">[Vorname Nachname]</span></p>
-    <span class="legal-page__label">Anschrift</span>
-    <p><span class="legal-page__placeholder">[Straße Hausnummer, PLZ Ort]</span></p>
-    <span class="legal-page__label">E-Mail</span>
-    <p><span class="legal-page__placeholder">[deine@email.de]</span></p>
-  </section>
+    <!-- 1 -->
+    <section>
+      <h2 data-i18n="legal.privacy.controllerHeading">1. Verantwortlicher</h2>
+      <p data-i18n="legal.privacy.controllerIntro">Verantwortlich für die Datenverarbeitung auf dieser Website ist:</p>
+      <span class="legal-page__label">XYZ</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.privacy.namePlaceholder">[Vorname Nachname]</span></p>
+      <span class="legal-page__label" data-i18n="legal.privacy.addressLabel">Anschrift</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.privacy.addressPlaceholder">[Straße Hausnummer, PLZ
+          Ort]</span></p>
+      <span class="legal-page__label">E-Mail</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.privacy.emailPlaceholder">[deine@email.de]</span></p>
+    </section>
 
-  <!-- 2 -->
-  <section>
-    <h2>2. Welche Daten wir speichern</h2>
-    <p>Wir speichern ausschließlich die folgenden personenbezogenen Daten, die ihr beim Registrieren und Nutzen der App aktiv angegeben habt:</p>
+    <!-- 2 -->
+    <section>
+      <h2 data-i18n="legal.privacy.storedDataHeading">2. Welche Daten wir speichern</h2>
+      <p data-i18n="legal.privacy.storedDataIntro">Wir speichern ausschließlich die folgenden personenbezogenen Daten,
+        die ihr beim Registrieren und Nutzen der App aktiv angegeben habt:</p>
 
-    <span class="legal-page__label">Accountdaten (über Supabase Auth)</span>
-    <span class="legal-page__tag">E-Mail-Adresse</span>
-    <span class="legal-page__tag">Passwort (gehashed)</span>
-    <span class="legal-page__tag">Benutzername</span>
+      <span class="legal-page__label" data-i18n="legal.privacy.accountDataLabel">Accountdaten (über Supabase
+        Auth)</span>
+      <span class="legal-page__tag" data-i18n="legal.privacy.emailAddressTag">E-Mail-Adresse</span>
+      <span class="legal-page__tag" data-i18n="legal.privacy.passwordTag">Passwort (gehashed)</span>
+      <span class="legal-page__tag" data-i18n="legal.privacy.usernameTag">Benutzername</span>
 
-    <span class="legal-page__label">Nutzungsdaten</span>
-    <span class="legal-page__tag">Namen-Einträge im Rad</span>
+      <span class="legal-page__label" data-i18n="legal.privacy.usageDataLabel">Nutzungsdaten</span>
+      <span class="legal-page__tag" data-i18n="legal.privacy.wheelEntriesTag">Namen-Einträge im Rad</span>
 
-    <p style="margin-top:1rem;">Es werden keine Tracking-Cookies, Werbenetzwerke oder Analyse-Tools eingesetzt.</p>
-  </section>
+      <p style="margin-top:1rem;" data-i18n="legal.privacy.noTrackingText">Es werden keine Tracking-Cookies,
+        Werbenetzwerke oder Analyse-Tools eingesetzt.</p>
+    </section>
 
-  <!-- 3 -->
-  <section>
-    <h2>3. Zweck der Verarbeitung</h2>
-    <p>Wir verarbeiten eure Daten ausschließlich zum Betrieb der Anwendung:</p>
-    <ul>
-      <li>Authentifizierung und Account-Verwaltung</li>
-      <li>Speicherung eurer Rad-Einträge pro Nutzer</li>
-      <li>Sicherheit und Missbrauchsprävention</li>
-    </ul>
-    <p>Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).</p>
-  </section>
+    <!-- 3 -->
+    <section>
+      <h2 data-i18n="legal.privacy.purposeHeading">3. Zweck der Verarbeitung</h2>
+      <p data-i18n="legal.privacy.purposeIntro">Wir verarbeiten eure Daten ausschließlich zum Betrieb der Anwendung:</p>
+      <ul data-i18n-html="legal.privacy.purposeList">
+        <li>Authentifizierung und Account-Verwaltung</li>
+        <li>Speicherung eurer Rad-Einträge pro Nutzer</li>
+        <li>Sicherheit und Missbrauchsprävention</li>
+      </ul>
+      <p data-i18n="legal.privacy.legalBasisText">Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).</p>
+    </section>
 
-  <!-- 4 -->
-  <section>
-    <h2>4. Drittanbieter – Supabase</h2>
-    <p>Wir nutzen <strong>Supabase</strong> (Supabase Inc., 970 Trestle Glen Rd, Oakland, CA 94610, USA) als Datenbank- und Authentifizierungsdienst. Eure Accountdaten werden auf Supabase-Servern gespeichert.</p>
-    <p>Supabase ist nach dem EU-US Data Privacy Framework zertifiziert. Weitere Informationen findet ihr in der <a href="https://supabase.com/privacy" target="_blank" style="color:var(--accent)">Supabase Datenschutzerklärung</a>.</p>
-  </section>
+    <!-- 4 -->
+    <section>
+      <h2 data-i18n="legal.privacy.supabaseHeading">4. Drittanbieter – Supabase</h2>
+      <p data-i18n-html="legal.privacy.supabaseText">Wir nutzen <strong>Supabase</strong> (Supabase Inc., 970 Trestle
+        Glen Rd, Oakland, CA 94610, USA) als Datenbank- und Authentifizierungsdienst. Eure Accountdaten werden auf
+        Supabase-Servern gespeichert.</p>
+      <p data-i18n-html="legal.privacy.supabasePrivacyText">Supabase ist nach dem EU-US Data Privacy Framework
+        zertifiziert. Weitere Informationen findet ihr in der <a href="https://supabase.com/privacy" target="_blank"
+          rel="noopener noreferrer" style="color:var(--accent)">Supabase Datenschutzerklärung</a>.</p>
+    </section>
 
-  <!-- 5 -->
-  <section>
-    <h2>5. Drittanbieter – Vercel</h2>
-    <p>Diese Website wird über <strong>Vercel</strong> (Vercel Inc., 340 Pine Street Suite 701, San Francisco, CA 94104, USA) gehostet. Beim Aufruf der Website werden technisch bedingt Server-Logs erstellt (IP-Adresse, Zeitstempel, aufgerufene URL). Diese werden von Vercel kurzzeitig gespeichert und nicht von uns ausgewertet.</p>
-    <p>Weitere Informationen: <a href="https://vercel.com/legal/privacy-policy" target="_blank" style="color:var(--accent)">Vercel Datenschutzerklärung</a>.</p>
-  </section>
+    <!-- 5 -->
+    <section>
+      <h2 data-i18n="legal.privacy.vercelHeading">5. Drittanbieter – Vercel</h2>
+      <p data-i18n-html="legal.privacy.vercelText">Diese Website wird über <strong>Vercel</strong> (Vercel Inc., 340
+        Pine Street Suite 701, San Francisco, CA 94104, USA) gehostet. Beim Aufruf der Website werden technisch bedingt
+        Server-Logs erstellt (IP-Adresse, Zeitstempel, aufgerufene URL). Diese werden von Vercel kurzzeitig gespeichert
+        und nicht von uns ausgewertet.</p>
+      <p data-i18n-html="legal.privacy.vercelPrivacyText">Weitere Informationen: <a
+          href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer"
+          style="color:var(--accent)">Vercel Datenschutzerklärung</a>.</p>
+    </section>
 
-  <!-- 6 -->
-  <section>
-    <h2>6. Speicherdauer</h2>
-    <p>Eure Daten werden gespeichert solange euer Account aktiv ist. Nach einer Account-Löschung werden alle personenbezogenen Daten innerhalb von <span class="legal-page__placeholder">[30 Tage – anpassen]</span> gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
-  </section>
+    <!-- 6 -->
+    <section>
+      <h2 data-i18n="legal.privacy.retentionHeading">6. Speicherdauer</h2>
+      <p data-i18n-html="legal.privacy.retentionText">Eure Daten werden gespeichert solange euer Account aktiv ist. Nach
+        einer Account-Löschung werden alle personenbezogenen Daten innerhalb von <span
+          class="legal-page__placeholder">[30 Tage – anpassen]</span> gelöscht, sofern keine gesetzlichen
+        Aufbewahrungspflichten entgegenstehen.</p>
+    </section>
 
-  <!-- 7 -->
-  <section>
-    <h2>7. Eure Rechte (DSGVO Art. 15–21)</h2>
-    <p>Ihr habt jederzeit das Recht auf:</p>
-    <ul>
-      <li><strong>Auskunft</strong> über eure gespeicherten Daten (Art. 15)</li>
-      <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16)</li>
-      <li><strong>Löschung</strong> eurer Daten ("Recht auf Vergessenwerden", Art. 17)</li>
-      <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18)</li>
-      <li><strong>Datenübertragbarkeit</strong> (Art. 20)</li>
-      <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21)</li>
-    </ul>
-    <p>Anfragen bitte an: <span class="legal-page__placeholder">[deine@email.de]</span></p>
-    <p>Ihr habt außerdem das Recht, euch bei der zuständigen Aufsichtsbehörde zu beschweren. In NRW ist das der <a href="https://www.ldi.nrw.de" target="_blank" style="color:var(--accent)">Landesbeauftragte für Datenschutz und Informationsfreiheit NRW</a>.</p>
-  </section>
+    <!-- 7 -->
+    <section>
+      <h2 data-i18n="legal.privacy.rightsHeading">7. Eure Rechte (DSGVO Art. 15–21)</h2>
+      <p data-i18n="legal.privacy.rightsIntro">Ihr habt jederzeit das Recht auf:</p>
+      <ul data-i18n-html="legal.privacy.rightsList">
+        <li><strong>Auskunft</strong> über eure gespeicherten Daten (Art. 15)</li>
+        <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16)</li>
+        <li><strong>Löschung</strong> eurer Daten ("Recht auf Vergessenwerden", Art. 17)</li>
+        <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18)</li>
+        <li><strong>Datenübertragbarkeit</strong> (Art. 20)</li>
+        <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21)</li>
+      </ul>
+      <p data-i18n-html="legal.privacy.requestsText">Anfragen bitte an: <span
+          class="legal-page__placeholder">[deine@email.de]</span></p>
+      <p data-i18n-html="legal.privacy.complaintText">Ihr habt außerdem das Recht, euch bei der zuständigen
+        Aufsichtsbehörde zu beschweren. In NRW ist das der <a href="https://www.ldi.nrw.de" target="_blank"
+          rel="noopener noreferrer" style="color:var(--accent)">Landesbeauftragte für Datenschutz und
+          Informationsfreiheit NRW</a>.</p>
+    </section>
 
-  <!-- 8 -->
-  <section>
-    <h2>8. Änderungen</h2>
-    <p>Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen. Die jeweils aktuelle Version findet ihr auf dieser Seite.</p>
-    <span class="legal-page__label">Stand</span>
-    <p><span class="legal-page__placeholder">[Datum eintragen]</span></p>
-  </section>
-</main>
+    <!-- 8 -->
+    <section>
+      <h2 data-i18n="legal.privacy.changesHeading">8. Änderungen</h2>
+      <p data-i18n="legal.privacy.changesText">Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen.
+        Die jeweils aktuelle Version findet ihr auf dieser Seite.</p>
+      <span class="legal-page__label" data-i18n="legal.privacy.versionLabel">Stand</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.privacy.datePlaceholder">[Datum eintragen]</span></p>
+    </section>
+  </main>
 
-<footer>
-  <a href="/imprint.html">Impressum</a> &nbsp;·&nbsp;
-  Family Guy Wheel of Fortune
-</footer>
+  <footer>
+    <a href="/imprint.html" data-i18n="html.imprint">Impressum</a> &nbsp;·&nbsp;
+    <span data-i18n="html.appName">Family Guy Wheel of Fortune</span>
+  </footer>
+
+  <script type="module" src="../script/app/legal.ts"></script>
 
 </body>
+
 </html>

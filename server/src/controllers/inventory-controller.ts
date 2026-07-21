@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { getOwnedAssets, selectAsset, getSavedWheels } from "../services/inventory-service";
 import { getSelectedAssetIds } from "../services/shop-service";
-import { asyncHandler } from "./response";
+import { asyncHandler, sendCodedError } from "./response";
+import { ERROR_CODES } from "../lib/error-codes";
 import type { HttpRequest, HttpResponse } from "./response";
 import { deleteWheel } from "../services/inventory-service";
 import { saveSavedWheels } from "../services/inventory-service";
@@ -29,7 +30,7 @@ const SelectRequestSchema = z.object({
 export const handleSelectAsset = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SelectRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "assetId is required" });
+        sendCodedError(res, 400, "assetId is required", ERROR_CODES.VALIDATION, { field: "assetId" });
         return;
     }
 
@@ -45,7 +46,7 @@ const DeleteWheelRequestSchema = z.object({
 export const handleDeleteWheel = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = DeleteWheelRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "id is required" });
+        sendCodedError(res, 400, "wheelId is required", ERROR_CODES.VALIDATION, { field: "wheelId" });
         return;
     }
     await deleteWheel(req.userId!, parsedBody.data.wheelId);
@@ -66,7 +67,7 @@ const SaveSavedWheelRequestSchema = z.object({
 export const handleSaveSavedWheels = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SaveSavedWheelRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "title and url are required" });
+        sendCodedError(res, 400, "title and url are required", ERROR_CODES.VALIDATION, { fields: ["title", "url"] });
         return;
     }
 

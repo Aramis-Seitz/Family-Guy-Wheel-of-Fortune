@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createRoom, joinRoom, leaveRoom, closeRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
-import { asyncHandler } from "./response";
+import { asyncHandler, sendCodedError } from "./response";
+import { ERROR_CODES } from "../lib/error-codes";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
     CreateRoomResponseSchema,
@@ -20,7 +21,7 @@ const RoomKeyRequestSchema = z.object({
 export const handleJoinRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
+        sendCodedError(res, 400, "Missing roomKey", ERROR_CODES.VALIDATION, { field: "roomKey" });
         return;
     }
 
@@ -31,7 +32,7 @@ export const handleJoinRoom = asyncHandler(async (req: HttpRequest, res: HttpRes
 export const handleLeaveRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
+        sendCodedError(res, 400, "Missing roomKey", ERROR_CODES.VALIDATION, { field: "roomKey" });
         return;
     }
 
@@ -42,7 +43,7 @@ export const handleLeaveRoom = asyncHandler(async (req: HttpRequest, res: HttpRe
 export const handleCloseRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
+        sendCodedError(res, 400, "Missing roomKey", ERROR_CODES.VALIDATION, { field: "roomKey" });
         return;
     }
 
@@ -58,7 +59,7 @@ const RoomSpinRequestSchema = z.object({
 export const handleSpinRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RoomSpinRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey or invalid direction" });
+        sendCodedError(res, 400, "Missing roomKey or invalid direction", ERROR_CODES.VALIDATION, { fields: ["roomKey", "direction"] });
         return;
     }
 
@@ -69,7 +70,7 @@ export const handleSpinRoom = asyncHandler(async (req: HttpRequest, res: HttpRes
 export const handleResetRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
+        sendCodedError(res, 400, "Missing roomKey", ERROR_CODES.VALIDATION, { field: "roomKey" });
         return;
     }
 
@@ -85,7 +86,7 @@ const SetMultiplierRequestSchema = z.object({
 export const handleSetMultiplier = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SetMultiplierRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey or multiplier" });
+        sendCodedError(res, 400, "Missing roomKey or multiplier", ERROR_CODES.VALIDATION, { fields: ["roomKey", "multiplier"] });
         return;
     }
 
@@ -101,7 +102,7 @@ const SetNamesRequestSchema = z.object({
 export const handleUpdateNames = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SetNamesRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey or names" });
+        sendCodedError(res, 400, "Missing roomKey or names", ERROR_CODES.VALIDATION, { fields: ["roomKey", "names"] });
         return;
     }
 

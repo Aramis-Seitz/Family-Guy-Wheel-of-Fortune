@@ -1,6 +1,7 @@
 import { input } from "./names-in-wheel-list";
 import { requiredElement, optionalElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import {
   NAME_VALIDATION_ERROR,
   type NameValidationErrorCode,
@@ -19,11 +20,11 @@ export const addBtnCentered = optionalElement<HTMLButtonElement>("add-name-btn-c
 function getNameValidationMessage(code: NameValidationErrorCode): string {
   switch (code) {
     case NAME_VALIDATION_ERROR.REQUIRED:
-      return "Bitte einen Namen eingeben.";
+      return t("names.required");
     case NAME_VALIDATION_ERROR.INVALID_CHARACTERS:
-      return "Nur Buchstaben, Zahlen und Apostrophe erlaubt.";
+      return t("names.invalidCharacters");
     default:
-      return "Ungültige Eingabe.";
+      return t("names.invalid");
   }
 }
 

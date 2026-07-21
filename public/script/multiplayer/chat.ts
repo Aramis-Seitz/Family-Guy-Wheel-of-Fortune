@@ -1,5 +1,6 @@
 import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { formatTime } from '../app/format';
 
 const MAX_LENGTH = 200;
 const SPAM_DELAY_MS = 1000;
@@ -8,10 +9,6 @@ let chatChannel: RealtimeChannel | null = null;
 let myUsername = '';
 let lastSentAt = 0;
 let abortController: AbortController | null = null;
-
-function formatTime(date: Date): string {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-}
 
 interface ChatMessage {
   username: string;
@@ -28,7 +25,7 @@ function appendMessage(msg: ChatMessage, isMine: boolean): void {
 
   const meta = document.createElement('span');
   meta.className = 'chat__meta';
-  meta.textContent = `${msg.username} · ${msg.timestamp}`;
+  meta.textContent = `${msg.username} · ${formatTime(msg.timestamp)}`;
 
   const text = document.createElement('p');
   text.className = 'chat__text';
@@ -71,7 +68,7 @@ export function initChat(roomKey: string, username: string): void {
     const msg: ChatMessage = {
       username: myUsername,
       text,
-      timestamp: formatTime(new Date()),
+      timestamp: new Date().toISOString(),
     };
 
     void chatChannel.send({ type: 'broadcast', event: 'message', payload: msg });

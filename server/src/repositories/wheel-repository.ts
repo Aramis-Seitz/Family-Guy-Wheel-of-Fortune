@@ -27,7 +27,7 @@ export async function listSavedWheels(userId: string): Promise<SavedWheel[]> {
         .limit(INVENTORY_LIMIT);
 
     if (error) {
-        console.error("Fehler beim Laden:", error);
+        console.error("Failed to load saved wheels:", error);
         return [];
     }
 

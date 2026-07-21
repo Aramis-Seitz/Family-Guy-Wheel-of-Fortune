@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Signup</title>
+    <title data-i18n="html.signUpPageTitle">Signup</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/logo.png" />
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/auth-widget.css">
@@ -11,54 +12,70 @@
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/legal-links.css">
     <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/language-switcher.css">
 </head>
+
 <body>
-<div class="auth-widget">
-    <main>
-        <section aria-label="Signup Form" class="auth-widget__form auth-widget__form--signup">
-            <form id="signup-form" action="login.html" method="post" autocomplete="on">
-                <h2>Signup</h2>
+    <header class="app-header">
+        <div class="app-header__language-switcher">
+            <button id="lang-de-btn" class="lang-btn" type="button" title="Deutsch">DE</button>
+            <button id="lang-en-btn" class="lang-btn" type="button" title="English">EN</button>
+        </div>
+    </header>
+    <div class="auth-widget">
+        <main>
+            <section aria-label="Signup Form" class="auth-widget__form auth-widget__form--signup">
+                <form id="signup-form" action="login.html" method="post" autocomplete="on">
+                    <h2 id="signup-title" data-i18n="html.signUp">Signup</h2>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-user">Username</label>
-                    <input type="text" id="signup-user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label for="signup-user" data-i18n="html.username">Username</label>
+                        <input type="text" id="signup-user" name="username" autocomplete="username"
+                            autocapitalize="none" spellcheck="false" required data-i18n-placeholder="html.username" />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label for="signup-email" data-i18n="html.email">Email</label>
+                        <input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email"
+                            required data-i18n-placeholder="html.email" />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-date-of-birth">Geburtsdatum</label>
-                    <input type="date" id="signup-date-of-birth" name="bday" autocomplete="bday" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label for="signup-date-of-birth" data-i18n="html.dob">Geburtsdatum</label>
+                        <input type="date" id="signup-date-of-birth" name="bday" autocomplete="bday" required />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-password">Passwort</label>
-                    <input type="password" id="signup-password" name="password" autocomplete="new-password" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label for="signup-password" data-i18n="html.password">Passwort</label>
+                        <input type="password" id="signup-password" name="password" autocomplete="new-password" required
+                            data-i18n-placeholder="html.password" />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-confirm-password">Confirm Passwort</label>
-                    <input type="password" id="signup-confirm-password" name="password_confirmation" autocomplete="new-password" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label for="signup-confirm-password" data-i18n="html.confirmPassword">Confirm Passwort</label>
+                        <input type="password" id="signup-confirm-password" name="password_confirmation"
+                            autocomplete="new-password" required data-i18n-placeholder="html.confirmPassword" />
+                    </div>
 
-                <button type="submit">Sign Up</button>
+                    <button type="submit" id="signup-submit-btn" data-i18n="html.signUp">Sign Up</button>
 
-                <div class="auth-widget__register-link">
-                    <p>Already have an account? <a href="login.html">Login</a></p>
-                </div>
+                    <div class="auth-widget__register-link">
+                        <p><span id="signup-help-text" data-i18n="html.alreadyHaveAccount">Already have an
+                                account?</span> <a href="login.html" id="login-link" data-i18n="html.login">Login</a>
+                        </p>
+                    </div>
 
-                <div class="legal-links">
-                    <a href="imprint.html" class="legal-links__link--imprint">Impressum</a>
-                    <a href="privacy.html" class="legal-links__link--privacy">Datenschutz</a>
-                </div>
-            </form>
-        </section>
-    </main>
-</div>
+                    <div class="legal-links">
+                        <a href="imprint.html" class="legal-links__link--imprint" data-i18n="html.imprint">Impressum</a>
+                        <a href="privacy.html" class="legal-links__link--privacy"
+                            data-i18n="html.privacy">Datenschutz</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
 
-<script type="module" src="../script/app/auth.ts"></script>
+    <script type="module" src="../script/app/auth.ts"></script>
 </body>
+
 </html>

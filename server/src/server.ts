@@ -11,6 +11,7 @@ import cors from "cors";
 import { mockRouter } from "./mock/routes";
 import { apiRoutes } from "./routes";
 import { requireBasicAuthExpress } from "./lib/basic-auth";
+import { detectLanguage } from "./middleware/language-detector";
 
 const USE_MOCK = process.env.USE_MOCK === 'true';
 
@@ -33,18 +34,20 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+app.use(detectLanguage);
 app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthExpress);
 app.use(express.static(path.resolve(__dirname, "../../public/dist/html")));
 app.use(express.static(path.resolve(__dirname, "../../public/dist")));
-app.use('/api', apiRoutes);
 
 if (USE_MOCK) {
   app.use('/api/mock', mockRouter);
 }
 
+app.use('/api', apiRoutes);
+
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`Server läuft auf http://localhost:${PORT}`);
+    console.log(`Server running at http://localhost:${PORT}`);
   });
 }
 

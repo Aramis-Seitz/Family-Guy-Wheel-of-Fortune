@@ -14,3 +14,28 @@
     justify-self: center;
 }
 
+.panel__status-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+}
+
+.panel #user-area,
+.panel #room-panel {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.panel #user-area {
+    justify-content: center;
+}
+
+/* Keep the complete sidebar clear of the fixed advertisement on wide screens. */
+@media (min-width: 1750px) {
+    .panel {
+        transform: translateX(-80px);
+    }
+}

@@ -1,4 +1,6 @@
 import { asAppError } from "../lib/errors";
+import { ERROR_CODES } from "../lib/error-codes";
+import type { ErrorCode } from "../lib/error-codes";
 
 export type HttpHeaders = Record<string, string | string[] | undefined>;
 
@@ -21,12 +23,26 @@ export function sendMethodNotAllowed(res: HttpResponse, allow: string): void {
     if (typeof res.setHeader === "function") {
         res.setHeader("Allow", allow);
     }
-    res.status(405).json({ error: "Method not allowed" });
+    res.status(405).json({ error: "Method not allowed", code: ERROR_CODES.METHOD_NOT_ALLOWED });
+}
+
+export function sendCodedError(
+    res: HttpResponse,
+    status: number,
+    error: string,
+    code: ErrorCode,
+    details?: Record<string, unknown>,
+): void {
+    res.status(status).json({ error, code, ...(details && { details }) });
 }
 
 export function sendUnexpectedError(res: HttpResponse, error: unknown): void {
     const appError = asAppError(error);
-    res.status(appError.statusCode).json({ error: appError.message });
+    res.status(appError.statusCode).json({
+        error: appError.message,
+        code: appError.code,
+        ...(appError.details && { details: appError.details }),
+    });
 }
 
 export function asyncHandler(handler: (req: HttpRequest, res: HttpResponse) => Promise<void>) {

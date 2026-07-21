@@ -203,6 +203,17 @@ export function createMockClient() {
         clearSession();
         return { error: null };
       },
+
+      onAuthStateChange(callback: (event: string, session: MockSession | null) => void) {
+        callback('INITIAL_SESSION', loadSession());
+        return {
+          data: {
+            subscription: {
+              unsubscribe() { },
+            },
+          },
+        };
+      },
     },
 
     from(table: string) {
@@ -211,6 +222,10 @@ export function createMockClient() {
 
     channel(_name: string) {
       return noopChannel;
+    },
+
+    async removeChannel(_channel: unknown) {
+      return 'ok';
     },
   };
 }

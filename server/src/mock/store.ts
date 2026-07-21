@@ -24,6 +24,35 @@ export interface SavedLink {
   created_at: string;
 }
 
+export interface MockAsset {
+  id: string;
+  name: string;
+  category: 'sound' | 'companion';
+  price_coins: number;
+  asset_url: string;
+}
+
+export interface MockAssetOwnership {
+  user_id: string;
+  asset_id: string;
+}
+
+export interface MockAssetSelection extends MockAssetOwnership {
+  category: MockAsset['category'];
+}
+
+export interface MockRoom {
+  id: string;
+  room_key: string;
+  host_id: string;
+  players: Array<{ id: string; username: string }>;
+  names_in_wheel: string[];
+  last_spin: number | null;
+  spun_at: string | null;
+  multiplier: number;
+  spin_direction: string | null;
+}
+
 export const store = {
   profiles: [
     {
@@ -37,6 +66,33 @@ export const store = {
   ] as Profile[],
   spin_tokens: [] as SpinToken[],
   saved_wheels: [] as SavedLink[],
+  assets: [
+    { id: 'mock-sound-bruh', name: 'Bruh', category: 'sound', price_coins: 10, asset_url: '/resources/sounds/bruh.mp3' },
+    { id: 'mock-companion-brian', name: 'Brian', category: 'companion', price_coins: 50, asset_url: '/resources/companions/brian.png' },
+    { id: 'mock-companion-cleveland', name: 'Cleveland', category: 'companion', price_coins: 40, asset_url: '/resources/companions/cleveland.png' },
+    { id: 'mock-sound-cymbal-crash', name: 'Cymbal Crash', category: 'sound', price_coins: 10, asset_url: '/resources/sounds/cymbal-crash.mp3' },
+    { id: 'mock-sound-drumroll', name: 'Drumroll', category: 'sound', price_coins: 10, asset_url: '/resources/sounds/drumroll.mp3' },
+    { id: 'mock-sound-dry-fart', name: 'Dry Fart', category: 'sound', price_coins: 20, asset_url: '/resources/sounds/dry-fart.mp3' },
+    { id: 'mock-companion-felix', name: 'Felix', category: 'companion', price_coins: 150, asset_url: '/resources/companions/felix.png' },
+    { id: 'mock-sound-giggity', name: 'Giggity', category: 'sound', price_coins: 15, asset_url: '/resources/sounds/giggity.mp3' },
+    { id: 'mock-companion-joe', name: 'Joe', category: 'companion', price_coins: 45, asset_url: '/resources/companions/joe.png' },
+    { id: 'mock-companion-lois', name: 'Lois', category: 'companion', price_coins: 40, asset_url: '/resources/companions/lois.png' },
+    { id: 'mock-companion-meg', name: 'Meg', category: 'companion', price_coins: 40, asset_url: '/resources/companions/meg.png' },
+    { id: 'mock-sound-michael-jackson', name: 'Michael Jackson', category: 'sound', price_coins: 50, asset_url: '/resources/sounds/michael-jackson-hee-hee.mp3' },
+    { id: 'mock-sound-neee', name: 'Neee', category: 'sound', price_coins: 25, asset_url: '/resources/sounds/neee.mp3' },
+    { id: 'mock-sound-perfect-fart', name: 'Perfect Fart', category: 'sound', price_coins: 25, asset_url: '/resources/sounds/perfect-fart.mp3' },
+    { id: 'mock-companion-peter', name: 'Peter', category: 'companion', price_coins: 60, asset_url: '/resources/companions/peter.png' },
+    { id: 'mock-sound-peter-laugh', name: 'Peter Laugh', category: 'sound', price_coins: 0, asset_url: '/resources/sounds/peter-griffin-laugh.mp3' },
+    { id: 'mock-sound-punch', name: 'Punch', category: 'sound', price_coins: 15, asset_url: '/resources/sounds/punch.mp3' },
+    { id: 'mock-companion-quagmire', name: 'Quagmire', category: 'companion', price_coins: 0, asset_url: '/resources/companions/quagmire.png' },
+    { id: 'mock-sound-rizz', name: 'Rizz', category: 'sound', price_coins: 20, asset_url: '/resources/sounds/rizz.mp3' },
+    { id: 'mock-companion-stewie', name: 'Stewie', category: 'companion', price_coins: 50, asset_url: '/resources/companions/stewie.png' },
+    { id: 'mock-sound-super-mario-bros', name: 'Super Mario Bros', category: 'sound', price_coins: 20, asset_url: '/resources/sounds/super-mario-bros.mp3' },
+    { id: 'mock-sound-whip', name: 'Whip', category: 'sound', price_coins: 10, asset_url: '/resources/sounds/whip.mp3' },
+  ] as MockAsset[],
+  asset_ownership: [] as MockAssetOwnership[],
+  asset_selection: [] as MockAssetSelection[],
+  rooms: [] as MockRoom[],
 };
 
 export function findProfile(id: string) {

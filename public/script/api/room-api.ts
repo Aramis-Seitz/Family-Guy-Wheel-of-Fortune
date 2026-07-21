@@ -8,34 +8,34 @@ import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBo
 
 export async function createRoom(): Promise<CreateRoomResponseBody> {
     const rawBody = await postJson("/api/room/create", undefined, {
-        errorFallback: "Room konnte nicht erstellt werden"
+        errorFallbackKey: "room.createFailed"
     });
     return CreateRoomResponseSchema.parse(rawBody);
 }
 
 export async function joinRoom(roomKey: string): Promise<JoinRoomResponseBody> {
     const rawBody = await postJson("/api/room/join", { roomKey }, {
-        errorFallback: "Beitritt zum Room fehlgeschlagen"
+        errorFallbackKey: "room.notFoundOrJoinError"
     });
     return JoinRoomResponseSchema.parse(rawBody);
 }
 
 export async function setMultiplier(roomKey: string, multiplier: number): Promise<void> {
     await postJson("/api/room/multiplier", { roomKey, multiplier }, {
-        errorFallback: "Multiplikator konnte nicht gesetzt werden"
+        errorFallbackKey: "api.room.multiplierFailed"
     });
 }
 
 export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<SpinRandomResponseBody> {
     const rawBody = await postJson("/api/room/spin", { roomKey, names, direction }, {
-        errorFallback: "Spin fehlgeschlagen"
+        errorFallbackKey: "room.spinFailed"
     });
     return SpinRandomResponseSchema.parse(rawBody);
 }
 
 export async function leaveRoom(roomKey: string): Promise<void> {
     await postJson("/api/room/leave", { roomKey }, {
-        errorFallback: "Room konnte nicht verlassen werden"
+        errorFallbackKey: "room.leaveFailed"
     });
 }
 
@@ -45,18 +45,18 @@ export function leaveRoomOnUnload(roomKey: string, token: string): void {
 
 export async function closeRoom(roomKey: string): Promise<void> {
     await postJson("/api/room/close", { roomKey }, {
-        errorFallback: "Room konnte nicht geschlossen werden"
+        errorFallbackKey: "room.closeFailed"
     });
 }
 
 export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
     await postJson("/api/room/wheel-items", { roomKey, names }, {
-        errorFallback: "Wheel-Items konnten nicht aktualisiert werden"
+        errorFallbackKey: "api.room.updateWheelFailed"
     });
 }
 
 export async function resetRoom(roomKey: string): Promise<void> {
     await postJson("/api/room/reset", { roomKey }, {
-        errorFallback: "Room konnte nicht zurückgesetzt werden"
+        errorFallbackKey: "room.resetFailed"
     });
 }

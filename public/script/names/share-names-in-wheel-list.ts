@@ -1,6 +1,7 @@
 import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier";
 import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import { requiredElement } from "../shared/dom-helpers";
 
 export function generateShareLink(): string {
@@ -53,13 +54,13 @@ export function initShareFeature(): void {
         try {
             await navigator.clipboard.writeText(link);
             showToast({
-                message: "Link copied!",
+                message: t("names.copyLinkSuccess"),
                 type: "success"
             });
         } catch (error) {
             console.error("Could not copy link:", error);
             showToast({
-                message: `Could not copy link: ${error}`,
+                message: t("names.copyLinkFailed", { message: String(error) }),
                 type: "error"
             });
         }

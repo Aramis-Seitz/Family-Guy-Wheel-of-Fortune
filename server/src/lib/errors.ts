@@ -1,11 +1,18 @@
+import { inferErrorCode } from "./error-codes";
+import type { ErrorCode } from "./error-codes";
+
 export class AppError extends Error {
     public readonly statusCode: number;
+    public readonly code: ErrorCode;
+    public readonly details?: Record<string, unknown>;
 
-    constructor(message: string, statusCode: number) {
+    constructor(message: string, statusCode: number, code?: ErrorCode, details?: Record<string, unknown>) {
         super(message);
         this.name = "AppError";
         this.statusCode = statusCode;
-    } 
+        this.code = code ?? inferErrorCode(message, statusCode);
+        this.details = details;
+    }
 }
 
 export function asAppError(error: unknown): AppError {

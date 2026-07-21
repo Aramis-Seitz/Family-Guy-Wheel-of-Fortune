@@ -9,8 +9,13 @@
     cursor: pointer;
 }
 
-.shop-btn:hover { background-color: #28a828; }
-.shop-btn:active { background-color: #1f7a1f; }
+.shop-btn:hover {
+    background-color: #28a828;
+}
+
+.shop-btn:active {
+    background-color: #1f7a1f;
+}
 
 .shop-modal {
     position: fixed;
@@ -64,26 +69,19 @@
 .shop-modal__header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
+    gap: 1rem;
     position: relative;
     margin-bottom: 20px;
 }
 
 .shop-modal__coin-balance {
-    position: absolute;
-    right: 4rem;
-    top: 50%;
-    transform: translateY(-50%);
     font-size: 20px;
     font-weight: 700;
     color: #ffffff;
 }
 
 .shop-modal__close-btn {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
     background: none;
     border: none;
     color: #aaa;
@@ -92,6 +90,13 @@
     padding: 0.25rem;
     border-radius: 0.375rem;
     transition: color 180ms ease, background 180ms ease;
+}
+
+.shop-modal__title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
 }
 
 .shop-modal__close-btn:hover {

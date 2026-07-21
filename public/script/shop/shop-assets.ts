@@ -1,9 +1,11 @@
 import { shopTabs, getClickedCategory, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop";
 import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview";
 import { requiredElement } from "../shared/dom-helpers";
 import type { Asset } from "shared";
+import { formatNumber } from "../app/format";
 
 
 // ----- ASSET ERSTELLEN UND LADEN -----
@@ -86,7 +88,7 @@ function createAssetTitle(asset: Asset): HTMLElement {
 function createAssetBuyButton(asset: Asset, owned: boolean, tooExpensive: boolean): HTMLElement {
     const btn = document.createElement("button");
     btn.className = "shop-modal__buy-btn";
-    btn.textContent = owned ? "OWNED" : `${asset.price_coins} 🪙`;
+    btn.textContent = owned ? t('shop.owned') : `${formatNumber(asset.price_coins)} 🪙`;
     btn.disabled = owned || tooExpensive;
 
     if (!owned && !tooExpensive) btn.addEventListener("click", () => handlePurchaseClick(asset, btn));
@@ -95,20 +97,20 @@ function createAssetBuyButton(asset: Asset, owned: boolean, tooExpensive: boolea
 
 async function handlePurchaseClick(asset: Asset, btn: HTMLButtonElement): Promise<void> {
     btn.disabled = true;
-    btn.textContent = "Buying...";
+    btn.textContent = t('shop.buying');
 
     try {
         const result = await purchaseAsset(asset.id);
-        if (!result.success) throw new Error("Kauf fehlgeschlagen");
+        if (!result.success) throw new Error(t('shop.purchaseFailed'));
         currentOwnedAssetIds.push(asset.id);
         await loadCoinBalance();
         renderCoinBalance();
-        showToast({ message: `${asset.name} gekauft!`, type: "success" });
+        showToast({ message: t('shop.assetPurchased', { name: asset.name }), type: "success" });
         loadShopAssets();
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Asset konnte nicht gekauft werden";
+        const message = error instanceof Error ? error.message : t('shop.purchaseFailed');
         showToast({ message, type: "error" });
         btn.disabled = false;
-        btn.textContent = `${asset.price_coins} 🪙`;
+        btn.textContent = `${formatNumber(asset.price_coins)} 🪙`;
     }
 }

@@ -13,17 +13,17 @@ export async function fetchRandomNumber(
   const rawData = await postJson(
     "/api/spin/random",
     { names, currentRotation, direction, multiplier }, {
-    errorFallback: "Server response not ok."
+    errorFallbackKey: "api.spin.randomFailed"
   });
   const data = SpinRandomResponseSchema.parse(rawData);
 
-  console.log("[SPIN] /api/spin/random Daten:", {
+  console.log("[SPIN] /api/spin/random data:", {
     ranNum: data.ranNum,
-    spinToken: data.spinToken || "LEER ← Backend-Env-Variablen fehlen wahrscheinlich!",
+    spinToken: data.spinToken || "EMPTY - backend environment variables may be missing",
   });
 
   if (!data.spinToken) {
-    console.warn("[SPIN] ⚠️ spinToken ist leer – Coins werden NICHT vergeben!");
+    console.warn("[SPIN] spinToken is empty; no coins will be awarded.");
   }
 
   return data;
@@ -38,12 +38,12 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
   try {
     const rawBody = await postJson("/api/spin/award-coins", { spinToken, winnerName }, {
       token: accessToken,
-      errorFallback: "Award coins request failed."
+      errorFallbackKey: "api.spin.awardFailed"
     });
     return AwardCoinsResponseSchema.parse(rawBody);
   } catch (error) {
     if (error instanceof ApiError) {
-      console.error("[award-coins] fehlgeschlagen:", error.status, error.message);
+      console.error("[award-coins] failed:", error.status, error.message);
     }
     throw error;
   }

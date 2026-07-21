@@ -15,3 +15,4 @@ Detaillierte Guides und Setups für das Family Guy Wheel of Fortune Projekt.
 
 - **[Commit-Konventionen](./guides/commit-conventions.md)** — Regeln für aussagekräftige Commits
 - **[ESLint](./guides/eslint.md)** — Setup, Benutzung und Regeln für Linting
+- **[Internationalisierung](./guides/i18n.md)** — Übersetzungen, Formatierung und lokalisierte API-Fehler

@@ -21,6 +21,7 @@ import {
 import { hideWinnerModal } from "./wheel/winner";
 import { initChat, destroyChat } from "./multiplayer/chat";
 import { showToast } from "./shared/toast";
+import { t } from "./app/i18n";
 import {
   createRoom,
   leaveRoom,
@@ -206,7 +207,7 @@ function renderPlayersSidebar(players: string[]): void {
 
     if (name === activeRoomHostName) {
       const tag = document.createElement('span');
-      tag.textContent = 'Host';
+      tag.textContent = t('room.hostTag');
       tag.className = 'room__host-tag';
       li.appendChild(tag);
     }
@@ -218,7 +219,7 @@ function renderPlayersSidebar(players: string[]): void {
       const inWheel = (roomNames ?? []).includes(name);
       toggle.textContent = inWheel ? '−' : '+';
       if (inWheel) toggle.classList.add('room__player-toggle-btn--added');
-      toggle.title = inWheel ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
+      toggle.title = inWheel ? t('room.removeFromWheel', { name }) : t('room.addToWheel', { name });
 
       toggle.addEventListener('click', async () => {
         toggle.disabled = true;
@@ -400,9 +401,9 @@ async function handleRoomSpinClick(direction: Direction): Promise<void> {
     const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + ranNum;
     spinWheel(totalSteps, direction, spinToken, names);
   } catch (error) {
-    console.error('[ROOM] Spin fehlgeschlagen:', error);
+    console.error('[ROOM] Spin failed:', error);
     unlockSpinButtons();
-    showToast({ message: 'Spin fehlgeschlagen', type: 'error' });
+    showToast({ message: t('room.spinFailed'), type: 'error' });
   }
 }
 
@@ -412,8 +413,8 @@ async function handleRoomResetClick(): Promise<void> {
     await resetRoom(activeRoomKey);
     handleLocalReset();
   } catch (error) {
-    console.error('[ROOM] Reset fehlgeschlagen:', error);
-    showToast({ message: 'Reset fehlgeschlagen', type: 'error' });
+    console.error('[ROOM] Reset failed:', error);
+    showToast({ message: t('room.resetFailed'), type: 'error' });
   }
 }
 
@@ -425,7 +426,7 @@ function handleRoomResetEvent(): void {
 function onRoomClosed(): void {
   if (isHost) return; // host handles its own leave flow
   clearRoom();
-  showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
+  showToast({ message: t('room.hostClosed'), type: 'info' });
 }
 
 function setNamesFromRoom(names: string[]): void {
@@ -495,10 +496,10 @@ function updateBulkButtonState(players: string[]): void {
   if (!bulkAddToWheelBtn) return;
   const anyMissing = players.some((p) => !(roomNames ?? []).includes(p));
   if (anyMissing) {
-    bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
+    bulkAddToWheelBtn.textContent = t('room.bulkAdd');
     bulkAddToWheelBtn.classList.remove('room__btn--remove');
   } else {
-    bulkAddToWheelBtn.textContent = 'Alle vom Rad entfernen';
+    bulkAddToWheelBtn.textContent = t('room.bulkRemove');
     bulkAddToWheelBtn.classList.add('room__btn--remove');
   }
 }
@@ -510,9 +511,9 @@ async function executeLeaveRoom(): Promise<void> {
   if (roomKey) {
     try {
       await leaveRoom(roomKey);
-      showToast({ message: wasHost ? 'Raum geschlossen' : 'Raum verlassen', type: 'success' });
+      showToast({ message: wasHost ? t('room.closed') : t('room.left'), type: 'success' });
     } catch {
-      showToast({ message: wasHost ? 'Raum konnte nicht geschlossen werden' : 'Raum konnte nicht verlassen werden', type: 'error' });
+      showToast({ message: wasHost ? t('room.closeFailed') : t('room.leaveFailed'), type: 'error' });
     }
   }
 }
@@ -540,10 +541,10 @@ async function executeCreateRoom(): Promise<void> {
       void setMultiplier(activeRoomKey, getMultiplier());
     };
     multiplierSlider?.addEventListener('input', multiplierSyncListener);
-    showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
+    showToast({ message: t('room.created', { roomKey }), type: 'success' });
   } catch (error) {
-    console.error('[ROOM] Erstellen fehlgeschlagen:', error);
-    showToast({ message: 'Raum konnte nicht erstellt werden', type: 'error' });
+    console.error('[ROOM] Creation failed:', error);
+    showToast({ message: t('room.createFailed'), type: 'error' });
   }
 }
 
@@ -568,10 +569,10 @@ async function executeJoinRoom(roomKey: string): Promise<void> {
       handleRoomResetEvent
     );
     initChat(roomKey, myUsername);
-    showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
+    showToast({ message: t('room.joined', { roomKey }), type: 'success' });
   } catch (error) {
-    console.error('[ROOM] Beitreten fehlgeschlagen:', error);
-    showToast({ message: 'Raum nicht gefunden oder Fehler beim Beitreten', type: 'error' });
+    console.error('[ROOM] Join failed:', error);
+    showToast({ message: t('room.notFoundOrJoinError'), type: 'error' });
   }
 }
 
@@ -594,6 +595,8 @@ const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confi
 const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-cancel-btn");
 
 export function initRoomControls(): void {
+  window.addEventListener('app:language-changed', () => updateBulkButtonState(currentPlayers));
+
   setOnNameInWheelListRemoved(async (removedName: string): Promise<void> => {
     await removeNameFromWheel(removedName);
   });
@@ -607,13 +610,13 @@ export function initRoomControls(): void {
 
   createRoomBtn?.addEventListener('click', () => {
     if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      showToast({ message: t('room.waitForWheelStop'), type: 'error' });
       return;
     }
     if (!activeRoomKey) savedNames = getNamesInWheelList();
     if (activeRoomKey) {
       showSwitchRoomConfirm(
-        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
+        t('room.switchToNewRoomConfirm', { currentRoom: activeRoomKey }),
         executeCreateRoom,
       );
       return;
@@ -625,13 +628,13 @@ export function initRoomControls(): void {
     const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
     if (!roomKey) return;
     if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      showToast({ message: t('room.waitForWheelStop'), type: 'error' });
       return;
     }
     if (!activeRoomKey) savedNames = getNamesInWheelList();
     if (activeRoomKey) {
       showSwitchRoomConfirm(
-        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,
+        t('room.switchRoomConfirm', { currentRoom: activeRoomKey, targetRoom: roomKey }),
         () => executeJoinRoom(roomKey),
       );
       return;
@@ -641,16 +644,15 @@ export function initRoomControls(): void {
 
   leaveRoomBtn?.addEventListener('click', () => {
     if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      showToast({ message: t('room.waitForWheelStop'), type: 'error' });
       return;
     }
     if (leaveRoomConfirmMessage) {
       if (isHost && currentPlayers.length > 1) {
         const guestCount = currentPlayers.length - 1;
-        leaveRoomConfirmMessage.textContent =
-          `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
+        leaveRoomConfirmMessage.textContent = t('room.leaveConfirmGuests', { count: guestCount });
       } else {
-        leaveRoomConfirmMessage.textContent = isHost ? 'Raum wirklich schließen?' : 'Raum wirklich verlassen?';
+        leaveRoomConfirmMessage.textContent = isHost ? t('room.leaveConfirmHost') : t('room.leaveConfirmGuest');
       }
     }
     leaveRoomConfirmModal?.showModal();
@@ -684,7 +686,7 @@ export function initRoomControls(): void {
         btn.classList.remove('room__btn--copied');
         btn.innerHTML = '&#128203;';
       }, 1500);
-      showToast({ message: 'Code in die Zwischenablage kopiert', type: 'success' });
+      showToast({ message: t('room.copiedToClipboard'), type: 'success' });
     });
   });
 }

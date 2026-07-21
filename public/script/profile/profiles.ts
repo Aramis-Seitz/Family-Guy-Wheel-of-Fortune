@@ -7,10 +7,14 @@ import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api";
 import { notifyAccountChanged } from "../shared/auth-channel";
+import { t } from "../app/i18n";
+import { formatNumber } from "../app/format";
 
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");
 export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
+let authenticated = false;
+let displayedCoins: number | null = null;
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -20,8 +24,9 @@ async function fetchCurrentSession(): Promise<Session | null> {
 
 function applyUnauthenticatedState(): void {
   if (!profileName || !authButton) return;
-  profileName.textContent = "Nicht eingeloggt";
-  authButton.textContent = "Login";
+  authenticated = false;
+  profileName.textContent = t('profile.notLoggedIn');
+  authButton.textContent = t('profile.login');
   authButton.addEventListener("click", () => {
     window.location.href = "/login.html";
   });
@@ -29,7 +34,8 @@ function applyUnauthenticatedState(): void {
 
 function applyCoinDisplay(coins: number): void {
   if (!coinDisplay) return;
-  coinDisplay.textContent = `🪙 ${coins}`;
+  displayedCoins = coins;
+  coinDisplay.textContent = `🪙 ${formatNumber(coins)}`;
   coinDisplay.style.display = "inline";
 }
 
@@ -40,7 +46,8 @@ interface ProfileData {
 
 function applyAuthenticatedState(profile: ProfileData | null): void {
   if (!profileName || !authButton) return;
-  const username = profile?.username ?? "Eingeloggt";
+  authenticated = true;
+  const username = profile?.username ?? t('profile.login');
   profileName.textContent = username;
 
   if (profile) {
@@ -48,17 +55,17 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   }
 
   profileName.classList.add("user-profile-name--clickable");
-  profileName.title = "Klick — zum Rad hinzufügen";
+  profileName.title = t('profile.clickToAdd');
   profileName.addEventListener("click", () => {
     if (isNameEditingLocked() || isSpinning()) return;
     if (!namesInWheelListState.addNameToWheelList(username)) {
-      showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: "error" });
+      showToast({ message: t('profile.maxItemsError', { max: MAX_ITEMS }), type: "error" });
       return;
     }
-    showToast({ message: `"${username}" wurde zum Rad hinzugefügt.`, type: "success" });
+    showToast({ message: t('profile.addedToWheel', { username }), type: "success" });
   });
 
-  authButton.textContent = "Logout";
+  authButton.textContent = t('profile.logout');
   authButton.addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
     notifyAccountChanged();
@@ -105,3 +112,15 @@ export async function initProfileUI(): Promise<void> {
   applyAuthenticatedState(profile);
   subscribeToCoinUpdates(session.user.id);
 }
+
+window.addEventListener('app:language-changed', () => {
+  if (!profileName || !authButton) return;
+  if (!authenticated) {
+    profileName.textContent = t('profile.notLoggedIn');
+    authButton.textContent = t('profile.login');
+  } else {
+    profileName.title = t('profile.clickToAdd');
+    authButton.textContent = t('profile.logout');
+  }
+  if (displayedCoins !== null) applyCoinDisplay(displayedCoins);
+});

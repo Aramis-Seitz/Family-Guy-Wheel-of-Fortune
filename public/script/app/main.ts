@@ -10,7 +10,7 @@ import { initMultiplierSlider } from "../wheel/multiplier";
 import { initVolumeSlider } from "../wheel/volume";
 import { preloadStaticSounds } from "../wheel/sound";
 import { initWinnerModal } from "../wheel/winner";
-import { initRoomUnloadGuard, activeRoomKey, initRoomControls, initNameControls, setMyUsername, redirectIfNoSession } from "../multiplayer/room";
+import { initRoomUnloadGuard, activeRoomKey, initRoomButtons, initAddNameInput, setMyUsername, redirectIfNoSession } from "../multiplayer/room";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 
@@ -19,7 +19,7 @@ async function initApp(): Promise<void> {
   if (await redirectIfNoSession()) return;
   initRoomUnloadGuard(() => activeRoomKey);
   initNamesInWheelList();
-  initNameControls();
+  initAddNameInput();
   initMultiplierSlider();
   initVolumeSlider();
   void preloadStaticSounds();
@@ -32,7 +32,7 @@ async function initApp(): Promise<void> {
   await applyActiveAssets();
   initInventory();
   initShop();
-  initRoomControls();
+  initRoomButtons();
   initWinnerModal();
 }
 

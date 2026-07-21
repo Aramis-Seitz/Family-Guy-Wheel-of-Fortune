@@ -1,13 +1,10 @@
 import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory"
-import type { InventoryCategory } from "./inventory";
+import type { InventoryCategory } from "./inventory-tabs";
 import type { Asset } from "shared";
 import { getSelectedAssetIds, selectAsset } from "../api/inventory-api";
 import { showToast } from "../shared/toast";
-import { resolveAssetImageSrc, createPreviewButton } from "../shared/asset-preview";
+import { createAssetCard } from "../shared/asset-card";
 import { applySelectedAsset } from "../shared/asset-selection";
-
-
-// ----- ASSET ERSTELLEN UND LADEN -----
 
 let currentSelectedAssetIds: string[] = [];
 
@@ -19,63 +16,19 @@ function isAssetSelected(assetId: string): boolean {
     return currentSelectedAssetIds.includes(assetId);
 }
 
-export function loadOwnedAssets(activeCategory: InventoryCategory): void {
+export function renderOwnedAssetCards(activeCategory: InventoryCategory): void {
     const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);
     filteredAssets.forEach(asset => inventoryAssetGrid.appendChild(createInventoryAssetCard(asset)));
 }
 
 function createInventoryAssetCard(asset: Asset): HTMLElement {
     const selected = isAssetSelected(asset.id);
-    const assetCard = document.createElement("div");
-    assetCard.className = "inventory-modal__asset-card";
-    if (selected) assetCard.classList.add("inventory-modal__asset-card--selected");
 
-    assetCard.appendChild(createInventoryAssetHeader(asset));
-    assetCard.appendChild(createInventoryAssetFooter(asset, selected));
-
-    return assetCard;
-}
-
-function createInventoryAssetHeader(asset: Asset): HTMLElement {
-    const assetHeader = document.createElement("div");
-    assetHeader.className = "inventory-modal__asset-header";
-    assetHeader.appendChild(createAssetIcon(asset));
-    return assetHeader;
-}
-
-function createAssetIcon(asset: Asset): HTMLElement {
-    const img = document.createElement("img");
-    img.className = "inventory-modal__asset-icon";
-    img.src = resolveAssetImageSrc(asset);
-    img.alt = asset.name;
-    return img;
-}
-
-function createInventoryAssetFooter(asset: Asset, selected: boolean): HTMLElement {
-    const assetFooter = document.createElement("div");
-    assetFooter.className = "inventory-modal__asset-footer";
-    assetFooter.appendChild(createInventoryAssetDetailsRow(asset));
-    assetFooter.appendChild(createInventoryAssetSelectButton(asset, selected));
-    return assetFooter;
-}
-
-function createInventoryAssetDetailsRow(asset: Asset): HTMLElement {
-    const detailsRow = document.createElement("div");
-    detailsRow.className = "inventory-modal__asset-details-row";
-    detailsRow.appendChild(createInventoryAssetTitle(asset));
-
-    if (asset.category === "sound") {
-        detailsRow.appendChild(createPreviewButton(asset, "inventory-modal__preview-btn"));
-    }
-
-    return detailsRow;
-}
-
-function createInventoryAssetTitle(asset: Asset): HTMLElement {
-    const title = document.createElement("p");
-    title.className = "inventory-modal__asset-title";
-    title.textContent = asset.name;
-    return title;
+    return createAssetCard(asset, {
+        cssPrefix: "inventory-modal",
+        cardStateClasses: selected ? ["inventory-modal__asset-card--selected"] : [],
+        renderActionButton: () => createInventoryAssetSelectButton(asset, selected),
+    });
 }
 
 function createInventoryAssetSelectButton(asset: Asset, selected: boolean): HTMLElement {

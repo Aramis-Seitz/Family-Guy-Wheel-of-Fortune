@@ -19,3 +19,24 @@ export function closeOnBackdropClick(modal: HTMLDialogElement, onClose?: () => v
     }
   });
 }
+
+export function onActivate(element: HTMLElement, handler: () => void): void {
+  element.addEventListener("click", handler);
+  element.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handler();
+    }
+  });
+}
+
+export function initToggleModal(
+  modal: HTMLDialogElement,
+  openBtn: HTMLElement,
+  closeBtn: HTMLElement,
+  onOpen: () => void
+): void {
+  openBtn.addEventListener("click", onOpen);
+  closeBtn.addEventListener("click", () => modal.close());
+  closeOnBackdropClick(modal);
+}

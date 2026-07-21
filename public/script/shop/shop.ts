@@ -1,10 +1,11 @@
-import { requiredElement, closeOnBackdropClick } from "../shared/dom-helpers";
+import { requiredElement, initToggleModal } from "../shared/dom-helpers";
 import { loadShopAssets } from "./shop-assets";
 import type { Asset } from "shared";
 import { getShopAssets } from "../api/shop-api";
 import { getUserCoins } from "../api/user-api";
 import { supabaseClient } from "../shared/supabase-client";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { renderCategoryTabs } from "../shared/category-tabs";
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
 
@@ -15,17 +16,11 @@ async function openShop(): Promise<void> {
     await refreshShop();
 }
 
-function closeShop(): void {
-    shopModal.close();
-}
-
 export const shopBtn = requiredElement<HTMLButtonElement>("shop-btn");
 export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close-btn");
 
 export function initShop(): void {
-    shopBtn.addEventListener("click", openShop);
-    shopCloseBtn.addEventListener("click", closeShop);
-    closeOnBackdropClick(shopModal, closeShop);
+    initToggleModal(shopModal, shopBtn, shopCloseBtn, openShop);
     subscribeToCoinUpdates();
 }
 
@@ -87,34 +82,12 @@ async function subscribeToCoinUpdates(): Promise<void> {
 
 export const shopTabs = requiredElement<HTMLElement>("shop-modal-tabs");
 
-function createShopTabButton(category: AssetCategory | "all"): HTMLButtonElement {
-    const button = document.createElement("button");
-    button.className = "shop-modal__tab";
-    button.dataset.category = category;
-    button.textContent = category === "all" ? "ALL" : `${category}s`.toUpperCase();
-
-    if (category === "all") button.classList.add("shop-modal__tab--active");
-
-    button.onclick = () => {
-        shopTabs.querySelectorAll(".shop-modal__tab").forEach(btn => btn.classList.remove("shop-modal__tab--active"));
-        button.classList.add("shop-modal__tab--active");
-        loadShopAssets();
-    };
-    return button;
-}
-
 function renderShopTabs(categories: (AssetCategory | "all")[]): void {
-    shopTabs.innerHTML = "";
-    categories.forEach(category => {
-        shopTabs.appendChild(createShopTabButton(category));
+    renderCategoryTabs(shopTabs, categories, {
+        cssPrefix: "shop-modal",
+        onSelect: loadShopAssets,
+        labelFor: (category) => category === "all" ? "ALL" : `${category}s`.toUpperCase(),
     });
-}
-
-export function getClickedCategory(target: HTMLElement): AssetCategory | "all" | null {
-    if (target && target.tagName === "BUTTON" && target.dataset.category) {
-        return target.dataset.category as AssetCategory | "all";
-    }
-    return null;
 }
 
 export function filterAssetsByCategory(category: AssetCategory | "all"): Asset[] {

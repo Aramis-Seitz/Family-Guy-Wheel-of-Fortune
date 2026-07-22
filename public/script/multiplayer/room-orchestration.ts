@@ -96,7 +96,7 @@ function syncRoomPlayers(players: string[]): void {
 
 // Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
 function handleRoomSpinEvent(extraRotationDegrees: number, multiplier: number, direction: string): void {
-  if (getCurrentMode() instanceof HostModeStrategy) return; // host already spun directly from POST response
+  if (getCurrentMode().isHost()) return; // host already spun directly from POST response
   lockAllSpinElements();
   const namesInWheelList = getNamesInWheelList();
   const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + extraRotationDegrees;
@@ -112,7 +112,7 @@ function handleWinnerModalCloseEvent(): void {
 }
 
 function onRoomClosed(): void {
-  if (getCurrentMode() instanceof HostModeStrategy) return; // host handles its own leave flow
+  if (getCurrentMode().isHost()) return; // host handles its own leave flow
   clearRoom();
   showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
 }

@@ -24,6 +24,7 @@ export interface GameModeStrategy {
   removeNameFromWheel(index: number): Promise<void>;
   toggleAllPlayersInWheel(players: string[]): Promise<void>;
   canManagePlayers(): boolean;
+  isHost(): boolean;
   getLeaveConfirmMessage(guestCount: number): string;
   getLeaveResultMessage(success: boolean): string;
 }
@@ -59,6 +60,10 @@ export class SoloModeStrategy implements GameModeStrategy {
   }
 
   canManagePlayers(): boolean {
+    return false;
+  }
+
+  isHost(): boolean {
     return false;
   }
 
@@ -154,6 +159,10 @@ export class HostModeStrategy implements GameModeStrategy {
     return true;
   }
 
+  isHost(): boolean {
+    return true;
+  }
+
   getLeaveConfirmMessage(guestCount: number): string {
     if (guestCount > 0) {
       return `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
@@ -201,6 +210,10 @@ export class GuestModeStrategy implements GameModeStrategy {
   }
 
   canManagePlayers(): boolean {
+    return false;
+  }
+
+  isHost(): boolean {
     return false;
   }
 

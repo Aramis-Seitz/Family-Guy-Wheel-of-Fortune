@@ -4,7 +4,7 @@ import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked }
 import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
 import { getMultiplier, multiplierSlider } from "./multiplier";
 import { wheelElement } from "./renderer";
-import { bulkAddToWheelBtn } from "../multiplayer/room-players-sidebar";
+import { bulkAddToWheelBtn, getPlayerToggleButtons } from "../multiplayer/room-players-sidebar";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { profileName } from "../profile/profiles";
 import { MIN_ITEMS } from "../names/names-in-wheel-list-state";
@@ -38,8 +38,7 @@ export const spinRightBtn = requiredElement<HTMLButtonElement>("spin-right-btn")
 export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
 
 function getSpinRelatedElements(): SpinElement[] {
-  const playerToggleButtons = document.querySelectorAll<HTMLButtonElement>(".room__player-toggle-btn");
-  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, playerToggleButtons];
+  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, getPlayerToggleButtons()];
 
   if (bulkAddToWheelBtn) {
     elements.push(bulkAddToWheelBtn);
@@ -50,7 +49,7 @@ function getSpinRelatedElements(): SpinElement[] {
 
 export const SPIN_DISABLED_OPACITY: string = "0.5";
 
-function applyDisabledStyle(el: HTMLButtonElement | HTMLInputElement, disabled: boolean): void {
+export function applyDisabledStyle(el: HTMLButtonElement | HTMLInputElement, disabled: boolean): void {
   el.disabled = disabled;
   if (disabled) {
     el.style.setProperty("opacity", SPIN_DISABLED_OPACITY);

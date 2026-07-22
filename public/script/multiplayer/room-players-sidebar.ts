@@ -1,5 +1,6 @@
 import { optionalElement } from "../shared/dom-helpers";
 import { getNamesInWheelList, addBtn, input } from "../names/names-in-wheel-list";
+import { applyDisabledStyle } from "../wheel/spin";
 import { activeRoomHostName, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
 import { getCurrentMode } from "./game-mode-strategy";
 
@@ -58,6 +59,10 @@ export function renderPlayersSidebar(players: string[]): void {
   });
 }
 
+export function getPlayerToggleButtons(): NodeListOf<HTMLButtonElement> {
+  return document.querySelectorAll<HTMLButtonElement>(".room__player-toggle-btn");
+}
+
 export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("room-bulk-add-btn");
 
 export function setHostControlsVisibility(): void {
@@ -67,12 +72,8 @@ export function setHostControlsVisibility(): void {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
   }
 
-  const hostOnlyInputs = [input, addBtn];
-  hostOnlyInputs.forEach((element) => {
-    if (!element) return;
-    element.disabled = !host;
-    element.style.opacity = host ? '1' : '0.5';
-    element.style.cursor = host ? 'text' : 'not-allowed';
+  [input, addBtn].forEach((element) => {
+    if (element) applyDisabledStyle(element, !host);
   });
 }
 

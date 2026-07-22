@@ -1,4 +1,4 @@
-import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin";
+import { applyDisabledStyle, spinLeftBtn, spinRightBtn } from "../wheel/spin";
 import { wheelEmptyHint } from "../multiplayer/room-players-sidebar";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { requiredElement } from "../shared/dom-helpers";
@@ -101,28 +101,13 @@ export function updateEmptyState(): void {
 
 function updateSpinButtonState(): void {
   const disabled = getSegmentCountOfWheelList() < MIN_ITEMS;
-  [spinLeftBtn, spinRightBtn].forEach((btn) => {
-    btn.disabled = disabled;
-    if (disabled) {
-      btn.style.setProperty("opacity", SPIN_DISABLED_OPACITY);
-      btn.style.setProperty("cursor", "not-allowed");
-      btn.style.setProperty("pointer-events", "none");
-    } else {
-      btn.style.removeProperty("opacity");
-      btn.style.removeProperty("cursor");
-      btn.style.removeProperty("pointer-events");
-    }
-  });
+  [spinLeftBtn, spinRightBtn].forEach((btn) => applyDisabledStyle(btn, disabled));
 }
 
 export function syncRemoveButtons(): void {
   const buttons = list.querySelectorAll(".names-in-wheel-list-element__remove-btn") as NodeListOf<HTMLButtonElement>;
   const disabled = roomLocked && disableRemoveWhileLocked;
-  buttons.forEach((btn) => {
-    btn.disabled = disabled;
-    btn.style.cursor = disabled ? "not-allowed" : "pointer";
-    btn.style.opacity = disabled ? "0.5" : "1";
-  });
+  buttons.forEach((btn) => applyDisabledStyle(btn, disabled));
 }
 
 export const input = requiredElement<HTMLInputElement>("name-input");
@@ -130,14 +115,8 @@ export const addBtn = requiredElement<HTMLButtonElement>("add-name-btn");
 
 export function syncAddElements(): void {
   const disabled = (roomLocked && disableAddWhileLocked) || getSegmentCountOfWheelList() >= MAX_ITEMS;
-
-  addBtn.disabled = disabled;
-  input.disabled = disabled;
-
-  addBtn.style.opacity = disabled ? "0.5" : "1";
-  addBtn.style.cursor = disabled ? "not-allowed" : "pointer";
-  input.style.opacity = disabled ? "0.5" : "1";
-  input.style.cursor = disabled ? "not-allowed" : "text";
+  applyDisabledStyle(addBtn, disabled);
+  applyDisabledStyle(input, disabled);
 }
 
 function showErrorToast(message: string): void {

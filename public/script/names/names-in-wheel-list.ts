@@ -190,7 +190,3 @@ export function initNamesInWheelList(): void {
   namesInWheelListState.setNamesInWheelList(initialNames);
   initNameInputValidation();
 }
-
-export function initExistingNamesInWheelList(): void {
-  initNamesInWheelList();
-}

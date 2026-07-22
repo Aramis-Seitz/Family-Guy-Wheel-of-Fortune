@@ -99,6 +99,11 @@ async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
   }
 }
 
+async function updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList: string[]): Promise<void> {
+  if (!activeRoomKey) return;
+  await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
+}
+
 export class HostModeStrategy implements GameModeStrategy {
   async onSpinClick(direction: Direction): Promise<void> {
     if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
@@ -128,8 +133,6 @@ export class HostModeStrategy implements GameModeStrategy {
   }
 
   async addNameToWheel(rawName: string): Promise<void> {
-    if (!activeRoomKey) return;
-
     const validation = validateName(rawName);
     if (!validation.valid) {
       showToast({ message: getNameValidationMessage(validation.code), type: 'error' });
@@ -143,20 +146,18 @@ export class HostModeStrategy implements GameModeStrategy {
     }
 
     const updatedNamesInWheelList = [...existingNamesInWheelList, validation.value];
-    await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
+    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
     input.value = '';
   }
 
   async removeNameFromWheel(index: number): Promise<void> {
-    if (!activeRoomKey) return;
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     if (index < 0 || index >= existingNamesInWheelList.length) return;
     const updatedNamesInWheelList = [...existingNamesInWheelList.slice(0, index), ...existingNamesInWheelList.slice(index + 1)];
-    await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
+    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
   }
 
   async toggleAllPlayersInWheel(players: string[]): Promise<void> {
-    if (!activeRoomKey) return;
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     const missingPlayers = getMissingPlayers(players, existingNamesInWheelList);
 
@@ -166,12 +167,12 @@ export class HostModeStrategy implements GameModeStrategy {
         showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: 'error' });
         return;
       }
-      await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
+      await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
       return;
     }
 
     const updatedNamesInWheelList = existingNamesInWheelList.filter((existingName) => !players.includes(existingName));
-    await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
+    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
   }
 
   canManagePlayers(): boolean {

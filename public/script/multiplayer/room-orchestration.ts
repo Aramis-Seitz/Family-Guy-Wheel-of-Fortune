@@ -30,12 +30,8 @@ export function setMyUsername(newUsername: string): void {
 function setRoomActive(roomKey: string, host: boolean): void {
   setActiveRoomKey(roomKey);
   setCurrentMode(host ? new HostModeStrategy() : new GuestModeStrategy());
-  if (host) {
-    lockNameEditing(false, false);
-  } else {
-    lockNameEditing(true, true);
-  }
-  setHostControlsVisibility(host);
+  lockNameEditing();
+  setHostControlsVisibility();
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
   if (roomInfo) roomInfo.classList.remove('hidden');
 
@@ -66,7 +62,7 @@ function clearRoom(): void {
     multiplierSyncListener = null;
   }
   applyGameModeLock();
-  setHostControlsVisibility(false);
+  setHostControlsVisibility();
   renderPlayersSidebar([]);
   replaceNames(namesBeforeJoiningRoom);
   updateWheelEmptyState();

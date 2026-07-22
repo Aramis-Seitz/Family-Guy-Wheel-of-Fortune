@@ -60,7 +60,9 @@ export function renderPlayersSidebar(players: string[]): void {
 
 export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("room-bulk-add-btn");
 
-export function setHostControlsVisibility(host: boolean): void {
+export function setHostControlsVisibility(): void {
+  const host: boolean = getCurrentMode().isHost();
+
   if (bulkAddToWheelBtn) {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
   }

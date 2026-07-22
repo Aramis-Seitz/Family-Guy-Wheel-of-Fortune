@@ -16,10 +16,11 @@ let roomLocked = false;
 let disableAddWhileLocked = true;
 let disableRemoveWhileLocked = true;
 
-export function lockNameEditing(disableAdd = true, disableRemove = true): void {
+export function lockNameEditing(): void {
   roomLocked = true;
-  disableAddWhileLocked = disableAdd;
-  disableRemoveWhileLocked = disableRemove;
+  const isHost = getCurrentMode().isHost();
+  disableAddWhileLocked = !isHost;
+  disableRemoveWhileLocked = !isHost;
   syncAddElements();
   syncRemoveButtons();
 }

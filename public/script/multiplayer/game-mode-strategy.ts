@@ -11,6 +11,9 @@ import {
   addNameToList, getNamesInWheelList,
   addBtn, input, getRemoveBtn,
 } from "../names/names-in-wheel-list";
+import { getNameValidationMessage } from "../names/name-input-validation";
+import { MAX_ITEMS } from "../names/names-in-wheel-list-state";
+import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { spinRoom, updateRoomNames, resetRoom } from "../api/room-api";
 import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
@@ -125,9 +128,21 @@ export class HostModeStrategy implements GameModeStrategy {
   }
 
   async addNameToWheel(rawName: string): Promise<void> {
-    const trimmed = rawName.trim();
-    if (!trimmed || !activeRoomKey) return;
-    const updatedNamesInWheelList = [...(activeRoomNamesInWheelList ?? []), trimmed];
+    if (!activeRoomKey) return;
+
+    const validation = validateName(rawName);
+    if (!validation.valid) {
+      showToast({ message: getNameValidationMessage(validation.code), type: 'error' });
+      return;
+    }
+
+    const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
+    if (existingNamesInWheelList.length >= MAX_ITEMS) {
+      showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: 'error' });
+      return;
+    }
+
+    const updatedNamesInWheelList = [...existingNamesInWheelList, validation.value];
     await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
     input.value = '';
   }
@@ -147,6 +162,10 @@ export class HostModeStrategy implements GameModeStrategy {
 
     if (missingPlayers.length > 0) {
       const updatedNamesInWheelList = [...existingNamesInWheelList, ...missingPlayers];
+      if (updatedNamesInWheelList.length > MAX_ITEMS) {
+        showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: 'error' });
+        return;
+      }
       await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
       return;
     }

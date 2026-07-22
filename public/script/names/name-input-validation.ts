@@ -16,7 +16,7 @@ export const centeredInput = optionalElement<HTMLDivElement>("name-centered-inpu
 export const inputCentered = optionalElement<HTMLInputElement>("name-input-centered");
 export const addBtnCentered = optionalElement<HTMLButtonElement>("add-name-btn-centered");
 
-function getNameValidationMessage(code: NameValidationErrorCode): string {
+export function getNameValidationMessage(code: NameValidationErrorCode): string {
   switch (code) {
     case NAME_VALIDATION_ERROR.REQUIRED:
       return "Bitte einen Namen eingeben.";

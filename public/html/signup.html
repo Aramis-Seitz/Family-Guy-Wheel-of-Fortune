@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Signup</title>
+    <title data-i18n="html.signupTitle">Sign up</title>
     <link rel="shortcut icon" type="image/x-icon" href="/img/logo.png" />
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/auth-widget.css">
@@ -11,54 +12,69 @@
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/legal-links.css">
     <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/language-switcher.css">
 </head>
+
 <body>
-<div class="auth-widget">
-    <main>
-        <section aria-label="Signup Form" class="auth-widget__form auth-widget__form--signup">
-            <form id="signup-form" action="login.html" method="post" autocomplete="on">
-                <h2>Signup</h2>
+    <header class="app-header">
+        <div class="app-header__language-switcher" aria-label="Language selection">
+            <button class="lang-btn" type="button" data-language="de">DE</button>
+            <button class="lang-btn" type="button" data-language="en">EN</button>
+        </div>
+    </header>
+    <div class="auth-widget">
+        <main>
+            <section data-i18n-aria-label="html.signupForm" aria-label="Sign-up form"
+                class="auth-widget__form auth-widget__form--signup">
+                <form id="signup-form" action="login.html" method="post" autocomplete="on">
+                    <h2 data-i18n="html.signup">Sign up</h2>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-user">Username</label>
-                    <input type="text" id="signup-user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label data-i18n="html.username" for="signup-user">Username</label>
+                        <input type="text" id="signup-user" name="username" autocomplete="username"
+                            autocapitalize="none" spellcheck="false" required />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label data-i18n="html.email" for="signup-email">Email</label>
+                        <input type="email" id="signup-email" name="email" autocomplete="email" inputmode="email"
+                            required />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-date-of-birth">Geburtsdatum</label>
-                    <input type="date" id="signup-date-of-birth" name="bday" autocomplete="bday" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label data-i18n="html.dateOfBirth" for="signup-date-of-birth">Date of birth</label>
+                        <input type="date" id="signup-date-of-birth" name="bday" autocomplete="bday" required />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-password">Passwort</label>
-                    <input type="password" id="signup-password" name="password" autocomplete="new-password" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label data-i18n="html.password" for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="password" autocomplete="new-password"
+                            required />
+                    </div>
 
-                <div class="auth-widget__input-field">
-                    <label for="signup-confirm-password">Confirm Passwort</label>
-                    <input type="password" id="signup-confirm-password" name="password_confirmation" autocomplete="new-password" required />
-                </div>
+                    <div class="auth-widget__input-field">
+                        <label data-i18n="html.confirmPassword" for="signup-confirm-password">Confirm password</label>
+                        <input type="password" id="signup-confirm-password" name="password_confirmation"
+                            autocomplete="new-password" required />
+                    </div>
 
-                <button type="submit">Sign Up</button>
+                    <button data-i18n="html.signup" type="submit">Sign up</button>
 
-                <div class="auth-widget__register-link">
-                    <p>Already have an account? <a href="login.html">Login</a></p>
-                </div>
+                    <div class="auth-widget__register-link">
+                        <p><span data-i18n="html.hasAccount">Already have an account?</span> <a data-i18n="html.login"
+                                href="login.html">Login</a></p>
+                    </div>
 
-                <div class="legal-links">
-                    <a href="imprint.html" class="legal-links__link--imprint">Impressum</a>
-                    <a href="privacy.html" class="legal-links__link--privacy">Datenschutz</a>
-                </div>
-            </form>
-        </section>
-    </main>
-</div>
+                    <div class="legal-links">
+                        <a data-i18n="html.imprint" href="imprint.html" class="legal-links__link--imprint">Imprint</a>
+                        <a data-i18n="html.privacy" href="privacy.html" class="legal-links__link--privacy">Privacy</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
 
-<script type="module" src="../script/app/auth.ts"></script>
+    <script type="module" src="../script/app/auth.ts"></script>
 </body>
+
 </html>

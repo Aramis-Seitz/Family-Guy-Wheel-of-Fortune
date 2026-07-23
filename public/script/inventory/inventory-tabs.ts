@@ -3,6 +3,7 @@ import { ASSET_CATEGORIES } from "../shop/shop";
 import { isMultiplayerActive } from "../room";
 import { loadInventoryByCategory } from "./inventory";
 import { renderCategoryTabs, getActiveCategory } from "../shared/category-tabs";
+import { t } from "../app/i18n";
 
 export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
 export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
@@ -19,5 +20,6 @@ export async function loadInventoryTabs(): Promise<void> {
   renderCategoryTabs(inventoryTabs, categories, {
     cssPrefix: "inventory-modal",
     onSelect: loadInventoryByCategory,
+    labelFor: (category) => t(`categories.${category}`).toUpperCase(),
   });
 }

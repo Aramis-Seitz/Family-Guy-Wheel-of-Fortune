@@ -10,6 +10,7 @@ import {
   validateNameInput,
 } from "./name-input-validation";
 import { namesInWheelListState, MAX_ITEMS, MIN_ITEMS } from "./names-in-wheel-list-state";
+import { t } from "../app/i18n";
 
 let roomLocked = false;
 let disableAddWhileLocked = true;
@@ -75,6 +76,7 @@ function createNamesinWheelListElement(name: string, index: number): HTMLLIEleme
   btn.className = "names-in-wheel-list-element__remove-btn";
   btn.type = "button";
   btn.textContent = "-";
+  btn.setAttribute("aria-label", t("a11y.removeName"));
   btn.addEventListener("click", async () => {
     await handleRemoveNameElementFromWheelList(index, li);
   });
@@ -183,7 +185,7 @@ export function addNameToList(rawName: string): void {
   }
 
   if (!namesInWheelListState.addNameToWheelList(validation.value)) {
-    showErrorToast(`Maximal ${MAX_ITEMS} Einträge erlaubt.`);
+    showErrorToast(t("names.maxItems", { max: MAX_ITEMS }));
     return;
   }
 

@@ -21,6 +21,7 @@ import {
 import { hideWinnerModal } from "./wheel/winner";
 import { initChat, destroyChat } from "./multiplayer/chat";
 import { showToast } from "./shared/toast";
+import { t } from "./app/i18n";
 import {
   createRoom,
   leaveRoom,
@@ -253,11 +254,11 @@ class SoloModeStrategy implements GameModeStrategy {
   // versteckt, solange currentMode SoloModeStrategy ist. Nur wegen des
   // GameModeStrategy-Interfaces Pflicht, siehe GuestModeStrategy.addName().
   getLeaveConfirmMessage(): string {
-    return 'Raum wirklich verlassen?';
+    return t("room.leaveConfirmGuest");
   }
 
   getLeaveResultMessage(success: boolean): string {
-    return success ? 'Raum verlassen' : 'Raum konnte nicht verlassen werden';
+    return success ? t("room.left") : t("api.room.leaveFailed");
   }
 }
 
@@ -273,7 +274,7 @@ class HostModeStrategy implements GameModeStrategy {
     } catch (error) {
       console.error('[ROOM] Spin fehlgeschlagen:', error);
       applyGameModeLock();
-      showToast({ message: 'Spin fehlgeschlagen', type: 'error' });
+      showToast({ message: t("api.room.spinFailed"), type: 'error' });
     }
   }
 
@@ -342,13 +343,13 @@ class HostModeStrategy implements GameModeStrategy {
 
   getLeaveConfirmMessage(guestCount: number): string {
     if (guestCount > 0) {
-      return `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
+      return t("room.leaveConfirmGuests", { count: guestCount });
     }
-    return 'Raum wirklich schließen?';
+    return t("room.leaveConfirmHost");
   }
 
   getLeaveResultMessage(success: boolean): string {
-    return success ? 'Raum geschlossen' : 'Raum konnte nicht geschlossen werden';
+    return success ? t("room.closed") : t("api.room.closeFailed");
   }
 }
 
@@ -399,11 +400,11 @@ class GuestModeStrategy implements GameModeStrategy {
   }
 
   getLeaveConfirmMessage(): string {
-    return 'Raum wirklich verlassen?';
+    return t("room.leaveConfirmGuest");
   }
 
   getLeaveResultMessage(success: boolean): string {
-    return success ? 'Raum verlassen' : 'Raum konnte nicht verlassen werden';
+    return success ? t("room.left") : t("api.room.leaveFailed");
   }
 }
 
@@ -446,7 +447,7 @@ function renderPlayersSidebar(players: string[]): void {
 
     if (name === activeRoomHostName) {
       const tag = document.createElement('span');
-      tag.textContent = 'Host';
+      tag.textContent = t("room.host");
       tag.className = 'room__host-tag';
       li.appendChild(tag);
     }
@@ -458,7 +459,8 @@ function renderPlayersSidebar(players: string[]): void {
       const inWheel = (roomNames ?? []).includes(name);
       toggle.textContent = inWheel ? '−' : '+';
       if (inWheel) toggle.classList.add('room__player-toggle-btn--added');
-      toggle.title = inWheel ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
+      toggle.title = inWheel ? t("room.removeFromWheel", { name }) : t("room.addToWheel", { name });
+      toggle.setAttribute("aria-label", toggle.title);
 
       toggle.addEventListener('click', async () => {
         toggle.disabled = true;
@@ -597,7 +599,7 @@ async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
     // vorzupreschen.
   } catch (error) {
     console.error('[ROOM] Reset fehlgeschlagen:', error);
-    showToast({ message: 'Reset fehlgeschlagen', type: 'error' });
+    showToast({ message: t("api.room.resetFailed"), type: 'error' });
   }
 }
 
@@ -612,7 +614,7 @@ function handleWinnerModalCloseEvent(): void {
 function onRoomClosed(): void {
   if (currentMode instanceof HostModeStrategy) return; // host handles its own leave flow
   clearRoom();
-  showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
+  showToast({ message: t("room.hostClosed"), type: 'info' });
 }
 
 function setNamesFromRoom(names: string[]): void {
@@ -629,10 +631,10 @@ function updateBulkButtonState(players: string[]): void {
   if (!bulkAddToWheelBtn) return;
   const anyMissing = players.some((p) => !(roomNames ?? []).includes(p));
   if (anyMissing) {
-    bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
+    bulkAddToWheelBtn.textContent = t("room.bulkAdd");
     bulkAddToWheelBtn.classList.remove('room__btn--remove');
   } else {
-    bulkAddToWheelBtn.textContent = 'Alle vom Rad entfernen';
+    bulkAddToWheelBtn.textContent = t("room.bulkRemove");
     bulkAddToWheelBtn.classList.add('room__btn--remove');
   }
 }
@@ -677,10 +679,10 @@ async function executeCreateRoom(): Promise<void> {
       void setMultiplier(activeRoomKey, getMultiplier());
     };
     multiplierSlider?.addEventListener('input', multiplierSyncListener);
-    showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
+    showToast({ message: t("room.created", { roomKey }), type: 'success' });
   } catch (error) {
     console.error('[ROOM] Erstellen fehlgeschlagen:', error);
-    showToast({ message: 'Raum konnte nicht erstellt werden', type: 'error' });
+    showToast({ message: t("api.room.createFailed"), type: 'error' });
   }
 }
 
@@ -707,19 +709,28 @@ async function executeJoinRoom(roomKey: string): Promise<void> {
       handleWinnerModalCloseEvent
     );
     initChat(roomKey, myUsername);
-    showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
+    showToast({ message: t("room.joined", { roomKey }), type: 'success' });
   } catch (error) {
     console.error('[ROOM] Beitreten fehlgeschlagen:', error);
-    showToast({ message: 'Raum nicht gefunden oder Fehler beim Beitreten', type: 'error' });
+    showToast({ message: t("api.room.joinFailed"), type: 'error' });
   }
 }
 
 let pendingRoomAction: (() => Promise<void>) | null = null;
+let pendingRoomMessageKey: string | null = null;
+let pendingRoomMessageValues: Record<string, unknown> | undefined;
 const leaveRoomConfirmModal = optionalElement<HTMLDialogElement>("leave-room-confirm-modal");
 const leaveRoomConfirmMessage = optionalElement<HTMLParagraphElement>("leave-room-confirm-message");
 
-export function showSwitchRoomConfirm(message: string, action: () => Promise<void>): void {
-  if (leaveRoomConfirmMessage) leaveRoomConfirmMessage.textContent = message;
+function renderPendingRoomMessage(): void {
+  if (!leaveRoomConfirmMessage || !pendingRoomMessageKey) return;
+  leaveRoomConfirmMessage.textContent = t(pendingRoomMessageKey, pendingRoomMessageValues);
+}
+
+export function showSwitchRoomConfirm(messageKey: string, action: () => Promise<void>, values?: Record<string, unknown>): void {
+  pendingRoomMessageKey = messageKey;
+  pendingRoomMessageValues = values;
+  renderPendingRoomMessage();
   pendingRoomAction = action;
   leaveRoomConfirmModal?.showModal();
 }
@@ -733,6 +744,11 @@ const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confi
 const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-cancel-btn");
 
 export function initRoomControls(): void {
+  window.addEventListener("app:language-changed", () => {
+    renderPlayersSidebar(currentPlayers);
+    updateBulkButtonState(currentPlayers);
+    renderPendingRoomMessage();
+  });
   setOnNameInWheelListRemoved(async (removedName: string): Promise<void> => {
     await currentMode.removeNameFromWheel(removedName);
   });
@@ -745,14 +761,15 @@ export function initRoomControls(): void {
 
   createRoomBtn?.addEventListener('click', () => {
     if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      showToast({ message: t("room.waitForWheelStop"), type: 'error' });
       return;
     }
     if (!activeRoomKey) savedNames = getNamesInWheelList();
     if (activeRoomKey) {
       showSwitchRoomConfirm(
-        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
+        "room.switchToNewRoom",
         executeCreateRoom,
+        { currentRoom: activeRoomKey },
       );
       return;
     }
@@ -763,14 +780,15 @@ export function initRoomControls(): void {
     const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
     if (!roomKey) return;
     if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      showToast({ message: t("room.waitForWheelStop"), type: 'error' });
       return;
     }
     if (!activeRoomKey) savedNames = getNamesInWheelList();
     if (activeRoomKey) {
       showSwitchRoomConfirm(
-        `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,
+        "room.switchRoom",
         () => executeJoinRoom(roomKey),
+        { currentRoom: activeRoomKey, targetRoom: roomKey },
       );
       return;
     }
@@ -779,12 +797,18 @@ export function initRoomControls(): void {
 
   leaveRoomBtn?.addEventListener('click', () => {
     if (isSpinning()) {
-      showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+      showToast({ message: t("room.waitForWheelStop"), type: 'error' });
       return;
     }
     if (leaveRoomConfirmMessage) {
       const guestCount = currentPlayers.length - 1;
-      leaveRoomConfirmMessage.textContent = currentMode.getLeaveConfirmMessage(guestCount);
+      pendingRoomMessageKey = currentMode instanceof HostModeStrategy && guestCount > 0
+        ? "room.leaveConfirmGuests"
+        : currentMode instanceof HostModeStrategy
+          ? "room.leaveConfirmHost"
+          : "room.leaveConfirmGuest";
+      pendingRoomMessageValues = pendingRoomMessageKey === "room.leaveConfirmGuests" ? { count: guestCount } : undefined;
+      renderPendingRoomMessage();
     }
     leaveRoomConfirmModal?.showModal();
   });
@@ -794,6 +818,8 @@ export function initRoomControls(): void {
     if (pendingRoomAction) {
       const action = pendingRoomAction;
       pendingRoomAction = null;
+      pendingRoomMessageKey = null;
+      pendingRoomMessageValues = undefined;
       void action();
     } else {
       void executeLeaveRoom();
@@ -803,6 +829,8 @@ export function initRoomControls(): void {
   cancelLeaveRoomBtn?.addEventListener('click', () => {
     leaveRoomConfirmModal?.close();
     pendingRoomAction = null;
+    pendingRoomMessageKey = null;
+    pendingRoomMessageValues = undefined;
   });
 
   copyRoomKeyBtn?.addEventListener('click', () => {
@@ -817,7 +845,7 @@ export function initRoomControls(): void {
         btn.classList.remove('room__btn--copied');
         btn.innerHTML = '&#128203;';
       }, 1500);
-      showToast({ message: 'Code in die Zwischenablage kopiert', type: 'success' });
+      showToast({ message: t("room.copied"), type: 'success' });
     });
   });
 }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --project tsconfig.json && vite build && node -e \"require('fs').cpSync('resources','dist/resources',{recursive:true})\"",
+    "build": "tsc --project tsconfig.json && vite build && node -e \"require('fs').cpSync('resources','dist/resources',{recursive:true}); require('fs').cpSync('locales','dist/locales',{recursive:true})\"",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {
@@ -14,6 +14,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",
+    "i18next": "^26.3.6",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "i18next-http-backend": "^4.0.0",
     "shared": "*",
     "zod": "^3.23.8"
   }

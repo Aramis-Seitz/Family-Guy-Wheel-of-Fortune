@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Family Guy Wheel of Fortune!</title>
+    <title data-i18n="html.mainTitle">Family Guy Wheel of Fortune!</title>
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/wheel.css">
@@ -24,25 +24,31 @@
     <link rel="stylesheet" href="../css/room-confirm-modal.css">
     <link rel="stylesheet" href="../css/chat.css">
     <link rel="stylesheet" href="../css/shop.css">
+    <link rel="stylesheet" href="../css/language-switcher.css">
     <link rel="icon" type="image/png" href="resources/favicon.png">
 </head>
 
 <body>
+    <header class="app-header app-header--overlay">
+        <div class="app-header__language-switcher" aria-label="Language selection">
+            <button class="lang-btn" type="button" data-language="de">DE</button>
+            <button class="lang-btn" type="button" data-language="en">EN</button>
+        </div>
+    </header>
 
-
-
-    <button class="spin__btn" id="spin-left-btn" type="button">SPIN LEFT</button>
-    <button class="spin__btn" id="spin-right-btn" type="button">SPIN RIGHT</button>
-    <button id="reset-btn" type="button">RESET</button>
-    <button class="names-in-wheel-list__share-btn" id="share-names-in-wheel-list-btn">Share >3</button>
-    <button class="inventory-btn" id="inventory-btn">INVENTORY</button>
-    <button class="shop-btn" id="shop-btn">SHOP</button>
+    <button class="spin__btn" id="spin-left-btn" type="button" data-i18n="html.spinLeft">SPIN LEFT</button>
+    <button class="spin__btn" id="spin-right-btn" type="button" data-i18n="html.spinRight">SPIN RIGHT</button>
+    <button id="reset-btn" type="button" data-i18n="html.reset">RESET</button>
+    <button class="names-in-wheel-list__share-btn" id="share-names-in-wheel-list-btn"
+        data-i18n="html.share">Share</button>
+    <button class="inventory-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
+    <button class="shop-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
 
     <dialog id="inventory-modal">
         <div id="inventory-modal-content" class="inventory-modal__content">
             <div class="inventory-modal__header">
-                <h2>INVENTORY</h2>
-                <button id="inventory-modal-close-btn">✕</button>
+                <h2 data-i18n="html.inventory">INVENTORY</h2>
+                <button id="inventory-modal-close-btn" data-i18n-aria-label="a11y.close" aria-label="Close">✕</button>
             </div>
 
             <nav class="inventory-modal__tabs" id="inventory-modal-tabs"></nav>
@@ -56,18 +62,20 @@
     <dialog id="save-wheel-modal">
         <div class="save-wheel-modal__inner">
             <div class="save-wheel-modal__header">
-                <h3>Item hinzufügen</h3>
-                <button id="save-wheel-modal-close-btn" type="button">✕</button>
+                <h3 data-i18n="html.addItem">Add item</h3>
+                <button id="save-wheel-modal-close-btn" type="button" data-i18n-aria-label="a11y.close"
+                    aria-label="Close">✕</button>
             </div>
             <div class="save-wheel-modal__body">
                 <div class="save-wheel-modal__form-group">
-                    <label class="save-wheel-modal__label" for="save-wheel-input">Name</label>
-                    <input type="text" id="save-wheel-input" placeholder="z.B. Mathenoten" autocomplete="off">
+                    <label class="save-wheel-modal__label" for="save-wheel-input" data-i18n="html.name">Name</label>
+                    <input type="text" id="save-wheel-input" data-i18n-placeholder="html.exampleWheelName"
+                        placeholder="e.g. grades" autocomplete="off">
                 </div>
             </div>
             <div class="save-wheel-modal__footer">
-                <button id="save-wheel-modal-cancel-btn" type="button">Abbrechen</button>
-                <button id="save-wheel-modal-confirm-btn" type="button">Hinzufügen</button>
+                <button id="save-wheel-modal-cancel-btn" type="button" data-i18n="html.cancel">Cancel</button>
+                <button id="save-wheel-modal-confirm-btn" type="button" data-i18n="html.add">Add</button>
             </div>
         </div>
     </dialog>
@@ -75,14 +83,15 @@
     <dialog id="confirm-delete-modal">
         <div class="confirm-delete-modal__inner">
             <div class="confirm-delete-modal__header">
-                <h3>Item löschen?</h3>
+                <h3 data-i18n="html.deleteItem">Delete item?</h3>
             </div>
             <div class="confirm-delete-modal__body">
-                <p>Möchtest du <strong id="confirm-delete-modal-name"></strong> wirklich aus dem Inventar entfernen?</p>
+                <p data-i18n="html.deleteConfirm">Do you really want to remove this item from your inventory?</p><strong
+                    id="confirm-delete-modal-name"></strong>
             </div>
             <div class="confirm-delete-modal__footer">
-                <button id="confirm-delete-modal-cancel-btn" type="button">Abbrechen</button>
-                <button id="confirm-delete-modal-confirm-btn" type="button">Löschen</button>
+                <button id="confirm-delete-modal-cancel-btn" type="button" data-i18n="html.cancel">Cancel</button>
+                <button id="confirm-delete-modal-confirm-btn" type="button" data-i18n="html.delete">Delete</button>
             </div>
         </div>
     </dialog>
@@ -90,14 +99,16 @@
     <dialog id="leave-room-confirm-modal" class="room-confirm-modal">
         <div class="room-confirm-modal__inner">
             <div class="room-confirm-modal__header">
-                <h3>Raum schließen?</h3>
+                <h3 data-i18n="html.closeRoom">Close room?</h3>
             </div>
             <div class="room-confirm-modal__body">
                 <p class="room-confirm-modal__message" id="leave-room-confirm-message"></p>
             </div>
             <div class="room-confirm-modal__footer">
-                <button id="leave-room-confirm-cancel-btn" class="room-confirm-modal__cancel" type="button">Abbrechen</button>
-                <button id="leave-room-confirm-confirm-btn" class="room-confirm-modal__confirm" type="button">Bestätigen</button>
+                <button id="leave-room-confirm-cancel-btn" class="room-confirm-modal__cancel" type="button"
+                    data-i18n="html.cancel">Cancel</button>
+                <button id="leave-room-confirm-confirm-btn" class="room-confirm-modal__confirm" type="button"
+                    data-i18n="html.confirm">Confirm</button>
             </div>
         </div>
     </dialog>
@@ -105,9 +116,10 @@
     <dialog class="shop-modal" id="shop-modal">
         <div class="shop-modal__container">
             <header class="shop-modal__header">
-                <h2 class="shop-modal__title" id="shop-modal-title">SHOP</h2>
+                <h2 class="shop-modal__title" id="shop-modal-title" data-i18n="html.shop">SHOP</h2>
                 <div class="shop-modal__coin-balance" id="shop-modal-coin-balance"></div>
-                <button class="shop-modal__close-btn" id="shop-modal-close-btn">✕</button>
+                <button class="shop-modal__close-btn" id="shop-modal-close-btn" data-i18n-aria-label="a11y.close"
+                    aria-label="Close">✕</button>
             </header>
 
             <nav class="shop-modal__tabs" id="shop-modal-tabs"></nav>
@@ -117,45 +129,47 @@
         </div>
     </dialog>
 
-    <div id="user-area"
-        style="position:fixed; top:20px; right:20px; z-index:9999; background:white; color:black; padding:10px; border:2px solid black;">
+    <div id="user-area">
         <span id="user-coin-display" style="display:none; margin-right:8px;">🪙 0</span>
-        <span id="user-profile-name">Nicht eingeloggt</span>
-        <button id="auth-button" type="button">Login</button>
+        <span id="user-profile-name" data-i18n="profile.notLoggedIn">Not logged in</span>
+        <button id="auth-button" type="button" data-i18n="profile.login">Login</button>
     </div>
 
     <div id="room-panel">
-        <h3>Multiplayer</h3>
+        <h3 data-i18n="html.multiplayer">Multiplayer</h3>
         <div class="room__controls" id="room-controls">
-            <button id="room-create-btn" class="room__btn" type="button">Raum erstellen</button>
+            <button id="room-create-btn" class="room__btn" type="button" data-i18n="html.createRoom">Create
+                room</button>
             <div class="room__join">
-                <input type="text" id="room-key-input" placeholder="Code" maxlength="6" autocomplete="off">
-                <button id="room-join-btn" class="room__btn" type="button">Beitreten</button>
+                <input type="text" id="room-key-input" data-i18n-placeholder="html.roomCode" placeholder="Code"
+                    maxlength="6" autocomplete="off">
+                <button id="room-join-btn" class="room__btn" type="button" data-i18n="html.join">Join</button>
             </div>
         </div>
         <div id="room-info" class="hidden">
             <div class="room__key-row">
-                <span class="room__key-label">Raum:</span>
+                <span class="room__key-label" data-i18n="html.roomCodeLabel">Room:</span>
                 <span id="room-key-display"></span>
                 <button id="room-copy-key-btn" class="room__btn room__btn--copy" type="button"
-                    title="Code kopieren">&#128203;</button>
-                <button id="room-leave-btn" class="room__btn" type="button">Verlassen</button>
+                    data-i18n-title="html.roomCode" title="Code">&#128203;</button>
+                <button id="room-leave-btn" class="room__btn" type="button" data-i18n="html.leave">Leave</button>
             </div>
-            <p class="room__players-label">Mitspieler:</p>
+            <p class="room__players-label" data-i18n="html.players">Players:</p>
             <ul id="room-players-list"></ul>
-            <button id="room-bulk-add-btn" class="room__btn room__btn--small hidden" type="button">Alle zum Rad
-                hinzufügen</button>
+            <button id="room-bulk-add-btn" class="room__btn room__btn--small hidden" type="button"
+                data-i18n="room.bulkAdd">Add all to wheel</button>
             <div id="chat-section">
                 <div id="chat-header" class="chat__header">
-                    <span class="chat__label">💬Chat</span>
-                    <span id="chat-toggle-btn" class="chat__toggle-btn">▼</span>
+                    <span class="chat__label" data-i18n="html.chat">💬 Chat</span>
+                    <span id="chat-toggle-btn" class="chat__toggle-btn" aria-expanded="false">▼</span>
                 </div>
                 <div id="chat-body" class="chat__body--collapsed">
                     <ul id="chat-messages"></ul>
                     <div class="chat__input-row">
-                        <input type="text" id="chat-input" placeholder="Nachricht eingeben" maxlength="200"
-                            autocomplete="off">
-                        <button id="chat-send-btn" class="chat__send-btn" type="button">&#10148;</button>
+                        <input type="text" id="chat-input" data-i18n-placeholder="html.enterMessage"
+                            placeholder="Enter message" maxlength="200" autocomplete="off">
+                        <button id="chat-send-btn" class="chat__send-btn" type="button"
+                            data-i18n-aria-label="a11y.sendMessage" aria-label="Send message">&#10148;</button>
                     </div>
                 </div>
             </div>
@@ -163,9 +177,9 @@
     </div>
 
     <div class="container">
-        <img id="wheel-companion-image" alt="pointer image">
-        <div id="wheel-empty-hint" class="wheel__empty-hint hidden">Trage Namen in die Liste ein, um das Rad zu
-            erstellen.
+        <img id="wheel-companion-image" data-i18n-alt="a11y.companion" alt="Wheel companion">
+        <div id="wheel-empty-hint" class="wheel__empty-hint hidden" data-i18n="html.wheelEmpty">Enter names in the list
+            to build the wheel.
         </div>
         <svg id="wheel-svg" viewBox="0 0 200 200">
             <g id="wheel"></g>
@@ -174,7 +188,7 @@
         <div class="multiplier">
             <div class="multiplier__header">
                 <label for="multiplier-slider">
-                    Power: <span id="multiplier-value">1</span>x
+                    <span data-i18n="html.power">Power</span>: <span id="multiplier-value">1</span>x
                 </label>
             </div>
             <input type="range" id="multiplier-slider" min="1" max="2" step="0.1" value="1">
@@ -183,48 +197,58 @@
         <div class="volume">
             <div class="volume__header">
                 <label for="volume-slider">
-                    Volume: <span id="volume-value"></span>%
+                    <span data-i18n="html.volume">Volume</span>: <span id="volume-value"></span>%
                 </label>
             </div>
             <input type="range" id="volume-slider" min="0" max="100" step="1" value="50">
-            <button id="volume-icon" type="button" class="volume__icon-btn" title="Stumm">🔉</button>
+            <button id="volume-icon" type="button" class="volume__icon-btn" data-i18n-title="a11y.mute"
+                title="Mute">🔉</button>
         </div>
 
         <div class="panel">
             <div class="names-in-wheel-list__add-row" id="name-sidebar-add-row">
-                <input type="text" id="name-input" placeholder="Enter name …" />
-                <button class="names-in-wheel-list__add-btn" id="add-name-btn">+</button>
+                <input type="text" id="name-input" data-i18n-placeholder="html.enterName" placeholder="Enter name…" />
+                <button class="names-in-wheel-list__add-btn" id="add-name-btn" data-i18n-aria-label="a11y.addName"
+                    aria-label="Add name">+</button>
             </div>
 
             <ul class="names-in-wheel-list" id="names-in-wheel-list">
-                <li class="names-in-wheel-list-element"><span class="names-in-wheel-list-element__text">Lois</span><button class="names-in-wheel-list-element__remove-btn">−</button></li>
-                <li class="names-in-wheel-list-element"><span class="names-in-wheel-list-element__text">Meg</span><button class="names-in-wheel-list-element__remove-btn">−</button></li>
+                <li class="names-in-wheel-list-element"><span
+                        class="names-in-wheel-list-element__text">Lois</span><button
+                        class="names-in-wheel-list-element__remove-btn">−</button></li>
+                <li class="names-in-wheel-list-element"><span
+                        class="names-in-wheel-list-element__text">Meg</span><button
+                        class="names-in-wheel-list-element__remove-btn">−</button></li>
             </ul>
 
-            <p class="names-in-wheel-list__error-hint hidden" id="name-error-hint">At least 2 entries required.</p>
-            <p class="names-in-wheel-list__empty-hint" id="name-empty-hint" style="display:none">No names yet. Add some!</p>
+            <p class="names-in-wheel-list__error-hint hidden" id="name-error-hint" data-i18n="html.atLeast2">At least 2
+                entries required.</p>
+            <p class="names-in-wheel-list__empty-hint" id="name-empty-hint" style="display:none"
+                data-i18n="html.noNames">No names yet. Add some!</p>
         </div>
 
         <!-- centered input shown when wheel empty -->
         <div id="name-centered-input" class="name-centered-input name-centered-input--hidden">
             <div class="names-in-wheel-list__add-row">
-                <input type="text" id="name-input-centered" placeholder="Enter name …" />
-                <button class="names-in-wheel-list__add-btn" id="add-name-btn-centered">+</button>
+                <input type="text" id="name-input-centered" data-i18n-placeholder="html.enterName"
+                    placeholder="Enter name…" />
+                <button class="names-in-wheel-list__add-btn" id="add-name-btn-centered"
+                    data-i18n-aria-label="a11y.addName" aria-label="Add name">+</button>
             </div>
         </div>
 
         <div id="winner-modal" class="winner-modal hidden">
             <div class="winner-modal__content">
-                <h2>🎉 Winner!</h2>
+                <h2 data-i18n="html.winner">🎉 Winner!</h2>
                 <p id="winner-modal-text">-</p>
-                <button id="winner-modal-close-btn">OK</button>
-                <button id="winner-modal-remove-btn">REMOVE</button>
+                <button id="winner-modal-close-btn" data-i18n="html.ok">OK</button>
+                <button id="winner-modal-remove-btn" data-i18n="html.remove">REMOVE</button>
             </div>
         </div>
         <div class="video-corner-container">
             <video id="background-video" autoplay loop muted playsinline>
                 <source src="/resources/wirkaufendeinauto.mp4" type="video/mp4">
-                Dein Browser unterstützt das Video-Tag nicht(schade für dich).
+                <span data-i18n="html.videoFallback">Your browser does not support the video tag.</span>
             </video>
         </div>
 
@@ -233,8 +257,8 @@
 
     <div class="legal-links">
 
-        <a href="imprint.html" class="legal-links__link--imprint">Impressum</a>
-        <a href="privacy.html" class="legal-links__link--privacy">Datenschutz</a>
+        <a href="imprint.html" class="legal-links__link--imprint" data-i18n="html.imprint">Imprint</a>
+        <a href="privacy.html" class="legal-links__link--privacy" data-i18n="html.privacy">Privacy</a>
     </div>
 
     <script type="module" src="../script/app/main.ts"></script>

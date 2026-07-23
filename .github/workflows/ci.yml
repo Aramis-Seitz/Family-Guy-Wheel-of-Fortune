@@ -35,6 +35,9 @@ jobs:
  
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Validate locales
+        run: npm run check:i18n
  
       - name: Link Supabase Project
         run: npx supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}

@@ -2,6 +2,7 @@ import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../
 import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
+import { t } from "../app/i18n";
 
 export function generateShareLink(): string {
     const names = getNamesInWheelList();
@@ -53,13 +54,13 @@ export function initShareFeature(): void {
         try {
             await navigator.clipboard.writeText(link);
             showToast({
-                message: "Link copied!",
+                message: t("names.copySuccess"),
                 type: "success"
             });
         } catch (error) {
             console.error("Could not copy link:", error);
             showToast({
-                message: `Could not copy link: ${error}`,
+                message: t("names.copyFailed"),
                 type: "error"
             });
         }

@@ -1,7 +1,7 @@
 #user-area {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 0.35rem;
+    right: 16rem;
     z-index: 9999;
     background: white;
     color: black;
@@ -26,8 +26,13 @@
     text-decoration: underline;
 }
 
-#auth-widget-toggle:checked ~ main .auth-widget__form--login     { display: none; }
-#auth-widget-toggle:not(:checked) ~ main .auth-widget__form--signup { display: none; }
+#auth-widget-toggle:checked~main .auth-widget__form--login {
+    display: none;
+}
+
+#auth-widget-toggle:not(:checked)~main .auth-widget__form--signup {
+    display: none;
+}
 
 .auth-widget__forget-link {
     display: flex;
@@ -44,8 +49,14 @@
     cursor: pointer;
 }
 
-.auth-widget__forget-link a { color: #bbb; text-decoration: none; }
-.auth-widget__forget-link a:hover { text-decoration: underline; }
+.auth-widget__forget-link a {
+    color: #bbb;
+    text-decoration: none;
+}
+
+.auth-widget__forget-link a:hover {
+    text-decoration: underline;
+}
 
 .auth-widget__input-field {
     margin-bottom: 15px;

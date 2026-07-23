@@ -8,10 +8,14 @@ import { showToast } from "../shared/toast";
 import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api";
 import { notifyAccountChanged } from "../shared/auth-channel";
 import { activeRoomKey, executeLeaveRoom, showSwitchRoomConfirm } from "../room";
+import { formatNumber } from "../app/format";
+import { t } from "../app/i18n";
 
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");
 export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
+let currentProfile: ProfileData | null = null;
+let initialized = false;
 
 async function fetchCurrentSession(): Promise<Session | null> {
   const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -21,16 +25,14 @@ async function fetchCurrentSession(): Promise<Session | null> {
 
 function applyUnauthenticatedState(): void {
   if (!profileName || !authButton) return;
-  profileName.textContent = "Nicht eingeloggt";
-  authButton.textContent = "Login";
-  authButton.addEventListener("click", () => {
-    window.location.href = "/login.html";
-  });
+  currentProfile = null;
+  profileName.textContent = t("profile.notLoggedIn");
+  authButton.textContent = t("profile.login");
 }
 
 function applyCoinDisplay(coins: number): void {
   if (!coinDisplay) return;
-  coinDisplay.textContent = `🪙 ${coins}`;
+  coinDisplay.textContent = `🪙 ${formatNumber(coins)}`;
   coinDisplay.style.display = "inline";
 }
 
@@ -41,7 +43,8 @@ interface ProfileData {
 
 function applyAuthenticatedState(profile: ProfileData | null): void {
   if (!profileName || !authButton) return;
-  const username = profile?.username ?? "Eingeloggt";
+  currentProfile = profile;
+  const username = profile?.username ?? t("profile.loggedIn");
   profileName.textContent = username;
 
   if (profile) {
@@ -49,20 +52,29 @@ function applyAuthenticatedState(profile: ProfileData | null): void {
   }
 
   profileName.classList.add("user-profile-name--clickable");
-  profileName.title = "Klick — zum Rad hinzufügen";
-  profileName.addEventListener("click", () => {
-    if (isNameEditingLocked() || isSpinning()) return;
+  profileName.title = t("profile.clickToAdd");
+
+  authButton.textContent = t("profile.logout");
+
+}
+
+function bindProfileActions(): void {
+  profileName?.addEventListener("click", () => {
+    const username = currentProfile?.username;
+    if (!username || isNameEditingLocked() || isSpinning()) return;
     if (!namesInWheelListState.addNameToWheelList(username)) {
-      showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: "error" });
+      showToast({ message: t("profile.maxItems", { max: MAX_ITEMS }), type: "error" });
       return;
     }
-    showToast({ message: `"${username}" wurde zum Rad hinzugefügt.`, type: "success" });
+    showToast({ message: t("profile.added", { username }), type: "success" });
   });
 
-  authButton.textContent = "Logout";
-
-  authButton.addEventListener("click", () => {
-    showSwitchRoomConfirm("Wirklich ausloggen?", async () => {
+  authButton?.addEventListener("click", () => {
+    if (!currentProfile) {
+      window.location.href = "/login.html";
+      return;
+    }
+    showSwitchRoomConfirm("room.logoutConfirm", async () => {
       if (activeRoomKey) await executeLeaveRoom();
       await supabaseClient.auth.signOut();
       notifyAccountChanged();
@@ -99,6 +111,15 @@ export async function refreshCoinDisplay(): Promise<void> {
 
 export async function initProfileUI(): Promise<void> {
   if (!profileName || !authButton) return;
+
+  if (!initialized) {
+    initialized = true;
+    bindProfileActions();
+    window.addEventListener("app:language-changed", () => {
+      if (currentProfile) applyAuthenticatedState(currentProfile);
+      else applyUnauthenticatedState();
+    });
+  }
 
   const session = await fetchCurrentSession();
   if (!session) {

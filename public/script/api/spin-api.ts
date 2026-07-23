@@ -13,7 +13,7 @@ export async function fetchRandomNumber(
   const rawData = await postJson(
     "/api/spin/random",
     { names, currentRotation, direction, multiplier }, {
-    errorFallback: "Server response not ok."
+    errorFallbackKey: "api.spin.randomFailed"
   });
   const data = SpinRandomResponseSchema.parse(rawData);
 
@@ -38,7 +38,7 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
   try {
     const rawBody = await postJson("/api/spin/award-coins", { spinToken, winnerName }, {
       token: accessToken,
-      errorFallback: "Award coins request failed."
+      errorFallbackKey: "api.spin.awardFailed"
     });
     return AwardCoinsResponseSchema.parse(rawBody);
   } catch (error) {

@@ -7,6 +7,7 @@ import { refreshCoinDisplay } from "../profile/profiles";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import type { SpinConfig } from "./spin";
+import { t } from "../app/i18n";
 
 export const POINTER_OFFSET_DEG: number = 270;
 export const FULL_CIRCLE_DEG: number = 360;
@@ -30,7 +31,6 @@ export function displayWinnerModal(winnerName: string): void {
     removeWinnerBtn.classList.add("hidden");
   } else {
     removeWinnerBtn.classList.remove("hidden");
-    removeWinnerBtn.addEventListener("click", removeWinner);
   }
 }
 
@@ -129,7 +129,7 @@ function removeWinner(): void {
 
   if (names.length > 2) {
     showToast({
-      message: `"${removedName}" wurde erfolgreich aus dem Rad entfernt.`,
+      message: t("wheel.removed", { name: removedName }),
       type: "success"
     });
   }
@@ -147,4 +147,6 @@ export function initWinnerModal(): void {
   closeWinnerModalBtn.addEventListener("click", () => {
     getCurrentMode().onWinnerModalClose();
   });
+
+  removeWinnerBtn.addEventListener("click", removeWinner);
 }

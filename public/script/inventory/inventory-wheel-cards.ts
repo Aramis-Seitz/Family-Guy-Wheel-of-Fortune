@@ -6,6 +6,8 @@ import { createMiniWheel } from "./inventory-mini-wheel";
 import { openDeleteModal } from "./inventory-delete-modal";
 import { openSaveWheelModal } from "./inventory-save-wheel-modal";
 import { inventoryModal } from "./inventory";
+import { formatDate } from "../app/format";
+import { t } from "../app/i18n";
 
 let currentSavedWheels: SavedWheel[] = [];
 
@@ -18,7 +20,7 @@ export async function loadWheelCards(): Promise<void> {
 
 const MAX_WHEEL_CARDS: number = 12;
 
-function renderInventoryWheels(savedWheels: SavedWheel[]): void {
+export function renderInventoryWheels(savedWheels: SavedWheel[] = currentSavedWheels): void {
   for (let i = 0; i < MAX_WHEEL_CARDS; i++) {
     const card = createCardForSlot(savedWheels, i);
     const existing = inventoryWheelGrid.children[i];
@@ -41,6 +43,7 @@ function createAddCard(): HTMLDivElement {
   card.className = "inventory-modal__card inventory-modal__card--add";
   card.id = "inventory-modal-add-card-btn";
   card.textContent = "+";
+  card.setAttribute("aria-label", t("inventory.addAria"));
   card.setAttribute("role", "button");
   card.setAttribute("tabindex", "0");
   onActivate(card, openSaveWheelModal);
@@ -105,7 +108,7 @@ function buildCardContent(savedWheel: SavedWheel, names: string[]): HTMLDivEleme
 function createDeleteButton(savedWheel: SavedWheel): HTMLButtonElement {
   const btn = document.createElement("button");
   btn.className = "inventory-modal__card-delete-btn";
-  btn.setAttribute("aria-label", "Eintrag löschen");
+  btn.setAttribute("aria-label", t("inventory.deleteAria"));
   btn.textContent = "🗑️";
   btn.addEventListener("click", (e: MouseEvent) => {
     e.preventDefault();
@@ -131,12 +134,5 @@ function extractNamesFromLink(link: string | null): string[] {
   }
 }
 
-const DATE_FORMATTER = new Intl.DateTimeFormat("de-DE", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "2-digit",
-});
 
-function formatDate(dateString: string): string {
-  return DATE_FORMATTER.format(new Date(dateString));
-}
+window.addEventListener("app:language-changed", () => renderInventoryWheels());

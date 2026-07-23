@@ -25,13 +25,7 @@ export function displayWinnerModal(winnerName: string): void {
   if (!winnerModal || !winnerText) return;
   winnerText.textContent = `${winnerName}`;
   winnerModal.classList.remove("hidden");
-
-  if (isMultiplayerActive()) {
-    removeWinnerBtn.classList.add("hidden");
-  } else {
-    removeWinnerBtn.classList.remove("hidden");
-    removeWinnerBtn.addEventListener("click", removeWinner);
-  }
+  removeWinnerBtn.classList.remove("hidden");
 }
 
 export function hideWinnerModal(): void {
@@ -147,4 +141,6 @@ export function initWinnerModal(): void {
   closeWinnerModalBtn.addEventListener("click", () => {
     getCurrentMode().onWinnerModalClose();
   });
+
+  removeWinnerBtn.addEventListener("click", removeWinner);
 }

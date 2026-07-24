@@ -14,7 +14,7 @@ export type SelectAssetResult = {
 
 export async function getOwnedAssets(): Promise<Asset[]> {
     const rawBody = await getJson("/api/inventory/assets", {
-        errorFallback: "Assets konnten nicht geladen werden"
+        errorFallbackKey: "api.inventory.loadAssetsFailed"
     });
     const body = AssetsResponseSchema.parse(rawBody);
     return body.assets;
@@ -22,7 +22,7 @@ export async function getOwnedAssets(): Promise<Asset[]> {
 
 export async function getSelectedAssetIds(): Promise<string[]> {
     const rawBody = await getJson("/api/inventory/selected-asset-ids", {
-        errorFallback: "Asset-Ids konnten nicht geladen werden"
+        errorFallbackKey: "api.inventory.loadAssetIdsFailed"
     });
     const body = AssetIdsResponseSchema.parse(rawBody);
     return body.assetIds;
@@ -34,7 +34,7 @@ export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
     }
 
     const rawBody = await postJson("/api/inventory/select", { assetId }, {
-        errorFallback: "Asset konnte nicht ausgewählt werden"
+        errorFallbackKey: "api.inventory.selectAssetFailed"
     });
     const body = SelectResponseSchema.parse(rawBody);
 
@@ -46,13 +46,13 @@ export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
 
 export async function deleteSavedWheel(wheelId: string): Promise<void> {
     await postJson("/api/inventory/delete-saved-wheel", { wheelId }, {
-        errorFallback: "Rad konnte nicht gelöscht werden."
+        errorFallbackKey: "api.inventory.deleteWheelFailed"
     });
 }
 
 export async function getSavedWheels(): Promise<SavedWheel[]> {
     const rawBody = await getJson("/api/inventory/saved-wheels", {
-        errorFallback: "Räder konnten nicht geladen werden",
+        errorFallbackKey: "api.inventory.loadWheelsFailed",
     });
     const body = SavedWheelResponseSchema.parse(rawBody);
     return body.savedWheels;
@@ -60,6 +60,6 @@ export async function getSavedWheels(): Promise<SavedWheel[]> {
 
 export async function saveSavedWheels(title: string, url: string): Promise<void> {
     await postJson("/api/inventory/save-saved-wheel", { title, url }, {
-        errorFallback: "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+        errorFallbackKey: "api.inventory.saveFailed",
     });
 }

@@ -1,64 +1,83 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Impressum – Family Guy Wheel of Fortune</title>
+  <title data-i18n="html.imprintTitle">Imprint – Family Guy Wheel of Fortune</title>
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/imprint.css">
   <link rel="stylesheet" href="../css/legal-links.css">
+  <link rel="stylesheet" href="../css/language-switcher.css">
 </head>
+
 <body>
 
-<header>
-  <a href="/">← Zurück zur App</a>
-</header>
+  <header class="app-header">
+    <a href="/main.html" data-i18n="html.backToApp">← Back to app</a>
+    <div class="app-header__language-switcher" aria-label="Language selection">
+      <button class="lang-btn" type="button" data-language="de">DE</button>
+      <button class="lang-btn" type="button" data-language="en">EN</button>
+    </div>
+  </header>
 
-<main>
-  <h1>Impressum</h1>
-  <p class="legal-page__subtitle">Angaben gemäß § 5 DDG</p>
+  <main>
+    <h1 data-i18n="html.imprint">Imprint</h1>
+    <p class="legal-page__subtitle" data-i18n="html.imprintSubtitle">Information according to Section 5 DDG</p>
 
-  <section>
-    <h2>Betreiber</h2>
-    <span class="legal-page__label">xyz</span>
-    <p><span class="legal-page__placeholder">[Hier steht nichts da das nur ein privates lern prjekt ist, dankiii]</span></p>
+    <section>
+      <h2 data-i18n="legal.imprint.operator">Operator</h2>
+      <span class="legal-page__label">xyz</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.imprint.privatePlaceholder">[No information is provided
+          because this is a private learning project.]</span></p>
 
-    <span class="legal-page__label">Anschrift (ladungsfähig, kein Postfach)</span>
-    <p><span class="legal-page__placeholder">[Hier steht nichts da das nur ein privates lern prjekt ist, dankiii]</span></p>
-    <p><span class="legal-page__placeholder">[Hier steht nichts da das nur ein privates lern prjekt ist, dankiii]</span></p>
-    <p>Deutschland</p>
-  </section>
+      <span class="legal-page__label" data-i18n="legal.imprint.address">Address (serviceable address, no P.O.
+        box)</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.imprint.privatePlaceholder">[No information is provided
+          because this is a private learning project.]</span></p>
+      <p><span class="legal-page__placeholder" data-i18n="legal.imprint.privatePlaceholder">[No information is provided
+          because this is a private learning project.]</span></p>
+      <p data-i18n="legal.imprint.country">Germany</p>
+    </section>
 
-  <section>
-    <h2>Kontakt</h2>
-    <span class="legal-page__label">E-Mail (Pflicht)</span>
-    <p><span class="legal-page__placeholder">[Hier steht nichts da das nur ein privates lern prjekt ist, dankiii]</span></p>
+    <section>
+      <h2 data-i18n="legal.imprint.contact">Contact</h2>
+      <span class="legal-page__label" data-i18n="legal.imprint.emailRequired">Email (required)</span>
+      <p><span class="legal-page__placeholder" data-i18n="legal.imprint.privatePlaceholder">[No information is provided
+          because this is a private learning project.]</span></p>
 
-    <span class="legal-page__label">Telefon (empfohlen)</span>
-    <p><span class="legal-page__placeholder">[+49 ...]</span></p>
-  </section>
+      <span class="legal-page__label" data-i18n="legal.imprint.phone">Telephone (recommended)</span>
+      <p><span class="legal-page__placeholder">[+49 ...]</span></p>
+    </section>
 
-  <section>
-    <h2>Haftung für Inhalte</h2>
-    <p>Als Betreiber dieser Website sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG besteht keine Verpflichtung, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
-    <p>Bitte nicht wegklagen sind nur Azubis die lernen</p>
-  </section>
+    <section>
+      <h2 data-i18n="legal.imprint.liabilityContent">Liability for content</h2>
+      <p data-i18n="legal.imprint.liabilityContentText">As the operator of this website, we are responsible for our own
+        content in accordance with Section 7 (1) DDG and general legislation. Under Sections 8 to 10 DDG, there is no
+        obligation to monitor transmitted or stored third-party information.</p>
+      <p data-i18n="legal.imprint.training">This is a private learning project created by trainees.</p>
+    </section>
 
-  <section>
-    <h2>Haftung für Links</h2>
-    <p>Diese Website enthält Links zu externen Webseiten Dritter. Auf deren Inhalte haben wir keinen Einfluss und übernehmen keine Haftung. Für die Inhalte verlinkter Seiten ist stets deren Betreiber verantwortlich.</p>
-  </section>
+    <section>
+      <h2 data-i18n="legal.imprint.liabilityLinks">Liability for links</h2>
+      <p data-i18n="legal.imprint.liabilityLinksText">This website contains links to external third-party websites. We
+        have no influence over their content and accept no liability for it. The respective operator is always
+        responsible for the content of linked pages.</p>
+    </section>
 
-  <section>
-    <h2>Urheberrecht</h2>
-    <p>Die durch den Betreiber erstellten Inhalte und Werke unterliegen dem deutschen Urheberrecht. Vervielfältigung, Bearbeitung oder Verbreitung bedürfen der schriftlichen Zustimmung.</p>
-  </section>
-</main>
+    <section>
+      <h2 data-i18n="legal.imprint.copyright">Copyright</h2>
+      <p data-i18n="legal.imprint.copyrightText">Content and works created by the operator are subject to German
+        copyright law. Reproduction, editing, or distribution requires written consent.</p>
+    </section>
+  </main>
 
-<footer>
-  <a href="/privacy.html">Datenschutzerklärung</a> &nbsp;·&nbsp;
-  Family Guy Wheel of Fortune
-</footer>
+  <footer>
+    <a href="/privacy.html" data-i18n="html.privacy">Privacy</a> &nbsp;·&nbsp;
+    <span data-i18n="html.appName">Family Guy Wheel of Fortune</span>
+  </footer>
 
+  <script type="module" src="../script/app/legal.ts"></script>
 </body>
+
 </html>

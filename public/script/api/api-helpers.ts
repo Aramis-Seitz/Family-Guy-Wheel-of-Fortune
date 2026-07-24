@@ -1,5 +1,6 @@
 import { supabaseClient } from "../shared/supabase-client";
 import { apiUrl } from "../shared/api-base";
+import { t } from "../app/i18n";
 
 
 type ApiErrorBody = {
@@ -17,14 +18,14 @@ export class ApiError extends Error {
     }
 }
 
-export async function readApiError(response: Response, fallback: string): Promise<string> {
+export async function readApiError(response: Response, fallbackKey: string): Promise<string> {
     try {
         const body = await response.json() as ApiErrorBody;
-        if (body.error) return body.error;
+        if (body.error) console.error("API request failed:", body.error);
     } catch {
         // Keep fallback when response is not valid JSON.
     }
-    return fallback;
+    return t(fallbackKey);
 }
 
 export async function getAccessToken(): Promise<string> {
@@ -37,7 +38,7 @@ type HttpMethod = 'GET' | 'POST';
 type RequestOptions = {
     token?: string;
     keepalive?: boolean;
-    errorFallback?: string;
+    errorFallbackKey?: string;
 };
 
 async function request<T>(method: HttpMethod,
@@ -59,7 +60,7 @@ async function request<T>(method: HttpMethod,
     });
 
     if (!response.ok) {
-        const message = await readApiError(response, options.errorFallback ?? `HTTP ${response.status}`);
+        const message = await readApiError(response, options.errorFallbackKey ?? "api.generic");
         throw new ApiError(message, response.status);
     }
     return response.json() as Promise<T>;

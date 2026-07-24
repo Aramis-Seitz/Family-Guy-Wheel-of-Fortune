@@ -1,6 +1,7 @@
 import type { AssetCategory } from "../shop/shop";
 import type { Asset } from "shared";
 import { playAssetSound, stopAssetSound } from "../wheel/sound";
+import { t } from "../app/i18n";
 
 let activePreviewButton: HTMLButtonElement | null = null;
 
@@ -22,6 +23,7 @@ export function createPreviewButton(asset: Asset, className: string): HTMLButton
     const btn = document.createElement("button");
     btn.className = className;
     btn.textContent = "▶";
+    btn.setAttribute("aria-label", t("a11y.playPreview"));
 
     btn.addEventListener("click", async () => {
         if (activePreviewButton === btn) {
@@ -30,10 +32,12 @@ export function createPreviewButton(asset: Asset, className: string): HTMLButton
         }
         activePreviewButton = btn;
         btn.textContent = "⏹";
+        btn.setAttribute("aria-label", t("a11y.stopPreview"));
         try {
             await playAssetSound(asset.asset_url);
         } finally {
             btn.textContent = "▶";
+            btn.setAttribute("aria-label", t("a11y.playPreview"));
             if (activePreviewButton === btn) activePreviewButton = null;
         }
     });

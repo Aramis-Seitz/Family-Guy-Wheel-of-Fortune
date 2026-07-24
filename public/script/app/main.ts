@@ -16,9 +16,15 @@ import { initRoomButtons, initAddNameInput } from "../multiplayer/room-buttons";
 import { setMyUsername } from "../multiplayer/room-orchestration";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
+import { localizeHtmlElements } from "./html-localization";
+import { initI18n, t } from "./i18n";
+import { initLanguageSwitcher } from "./language-switcher";
 
 
 async function initApp(): Promise<void> {
+  await initI18n();
+  localizeHtmlElements();
+  initLanguageSwitcher();
   if (await redirectIfNoSession()) return;
   initRoomUnloadGuard(() => activeRoomKey);
   initNamesInWheelList();
@@ -30,7 +36,7 @@ async function initApp(): Promise<void> {
   initShareFeature();
   initAuthChannelListener();
   await initProfileUI();
-  setMyUsername(profileName?.textContent?.trim() || 'Anonym');
+  setMyUsername(profileName?.textContent?.trim() || t("generic.anonymous"));
   await ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();

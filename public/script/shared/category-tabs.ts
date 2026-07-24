@@ -2,6 +2,7 @@ export interface CategoryTabsOptions<T extends string> {
   cssPrefix: string;
   onSelect: () => void;
   labelFor?: (category: T) => string;
+  activeCategory?: T;
 }
 
 export function renderCategoryTabs<T extends string>(
@@ -10,7 +11,9 @@ export function renderCategoryTabs<T extends string>(
   options: CategoryTabsOptions<T>
 ): void {
   container.innerHTML = "";
-  const activeCategory = categories[0];
+  const activeCategory = options.activeCategory && categories.includes(options.activeCategory)
+    ? options.activeCategory
+    : categories[0];
   categories.forEach(category => {
     container.appendChild(createCategoryTabButton(container, category, activeCategory, options));
   });

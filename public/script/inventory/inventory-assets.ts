@@ -5,6 +5,7 @@ import { getSelectedAssetIds, selectAsset } from "../api/inventory-api";
 import { showToast } from "../shared/toast";
 import { createAssetCard } from "../shared/asset-card";
 import { applySelectedAsset } from "../shared/asset-selection";
+import { t } from "../app/i18n";
 
 let currentSelectedAssetIds: string[] = [];
 
@@ -34,7 +35,7 @@ function createInventoryAssetCard(asset: Asset): HTMLElement {
 function createInventoryAssetSelectButton(asset: Asset, selected: boolean): HTMLElement {
     const btn = document.createElement("button");
     btn.className = "inventory-modal__select-btn";
-    btn.textContent = selected ? "SELECTED ✓" : "SELECT";
+    btn.textContent = selected ? t("inventoryAssets.selected") : t("inventoryAssets.select");
     btn.disabled = selected;
 
     if (!selected) btn.addEventListener("click", () => handleSelectionClick(asset, btn));
@@ -43,11 +44,11 @@ function createInventoryAssetSelectButton(asset: Asset, selected: boolean): HTML
 
 async function handleSelectionClick(asset: Asset, btn: HTMLButtonElement): Promise<void> {
     btn.disabled = true;
-    btn.textContent = "Selecting...";
+    btn.textContent = t("inventoryAssets.selecting");
 
     try {
         const result = await selectAsset(asset.id);
-        if (!result.success) throw new Error("Auswählen fehlgeschlagen");
+        if (!result.success) throw new Error(t("inventoryAssets.selectionFailed"));
 
         const previousId = filterAssetsByCategory(asset.category)
             .find(a => currentSelectedAssetIds.includes(a.id))?.id;
@@ -55,12 +56,12 @@ async function handleSelectionClick(asset: Asset, btn: HTMLButtonElement): Promi
         currentSelectedAssetIds.push(asset.id);
 
         applySelectedAsset(asset);
-        showToast({ message: `${asset.name} ausgewählt!`, type: "success" });
+        showToast({ message: t("inventoryAssets.selectedToast", { name: asset.name }), type: "success" });
         loadInventoryByCategory();
     } catch (error) {
-        const message = error instanceof Error ? error.message : "Asset konnte nicht ausgewählt werden";
+        const message = error instanceof Error ? error.message : t("api.inventory.selectAssetFailed");
         showToast({ message, type: "error" });
         btn.disabled = false;
-        btn.textContent = "SELECT";
+        btn.textContent = t("inventoryAssets.select");
     }
 }

@@ -12,6 +12,7 @@
     "build": "npm run build --workspace shared && npm run build --workspace server && npm run build --workspace public",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "check:i18n": "node scripts/check-locales.mjs",
     "lint": "eslint ."
   },
   "devDependencies": {

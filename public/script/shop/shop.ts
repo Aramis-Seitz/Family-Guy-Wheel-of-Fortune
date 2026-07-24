@@ -5,7 +5,9 @@ import { getShopAssets } from "../api/shop-api";
 import { getUserCoins } from "../api/user-api";
 import { supabaseClient } from "../shared/supabase-client";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { renderCategoryTabs } from "../shared/category-tabs";
+import { getActiveCategory, renderCategoryTabs } from "../shared/category-tabs";
+import { formatNumber } from "../app/format";
+import { t } from "../app/i18n";
 
 // ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
 
@@ -22,6 +24,12 @@ export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close
 export function initShop(): void {
     initToggleModal(shopModal, shopBtn, shopCloseBtn, openShop);
     subscribeToCoinUpdates();
+    window.addEventListener("app:language-changed", () => {
+        const activeCategory = getActiveCategory<AssetCategory | "all">(shopTabs, "shop-modal") ?? "all";
+        renderShopTabs(["all", ...ASSET_CATEGORIES] as (AssetCategory | "all")[], activeCategory);
+        renderCoinBalance();
+        if (shopModal.open) void loadShopAssets();
+    });
 }
 
 export const ASSET_CATEGORIES: string[] = ["sound", "companion"] as const;
@@ -46,7 +54,7 @@ export const shopCoinBalance = requiredElement<HTMLDivElement>("shop-modal-coin-
 
 export function renderCoinBalance(): void {
     if (!shopCoinBalance) return;
-    shopCoinBalance.textContent = `🪙 ${balance}`;
+    shopCoinBalance.textContent = `🪙 ${formatNumber(balance)}`;
 }
 
 export async function loadCoinBalance(): Promise<void> {
@@ -82,11 +90,12 @@ async function subscribeToCoinUpdates(): Promise<void> {
 
 export const shopTabs = requiredElement<HTMLElement>("shop-modal-tabs");
 
-function renderShopTabs(categories: (AssetCategory | "all")[]): void {
+function renderShopTabs(categories: (AssetCategory | "all")[], activeCategory: AssetCategory | "all" = "all"): void {
     renderCategoryTabs(shopTabs, categories, {
         cssPrefix: "shop-modal",
         onSelect: loadShopAssets,
-        labelFor: (category) => category === "all" ? "ALL" : `${category}s`.toUpperCase(),
+        activeCategory,
+        labelFor: (category) => t(`categories.${category}`).toUpperCase(),
     });
 }
 

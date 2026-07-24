@@ -1,5 +1,6 @@
 import { requiredElement } from "../shared/dom-helpers";
 import { masterGain } from "./sound";
+import { t } from "../app/i18n";
 
 export const volumeSlider = requiredElement<HTMLInputElement>("volume-slider");
 export const volumeValue = requiredElement<HTMLSpanElement>("volume-value");
@@ -13,12 +14,19 @@ export function updateVolumeDisplay(): void {
 
     if (volume === 0) {
         volumeIcon.textContent = "🔇";
+        volumeIcon.title = t("a11y.unmute");
+        volumeIcon.setAttribute("aria-label", t("a11y.unmute"));
     } else if (volume <= 33) {
         volumeIcon.textContent = "🔈";
     } else if (volume <= 66) {
         volumeIcon.textContent = "🔉";
     } else {
         volumeIcon.textContent = "🔊";
+    }
+
+    if (volume > 0) {
+        volumeIcon.title = t("a11y.mute");
+        volumeIcon.setAttribute("aria-label", t("a11y.mute"));
     }
 
     applyVolumeToAudio(volume / 100);
@@ -74,4 +82,5 @@ export function initVolumeSlider(): void {
     volumeSlider.addEventListener("input", updateVolumeDisplay);
     volumeSlider.addEventListener("change", onSliderChange);
     volumeIcon.addEventListener("click", toggleMute);
+    window.addEventListener("app:language-changed", updateVolumeDisplay);
 }

@@ -15,13 +15,9 @@ class NamesInWheelState {
     return this.namesInWheel.length;
   }
 
-  subscribe(subscriber: NameSubscriber): () => void {
+  subscribe(subscriber: NameSubscriber): void {
     this.subscribers.add(subscriber);
     subscriber(this.getNamesInWheelList());
-
-    return () => {
-      this.subscribers.delete(subscriber);
-    };
   }
 
   setNamesInWheelList(names: string[]): void {

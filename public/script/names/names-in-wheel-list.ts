@@ -1,5 +1,6 @@
-import { SPIN_DISABLED_OPACITY, spinLeftBtn, spinRightBtn } from "../wheel/spin";
-import { wheelEmptyHint } from "../room";
+import { applyDisabledStyle, spinLeftBtn, spinRightBtn } from "../wheel/spin";
+import { wheelEmptyHint } from "../multiplayer/room-players-sidebar";
+import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { requiredElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
 import { validateName } from "../shared/validation";
@@ -15,16 +16,12 @@ import { t } from "../app/i18n";
 let roomLocked = false;
 let disableAddWhileLocked = true;
 let disableRemoveWhileLocked = true;
-let onNameInWheelListRemoved: ((removedName: string, index: number) => Promise<void> | void) | null = null;
 
-export function setOnNameInWheelListRemoved(callback: ((removedName: string, index: number) => Promise<void> | void) | null): void {
-  onNameInWheelListRemoved = callback;
-}
-
-export function lockNameEditing(disableAdd = true, disableRemove = true): void {
+export function lockNameEditing(): void {
   roomLocked = true;
-  disableAddWhileLocked = disableAdd;
-  disableRemoveWhileLocked = disableRemove;
+  const isHost = getCurrentMode().isHost();
+  disableAddWhileLocked = !isHost;
+  disableRemoveWhileLocked = !isHost;
   syncAddElements();
   syncRemoveButtons();
 }
@@ -106,28 +103,13 @@ export function updateEmptyState(): void {
 
 function updateSpinButtonState(): void {
   const disabled = getSegmentCountOfWheelList() < MIN_ITEMS;
-  [spinLeftBtn, spinRightBtn].forEach((btn) => {
-    btn.disabled = disabled;
-    if (disabled) {
-      btn.style.setProperty("opacity", SPIN_DISABLED_OPACITY);
-      btn.style.setProperty("cursor", "not-allowed");
-      btn.style.setProperty("pointer-events", "none");
-    } else {
-      btn.style.removeProperty("opacity");
-      btn.style.removeProperty("cursor");
-      btn.style.removeProperty("pointer-events");
-    }
-  });
+  [spinLeftBtn, spinRightBtn].forEach((btn) => applyDisabledStyle(btn, disabled));
 }
 
 export function syncRemoveButtons(): void {
   const buttons = list.querySelectorAll(".names-in-wheel-list-element__remove-btn") as NodeListOf<HTMLButtonElement>;
   const disabled = roomLocked && disableRemoveWhileLocked;
-  buttons.forEach((btn) => {
-    btn.disabled = disabled;
-    btn.style.cursor = disabled ? "not-allowed" : "pointer";
-    btn.style.opacity = disabled ? "0.5" : "1";
-  });
+  buttons.forEach((btn) => applyDisabledStyle(btn, disabled));
 }
 
 export const input = requiredElement<HTMLInputElement>("name-input");
@@ -135,14 +117,8 @@ export const addBtn = requiredElement<HTMLButtonElement>("add-name-btn");
 
 export function syncAddElements(): void {
   const disabled = (roomLocked && disableAddWhileLocked) || getSegmentCountOfWheelList() >= MAX_ITEMS;
-
-  addBtn.disabled = disabled;
-  input.disabled = disabled;
-
-  addBtn.style.opacity = disabled ? "0.5" : "1";
-  addBtn.style.cursor = disabled ? "not-allowed" : "pointer";
-  input.style.opacity = disabled ? "0.5" : "1";
-  input.style.cursor = disabled ? "not-allowed" : "text";
+  applyDisabledStyle(addBtn, disabled);
+  applyDisabledStyle(input, disabled);
 }
 
 function showErrorToast(message: string): void {
@@ -159,17 +135,15 @@ export function refreshWheel(): void {
 async function handleRemoveNameElementFromWheelList(index: number, wheelListNameElement: HTMLLIElement): Promise<void> {
   if (roomLocked && disableRemoveWhileLocked) return;
 
-  const nameText = wheelListNameElement.querySelector(".names-in-wheel-list-element__text")?.textContent?.trim() ?? "";
-  if (onNameInWheelListRemoved && nameText) {
-    const button = wheelListNameElement.querySelector(".names-in-wheel-list-element__remove-btn") as HTMLButtonElement | null;
-    if (button) button.disabled = true;
-    try {
-      await onNameInWheelListRemoved(nameText, index);
-    } catch (error) {
-      if (button) button.disabled = false;
-      console.error("Failed to remove name from room wheel names:", error);
-      return;
-    }
+  const button = wheelListNameElement.querySelector(".names-in-wheel-list-element__remove-btn") as HTMLButtonElement | null;
+  if (button) button.disabled = true;
+  try {
+    await getCurrentMode().removeNameFromWheel(index);
+  } catch (error) {
+    if (button) button.disabled = false;
+    console.error("Failed to remove name from room wheel names:", error);
+    showErrorToast("Entfernen fehlgeschlagen");
+    return;
   }
 
   namesInWheelListState.removeNameInWheelListAt(index);
@@ -217,8 +191,4 @@ export function initNamesInWheelList(): void {
   namesInWheelListState.subscribe(renderNamesInWheelList);
   namesInWheelListState.setNamesInWheelList(initialNames);
   initNameInputValidation();
-}
-
-export function initExistingNamesInWheelList(): void {
-  initNamesInWheelList();
 }

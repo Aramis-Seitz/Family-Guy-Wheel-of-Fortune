@@ -1,5 +1,6 @@
-import { randomBytes, randomInt, randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { getProfileByUserId } from "../repositories/profile-repository";
+import { getSecureRandomNumber } from "../lib/random";
 import {
     insertRoom,
     getRoomByKey,
@@ -88,7 +89,7 @@ export async function spinRoom(userId: string, roomKey: string, direction: strin
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError("Only the host may spin", 403);
 
-    const ranNum = randomInt(140, 901);
+    const ranNum = getSecureRandomNumber(0, 359);
     const spunAt = new Date().toISOString();
     await updateRoomSpin(roomKey, ranNum, spunAt, direction);
 

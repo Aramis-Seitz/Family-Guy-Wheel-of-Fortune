@@ -77,7 +77,7 @@ function bindProfileActions(): void {
       window.location.href = "/login.html";
       return;
     }
-    showSwitchRoomConfirm("room.logoutConfirm", async () => {
+    showSwitchRoomConfirm(t("room.logoutConfirm"), async () => {
       if (activeRoomKey) await executeLeaveRoom();
       await supabaseClient.auth.signOut();
       notifyAccountChanged();

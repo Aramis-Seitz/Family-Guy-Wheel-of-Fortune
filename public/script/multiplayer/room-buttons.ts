@@ -2,6 +2,7 @@ import { optionalElement } from "../shared/dom-helpers";
 import { addBtn, input } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import { activeRoomKey, activeRoomPlayers, roomKeyDisplay } from "./room-state";
 import { getCurrentMode } from "./game-mode-strategy";
 import { playersList, bulkAddToWheelBtn } from "./room-players-sidebar";
@@ -33,7 +34,7 @@ export function showSwitchRoomConfirm(message: string, action: () => Promise<voi
 // der erklärt, warum die Raum-Aktion gerade nicht ausgeführt werden darf.
 function isBlockedBySpinning(): boolean {
   if (!isSpinning()) return false;
-  showToast({ message: 'Bitte warte, bis das Rad aufgehört hat zu drehen', type: 'error' });
+  showToast({ message: t('room.waitForWheelStop'), type: 'error' });
   return true;
 }
 
@@ -66,7 +67,7 @@ export function initRoomButtons(): void {
   createRoomBtn?.addEventListener('click', () => {
     if (isBlockedBySpinning()) return;
     startRoomAction(
-      `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und neuen Raum erstellen?`,
+      t('room.switchToNewRoom', { currentRoom: activeRoomKey }),
       executeCreateRoom,
     );
   });
@@ -76,7 +77,7 @@ export function initRoomButtons(): void {
     if (!roomKey) return;
     if (isBlockedBySpinning()) return;
     startRoomAction(
-      `Du bist noch in Raum ${activeRoomKey}. Raum verlassen und Raum ${roomKey} beitreten?`,
+      t('room.switchRoom', { currentRoom: activeRoomKey, targetRoom: roomKey }),
       () => executeJoinRoom(roomKey),
     );
   });
@@ -118,7 +119,7 @@ export function initRoomButtons(): void {
         btn.classList.remove('room__btn--copied');
         btn.innerHTML = '&#128203;';
       }, 1500);
-      showToast({ message: 'Code in die Zwischenablage kopiert', type: 'success' });
+      showToast({ message: t('room.copied'), type: 'success' });
     });
   });
 }

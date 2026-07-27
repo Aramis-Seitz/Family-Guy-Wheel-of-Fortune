@@ -3,6 +3,7 @@ import { getNamesInWheelList, addBtn, input } from "../names/names-in-wheel-list
 import { applyDisabledStyle } from "../wheel/spin";
 import { activeRoomHostName, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
 import { getCurrentMode } from "./game-mode-strategy";
+import { t } from "../app/i18n";
 
 export const playersList = optionalElement<HTMLUListElement>("room-players-list");
 
@@ -22,7 +23,7 @@ export function renderPlayersSidebar(players: string[]): void {
 
     if (name === activeRoomHostName) {
       const hostTag = document.createElement('span');
-      hostTag.textContent = 'Host';
+      hostTag.textContent = t('room.host');
       hostTag.className = 'room__host-tag';
       playerEntry.appendChild(hostTag);
     }
@@ -34,7 +35,10 @@ export function renderPlayersSidebar(players: string[]): void {
       const isPlayerInWheelList = (activeRoomNamesInWheelList ?? []).includes(name);
       togglePlayerInWheelListBtn.textContent = isPlayerInWheelList ? '−' : '+';
       if (isPlayerInWheelList) togglePlayerInWheelListBtn.classList.add('room__player-toggle-btn--added');
-      togglePlayerInWheelListBtn.title = isPlayerInWheelList ? `Vom Rad entfernen: ${name}` : `Zu Rad hinzufügen: ${name}`;
+      togglePlayerInWheelListBtn.title = t(
+        isPlayerInWheelList ? 'room.removeFromWheel' : 'room.addToWheel',
+        { name },
+      );
 
       togglePlayerInWheelListBtn.addEventListener('click', async () => {
         togglePlayerInWheelListBtn.disabled = true;
@@ -88,10 +92,10 @@ export function updateBulkButtonState(players: string[]): void {
   if (!bulkAddToWheelBtn) return;
   const anyMissing = getMissingPlayers(players, activeRoomNamesInWheelList ?? []).length > 0;
   if (anyMissing) {
-    bulkAddToWheelBtn.textContent = 'Alle zum Rad hinzufügen';
+    bulkAddToWheelBtn.textContent = t('room.bulkAdd');
     bulkAddToWheelBtn.classList.remove('room__btn--remove');
   } else {
-    bulkAddToWheelBtn.textContent = 'Alle vom Rad entfernen';
+    bulkAddToWheelBtn.textContent = t('room.bulkRemove');
     bulkAddToWheelBtn.classList.add('room__btn--remove');
   }
 }

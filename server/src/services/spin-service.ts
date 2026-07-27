@@ -10,11 +10,20 @@ import {
 import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
-const MIN_ROTATION_DEGREE = 0;
-const MAX_ROTATION_DEGREE = 359;
+function getRandomWheelSpinNumber(): number {
+    return getSecureRandomNumber(0, 359);
+}
+
+function getRandomSpinnerCoins(): number {
+    return getSecureRandomNumber(1, 3);
+}
+
+function getRandomWinnerCoins(): number {
+    return getSecureRandomNumber(3, 6);
+}
 
 export async function generateSpin(userId: string): Promise<SpinRandomResponseBody> {
-    const ranNum = getSecureRandomNumber(MIN_ROTATION_DEGREE, MAX_ROTATION_DEGREE);
+    const ranNum = getRandomWheelSpinNumber();
     const spinToken = await insertSpinToken(randomUUID(), userId);
     return { ranNum, spinToken };
 }
@@ -27,7 +36,7 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
 
     await markSpinTokenUsed(spinToken);
 
-    const spinnerCoins = getSecureRandomNumber(1, 3);
+    const spinnerCoins = getRandomSpinnerCoins();
     const spinnerProfile = await getProfileByUserId(userId);
     const spinnerName = spinnerProfile?.username ?? userId;
 
@@ -35,7 +44,7 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
     const spinnerIsWinner = winnerUserId === userId;
 
     if (spinnerIsWinner) {
-        const winnerCoins = getSecureRandomNumber(3, 6);
+        const winnerCoins = getRandomWinnerCoins();
         await addCoins(userId, spinnerCoins + winnerCoins);
         console.log(`[coins] ${spinnerName} hat selbst gewonnen → +${spinnerCoins + winnerCoins} Coins`);
         return { spinnerCoins, winnerCoins, total: spinnerCoins + winnerCoins };
@@ -45,7 +54,7 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
     console.log(`[coins] Spinner: ${spinnerName} → +${spinnerCoins} Coins`);
 
     if (winnerUserId) {
-        const winnerCoins = getSecureRandomNumber(3, 6);
+        const winnerCoins = getRandomWinnerCoins();
         await addCoins(winnerUserId, winnerCoins);
         console.log(`[coins] Winner: ${winnerName} → +${winnerCoins} Coins`);
         return { spinnerCoins, winnerCoins };

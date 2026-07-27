@@ -10,6 +10,7 @@ export let activeRoomKey: string | null = null;
 export let activeRoomNamesInWheelList: string[] = [];
 export let activeRoomPlayers: string[] = [];
 export let activeRoomHostName = '';
+let pendingHostSpinToken = '';
 
 export const roomKeyDisplay = optionalElement<HTMLSpanElement>("room-key-display");
 export const roomInfo = optionalElement<HTMLDivElement>("room-info");
@@ -28,6 +29,18 @@ export function setActiveRoomPlayers(players: string[]): void {
 
 export function setActiveRoomHostName(hostName: string): void {
   activeRoomHostName = hostName;
+}
+
+export function setPendingHostSpinToken(token: string): void {
+  pendingHostSpinToken = token;
+}
+
+// Liest den zwischengespeicherten Spin-Token und leert ihn sofort wieder, damit
+// er nie versehentlich für ein zweites Realtime-Spin-Event wiederverwendet wird.
+export function consumePendingHostSpinToken(): string {
+  const token = pendingHostSpinToken;
+  pendingHostSpinToken = '';
+  return token;
 }
 
 export function isMultiplayerActive(): boolean {

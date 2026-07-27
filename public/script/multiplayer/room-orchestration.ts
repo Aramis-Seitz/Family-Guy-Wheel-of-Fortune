@@ -16,6 +16,7 @@ import {
   activeRoomPlayers, setActiveRoomPlayers,
   setActiveRoomNamesInWheelList,
   setActiveRoomHostName,
+  consumePendingHostSpinToken, setPendingHostSpinToken,
   roomKeyDisplay, roomInfo,
 } from "./room-state";
 import { getCurrentMode, setCurrentMode, SoloModeStrategy, HostModeStrategy, GuestModeStrategy } from "./game-mode-strategy";
@@ -50,6 +51,7 @@ export function backupNamesBeforeJoiningRoom(): void {
 function clearRoom(): void {
   setActiveRoomPlayers([]);
   setActiveRoomNamesInWheelList([]);
+  setPendingHostSpinToken('');
   unlockNameEditing();
   unsubscribeFromRoom();
   setCurrentMode(new SoloModeStrategy());
@@ -90,13 +92,16 @@ function syncRoomPlayers(players: string[]): void {
   updateRoomPlayers(players);
 }
 
-// Non-host only: realtime fires → spin wheel visually (no coins, winner determined locally for display)
+// Realtime fires für Host und Gast gleichermaßen → beide spinnen erst hier, synchron
+// zueinander. Nur der Host bringt einen echten Spin-Token mit (aus dem eigenen
+// spinRoom()-Call zwischengespeichert), der Gast bekommt nie einen — Coins werden
+// nur mit einem gültigen, serverseitig geprüften Token vergeben.
 function handleRoomSpinEvent(extraRotationDegrees: number, multiplier: number, direction: string): void {
-  if (getCurrentMode().isHost()) return; // host already spun directly from POST response
   lockAllSpinElements();
   const namesInWheelList = getNamesInWheelList();
   const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + extraRotationDegrees;
-  spinWheel(totalSteps, direction as Direction, '', namesInWheelList);
+  const spinToken = getCurrentMode().isHost() ? consumePendingHostSpinToken() : '';
+  spinWheel(totalSteps, direction as Direction, spinToken, namesInWheelList);
 }
 
 function handleWheelResetEvent(): void {

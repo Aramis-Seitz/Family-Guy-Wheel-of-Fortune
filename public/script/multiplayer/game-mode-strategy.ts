@@ -1,11 +1,10 @@
 import {
-  spinWheel, spinWheelWithRandomSteps, lockAllSpinElements, applyGameModeLock,
+  spinWheelWithRandomSteps, lockAllSpinElements, applyGameModeLock,
   resetWheelRotation,
   spinLeftBtn, spinRightBtn, resetBtn,
-  MIN_SPIN_ROTATIONS,
 } from "../wheel/spin";
 import type { Direction, SpinElement } from "../wheel/spin";
-import { getMultiplier, multiplierSlider } from "../wheel/multiplier";
+import { multiplierSlider } from "../wheel/multiplier";
 import { hideWinnerModal } from "../wheel/winner";
 import {
   addNameToList, getNamesInWheelList,
@@ -16,7 +15,7 @@ import { MAX_ITEMS } from "../names/names-in-wheel-list-state";
 import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { spinRoom, updateRoomNames, resetRoom } from "../api/room-api";
-import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
+import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken } from "./room-state";
 
 export interface GameModeStrategy {
   onSpinClick(direction: Direction): Promise<void>;
@@ -105,14 +104,16 @@ async function updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList: string[])
 }
 
 export class HostModeStrategy implements GameModeStrategy {
+  // Animiert nicht direkt — das übernimmt handleRoomSpinEvent() in room-orchestration.ts,
+  // sobald das Realtime-Update zurückkommt, damit der Host synchron mit allen anderen
+  // Spielern spinnt statt vorzupreschen (analog zu Namen/Reset).
   async onSpinClick(direction: Direction): Promise<void> {
     if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
     lockAllSpinElements();
     try {
       const namesInWheelList = getNamesInWheelList();
-      const { ranNum: extraRotationDegrees, spinToken } = await spinRoom(activeRoomKey, namesInWheelList, direction);
-      const totalSteps = Math.round(MIN_SPIN_ROTATIONS * getMultiplier()) + extraRotationDegrees;
-      spinWheel(totalSteps, direction, spinToken, namesInWheelList);
+      const { spinToken } = await spinRoom(activeRoomKey, namesInWheelList, direction);
+      setPendingHostSpinToken(spinToken);
     } catch (error) {
       console.error('[ROOM] Spin fehlgeschlagen:', error);
       applyGameModeLock();

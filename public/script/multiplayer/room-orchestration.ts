@@ -9,6 +9,7 @@ import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay, multiplier
 import { hideWinnerModal } from "../wheel/winner";
 import { initChat, destroyChat } from "./room-chat";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import { createRoom, leaveRoom, joinRoom, setMultiplier } from '../api/room-api';
 import { subscribeToRoom, unsubscribeFromRoom } from "./room-realtime-sync";
 import {
@@ -110,7 +111,7 @@ function handleWinnerModalCloseEvent(): void {
 function onRoomClosed(): void {
   if (getCurrentMode().isHost()) return; // host handles its own leave flow
   clearRoom();
-  showToast({ message: 'Der Host hat den Raum geschlossen', type: 'info' });
+  showToast({ message: t('room.hostClosed'), type: 'info' });
 }
 
 function setNamesFromRoom(names: string[]): void {
@@ -169,10 +170,10 @@ export async function executeCreateRoom(): Promise<void> {
       void setMultiplier(activeRoomKey, getMultiplier());
     };
     multiplierSlider?.addEventListener('input', multiplierSyncListener);
-    showToast({ message: `Raum erstellt: ${roomKey}`, type: 'success' });
+    showToast({ message: t('room.created', { roomKey }), type: 'success' });
   } catch (error) {
     console.error('[ROOM] Erstellen fehlgeschlagen:', error);
-    showToast({ message: 'Raum konnte nicht erstellt werden', type: 'error' });
+    showToast({ message: t('api.room.createFailed'), type: 'error' });
   }
 }
 
@@ -189,9 +190,9 @@ export async function executeJoinRoom(roomKey: string): Promise<void> {
     setMultiplierSlider(multiplier);
     updateMultiplierDisplay();
     finishRoomSetup(roomKey);
-    showToast({ message: `Raum beigetreten: ${roomKey}`, type: 'success' });
+    showToast({ message: t('room.joined', { roomKey }), type: 'success' });
   } catch (error) {
     console.error('[ROOM] Beitreten fehlgeschlagen:', error);
-    showToast({ message: 'Raum nicht gefunden oder Fehler beim Beitreten', type: 'error' });
+    showToast({ message: t('api.room.joinFailed'), type: 'error' });
   }
 }

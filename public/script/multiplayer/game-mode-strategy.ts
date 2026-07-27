@@ -15,6 +15,7 @@ import { getNameValidationMessage } from "../names/name-input-validation";
 import { MAX_ITEMS } from "../names/names-in-wheel-list-state";
 import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
+import { t } from "../app/i18n";
 import { spinRoom, updateRoomNames, resetRoom } from "../api/room-api";
 import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
 
@@ -74,11 +75,11 @@ export class SoloModeStrategy implements GameModeStrategy {
   // versteckt, solange currentMode SoloModeStrategy ist. Nur wegen des
   // GameModeStrategy-Interfaces Pflicht, siehe GuestModeStrategy.addName().
   getLeaveConfirmMessage(): string {
-    return 'Raum wirklich verlassen?';
+    return t('room.leaveConfirmGuest');
   }
 
   getLeaveResultMessage(success: boolean): string {
-    return success ? 'Raum verlassen' : 'Raum konnte nicht verlassen werden';
+    return t(success ? 'room.left' : 'api.room.leaveFailed');
   }
 }
 
@@ -95,7 +96,7 @@ async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
     // vorzupreschen.
   } catch (error) {
     console.error('[ROOM] Reset fehlgeschlagen:', error);
-    showToast({ message: 'Reset fehlgeschlagen', type: 'error' });
+    showToast({ message: t('api.room.resetFailed'), type: 'error' });
   }
 }
 
@@ -116,7 +117,7 @@ export class HostModeStrategy implements GameModeStrategy {
     } catch (error) {
       console.error('[ROOM] Spin fehlgeschlagen:', error);
       applyGameModeLock();
-      showToast({ message: 'Spin fehlgeschlagen', type: 'error' });
+      showToast({ message: t('api.room.spinFailed'), type: 'error' });
     }
   }
 
@@ -141,7 +142,7 @@ export class HostModeStrategy implements GameModeStrategy {
 
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     if (existingNamesInWheelList.length >= MAX_ITEMS) {
-      showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: 'error' });
+      showToast({ message: t('names.maxItems', { max: MAX_ITEMS }), type: 'error' });
       return;
     }
 
@@ -164,7 +165,7 @@ export class HostModeStrategy implements GameModeStrategy {
     if (missingPlayers.length > 0) {
       const updatedNamesInWheelList = [...existingNamesInWheelList, ...missingPlayers];
       if (updatedNamesInWheelList.length > MAX_ITEMS) {
-        showToast({ message: `Maximal ${MAX_ITEMS} Einträge erlaubt.`, type: 'error' });
+        showToast({ message: t('names.maxItems', { max: MAX_ITEMS }), type: 'error' });
         return;
       }
       await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
@@ -185,13 +186,13 @@ export class HostModeStrategy implements GameModeStrategy {
 
   getLeaveConfirmMessage(guestCount: number): string {
     if (guestCount > 0) {
-      return `Du bist Host von ${guestCount} ${guestCount === 1 ? 'Mitspieler' : 'Mitspielern'}. Raum wirklich schließen?`;
+      return t('room.leaveConfirmGuests', { count: guestCount });
     }
-    return 'Raum wirklich schließen?';
+    return t('room.leaveConfirmHost');
   }
 
   getLeaveResultMessage(success: boolean): string {
-    return success ? 'Raum geschlossen' : 'Raum konnte nicht geschlossen werden';
+    return t(success ? 'room.closed' : 'api.room.closeFailed');
   }
 }
 
@@ -238,11 +239,11 @@ export class GuestModeStrategy implements GameModeStrategy {
   }
 
   getLeaveConfirmMessage(): string {
-    return 'Raum wirklich verlassen?';
+    return t('room.leaveConfirmGuest');
   }
 
   getLeaveResultMessage(success: boolean): string {
-    return success ? 'Raum verlassen' : 'Raum konnte nicht verlassen werden';
+    return t(success ? 'room.left' : 'api.room.leaveFailed');
   }
 }
 

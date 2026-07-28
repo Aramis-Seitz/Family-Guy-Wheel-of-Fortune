@@ -27,18 +27,6 @@
 | `chore`    | Dependencies, Configs                  |
 | `ci`       | CI/CD-Pipeline                         |
 
-## Branch-Typen
-
-| Typ        | Bedeutung                              |
-| ---------- | -------------------------------------- |
-| `feature`  | Neue Funktion                          |
-| `bug`      | Bug behoben                            |
-
-Bsp. 
-```
-feature/'ticketnummer'/task
-```
-
 ## Breaking Changes
 
 ```

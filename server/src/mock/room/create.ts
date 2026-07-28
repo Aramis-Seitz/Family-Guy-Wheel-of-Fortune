@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { randomBytes } from 'crypto';
-import { createServiceClient } from '../supabase';
-
+ //import { randomBytes } from 'crypto';
+ //import { createServiceClient } from '../supabase';
 export const router = Router();
 
 // function generateRoomKey(): string {
@@ -10,7 +9,7 @@ export const router = Router();
 //   return Array.from(bytes, (b) => chars[b % chars.length]).join('');
 // }
 
-router.post('/', async (req, res) => {
+router.post('/', async () => {
   // const jwt = (req.headers['authorization'] ?? '').replace(/^Bearer\s+/, '');
   // if (!jwt) { res.status(401).json({ error: 'Unauthorized' }); return; }
 

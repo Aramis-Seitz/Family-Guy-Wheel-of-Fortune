@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { createServiceClient } from '../supabase';
-
+ //import { createServiceClient } from '../supabase';
 export const router = Router();
 
-router.post('/', async (req, res) => {
+router.post('/', async () => {
   // const jwt = (req.headers['authorization'] ?? '').replace(/^Bearer\s+/, '');
   // if (!jwt) { res.status(401).json({ error: 'Unauthorized' }); return; }
 

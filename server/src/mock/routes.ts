@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { randomUUID } from 'crypto';
 import {
-  store,
   findProfile,
   findProfileByEmail,
   findProfileByUsername,

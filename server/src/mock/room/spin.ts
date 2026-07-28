@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { randomUUID } from 'crypto';
-import { createServiceClient } from '../supabase';
-import { getSecureRandomNumber } from '../../lib/random';
-
+ //import { randomUUID } from 'crypto';
+ //import { createServiceClient } from '../supabase';
+ //import { getSecureRandomNumber } from '../../lib/random';
 export const router = Router();
 
 //const MIN_ROTATION_DEGREE = 140;
 //const MAX_ROTATION_DEGREE = 900;
 
-router.post('/', async (req, res) => {
+router.post('/', async () => {
   // const jwt = (req.headers['authorization'] ?? '').replace(/^Bearer\s+/, '');
   // if (!jwt) { res.status(401).json({ error: 'Unauthorized' }); return; }
 

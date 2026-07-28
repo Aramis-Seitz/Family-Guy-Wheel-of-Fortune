@@ -1,10 +1,17 @@
 import { decodeMockJwt } from './routes';
 import { store, findProfile, createSpinToken } from './store';
 
-function project(row: any, cols: string) {
+type MockRow = Record<string, unknown>;
+
+type MockQueryResult = {
+  data: unknown;
+  error: { message: string } | null;
+};
+
+function project(row: MockRow, cols: string): MockRow {
   if (!cols || cols === '*') return { ...row };
-  const result: Record<string, unknown> = {};
-  for (const part of cols.split(',').map(s => s.trim())) {
+  const result: MockRow = {};
+  for (const part of cols.split(',').map((s: string) => s.trim())) {
     result[part] = row[part];
   }
   return result;
@@ -15,8 +22,8 @@ class MockQueryBuilder {
   private _op = '';
   private _selectCols = '*';
   private _afterInsertSelect = '';
-  private _insertData: any;
-  private _updateData: any;
+  private _insertData: unknown;
+  private _updateData: unknown;
   private _filters: { col: string; val: unknown }[] = [];
   private _single = false;
 
@@ -32,36 +39,36 @@ class MockQueryBuilder {
     return this;
   }
 
-  insert(data: any) { this._op = 'insert'; this._insertData = data; return this; }
-  update(data: any) { this._op = 'update'; this._updateData = data; return this; }
+  insert(data: unknown) { this._op = 'insert'; this._insertData = data; return this; }
+  update(data: unknown) { this._op = 'update'; this._updateData = data; return this; }
   delete() { this._op = 'delete'; return this; }
   eq(col: string, val: unknown) { this._filters.push({ col, val }); return this; }
   single() { this._single = true; return this; }
 
-  then(resolve: (v: any) => any, reject?: (e: any) => any) {
+  then(resolve: (value: MockQueryResult) => unknown, reject?: (reason: unknown) => unknown) {
     return Promise.resolve(this._run()).then(resolve, reject);
   }
 
-  private _match(row: any) {
-    return this._filters.every(f => row[f.col] === f.val);
+  private _match(row: MockRow) {
+    return this._filters.every((f) => row[f.col] === f.val);
   }
 
-  private _run(): { data: any; error: any } {
+  private _run(): MockQueryResult {
     const t = this._table;
 
     if (t === 'profiles') {
       if (this._op === 'select') {
-        const rows = store.profiles.filter(r => this._match(r));
+        const rows = store.profiles.filter((r) => this._match(r));
         if (this._single) {
           return rows.length > 0
             ? { data: project(rows[0], this._selectCols), error: null }
             : { data: null, error: { message: 'Row not found' } };
         }
-        return { data: rows.map(r => project(r, this._selectCols)), error: null };
+        return { data: rows.map((r) => project(r, this._selectCols)), error: null };
       }
 
       if (this._op === 'update') {
-        store.profiles.filter(r => this._match(r)).forEach(r => Object.assign(r, this._updateData));
+        store.profiles.filter((r) => this._match(r)).forEach((r) => Object.assign(r, this._updateData));
         return { data: null, error: null };
       }
     }
@@ -69,7 +76,7 @@ class MockQueryBuilder {
     if (t === 'spin_tokens') {
       if (this._op === 'insert') {
         const data = Array.isArray(this._insertData) ? this._insertData[0] : this._insertData;
-        const token = createSpinToken(data.user_id);
+        const token = createSpinToken((data as { user_id: string }).user_id);
         if (this._afterInsertSelect) {
           const projected = project(token, this._afterInsertSelect);
           return { data: this._single ? projected : [projected], error: null };
@@ -78,17 +85,17 @@ class MockQueryBuilder {
       }
 
       if (this._op === 'select') {
-        const rows = store.spin_tokens.filter(r => this._match(r));
+        const rows = store.spin_tokens.filter((r) => this._match(r));
         if (this._single) {
           return rows.length > 0
             ? { data: project(rows[0], this._selectCols), error: null }
             : { data: null, error: { message: 'Row not found' } };
         }
-        return { data: rows.map(r => project(r, this._selectCols)), error: null };
+        return { data: rows.map((r) => project(r, this._selectCols)), error: null };
       }
 
       if (this._op === 'update') {
-        store.spin_tokens.filter(r => this._match(r)).forEach(r => Object.assign(r, this._updateData));
+        store.spin_tokens.filter((r) => this._match(r)).forEach((r) => Object.assign(r, this._updateData));
         return { data: null, error: null };
       }
     }

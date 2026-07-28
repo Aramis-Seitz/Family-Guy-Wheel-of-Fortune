@@ -32,7 +32,7 @@
 | Typ        | Bedeutung                              |
 | ---------- | -------------------------------------- |
 | `feature`  | Neue Funktion                          |
-| `fix`      | Bug behoben                            |
+| `bug`      | Bug behoben                            |
 
 Bsp. 
 ```

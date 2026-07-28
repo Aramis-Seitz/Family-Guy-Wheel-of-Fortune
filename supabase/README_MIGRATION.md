@@ -67,7 +67,7 @@ end $$;
 
 ## Deployment
 
-Einfach auf `main` oder `develop` pushen/mergen:
+Einfach auf `main` pushen/mergen:
 
 ```
 feature-branch → PR → merge → CI läuft → Migration wird automatisch angewendet

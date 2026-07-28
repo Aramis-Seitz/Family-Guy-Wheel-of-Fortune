@@ -1,4 +1,4 @@
-# How to: Commits schreiben
+# How to: Branches benennen
 
 ## Branch-Typen
 

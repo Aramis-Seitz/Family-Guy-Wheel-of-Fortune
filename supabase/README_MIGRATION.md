@@ -95,6 +95,24 @@ Die Pipeline macht folgendes (`.github/workflows/ci.yml`):
 
 ---
 
+## Lokal vs. Remote abgleichen / reparieren
+
+Bei Mismatch zwischen lokalen Dateien und Supabase-History (z.B. Datei umbenannt/gelöscht, die remote schon als "applied" markiert war) — **lokal ausführen, nicht in die CI packen:**
+
+```bash
+npx supabase link --project-ref <PROJECT_ID>
+
+# Zeigt Local vs. Remote Versionen im Vergleich
+npx supabase migration list
+
+# Markiert eine Version remote als nicht ausgeführt (ändert keine Daten, nur die History)
+npx supabase migration repair --status reverted <VERSION> --linked
+```
+
+Danach `migration list` erneut checken, ob Local/Remote wieder übereinstimmen.
+
+---
+
 ## Rollback
 
 Supabase hat **kein automatisches Rollback**. Bei einem Fehler manuell vorgehen:

@@ -52,8 +52,8 @@ main {
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
+    background: #e5e5e5;
+    color: #111;
     font-size: 14px;
 }
 

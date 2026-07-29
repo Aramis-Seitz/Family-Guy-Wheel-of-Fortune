@@ -27,10 +27,11 @@
     --user-area-border: #444;
     --room-console-bg: #2d2d2d;
     --room-console-text: #f8fafc;
+    --room-panel-title: #ffffff;
 }
 
 [data-theme="dark"] {
-    --bg: #0f172a;
+    --bg: #000000;
     --surface: #111827;
     --surface-soft: #1e293b;
     --text: #f8fafc;
@@ -44,6 +45,7 @@
 
     --room-console-bg: #ffffff;
     --room-console-text: #111827;
+    --room-panel-title: #000000;
 }
 
 *,

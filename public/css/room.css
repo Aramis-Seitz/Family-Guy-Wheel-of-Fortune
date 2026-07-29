@@ -19,7 +19,7 @@
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text);
+  color: var(--room-panel-title);
 }
 
 .room__controls {

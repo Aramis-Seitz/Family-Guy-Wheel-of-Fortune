@@ -4,7 +4,7 @@
     right: 16rem;
     z-index: 9999;
     background: var(--user-area-bg);
-    color: var(--text);
+    color: #fff;
     padding: 10px 14px;
     border: 2px solid var(--user-area-border);
     border-radius: 10px;
@@ -17,7 +17,7 @@
     padding: 6px 10px;
     cursor: pointer;
     background: var(--user-area-bg);
-    color: var(--text);
+    color: #fff;
     border: 1px solid var(--user-area-border);
 }
 
@@ -74,10 +74,10 @@
 
 .auth-widget__input-field input {
     padding: 10px;
-    border: 1px solid #333;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: #1e1e1e;
-    color: #f0f0f0;
+    background: #e5e5e5;
+    color: #111;
     font-size: 14px;
 }
 

@@ -3,10 +3,10 @@
     top: 0.35rem;
     right: 16rem;
     z-index: 9999;
-    background: var(--surface);
+    background: var(--user-area-bg);
     color: var(--text);
     padding: 10px 14px;
-    border: 2px solid var(--border);
+    border: 2px solid var(--user-area-border);
     border-radius: 10px;
     display: flex;
     gap: 10px;
@@ -16,6 +16,9 @@
 #auth-button {
     padding: 6px 10px;
     cursor: pointer;
+    background: var(--user-area-bg);
+    color: var(--text);
+    border: 1px solid var(--user-area-border);
 }
 
 #user-profile-name.user-profile-name--clickable {

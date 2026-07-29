@@ -3,8 +3,8 @@
   top: 270px;      
   left: 20px;      
   z-index: 9000;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--room-console-bg);
+  color: var(--room-console-text);
   padding: 14px 16px;
   border: 2px solid var(--border);
   border-radius: 16px;

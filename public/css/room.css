@@ -3,14 +3,14 @@
   top: 270px;      
   left: 20px;      
   z-index: 9000;
-  background: white;
-  color: black;
+  background: var(--surface);
+  color: var(--text);
   padding: 14px 16px;
-  border: 2px solid black;
+  border: 2px solid var(--border);
   border-radius: 16px;
   min-width: 210px;
   font-family: inherit;
-  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
 }
 
 #room-panel h3 {
@@ -19,7 +19,7 @@
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #333;
+  color: var(--text);
 }
 
 .room__controls {
@@ -38,16 +38,18 @@
   padding: 7px 10px;
   font-size: 0.85rem;
   text-transform: uppercase;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid var(--border);
   border-radius: 100px;
   font-family: monospace;
   letter-spacing: 0.15em;
   transition: border-color var(--transition);
   outline: none;
+  background: var(--bg);
+  color: var(--text);
 }
 
 #room-key-input:focus {
-  border-color: #00a2ff;
+  border-color: var(--primary);
 }
 
 .room__btn {
@@ -89,14 +91,14 @@
 }
 
 #room-leave-btn {
-  background: #e0e0e0;
-  color: #333;
+  background: var(--surface-soft);
+  color: var(--text);
   font-size: 0.78rem;
   padding: 5px 10px;
 }
 
 #room-leave-btn:hover {
-  background: #c8c8c8;
+  background: var(--surface);
 }
 
 .room__btn--copy {
@@ -217,7 +219,7 @@
   font-size: 1rem;
   font-weight: bold;
   letter-spacing: 0.2em;
-  background: #f5f5f5;
+  background: var(--surface-soft);
   padding: 2px 8px;
   border-radius: 100px;
 }
@@ -245,10 +247,11 @@
 #room-players-list li {
   font-size: 0.85rem;
   padding: 4px 10px;
-  background: #f7f7f7;
+  background: var(--surface-soft);
   border-radius: 100px;
   position: relative;
   text-align: center;
+  color: var(--text);
 }
 
 .room__host-tag {

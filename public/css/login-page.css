@@ -2,12 +2,12 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background: #000;
-    color: #f0f0f0;
+    background: var(--bg);
+    color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 .auth-widget {
@@ -23,10 +23,10 @@ main {
 }
 
 .auth-widget__form {
-    background: #161618;
+    background: var(--surface);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
     width: 320px;
     box-sizing: border-box;
 }
@@ -49,16 +49,16 @@ main {
 
 .auth-widget__input-field input {
     padding: 10px;
-    border: 1px solid #333;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: #1e1e1e;
-    color: #f0f0f0;
+    background: var(--bg);
+    color: var(--text);
     font-size: 14px;
 }
 
 .auth-widget__input-field input:focus {
     outline: none;
-    border-color: #555;
+    border-color: var(--primary);
 }
 
 .auth-widget__forget-link {
@@ -88,16 +88,16 @@ main {
 button {
     width: 100%;
     padding: 12px;
-    background: #333;
-    border: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    color: #fff;
+    color: var(--text);
     font-size: 16px;
     cursor: pointer;
 }
 
 button:hover {
-    background: #444;
+    background: var(--surface-soft);
 }
 
 .auth-widget__register-link {

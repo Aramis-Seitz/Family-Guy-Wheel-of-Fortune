@@ -19,11 +19,13 @@ import { initAuthChannelListener } from "../shared/auth-channel";
 import { localizeHtmlElements } from "./html-localization";
 import { initI18n, t } from "./i18n";
 import { initLanguageSwitcher } from "./language-switcher";
+import { initTheme } from "./theme";
 
 
 async function initApp(): Promise<void> {
   await initI18n();
   localizeHtmlElements();
+  initTheme();
   initLanguageSwitcher();
   if (await redirectIfNoSession()) return;
   initRoomUnloadGuard(() => activeRoomKey);

@@ -5,6 +5,7 @@ import { notifyAccountChanged } from "../shared/auth-channel";
 import { localizeHtmlElements } from "./html-localization";
 import { initI18n, t } from "./i18n";
 import { initLanguageSwitcher } from "./language-switcher";
+import { initTheme } from "./theme";
 
 const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 const signupForm = document.getElementById('signup-form') as HTMLFormElement | null;
@@ -21,6 +22,7 @@ const signupConfirmPasswordInput = document.getElementById('signup-confirm-passw
 async function initAuthPage(): Promise<void> {
     await initI18n();
     localizeHtmlElements();
+    initTheme();
     initLanguageSwitcher();
 }
 

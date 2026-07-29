@@ -81,6 +81,7 @@ export function initRoomButtons(): void {
     const roomKey = roomKeyInput?.value.trim().toUpperCase() ?? '';
     if (!roomKey) return;
     if (isBlockedBySpinning()) return;
+    if (roomKeyInput) roomKeyInput.value = '';
     startRoomAction(
       t('room.switchRoom', { currentRoom: activeRoomKey, targetRoom: roomKey }),
       () => executeJoinRoom(roomKey),

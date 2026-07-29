@@ -8,7 +8,7 @@ import { multiplierSlider } from "../wheel/multiplier";
 import { hideWinnerModal } from "../wheel/winner";
 import {
   addNameToList, getNamesInWheelList,
-  addBtn, input, getRemoveBtn,
+  addBtn, input, getRemoveBtn, removeNameFromListByIndex,
 } from "../names/names-in-wheel-list";
 import { getNameValidationMessage } from "../names/name-input-validation";
 import { MAX_ITEMS } from "../names/names-in-wheel-list-state";
@@ -25,6 +25,7 @@ export interface GameModeStrategy {
   getRoleLockedElements(): SpinElement[];
   addNameToWheel(rawName: string): Promise<void>;
   removeNameFromWheel(index: number): Promise<void>;
+  removeWinnerFromWheel(index: number): Promise<void>;
   toggleAllPlayersInWheel(players: string[]): Promise<void>;
   canManagePlayers(): boolean;
   isHost(): boolean;
@@ -56,6 +57,12 @@ export class SoloModeStrategy implements GameModeStrategy {
 
   async removeNameFromWheel(): Promise<void> {
     // no-op — lokales Entfernen läuft direkt über die Namensliste, nicht über den Raum-Callback
+  }
+
+  async removeWinnerFromWheel(index: number): Promise<void> {
+    removeNameFromListByIndex(index);
+    hideWinnerModal();
+    resetWheelRotation();
   }
 
   async toggleAllPlayersInWheel(): Promise<void> {
@@ -159,6 +166,11 @@ export class HostModeStrategy implements GameModeStrategy {
     await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
   }
 
+  async removeWinnerFromWheel(index: number): Promise<void> {
+    await this.removeNameFromWheel(index);
+    await handleRoomReset(true);
+  }
+
   async toggleAllPlayersInWheel(players: string[]): Promise<void> {
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     const missingPlayers = getMissingPlayers(players, existingNamesInWheelList);
@@ -225,6 +237,10 @@ export class GuestModeStrategy implements GameModeStrategy {
 
   async removeNameFromWheel(): Promise<void> {
     // no-op — nur der Host verwaltet die Namensliste
+  }
+
+  async removeWinnerFromWheel(): Promise<void> {
+    // no-op — Gäste dürfen Gewinner nicht vom gemeinsamen Rad entfernen
   }
 
   async toggleAllPlayersInWheel(): Promise<void> {

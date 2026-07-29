@@ -72,16 +72,20 @@
     font-size: 14px;
 }
 
-.auth-widget__input-field input {
+#login-form .auth-widget__input-field input,
+#signup-form .auth-widget__input-field input,
+.auth-widget__form .auth-widget__input-field input {
     padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: #e5e5e5 !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    background: #8e8e8e !important;
     color: #111 !important;
     font-size: 14px;
 }
 
-.auth-widget__input-field input:focus {
+#login-form .auth-widget__input-field input:focus,
+#signup-form .auth-widget__input-field input:focus,
+.auth-widget__form .auth-widget__input-field input:focus {
     outline: none;
-    border-color: #555;
+    border-color: #555 !important;
 }

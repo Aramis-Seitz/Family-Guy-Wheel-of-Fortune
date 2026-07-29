@@ -1,9 +1,8 @@
 import { isMultiplayerActive } from "../multiplayer/room-state";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { awardCoins } from "../api/spin-api";
-import { getNamesInWheelList, removeNameFromListByIndex } from "../names/names-in-wheel-list";
+import { getNamesInWheelList } from "../names/names-in-wheel-list";
 import { stopDrumRoll } from "./sound";
-import { resetWheelRotation } from "./spin";
 import { refreshCoinDisplay } from "../profile/profiles";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
@@ -28,11 +27,8 @@ export function displayWinnerModal(winnerName: string): void {
   winnerText.textContent = `${winnerName}`;
   winnerModal.classList.remove("hidden");
 
-  if (isMultiplayerActive()) {
-    removeWinnerBtn.classList.add("hidden");
-  } else {
-    removeWinnerBtn.classList.remove("hidden");
-  }
+  const canRemoveWinner = !isMultiplayerActive() || getCurrentMode().isHost();
+  removeWinnerBtn.classList.toggle("hidden", !canRemoveWinner);
 }
 
 export function hideWinnerModal(): void {
@@ -116,15 +112,15 @@ export function announceWinner(spinToken: string, winnerName: string): void {
     });
 }
 
-function removeWinner(): void {
+async function removeWinner(): Promise<void> {
+  if (isMultiplayerActive() && !getCurrentMode().isHost()) return;
   if (!lastWinnerName) return;
   const removedName = lastWinnerName;
   const names = getNamesInWheelList();
   const index = names.indexOf(removedName);
 
   if (index < 0) {
-    hideWinnerModal();
-    resetWheelRotation();
+    getCurrentMode().onWinnerModalClose();
     return;
   }
 
@@ -135,9 +131,12 @@ function removeWinner(): void {
     });
   }
 
-  removeNameFromListByIndex(index);
-  hideWinnerModal();
-  resetWheelRotation();
+  try {
+    await getCurrentMode().removeWinnerFromWheel(index);
+  } catch (error) {
+    console.error("[WINNER] Gewinner konnte nicht vom Rad entfernt werden:", error);
+    showToast({ message: t("api.room.updateWheelFailed"), type: "error" });
+  }
 }
 
 const closeWinnerModalBtn = requiredElement<HTMLButtonElement>("winner-modal-close-btn");
@@ -149,5 +148,12 @@ export function initWinnerModal(): void {
     getCurrentMode().onWinnerModalClose();
   });
 
-  removeWinnerBtn.addEventListener("click", removeWinner);
+  removeWinnerBtn.addEventListener("click", async () => {
+    removeWinnerBtn.disabled = true;
+    try {
+      await removeWinner();
+    } finally {
+      removeWinnerBtn.disabled = false;
+    }
+  });
 }

@@ -57,6 +57,11 @@ const copyRoomKeyBtn = optionalElement<HTMLButtonElement>("room-copy-key-btn");
 const confirmLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-confirm-btn");
 const cancelLeaveRoomBtn = optionalElement<HTMLButtonElement>("leave-room-confirm-cancel-btn");
 
+export function enableRoomButtons(): void {
+  createRoomBtn?.removeAttribute('disabled');
+  joinRoomBtn?.removeAttribute('disabled');
+}
+
 export function initRoomButtons(): void {
   bulkAddToWheelBtn?.addEventListener('click', async () => {
     const players = Array.from(playersList?.querySelectorAll('.room__player-name') ?? [])

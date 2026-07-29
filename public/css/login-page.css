@@ -52,8 +52,8 @@ main {
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: #e5e5e5;
-    color: #111;
+    background: #e5e5e5 !important;
+    color: #111 !important;
     font-size: 14px;
 }
 

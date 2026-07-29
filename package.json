@@ -23,7 +23,9 @@
     "vitest": "^4.1.8"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.104.0",
+    "@vercel/functions": "^3.7.6",
     "dotenv": "^17.4.2"
   }
 }

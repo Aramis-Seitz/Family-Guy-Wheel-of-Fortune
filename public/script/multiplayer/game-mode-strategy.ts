@@ -222,7 +222,8 @@ export class GuestModeStrategy implements GameModeStrategy {
   }
 
   onWinnerModalClose(): void {
-    // no-op — Gast wartet auf das Realtime-Event vom Host
+    hideWinnerModal();
+    resetWheelRotation();
   }
 
   getRoleLockedElements(): SpinElement[] {

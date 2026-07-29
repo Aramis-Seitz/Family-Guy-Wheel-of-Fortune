@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 import { createMockClient } from '../mock-supabase-client';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
@@ -10,9 +10,12 @@ if (!USE_MOCK && (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY)) {
   throw new Error('Missing Supabase environment variables');
 }
 
+// createBrowserClient (statt createClient) legt die Session in Cookies statt
+// localStorage ab, damit die Vercel-Edge-Middleware sie vor Auslieferung von
+// main.html lesen und prüfen kann (siehe /middleware.ts).
 export const supabaseClient = USE_MOCK
   ? (createMockClient() as any)
-  : createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  : createBrowserClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 export async function fetchCurrentUser() {
   const {

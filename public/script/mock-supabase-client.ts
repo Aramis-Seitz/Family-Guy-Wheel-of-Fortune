@@ -1,10 +1,22 @@
 import { apiUrl } from './shared/api-base';
 
+// Ersetzt den echten Supabase-JS-Client im Mock-Modus (VITE_USE_MOCK=true).
+// Seit der Backend-Refactorierung läuft der komplette Datenzugriff
+// (Profile, Coins, Rooms, Shop, Inventory, Spins) über die REST-API unter
+// /api/* — dieser Mock muss deshalb nur noch nachbilden, was das Frontend
+// tatsächlich direkt am Supabase-Client aufruft: Auth und Realtime.
+
 const SESSION_KEY = 'mock_session';
+
+interface MockUser {
+  id: string;
+  email: string;
+  user_metadata: { username: string; date_of_birth?: string | null };
+}
 
 interface MockSession {
   access_token: string;
-  user: { id: string; email: string; user_metadata: { username: string; date_of_birth?: string | null } };
+  user: MockUser;
 }
 
 function loadSession(): MockSession | null {
@@ -16,148 +28,134 @@ function loadSession(): MockSession | null {
   }
 }
 
-function saveSession(session: MockSession) {
+function saveSession(session: MockSession): void {
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
 
-function clearSession() {
+function clearSession(): void {
   localStorage.removeItem(SESSION_KEY);
 }
 
-function projectRow(row: any, cols: string) {
-  if (!cols || cols === '*') return { ...row };
-  const result: Record<string, unknown> = {};
-  for (const part of cols.split(',').map(s => s.trim())) {
-    if (part.includes(':')) {
-      const [alias, source] = part.split(':').map(s => s.trim());
-      result[alias] = row[source];
-    } else {
-      result[part] = row[part];
-    }
-  }
-  return result;
+type AuthListener = (event: string, session: MockSession | null) => void;
+const authListeners = new Set<AuthListener>();
+
+function notifyAuthListeners(event: string, session: MockSession | null): void {
+  authListeners.forEach((cb) => cb(event, session));
 }
 
-class MockQueryBuilder {
-  private _table: string;
-  private _op = '';
-  private _selectCols = '*';
-  private _insertData: any;
-  private _filters: { col: string; val: unknown }[] = [];
-  private _orderCol?: string;
-  private _orderAsc = true;
-  private _limitNum?: number;
-  private _single = false;
+// --- Realtime -------------------------------------------------------
+// Es gibt kein echtes WebSocket-Realtime im Mock. Jeder Channel pollt
+// stattdessen den passenden /api/mock/realtime/* Endpoint und übersetzt
+// Änderungen in dieselben postgres_changes/broadcast-Events, die
+// room-realtime-sync.ts und room-chat.ts von der echten Supabase-Realtime
+// erwarten. Funktioniert über mehrere Tabs/Browser hinweg, weil der
+// Node-Server als gemeinsamer Zustand dient.
 
-  constructor(table: string) { this._table = table; }
+const POLL_INTERVAL_MS = 700;
 
-  select(cols = '*') { this._op = 'select'; this._selectCols = cols; return this; }
-  insert(data: any) { this._op = 'insert'; this._insertData = data; return this; }
-  update(_data: any) { this._op = 'noop'; return this; }
-  delete() { this._op = 'delete'; return this; }
-  eq(col: string, val: unknown) { this._filters.push({ col, val }); return this; }
-  order(col: string, opts: { ascending?: boolean } = {}) {
-    this._orderCol = col;
-    this._orderAsc = opts.ascending !== false;
+type PgHandler = { event: string; callback: (payload: { new: unknown }) => void };
+type BroadcastHandler = { event: string; callback: (msg: { payload: unknown }) => void };
+interface ChatMessage { seq: number; event: string; payload: unknown }
+
+class MockChannel {
+  private name: string;
+  private pgHandlers: PgHandler[] = [];
+  private broadcastHandlers: BroadcastHandler[] = [];
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private closed = false;
+  private lastRoomSnapshot: string | null = null;
+  private lastChatSeq = 0;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  on(type: string, filter: { event: string }, callback: (arg: never) => void): this {
+    if (type === 'postgres_changes') this.pgHandlers.push({ event: filter.event, callback: callback as PgHandler['callback'] });
+    if (type === 'broadcast') this.broadcastHandlers.push({ event: filter.event, callback: callback as BroadcastHandler['callback'] });
     return this;
   }
-  limit(n: number) { this._limitNum = n; return this; }
-  single() { this._single = true; return this; }
 
-  then(resolve: (v: any) => any, reject?: (e: any) => any) {
-    return this._execute().then(resolve, reject);
+  subscribe(): this {
+    if (this.name.startsWith('room:')) this.pollRoom(this.name.slice('room:'.length));
+    if (this.name.startsWith('chat:')) this.pollChat(this.name.slice('chat:'.length));
+    return this;
   }
 
-  private _eqFilter(key: string) {
-    return this._filters.find(f => f.col === key)?.val as string | undefined;
+  async send(msg: { type: string; event: string; payload: unknown }): Promise<'ok'> {
+    if (msg.type === 'broadcast' && this.name.startsWith('chat:')) {
+      const roomKey = this.name.slice('chat:'.length);
+      await fetch(apiUrl(`/api/mock/realtime/chat/${roomKey}`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: msg.event, payload: msg.payload }),
+      });
+    }
+    return 'ok';
   }
 
-  private async _execute(): Promise<{ data: any; error: any }> {
-    try {
-      return await this._run();
-    } catch (err: any) {
-      return { data: null, error: { message: err.message } };
-    }
+  close(): void {
+    this.closed = true;
+    if (this.timer) clearTimeout(this.timer);
   }
 
-  private async _run(): Promise<{ data: any; error: any }> {
-    const t = this._table;
-    const cols = this._selectCols;
+  private schedule(fn: () => void): void {
+    if (this.closed) return;
+    this.timer = setTimeout(fn, POLL_INTERVAL_MS);
+  }
 
-    if (t === 'profiles') {
-      if (this._op === 'select') {
-        const id = this._eqFilter('id');
-        const username = this._eqFilter('username');
-
-        const url = id
-          ? apiUrl(`/api/mock/profile/${id}`)
-          : username
-            ? apiUrl(`/api/mock/profile/by-username/${encodeURIComponent(username)}`)
-            : null;
-
-        if (!url) return { data: null, error: { message: 'Missing filter for profiles select' } };
-
-        const res = await fetch(url);
-        if (!res.ok) return { data: null, error: { message: 'Not found' } };
-        const row = projectRow(await res.json(), cols);
-        return { data: this._single ? row : [row], error: null };
+  private pollRoom(roomKey: string): void {
+    const tick = async (): Promise<void> => {
+      if (this.closed) return;
+      try {
+        const res = await fetch(apiUrl(`/api/mock/realtime/rooms/${roomKey}`));
+        if (res.status === 404) {
+          if (this.lastRoomSnapshot !== null) {
+            this.lastRoomSnapshot = null;
+            this.emitPg('DELETE', null);
+          }
+        } else if (res.ok) {
+          const row = await res.json();
+          const snapshot = JSON.stringify(row);
+          if (snapshot !== this.lastRoomSnapshot) {
+            this.lastRoomSnapshot = snapshot;
+            this.emitPg('UPDATE', row);
+          }
+        }
+      } catch {
+        // Netzwerkfehler ignorieren — der nächste Poll versucht es erneut.
       }
+      this.schedule(() => void tick());
+    };
+    void tick();
+  }
 
-      if (this._op === 'insert') {
-        const data = Array.isArray(this._insertData) ? this._insertData[0] : this._insertData;
-        const res = await fetch(apiUrl('/api/mock/profile'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
-        // 409 = profile already created during signUp – treat as success
-        if (res.status === 409) return { data: null, error: null };
-        if (!res.ok) return { data: null, error: { message: 'Insert failed' } };
-        return { data: await res.json(), error: null };
+  private pollChat(roomKey: string): void {
+    const tick = async (): Promise<void> => {
+      if (this.closed) return;
+      try {
+        const res = await fetch(apiUrl(`/api/mock/realtime/chat/${roomKey}?since=${this.lastChatSeq}`));
+        if (res.ok) {
+          const messages: ChatMessage[] = await res.json();
+          for (const msg of messages) {
+            this.lastChatSeq = Math.max(this.lastChatSeq, msg.seq);
+            this.broadcastHandlers
+              .filter((h) => h.event === msg.event)
+              .forEach((h) => h.callback({ payload: msg.payload }));
+          }
+        }
+      } catch {
+        // Netzwerkfehler ignorieren — der nächste Poll versucht es erneut.
       }
-    }
+      this.schedule(() => void tick());
+    };
+    void tick();
+  }
 
-    if (t === 'saved_wheels') {
-      if (this._op === 'select') {
-        const userId = this._eqFilter('user_id');
-        if (!userId) return { data: [], error: null };
-
-        const res = await fetch(apiUrl(`/api/mock/saved_wheels/${userId}`));
-        if (!res.ok) return { data: [], error: null };
-        const rows: any[] = await res.json();
-        const projected = rows.map(r => projectRow(r, cols));
-        return { data: projected, error: null };
-      }
-
-      if (this._op === 'insert') {
-        const data = Array.isArray(this._insertData) ? this._insertData[0] : this._insertData;
-        const res = await fetch(apiUrl('/api/mock/saved_wheels'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
-        if (!res.ok) return { data: null, error: { message: 'Insert failed' } };
-        return { data: await res.json(), error: null };
-      }
-
-      if (this._op === 'delete') {
-        const id = this._eqFilter('id');
-        if (!id) return { data: null, error: { message: 'No id filter for delete' } };
-        await fetch(apiUrl(`/api/mock/saved_wheels/${id}`), { method: 'DELETE' });
-        return { data: null, error: null };
-      }
-    }
-
-    if (this._op === 'noop') return { data: null, error: null };
-
-    return { data: null, error: { message: `Unsupported: ${t}.${this._op}` } };
+  private emitPg(event: 'UPDATE' | 'DELETE', row: unknown): void {
+    this.pgHandlers.filter((h) => h.event === event).forEach((h) => h.callback({ new: row }));
   }
 }
-
-const noopChannel = {
-  on(..._args: any[]) { return noopChannel; },
-  subscribe() { return noopChannel; },
-};
 
 export function createMockClient() {
   return {
@@ -170,8 +168,10 @@ export function createMockClient() {
         });
         const body = await res.json();
         if (!res.ok) return { data: null, error: { message: body.error } };
-        saveSession({ access_token: body.token, user: body.user });
-        return { data: body, error: null };
+        const session: MockSession = { access_token: body.token, user: body.user };
+        saveSession(session);
+        notifyAuthListeners('SIGNED_IN', session);
+        return { data: { user: body.user, session }, error: null };
       },
 
       async signUp({ email, password, options }: { email: string; password: string; options?: { data?: { username?: string; date_of_birth?: string } } }) {
@@ -183,14 +183,15 @@ export function createMockClient() {
           body: JSON.stringify({ email, password, username, date_of_birth }),
         });
         const body = await res.json();
-        if (!res.ok) return { data: { user: null }, error: { message: body.error } };
-        saveSession({ access_token: body.token, user: body.user });
-        return { data: { user: body.user }, error: null };
+        if (!res.ok) return { data: { user: null, session: null }, error: { message: body.error } };
+        const session: MockSession = { access_token: body.token, user: body.user };
+        saveSession(session);
+        notifyAuthListeners('SIGNED_IN', session);
+        return { data: { user: body.user, session }, error: null };
       },
 
       async getSession() {
-        const session = loadSession();
-        return { data: { session }, error: null };
+        return { data: { session: loadSession() }, error: null };
       },
 
       async getUser() {
@@ -199,18 +200,28 @@ export function createMockClient() {
         return { data: { user: session.user }, error: null };
       },
 
+      onAuthStateChange(callback: AuthListener) {
+        authListeners.add(callback);
+        // Supabase ruft den Callback direkt nach der Registrierung einmal
+        // mit dem aktuellen Stand auf ("INITIAL_SESSION").
+        callback('INITIAL_SESSION', loadSession());
+        return { data: { subscription: { unsubscribe: () => authListeners.delete(callback) } } };
+      },
+
       async signOut() {
         clearSession();
+        notifyAuthListeners('SIGNED_OUT', null);
         return { error: null };
       },
     },
 
-    from(table: string) {
-      return new MockQueryBuilder(table);
+    channel(name: string) {
+      return new MockChannel(name);
     },
 
-    channel(_name: string) {
-      return noopChannel;
+    async removeChannel(channel: MockChannel) {
+      channel.close();
+      return 'ok';
     },
   };
 }

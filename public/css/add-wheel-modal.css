@@ -2,11 +2,11 @@
 #save-wheel-modal {
     border: none;
     border-radius: 14px;
-    background: #1a1f2e;
-    color: #fff;
+    background: var(--surface);
+    color: var(--text);
     padding: 0;
     width: min(380px, 92vw);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .12);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -38,9 +38,9 @@
 
 #save-wheel-modal-close-btn {
     background: none;
-    border: 1px solid #444;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    color: #aaa;
+    color: var(--muted);
     padding: 3px 10px;
     font-size: 0.82rem;
     cursor: pointer;
@@ -48,8 +48,8 @@
 }
 
 #save-wheel-modal-close-btn:hover {
-    color: #fff;
-    border-color: #888;
+    color: var(--text);
+    border-color: var(--primary);
 }
 
 .save-wheel-modal__body {
@@ -71,12 +71,12 @@
 }
 
 #save-wheel-input {
-    background: #2a2a2a;
-    border: 1px solid #3a3a3a;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 15px;
-    color: #fff;
+    color: var(--text);
     width: 100%;
     outline: none;
     font-family: 'Segoe UI', sans-serif;

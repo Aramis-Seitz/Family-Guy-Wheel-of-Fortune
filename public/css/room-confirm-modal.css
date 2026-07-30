@@ -2,11 +2,11 @@
 .room-confirm-modal {
   border: none;
   border-radius: 14px;
-  background: #1a1f2e;
-  color: #fff;
+  background: var(--surface);
+  color: var(--text);
   padding: 0;
   width: min(360px, 92vw);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .12);
   position: fixed;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);

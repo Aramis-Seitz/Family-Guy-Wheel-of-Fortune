@@ -28,11 +28,11 @@
   font-size: 13px;
   font-weight: 500;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #ffffff;
-  color: #6b7280;
+  background-color: var(--surface);
+  color: var(--text);
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 8px 24px rgba(0, 0, 0, 0.20);
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.16);
   pointer-events: auto;
   opacity: 0;
   transform: translateY(12px) scale(0.97);

@@ -35,7 +35,7 @@ function createThemeToggleButton(): HTMLButtonElement | null {
 function updateThemeToggleButton(theme: Theme): void {
   const button = document.getElementById(THEME_BUTTON_ID) as HTMLButtonElement | null;
   if (!button) return;
-  button.textContent = theme === "dark" ? "☀️ Light" : "🌙 Dark";
+  button.textContent = theme === "dark" ? "💥 Light" : "🌙 Dark";
   button.setAttribute("aria-pressed", String(theme === "dark"));
   button.setAttribute(
     "aria-label",
@@ -46,6 +46,13 @@ function updateThemeToggleButton(theme: Theme): void {
 function applyTheme(theme: Theme): void {
   document.body.setAttribute("data-theme", theme);
   updateThemeToggleButton(theme);
+}
+
+function playLightModeSound(): void {
+  const audio = new Audio("/resources/sounds/Flashbang - Sound effect (HD).mp3");
+  void audio.play().catch(() => {
+    // Ignore playback errors, e.g. if the browser blocks autoplay.
+  });
 }
 
 function getPreferredTheme(): Theme {
@@ -61,6 +68,9 @@ export function initTheme(): void {
   if (button) {
     button.addEventListener("click", () => {
       const nextTheme: Theme = document.body.dataset.theme === "dark" ? "light" : "dark";
+      if (nextTheme === "light") {
+        playLightModeSound();
+      }
       applyTheme(nextTheme);
       saveTheme(nextTheme);
     });

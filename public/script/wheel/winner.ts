@@ -28,7 +28,7 @@ export function displayWinnerModal(winnerName: string): void {
   winnerModal.classList.remove("hidden");
 
   const canRemoveWinner = !isMultiplayerActive() || getCurrentMode().isHost();
-  removeWinnerBtn.classList.toggle("hidden", !canRemoveWinner);
+  removeWinnerBtn.hidden = !canRemoveWinner;
 }
 
 export function hideWinnerModal(): void {

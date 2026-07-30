@@ -18,6 +18,9 @@ import { generateSpin } from "./spin-service";
 import { AppError } from "../lib/errors";
 import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
+const MAX_WHEEL_NAMES = 16;
+const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
+
 function generateRoomKey(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const bytes = randomBytes(6);
@@ -39,6 +42,23 @@ export async function createRoom(userId: string): Promise<CreateRoomResponseBody
 
 function toUsernames(players: RoomPlayer[]): string[] {
     return players.map((p) => p.username);
+}
+
+function requireRoomHost(room: { host_id: string } | null, userId: string, action: string): void {
+    if (!room) throw new AppError("Room not found", 404);
+    if (room.host_id !== userId) throw new AppError(`Only the host may ${action}`, 403);
+}
+
+function validateRoomNames(names: string[]): string[] {
+    if (names.length > MAX_WHEEL_NAMES) {
+        throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
+    }
+
+    const normalizedNames = names.map((name) => name.trim());
+    if (normalizedNames.some((name) => !name || !WHEEL_NAME_PATTERN.test(name))) {
+        throw new AppError("Wheel names must contain only letters, numbers, or apostrophes", 400);
+    }
+    return normalizedNames;
 }
 
 export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoomResponseBody> {
@@ -85,8 +105,8 @@ export async function leaveRoom(userId: string, roomKey: string): Promise<void> 
 
 export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<SpinRandomResponseBody> {
     const room = await getRoomByKey(roomKey);
-    if (!room) throw new AppError("Room not found", 404);
-    if (room.host_id !== userId) throw new AppError("Only the host may spin", 403);
+    requireRoomHost(room, userId, "spin");
+    if (direction !== "left" && direction !== "right") throw new AppError("Invalid spin direction", 400);
 
     const { ranNum, spinToken } = await generateSpin(userId);
     const spunAt = new Date().toISOString();
@@ -97,22 +117,20 @@ export async function spinRoom(userId: string, roomKey: string, direction: strin
 
 export async function setRoomNames(userId: string, roomKey: string, names: string[]): Promise<void> {
     const room = await getRoomByKey(roomKey);
-    if (!room) throw new AppError("Room not found", 404);
-    if (room.host_id !== userId) throw new AppError("Only the host may update wheel items", 403);
-    await updateRoomNames(roomKey, names);
+    requireRoomHost(room, userId, "update wheel items");
+    await updateRoomNames(roomKey, validateRoomNames(names));
 }
 
 export async function resetRoom(userId: string, roomKey: string, closeWinnerModal: boolean): Promise<void> {
     const room = await getRoomByKey(roomKey);
-    if (!room) throw new AppError("Room not found", 404);
-    if (room.host_id !== userId) throw new AppError("Only the host may reset", 403);
+    requireRoomHost(room, userId, "reset");
     await updateRoomReset(roomKey, closeWinnerModal);
 }
 
 export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {
     const room = await getRoomByKey(roomKey);
-    if (!room) throw new AppError("Room not found", 404);
-    if (room.host_id !== userId) throw new AppError("Only the host may change the multiplier", 403);
+    requireRoomHost(room, userId, "change the multiplier");
+    if (!Number.isFinite(multiplier)) throw new AppError("Invalid multiplier", 400);
     const clamped = Math.min(2, Math.max(1, multiplier));
     await updateRoomMultiplier(roomKey, clamped);
 }

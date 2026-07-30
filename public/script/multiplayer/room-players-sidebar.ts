@@ -1,7 +1,7 @@
 import { optionalElement } from "../shared/dom-helpers";
 import { getNamesInWheelList, addBtn, input } from "../names/names-in-wheel-list";
 import { applyDisabledStyle } from "../wheel/spin";
-import { activeRoomHostName, activeRoomNamesInWheelList, getMissingPlayers } from "./room-state";
+import { activeRoomHostName, activeRoomNamesInWheelList, getMissingPlayers, isMultiplayerActive } from "./room-state";
 import { getCurrentMode } from "./game-mode-strategy";
 import { t } from "../app/i18n";
 
@@ -71,13 +71,31 @@ export const bulkAddToWheelBtn = optionalElement<HTMLButtonElement>("room-bulk-a
 
 export function setHostControlsVisibility(): void {
   const host: boolean = getCurrentMode().isHost();
+  const guestInRoom = isMultiplayerActive() && !host;
+
+  // Host-only-Controls werden für Gäste vollständig aus dem sichtbaren und
+  // fokussierbaren Bereich genommen. Die serverseitige Host-Prüfung bleibt
+  // dabei die verbindliche Sicherheitsgrenze.
+  [
+    "spin-left-btn",
+    "spin-right-btn",
+    "reset-btn",
+    "name-sidebar-add-row",
+    "name-centered-input",
+  ].forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.hidden = guestInRoom;
+      element.classList.toggle('hidden', guestInRoom);
+    }
+  });
 
   if (bulkAddToWheelBtn) {
     bulkAddToWheelBtn.classList.toggle('hidden', !host);
   }
 
   [input, addBtn].forEach((element) => {
-    if (element) applyDisabledStyle(element, !host);
+    if (element) applyDisabledStyle(element, guestInRoom);
   });
 }
 

@@ -69,17 +69,20 @@ function createNamesinWheelListElement(name: string, index: number): HTMLLIEleme
   span.className = "names-in-wheel-list-element__text";
   span.textContent = name;
 
-  const btn = document.createElement("button");
-  btn.className = "names-in-wheel-list-element__remove-btn";
-  btn.type = "button";
-  btn.textContent = "-";
-  btn.setAttribute("aria-label", t("a11y.removeName"));
-  btn.addEventListener("click", async () => {
-    await handleRemoveNameElementFromWheelList(index, li);
-  });
-
   li.appendChild(span);
-  li.appendChild(btn);
+  // Gäste erhalten keinen Entfernen-Button im DOM. So ist die Liste nicht
+  // nur gesperrt, sondern enthält für sie keine nicht verfügbaren Aktionen.
+  if (!roomLocked || getCurrentMode().isHost()) {
+    const btn = document.createElement("button");
+    btn.className = "names-in-wheel-list-element__remove-btn";
+    btn.type = "button";
+    btn.textContent = "-";
+    btn.setAttribute("aria-label", t("a11y.removeName"));
+    btn.addEventListener("click", async () => {
+      await handleRemoveNameElementFromWheelList(index, li);
+    });
+    li.appendChild(btn);
+  }
   return li;
 }
 
@@ -108,6 +111,10 @@ function updateSpinButtonState(): void {
 
 export function syncRemoveButtons(): void {
   const buttons = list.querySelectorAll(".names-in-wheel-list-element__remove-btn") as NodeListOf<HTMLButtonElement>;
+  if (roomLocked && !getCurrentMode().isHost()) {
+    buttons.forEach((btn) => btn.remove());
+    return;
+  }
   const disabled = roomLocked && disableRemoveWhileLocked;
   buttons.forEach((btn) => applyDisabledStyle(btn, disabled));
 }

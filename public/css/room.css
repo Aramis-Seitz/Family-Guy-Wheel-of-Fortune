@@ -219,7 +219,8 @@
   font-size: 1rem;
   font-weight: bold;
   letter-spacing: 0.2em;
-  background: var(--surface-soft);
+  background: #d1d5db;
+  color: #111;
   padding: 2px 8px;
   border-radius: 100px;
 }
@@ -247,11 +248,11 @@
 #room-players-list li {
   font-size: 0.85rem;
   padding: 4px 10px;
-  background: var(--surface-soft);
+  background: #d1d5db;
   border-radius: 100px;
   position: relative;
   text-align: center;
-  color: var(--text);
+  color: #111;
 }
 
 .room__host-tag {

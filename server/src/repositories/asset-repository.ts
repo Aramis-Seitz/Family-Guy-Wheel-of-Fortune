@@ -1,140 +1,19 @@
-import { supabaseClient } from "../lib/supabase-client";
-import { AppError } from "../lib/errors";
-import type { Asset } from "shared";
+import * as real from "./asset-repository.real";
+import * as mock from "./asset-repository.mock";
 
-export async function listAssets(): Promise<Asset[]> {
-    const { data, error } = await supabaseClient
-        .from("asset")
-        .select("id, name, category, price_coins, asset_url")
-        .order("name");
+const USE_MOCK = process.env.USE_MOCK === "true";
+const impl = USE_MOCK ? mock : real;
 
-    if (error) throw error;
-    return (data ?? []) as Asset[];
-}
+export const listAssets = impl.listAssets;
+export const getAssetById = impl.getAssetById;
+export const listOwnedAssets = impl.listOwnedAssets;
+export const listSelectedAssetIds = impl.listSelectedAssetIds;
+export const listAssetCategories = impl.listAssetCategories;
+export const userOwnsAsset = impl.userOwnsAsset;
+export const createAssetOwnership = impl.createAssetOwnership;
+export const userSelectedAsset = impl.userSelectedAsset;
+export const assignDefaultAssets = impl.assignDefaultAssets;
+export const createAssetSelection = impl.createAssetSelection;
 
-export async function getAssetById(assetId: string): Promise<Asset | null> {
-    const { data, error } = await supabaseClient
-        .from("asset")
-        .select("id, name, category, price_coins, asset_url")
-        .eq("id", assetId)
-        .single();
-
-    if (error) {
-        if (error.code === "PGRST116") return null;
-        throw error;
-    }
-
-    return (data ?? null) as Asset | null;
-}
-
-type AssetOwnershipRow = {
-    asset?: Asset | Asset[] | null;
-};
-
-export async function listOwnedAssets(userId: string): Promise<Asset[]> {
-    const { data, error } = await supabaseClient
-        .from("asset_ownership")
-        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
-        .eq("user_id", userId);
-
-    if (error) throw error;
-
-    const rows = (data ?? []) as AssetOwnershipRow[];
-    return rows
-        .map((row) => row.asset)
-        .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
-}
-
-type AssetSelectionRow = {
-    asset?: Asset | Asset[] | null;
-};
-
-export async function listSelectedAssets(userId: string): Promise<Asset[]> {
-    const { data, error } = await supabaseClient
-        .from("asset_selection")
-        .select("asset:asset_selection_asset_category_fk(id, name, category, price_coins, asset_url)")
-        .eq("user_id", userId);
-
-    if (error) throw error;
-
-    const rows = (data ?? []) as AssetSelectionRow[];
-    return rows
-        .map((row) => row.asset)
-        .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
-}
-
-export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {
-    const { data, error } = await supabaseClient
-        .from("asset_ownership")
-        .select("asset_id")
-        .eq("user_id", userId)
-        .eq("asset_id", assetId)
-        .single();
-    return !error && !!data;
-}
-
-export async function createAssetOwnership(userId: string, assetId: string): Promise<void> {
-    const { error } = await supabaseClient
-        .from("asset_ownership")
-        .insert({ user_id: userId, asset_id: assetId });
-
-    if (error) throw error;
-}
-
-export async function userSelectedAsset(userId: string, assetId: string): Promise<boolean> {
-    const { data, error } = await supabaseClient
-        .from("asset_selection")
-        .select("asset_id")
-        .eq("user_id", userId)
-        .eq("asset_id", assetId)
-        .single();
-    return !error && !!data;
-}
-
-export async function assignDefaultAssets(userId: string): Promise<void> {
-    const { data: assets, error: assetsError } = await supabaseClient
-        .from("asset")
-        .select("id, category")
-        .in("name", ["Peter Laugh", "Quagmire"]);
-
-    if (assetsError) throw assetsError;
-    if (!assets || assets.length === 0) throw new AppError("Default-Assets nicht gefunden", 500);
-
-    const ownershipRows = assets.map((a) => ({ user_id: userId, asset_id: a.id }));
-    const { error: ownershipError } = await supabaseClient
-        .from("asset_ownership")
-        .upsert(ownershipRows, { onConflict: "user_id,asset_id", ignoreDuplicates: true });
-    if (ownershipError) throw ownershipError;
-
-    const selectionRows = assets.map((a) => ({ user_id: userId, asset_id: a.id, category: a.category }));
-    const { error: selectionError } = await supabaseClient
-        .from("asset_selection")
-        .upsert(selectionRows, { onConflict: "user_id,category", ignoreDuplicates: true });
-    if (selectionError) throw selectionError;
-}
-
-export async function createAssetSelection(userId: string, assetId: string): Promise<void> {
-    const asset = await getAssetById(assetId);
-
-    if (!asset) throw new AppError("Asset konnte nicht gefunden werden", 404);
-
-    const { error } = await supabaseClient
-        .from('asset_selection')
-        .upsert(
-            {
-                user_id: userId,
-                asset_id: assetId,
-                category: asset.category,
-            },
-            {
-                onConflict: 'user_id,category'
-            }
-        );
-
-    if (error) {
-        console.error('Upsert error:', error);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
-        throw new AppError(`Asset konnte nicht erfolgreich ausgewählt werden: ${error.message}`, 500);
-    }
-}
+export { AssetCategorySchema } from "./asset-repository.shared";
+export type { AssetCategory } from "./asset-repository.shared";

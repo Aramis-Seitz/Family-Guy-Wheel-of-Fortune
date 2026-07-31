@@ -1,10 +1,6 @@
-import { z } from "zod";
 import { supabaseClient } from "../lib/supabase-client";
 import { AppError } from "../lib/errors";
 import type { Asset } from "shared";
-
-export const AssetCategorySchema = z.enum(["sound", "companion"]);
-export type AssetCategory = z.infer<typeof AssetCategorySchema>;
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient
@@ -57,16 +53,6 @@ export async function listSelectedAssetIds(userId: string): Promise<string[]> {
 
     if (error) throw error;
     return (data ?? []).map((row) => row.asset_id as string);
-}
-
-export async function listAssetCategories(): Promise<AssetCategory[]> {
-    const { data, error } = await supabaseClient
-        .from("asset")
-        .select("category");
-
-    if (error) throw error;
-
-    return [...new Set((data ?? []).map((row) => row.category as AssetCategory))];
 }
 
 export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {

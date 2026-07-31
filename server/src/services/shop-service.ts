@@ -3,13 +3,11 @@ import {
     getAssetById,
     listAssets,
     listSelectedAssetIds,
-    listAssetCategories,
     userOwnsAsset
 } from "../repositories/asset-repository";
 import { getCoinsByUserId, updateCoinsByUserId } from "../repositories/profile-repository";
 import { AppError } from "../lib/errors";
 import type { Asset, PurchaseResponseBody } from "shared";
-import type { AssetCategory } from "../repositories/asset-repository";
 
 export async function getAssets(): Promise<Asset[]> {
     return listAssets();
@@ -49,8 +47,4 @@ export async function purchaseAsset(userId: string, assetId: string): Promise<Pu
         coins: remainingCoins,
         assetId
     };
-}
-
-export async function getAssetCategories(): Promise<AssetCategory[]> {
-    return listAssetCategories();
 }

@@ -23,7 +23,7 @@ export async function getOwnedAssets(): Promise<Asset[]> {
 export async function getSelectedAssets(): Promise<Asset[]> {
     const userId = await getCurrentUserId();
     const rawBody = await getJson(`/api/users/${userId}/inventory/selected-assets`, {
-        errorFallbackKey: "api.inventory.loadAssetIdsFailed"
+        errorFallbackKey: "api.inventory.loadSelectedAssetsFailed"
     });
     const body = AssetsResponseSchema.parse(rawBody);
     return body.assets;

@@ -18,7 +18,7 @@
         "generic": "Something went wrong. Please try again.",
         "inventory": {
             "loadAssetsFailed": "Could not load assets.",
-            "loadAssetIdsFailed": "Could not load selected assets.",
+            "loadSelectedAssetsFailed": "Could not load selected assets.",
             "selectAssetFailed": "Could not select asset.",
             "deleteWheelFailed": "Could not delete wheel.",
             "loadWheelsFailed": "Could not load saved wheels.",

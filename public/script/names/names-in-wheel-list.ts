@@ -4,7 +4,7 @@ import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { requiredElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
 import { validateName } from "../shared/validation";
-import { generateWheel, getSegmentColor } from "../wheel/renderer";
+import { generateWheel, getSegmentColor, getSegmentTextColor } from "../wheel/renderer";
 import {
   clearNameInputError,
   initNameInputValidation,
@@ -64,6 +64,7 @@ function createNamesinWheelListElement(name: string, index: number): HTMLLIEleme
   const li = document.createElement("li");
   li.className = "names-in-wheel-list-element";
   li.style.backgroundColor = getSegmentColor(index);
+  li.style.color = getSegmentTextColor(index);
 
   const span = document.createElement("span");
   span.className = "names-in-wheel-list-element__text";

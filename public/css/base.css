@@ -1,4 +1,6 @@
 :root {
+    color-scheme: light;
+
     --space-2: 0.5rem;
     --space-3: 0.75rem;
     --space-4: 1rem;
@@ -6,46 +8,94 @@
     --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
     --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
-    --color-text-muted: #6b7280;
-    --color-error: #f87171;
 
-    --bg: #ffffff;
-    --surface: #f8fafc;
-    --surface-soft: #eef2ff;
-    --text: #111827;
-    --muted: #6b7280;
-    --border: #d1d5db;
-    --primary: #00a2ff;
-    --accent: #ffb800;
-    --inverse-text: #f9fafb;
-    --inverse-surface: #111827;
-    --inverse-border: #334155;
+    /* Light theme: the only source of fixed application colors. */
+    --background: #F9F6ED;
+    --text: #2E2E2E;
+    --button-bg: #2E2E2E;
+    --button-text: #F9F6ED;
+    --input-bg: #F1F1F1;
+    --input-text: #2E2E2E;
+    --input-placeholder: #979797;
+    --surface: #FFFFFF;
+    --surface-text: #2E2E2E;
+    --auth-bg: #FFFFFF;
+    --auth-text: #2E2E2E;
+    --login-container-bg: var(--auth-bg);
 
-    --login-surface: #161618;
-    --login-text: #f0f0f0;
-    --user-area-bg: #2d2d2d;
-    --user-area-border: #444;
-    --room-console-bg: #2d2d2d;
-    --room-console-text: #f8fafc;
-    --room-panel-title: #ffffff;
+    /* Central utility colors and semantic aliases. */
+    --transparent: transparent;
+    --backdrop: rgba(0, 0, 0, 0.5);
+    --backdrop-strong: rgba(0, 0, 0, 0.75);
+    --shadow-soft: rgba(0, 0, 0, 0.12);
+    --shadow-medium: rgba(0, 0, 0, 0.16);
+    --shadow-strong: rgba(0, 0, 0, 0.25);
+    --bg: var(--background);
+    --border: var(--input-placeholder);
+    --muted: var(--text);
+    --surface-muted: var(--surface-text);
+    --focus-ring: var(--text);
+    --surface-focus-ring: var(--surface-text);
+    --input-focus-ring: var(--input-text);
+    --color-text-muted: var(--text);
+    --color-error: var(--text);
+    --surface-soft: var(--input-bg);
+    --primary: var(--button-bg);
+    --accent: var(--button-bg);
+    --login-surface: var(--auth-bg);
+    --login-text: var(--auth-text);
+    --user-area-bg: var(--auth-bg);
+    --user-area-text: var(--auth-text);
+    --user-area-border: var(--border);
+    --room-console-bg: var(--surface);
+    --room-console-text: var(--surface-text);
+    --room-panel-title: var(--surface-text);
+
+    /* Wheel and confetti colors remain centralized and preserve contrast. */
+    --wheel-segment-1: var(--surface);
+    --wheel-segment-text-1: var(--surface-text);
+    --wheel-segment-2: var(--input-bg);
+    --wheel-segment-text-2: var(--input-text);
+    --wheel-segment-3: var(--button-bg);
+    --wheel-segment-text-3: var(--button-text);
+    --wheel-segment-4: var(--background);
+    --wheel-segment-text-4: var(--text);
+    --wheel-segment-5: var(--surface);
+    --wheel-segment-text-5: var(--surface-text);
+    --wheel-segment-6: var(--input-bg);
+    --wheel-segment-text-6: var(--input-text);
+    --wheel-segment-7: var(--button-bg);
+    --wheel-segment-text-7: var(--button-text);
+    --wheel-segment-8: var(--background);
+    --wheel-segment-text-8: var(--text);
+    --wheel-segment-9: var(--surface);
+    --wheel-segment-text-9: var(--surface-text);
+    --wheel-segment-10: var(--input-bg);
+    --wheel-segment-text-10: var(--input-text);
+    --wheel-segment-11: var(--button-bg);
+    --wheel-segment-text-11: var(--button-text);
+    --wheel-segment-12: var(--background);
+    --wheel-segment-text-12: var(--text);
+    --wheel-segment-13: var(--surface);
+    --wheel-segment-text-13: var(--surface-text);
+    --wheel-stroke: var(--border);
 }
 
 [data-theme="dark"] {
-    --bg: #000000;
-    --surface: #111827;
-    --surface-soft: #1e293b;
-    --text: #f8fafc;
-    --muted: #94a3b8;
-    --border: #334155;
-    --primary: #38bdf8;
-    --accent: #fbbf24;
-    --inverse-text: #111827;
-    --inverse-surface: #f8fafc;
-    --inverse-border: #d1d5db;
-
-    --room-console-bg: #ffffff;
-    --room-console-text: #111827;
-    --room-panel-title: #000000;
+    color-scheme: dark;
+    --background: #000000;
+    --text: #F9F6ED;
+    --button-bg: #979797;
+    --button-text: #000000;
+    --input-bg: #91908A;
+    --input-text: #000000;
+    --input-placeholder: #242322;
+    --surface: #F9F6ED;
+    --surface-text: #2E2E2E;
+    --auth-bg: #161618;
+    --auth-text: #FFFFFF;
+    --login-container-bg: #333333;
+    --border: var(--button-bg);
 }
 
 *,
@@ -57,7 +107,7 @@
 }
 
 body {
-    background: var(--bg);
+    background: var(--background);
     color: var(--text);
     text-align: center;
     font-family: 'Segoe UI', sans-serif;
@@ -70,7 +120,83 @@ input,
 textarea,
 select {
     font: inherit;
-    color: inherit;
+}
+
+button {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border-color: var(--button-bg);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+    background: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--input-placeholder);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--input-placeholder);
+    opacity: 1;
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+    accent-color: var(--button-bg);
+}
+
+a {
+    color: currentColor;
+}
+
+button:hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+
+button:active:not(:disabled) {
+    filter: brightness(0.9);
+}
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled,
+[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+button:focus-visible {
+    outline: 3px solid var(--button-bg);
+    outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    border-color: var(--input-focus-ring);
+    outline: 2px solid var(--input-focus-ring);
+    outline-offset: 2px;
+}
+
+a:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+
+button svg {
+    color: currentColor;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+::selection {
+    background: var(--button-bg);
+    color: var(--button-text);
 }
 
 .hidden {

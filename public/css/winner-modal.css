@@ -1,7 +1,7 @@
 .winner-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
+    background: var(--backdrop-strong);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9,13 +9,13 @@
 }
 
 .winner-modal__content {
-    background: linear-gradient(135deg, #ffffff, #f5f5f5);
-    color: black;
+    background: var(--surface);
+    color: var(--surface-text);
     padding: 40px;
     border-radius: 16px;
     text-align: center;
     min-width: 280px;
-    box-shadow: 0 0 30px rgba(255, 184, 0, 0.6);
+    box-shadow: 0 20px 60px var(--shadow-strong);
     animation: popIn 0.4s ease;
 }
 
@@ -30,7 +30,8 @@
 }
 
 #winner-modal-remove-btn {
-    background: #ff0000;
+    background: var(--button-bg);
+    color: var(--button-text);
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -38,10 +39,13 @@
     cursor: pointer;
 }
 
-#winner-modal-remove-btn:hover { background: #c90000; }
+#winner-modal-remove-btn:hover {
+    filter: brightness(1.12);
+}
 
 #winner-modal-close-btn {
-    background: #ffb800;
+    background: var(--button-bg);
+    color: var(--button-text);
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -49,7 +53,9 @@
     cursor: pointer;
 }
 
-#winner-modal-close-btn:hover { background: #ffa500; }
+#winner-modal-close-btn:hover {
+    filter: brightness(1.12);
+}
 
 #winner-modal-confetti-canvas {
     position: fixed;
@@ -59,6 +65,13 @@
 }
 
 @keyframes popIn {
-    from { transform: scale(0.7); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

@@ -44,6 +44,7 @@ function updateThemeToggleButton(theme: Theme): void {
 }
 
 function applyTheme(theme: Theme): void {
+  document.documentElement.setAttribute("data-theme", theme);
   document.body.setAttribute("data-theme", theme);
   updateThemeToggleButton(theme);
 }

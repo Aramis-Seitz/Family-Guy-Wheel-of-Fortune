@@ -1,6 +1,6 @@
 .spin__btn {
-    background-color: #ffb800;
-    color: black;
+    background-color: var(--button-bg);
+    color: var(--button-text);
     font-weight: bold;
     font-size: 1.2rem;
     padding: 15px;
@@ -9,12 +9,17 @@
     cursor: pointer;
 }
 
-.spin__btn:hover { background-color: #ffa500; }
-.spin__btn:active { background-color: #e59400; }
+.spin__btn:hover {
+    filter: brightness(1.12);
+}
+
+.spin__btn:active {
+    filter: brightness(0.9);
+}
 
 #reset-btn {
-    background-color: #888;
-    color: white;
+    background-color: var(--button-bg);
+    color: var(--button-text);
     font-weight: bold;
     font-size: 1.2rem;
     padding: 15px;
@@ -23,5 +28,10 @@
     cursor: pointer;
 }
 
-#reset-btn:hover { background-color: #777; }
-#reset-btn:active { background-color: #666; }
+#reset-btn:hover {
+    filter: brightness(1.12);
+}
+
+#reset-btn:active {
+    filter: brightness(0.9);
+}

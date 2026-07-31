@@ -10,35 +10,34 @@
 
 .shop-modal__tab,
 .inventory-modal__tab {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--input-bg);
+    border: 1px solid var(--input-placeholder);
     border-radius: 8px;
-    color: #aaa;
+    color: var(--input-text);
     font-size: 13px;
     font-weight: 600;
     padding: 10px 16px;
     cursor: pointer;
-    transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+    transition: filter 150ms ease, opacity 150ms ease;
 }
 
 .shop-modal__tab:hover,
 .inventory-modal__tab:hover {
-    color: #ffffff;
-    background: rgba(0, 162, 255, 0.1);
-    border-color: rgba(0, 162, 255, 0.3);
+    filter: brightness(0.94);
 }
 
 .shop-modal__tab--active,
 .inventory-modal__tab--active {
-    background: rgba(0, 162, 255, 0.1);
-    border-color: rgba(0, 162, 255, 0.3);
+    background: var(--button-bg);
+    border-color: var(--button-bg);
+    color: var(--button-text);
 }
 
 .shop-modal__divider,
 .inventory-modal__divider {
     border: none;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--border);
     margin: 1rem 0;
 }
 
@@ -50,7 +49,7 @@
     height: calc(2 * 275px + 1 * 32px);
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 162, 255, 0.18) transparent;
+    scrollbar-color: var(--border) var(--transparent);
 }
 
 .shop-modal__asset-card,
@@ -60,7 +59,8 @@
     height: 275px;
     width: 100%;
     border-radius: 14px;
-    background: rgba(0, 162, 255, 0.18);
+    background: var(--input-bg);
+    color: var(--input-text);
     padding: 10%;
 }
 
@@ -76,8 +76,8 @@
     width: 120px;
     height: 120px;
 
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--surface);
+    border: 1px solid var(--input-placeholder);
     border-radius: 8px;
 }
 
@@ -126,20 +126,20 @@
     height: 35px;
     width: 35px;
     border: none;
-    background: rgba(0, 162, 255, 0.5);
-    color: white;
+    background: var(--button-bg);
+    color: var(--button-text);
     align-content: center;
     cursor: pointer;
 }
 
 .shop-modal__preview-btn:hover,
 .inventory-modal__preview-btn:hover {
-    background: rgba(0, 162, 255, 0.7);
+    filter: brightness(1.12);
 }
 
 .shop-modal__preview-btn:active,
 .inventory-modal__preview-btn:active {
-    background: rgba(0, 162, 255, 0.9);
+    filter: brightness(0.9);
 }
 
 /* Shop "kaufen" und Inventory "auswählen" sind fachlich unterschiedliche Aktionen,
@@ -147,27 +147,25 @@
    (owned/too-expensive/selected) bleiben in shop.css bzw. inventory.css. */
 .shop-modal__buy-btn,
 .inventory-modal__select-btn {
-    background: rgba(0, 162, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--button-bg);
+    border: 1px solid var(--button-bg);
     border-radius: 8px;
-    color: #ffffff;
+    color: var(--button-text);
     font-size: 16px;
     font-weight: 600;
     padding: 8px 16px;
     cursor: pointer;
     width: 100%;
-    transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+    transition: filter 150ms ease, opacity 150ms ease;
     align-self: flex-end;
 }
 
 .shop-modal__buy-btn:hover,
 .inventory-modal__select-btn:hover {
-    background: rgba(0, 162, 255, 0.7);
-    border-color: rgba(0, 162, 255, 0.5);
+    filter: brightness(1.12);
 }
 
 .shop-modal__buy-btn:active,
 .inventory-modal__select-btn:active {
-    background: rgba(0, 162, 255, 0.9);
-    border-color: rgba(0, 162, 255, 0.7);
+    filter: brightness(0.9);
 }

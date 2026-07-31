@@ -1,7 +1,7 @@
 #room-panel {
   position: fixed;
-  top: 270px;      
-  left: 20px;      
+  top: 270px;
+  left: 20px;
   z-index: 9000;
   background: var(--room-console-bg);
   color: var(--room-console-text);
@@ -10,7 +10,7 @@
   border-radius: 16px;
   min-width: 210px;
   font-family: inherit;
-  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  box-shadow: 0 4px 16px var(--shadow-soft);
 }
 
 #room-panel h3 {
@@ -44,12 +44,12 @@
   letter-spacing: 0.15em;
   transition: border-color var(--transition);
   outline: none;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--input-bg);
+  color: var(--input-text);
 }
 
 #room-key-input:focus {
-  border-color: var(--primary);
+  border-color: var(--input-focus-ring);
 }
 
 .room__btn {
@@ -73,75 +73,73 @@
 }
 
 #room-create-btn {
-  background: #ffb800;
-  color: black;
+  background: var(--button-bg);
+  color: var(--button-text);
 }
 
 #room-create-btn:hover {
-  background: #ffa500;
+  filter: brightness(1.12);
 }
 
 #room-join-btn {
-  background: #00a2ff;
-  color: black;
+  background: var(--button-bg);
+  color: var(--button-text);
 }
 
 #room-join-btn:hover {
-  background: #0090e0;
+  filter: brightness(1.12);
 }
 
 #room-leave-btn {
-  background: var(--surface-soft);
-  color: var(--text);
+  background: var(--button-bg);
+  color: var(--button-text);
   font-size: 0.78rem;
   padding: 5px 10px;
 }
 
 #room-leave-btn:hover {
-  background: var(--surface);
+  filter: brightness(1.12);
 }
 
 .room__btn--copy {
   padding: 5px 8px;
   font-size: 0.85rem;
-  background: #f0f0f0;
-  color: #333;
+  background: var(--button-bg);
+  color: var(--button-text);
   line-height: 1;
 }
 
 .room__btn--copy:hover {
-  background: #ddd;
+  filter: brightness(1.12);
 }
 
 .room__btn--copy.room__btn--copied {
-  background: #d4edda;
-  color: #155724;
+  box-shadow: inset 0 0 0 2px currentColor;
 }
 
 #room-info {
   margin-top: 10px;
-  border-top: 1.5px solid #f0f0f0;
+  border-top: 1.5px solid var(--border);
   padding-top: 10px;
 }
 
 #room-bulk-add-btn {
   margin-top: 10px;
   width: 100%;
-  background: #1c1c1e;
-  /* Fancy Apple-Grey */
-  color: white;
+  background: var(--button-bg);
+  color: var(--button-text);
   font-size: 0.85rem;
   border-radius: 100px;
   padding: 8px 12px;
 }
 
 #room-bulk-add-btn:hover {
-  background: #2c2c2e;
+  filter: brightness(1.12);
 }
 
 /* Bulk remove variant (when all players present) */
 #room-bulk-add-btn.room__btn--remove {
-  background: #111;
+  box-shadow: inset 0 0 0 2px currentColor;
 }
 
 /* Player toggle button styling */
@@ -150,8 +148,8 @@
   padding: 4px 8px;
   border-radius: 999px;
   border: none;
-  background: #f0f0f0;
-  color: #111;
+  background: var(--button-bg);
+  color: var(--button-text);
   font-weight: bold;
   cursor: pointer;
   min-width: 36px;
@@ -163,8 +161,7 @@
 }
 
 .room__player-toggle-btn--added {
-  background: #111;
-  color: white;
+  box-shadow: inset 0 0 0 2px currentColor;
 }
 
 .room__player-toggle-btn:active {
@@ -184,7 +181,7 @@
 }
 
 .name-centered-input .names-in-wheel-list__add-row {
-  background: transparent;
+  background: var(--transparent);
   box-shadow: none;
 }
 
@@ -210,7 +207,7 @@
 
 .room__key-label {
   font-size: 0.78rem;
-  color: #666;
+  color: var(--surface-text);
   flex-shrink: 0;
 }
 
@@ -219,15 +216,15 @@
   font-size: 1rem;
   font-weight: bold;
   letter-spacing: 0.2em;
-  background: #d1d5db;
-  color: #111;
+  background: var(--input-bg);
+  color: var(--input-text);
   padding: 2px 8px;
   border-radius: 100px;
 }
 
 .room__players-label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--surface-text);
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -248,23 +245,21 @@
 #room-players-list li {
   font-size: 0.85rem;
   padding: 4px 10px;
-  background: #d1d5db;
+  background: var(--input-bg);
   border-radius: 100px;
   position: relative;
   text-align: center;
-  color: #111;
+  color: var(--input-text);
 }
 
 .room__host-tag {
   font-size: 0.85rem;
-  border: 1.5px solid rgba(0, 0, 0, 0.4);
+  border: 1.5px solid currentColor;
   padding: 1px 6px;
   border-radius: 100px;
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--input-text);
 }
-
-

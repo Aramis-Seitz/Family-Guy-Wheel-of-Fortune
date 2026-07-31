@@ -8,6 +8,7 @@ import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import type { SpinConfig } from "./spin";
 import { t } from "../app/i18n";
+import { SEGMENT_COLORS, getResolvedSegmentColor } from "./renderer";
 
 export const POINTER_OFFSET_DEG: number = 270;
 export const FULL_CIRCLE_DEG: number = 360;
@@ -46,6 +47,7 @@ function startConfetti(): void {
 
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
+  const confettiColors = SEGMENT_COLORS.map((_, index) => getResolvedSegmentColor(index));
 
   const pieces = Array.from({ length: 999 }, () => ({
     x: Math.random() * confettiCanvas.width,
@@ -54,7 +56,7 @@ function startConfetti(): void {
     speed: Math.random() * 20 + 2,
     angle: Math.random() * Math.PI * 2,
     spin: Math.random() * 0.1 - 0.05,
-    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+    color: confettiColors[Math.floor(Math.random() * confettiColors.length)]
   }));
 
   let running = true;

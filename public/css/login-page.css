@@ -2,8 +2,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--auth-bg);
+    color: var(--auth-text);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,13 +23,17 @@ main {
 }
 
 .auth-widget__form {
-    background: var(--login-surface);
-    color: var(--login-text);
+    background: var(--auth-bg);
+    color: var(--auth-text);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 10px var(--shadow-soft);
     width: 320px;
     box-sizing: border-box;
+}
+
+.auth-widget__form--login {
+    background: var(--login-container-bg);
 }
 
 .auth-widget__form h2 {
@@ -52,10 +56,10 @@ main {
 #login-form input,
 #signup-form input {
     padding: 10px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--input-placeholder);
     border-radius: 8px;
-    background: #8e8e8e !important;
-    color: #111 !important;
+    background: var(--input-bg) !important;
+    color: var(--input-text) !important;
     font-size: 14px;
 }
 
@@ -63,7 +67,7 @@ main {
 #login-form input:focus,
 #signup-form input:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: var(--input-focus-ring);
 }
 
 .auth-widget__forget-link {
@@ -82,27 +86,27 @@ main {
 }
 
 .auth-widget__forget-link a {
-    color: #bbb;
+    color: currentColor;
     text-decoration: none;
 }
 
 .auth-widget__forget-link a:hover {
-    text-decoration: underline;
+    opacity: 0.75;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--button-bg);
+    border: 1px solid var(--button-bg);
     border-radius: 8px;
-    color: var(--text);
+    color: var(--button-text);
     font-size: 16px;
     cursor: pointer;
 }
 
 button:hover {
-    background: var(--surface-soft);
+    filter: brightness(1.12);
 }
 
 .auth-widget__register-link {
@@ -115,9 +119,10 @@ button:hover {
     display: none;
 }
 
-#auth-widget-toggle:checked ~ main .auth-widget__form--login {
+#auth-widget-toggle:checked~main .auth-widget__form--login {
     display: none;
 }
-#auth-widget-toggle:not(:checked) ~ main .auth-widget__form--signup {
+
+#auth-widget-toggle:not(:checked)~main .auth-widget__form--signup {
     display: none;
 }

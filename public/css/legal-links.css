@@ -8,19 +8,20 @@
     z-index: 9999;
 }
 
-.legal-links__link--imprint, .legal-links__link--privacy {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.6);
+.legal-links__link--imprint,
+.legal-links__link--privacy {
+    background: var(--button-bg);
+    border: 1px solid var(--button-bg);
+    color: var(--button-text);
     padding: 6px 14px;
     border-radius: 4px;
     font-size: 0.75rem;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: filter var(--transition), opacity var(--transition);
 }
 
-.legal-links__link--imprint:hover, .legal-links__link--privacy:hover {
-    border-color: rgba(255,255,255,0.8);
-    color: white;
+.legal-links__link--imprint:hover,
+.legal-links__link--privacy:hover {
+    filter: brightness(1.12);
 }

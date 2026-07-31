@@ -6,7 +6,7 @@ import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 
 export const handleGenerateSpin = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const result = await generateSpin(req.userId!);
-    res.status(200).json(SpinRandomResponseSchema.parse(result));
+    res.status(201).json(SpinRandomResponseSchema.parse(result));
 });
 
 const AwardCoinsRequestSchema = z.object({

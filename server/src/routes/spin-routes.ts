@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { handleGenerateSpin, handleAwardCoins } from "../controllers/spin-controller";
+import { handleAwardCoins } from "../controllers/spin-controller";
 
 export const spinRoutes = Router();
 
-spinRoutes.post("/random", handleGenerateSpin);
 spinRoutes.post("/award-coins", handleAwardCoins);

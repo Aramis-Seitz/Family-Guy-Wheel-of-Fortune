@@ -11,13 +11,13 @@ export async function fetchRandomNumber(
 ): Promise<SpinRandomResponseBody> {
 
   const rawData = await postJson(
-    "/api/spin/random",
+    "/api/spins",
     { names, currentRotation, direction, multiplier }, {
     errorFallbackKey: "api.spin.randomFailed"
   });
   const data = SpinRandomResponseSchema.parse(rawData);
 
-  console.log("[SPIN] /api/spin/random Daten:", {
+  console.log("[SPIN] /api/spins Daten:", {
     ranNum: data.ranNum,
     spinToken: data.spinToken || "LEER ← Backend-Env-Variablen fehlen wahrscheinlich!",
   });

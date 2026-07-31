@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, setUserCoins, subtractUserCoins } from "../services/user-service";
+import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, addUserCoins, subtractUserCoins } from "../services/user-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
@@ -8,7 +8,7 @@ import {
 } from "shared";
 
 export const handleEnsureDefaultAssets = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    await ensureDefaultAssets(req.userId!);
+    await ensureDefaultAssets(req.params!.userId!);
     res.status(200).json({ ok: true });
 });
 
@@ -31,46 +31,35 @@ export const handleRegisterUser = asyncHandler(async (req: HttpRequest, res: Htt
 });
 
 export const handleGetUserCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const coins = await getUserCoins(req.userId!);
+    const coins = await getUserCoins(req.params!.userId!);
     res.status(200).json(CoinsResponseSchema.parse({ coins }));
 });
 
-const SetCoinsRequestSchema = z.object({
-    coins: z.number(),
-});
+const PatchCoinsRequestSchema = z.union([
+    z.object({ add: z.number() }).strict(),
+    z.object({ subtract: z.number() }).strict(),
+]);
 
-export const handleSetUserCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = SetCoinsRequestSchema.safeParse(req.body);
+export const handlePatchUserCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = PatchCoinsRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "coins is required" });
+        res.status(400).json({ error: "Provide either { add } or { subtract }" });
         return;
     }
 
-    const coins = await setUserCoins(req.userId!, parsedBody.data.coins);
+    const userId = req.params!.userId!;
+    const coins = "add" in parsedBody.data
+        ? await addUserCoins(userId, parsedBody.data.add)
+        : await subtractUserCoins(userId, parsedBody.data.subtract);
     res.status(200).json(CoinsResponseSchema.parse({ coins }));
 });
 
 export const handleUserProfile = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const profile = await getUserProfile(req.userId!);
+    const profile = await getUserProfile(req.params!.userId!);
     if (!profile) {
         res.status(404).json({ error: "Profile not found" });
         return;
     }
 
     res.status(200).json(ProfileResponseSchema.parse({ profile }));
-});
-
-const SubtractCoinsRequestSchema = z.object({
-    amount: z.number(),
-});
-
-export const handleSubtractCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = SubtractCoinsRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "amount is required" });
-        return;
-    }
-
-    const coins = await subtractUserCoins(req.userId!, parsedBody.data.amount);
-    res.status(200).json(CoinsResponseSchema.parse({ coins }));
 });

@@ -1,17 +1,19 @@
-import { getJson, postJson, ApiError } from "./api-helpers";
+import { getJson, patchJson, postJson, getCurrentUserId, ApiError } from "./api-helpers";
 import { CoinsResponseSchema, ProfileResponseSchema } from "shared";
 
 export async function getUserCoins(): Promise<number> {
-    const rawBody = await getJson("/api/user/coins", {
+    const userId = await getCurrentUserId();
+    const rawBody = await getJson(`/api/users/${userId}/coins`, {
         errorFallbackKey: "api.user.loadCoinsFailed"
     });
     return CoinsResponseSchema.parse(rawBody).coins;
 }
 
 export async function getUserProfile(): Promise<{ username: string; coins: number } | null> {
+    const userId = await getCurrentUserId();
     let rawBody: unknown;
     try {
-        rawBody = await getJson("/api/user/profile", {
+        rawBody = await getJson(`/api/users/${userId}`, {
             errorFallbackKey: "api.user.loadProfileFailed"
         });
     } catch (error) {
@@ -23,21 +25,24 @@ export async function getUserProfile(): Promise<{ username: string; coins: numbe
     return body.profile;
 }
 
-export async function setUserCoins(coins: number): Promise<number> {
-    const rawBody = await postJson("/api/user/coins", { coins }, {
-        errorFallbackKey: "api.user.setCoinsFailed"
+export async function addUserCoins(amount: number): Promise<number> {
+    const userId = await getCurrentUserId();
+    const rawBody = await patchJson(`/api/users/${userId}/coins`, { add: amount }, {
+        errorFallbackKey: "api.user.addCoinsFailed"
     });
     return CoinsResponseSchema.parse(rawBody).coins;
 }
 
 export async function ensureDefaultAssets(): Promise<void> {
-    await postJson("/api/user/ensure-defaults", undefined, {
+    const userId = await getCurrentUserId();
+    await postJson(`/api/users/${userId}/inventory/default-assets`, undefined, {
         errorFallbackKey: "api.user.defaultAssetsFailed"
     });
 }
 
 export async function subtractUserCoins(amount: number): Promise<number> {
-    const rawBody = await postJson("/api/user/subtract-coins", { amount }, {
+    const userId = await getCurrentUserId();
+    const rawBody = await patchJson(`/api/users/${userId}/coins`, { subtract: amount }, {
         errorFallbackKey: "api.user.subtractCoinsFailed"
     });
     return CoinsResponseSchema.parse(rawBody).coins;

@@ -154,7 +154,7 @@ if (signupForm) {
                 return;
             }
 
-            const registerResponse = await fetch(apiUrl("/api/user/register"), {
+            const registerResponse = await fetch(apiUrl("/api/users"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,6 +1,7 @@
 import { shopTabs, filterAssetsByCategory, renderCoinBalance, loadCoinBalance, balance } from "./shop";
 import type { AssetCategory } from "./shop";
-import { getOwnedAssetIds, purchaseAsset } from "../api/shop-api";
+import { purchaseAsset } from "../api/shop-api";
+import { getOwnedAssets } from "../api/inventory-api";
 import { showToast } from "../shared/toast";
 import { createAssetCard } from "../shared/asset-card";
 import { getActiveCategory } from "../shared/category-tabs";
@@ -18,7 +19,7 @@ function isAssetOwned(assetId: string): boolean {
 export const shopGrid = requiredElement<HTMLElement>("shop-modal-grid");
 
 export async function loadShopAssets(): Promise<void> {
-    currentOwnedAssetIds = await getOwnedAssetIds();
+    currentOwnedAssetIds = (await getOwnedAssets()).map(asset => asset.id);
     shopGrid.innerHTML = "";
     const activeCategory = getActiveCategory<AssetCategory | "all">(shopTabs, "shop-modal") ?? "all";
     const filteredAssets: Asset[] = filterAssetsByCategory(activeCategory);

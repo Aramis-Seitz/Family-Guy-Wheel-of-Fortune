@@ -13,12 +13,12 @@ import {
 } from "shared";
 
 export const handleGetOwnedAssets = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const assets = await getOwnedAssets(req.userId!);
+    const assets = await getOwnedAssets(req.params!.userId!);
     res.status(200).json(AssetsResponseSchema.parse({ assets }));
 });
 
 export const handleGetSelectedAssetIds = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const assetIds = await getSelectedAssetIds(req.userId!);
+    const assetIds = await getSelectedAssetIds(req.params!.userId!);
     res.status(200).json(AssetIdsResponseSchema.parse({ assetIds }));
 });
 
@@ -33,28 +33,19 @@ export const handleSelectAsset = asyncHandler(async (req: HttpRequest, res: Http
         return;
     }
 
-    const result = await selectAsset(req.userId!, parsedBody.data.assetId);
+    const result = await selectAsset(req.params!.userId!, parsedBody.data.assetId);
 
     res.status(200).json(SelectResponseSchema.parse(result));
 });
 
-const DeleteWheelRequestSchema = z.object({
-    wheelId: z.string().min(1),
-});
-
 export const handleDeleteWheel = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = DeleteWheelRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "id is required" });
-        return;
-    }
-    await deleteWheel(req.userId!, parsedBody.data.wheelId);
+    await deleteWheel(req.params!.userId!, req.params!.wheelId!);
 
     res.status(200).json({ ok: true });
 });
 
 export const handleGetSavedWheels = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const savedWheels = await getSavedWheels(req.userId!);
+    const savedWheels = await getSavedWheels(req.params!.userId!);
     res.status(200).json(SavedWheelResponseSchema.parse({ savedWheels }));
 });
 
@@ -70,7 +61,7 @@ export const handleSaveSavedWheels = asyncHandler(async (req: HttpRequest, res: 
         return;
     }
 
-    await saveSavedWheels(req.userId!, parsedBody.data.title, parsedBody.data.url);
+    await saveSavedWheels(req.params!.userId!, parsedBody.data.title, parsedBody.data.url);
 
     res.status(200).json({ ok: true });
 });

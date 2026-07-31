@@ -16,13 +16,15 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
     return getProfileByUserId(userId);
 }
 
-export async function setUserCoins(userId: string, coins: number): Promise<number> {
-    if (!Number.isFinite(coins) || coins < 0) {
-        throw new AppError("Invalid coins value", 400);
+export async function addUserCoins(userId: string, amount: number): Promise<number> {
+    if (!Number.isFinite(amount) || amount <= 0) {
+        throw new AppError("Invalid amount", 400);
     }
 
-    await updateCoinsByUserId(userId, coins);
-    return coins;
+    const currentCoins = await getCoinsByUserId(userId);
+    const newBalance = currentCoins + amount;
+    await updateCoinsByUserId(userId, newBalance);
+    return newBalance;
 }
 
 export async function registerUser(userId: string, username: string, email: string, dateOfBirth: string): Promise<void> {

@@ -33,7 +33,15 @@ export async function getAccessToken(): Promise<string> {
     return session?.access_token ?? '';
 }
 
-type HttpMethod = 'GET' | 'POST';
+export async function getCurrentUserId(): Promise<string> {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.user.id) {
+        throw new ApiError("Not authenticated", 401);
+    }
+    return session.user.id;
+}
+
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
 type RequestOptions = {
     token?: string;
@@ -72,4 +80,12 @@ export function postJson<T>(path: string, body?: Record<string, unknown>, option
 
 export function getJson<T>(path: string, options: RequestOptions = {}): Promise<T> {
     return request<T>('GET', path, undefined, options);
+}
+
+export function patchJson<T>(path: string, body?: Record<string, unknown>, options: RequestOptions = {}): Promise<T> {
+    return request<T>('PATCH', path, body, options);
+}
+
+export function deleteJson<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    return request<T>('DELETE', path, undefined, options);
 }

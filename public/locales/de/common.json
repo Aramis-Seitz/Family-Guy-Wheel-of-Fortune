@@ -42,7 +42,7 @@
         "user": {
             "loadCoinsFailed": "Coins konnten nicht geladen werden.",
             "loadProfileFailed": "Das Profil konnte nicht geladen werden.",
-            "setCoinsFailed": "Coins konnten nicht aktualisiert werden.",
+            "addCoinsFailed": "Coins konnten nicht aktualisiert werden.",
             "defaultAssetsFailed": "Standard-Assets konnten nicht eingerichtet werden.",
             "subtractCoinsFailed": "Coins konnten nicht abgezogen werden."
         },

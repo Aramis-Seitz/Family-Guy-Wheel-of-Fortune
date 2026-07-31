@@ -1,10 +1,9 @@
 import { z } from "zod";
-import { getAssets, getOwnedAssetIds, getAssetCategories, purchaseAsset } from "../services/shop-service";
+import { getAssets, getAssetCategories, purchaseAsset } from "../services/shop-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
     AssetsResponseSchema,
-    AssetIdsResponseSchema,
     PurchaseResponseSchema,
 } from "shared";
 import { AssetCategorySchema } from "../repositories/asset-repository";
@@ -12,11 +11,6 @@ import { AssetCategorySchema } from "../repositories/asset-repository";
 export const handleGetShopAssets = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const assets = await getAssets();
     res.status(200).json(AssetsResponseSchema.parse({ assets }));
-});
-
-export const handleGetOwnedAssetIds = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const assetIds = await getOwnedAssetIds(req.userId!);
-    res.status(200).json(AssetIdsResponseSchema.parse({ assetIds }));
 });
 
 const AssetCategoriesResponseSchema = z.object({

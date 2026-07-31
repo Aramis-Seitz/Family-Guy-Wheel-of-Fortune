@@ -42,7 +42,7 @@
         "user": {
             "loadCoinsFailed": "Could not load coins.",
             "loadProfileFailed": "Could not load profile.",
-            "setCoinsFailed": "Could not update coins.",
+            "addCoinsFailed": "Could not update coins.",
             "defaultAssetsFailed": "Could not initialize default assets.",
             "subtractCoinsFailed": "Could not subtract coins."
         },

@@ -21,7 +21,7 @@ export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResul
         throw new Error("assetId is required");
     }
 
-    const rawBody = await postJson("/api/shop/purchase", { assetId }, {
+    const rawBody = await postJson("/api/shop/purchases", { assetId }, {
         errorFallbackKey: "api.shop.purchaseFailed"
     });
     const body = PurchaseResponseSchema.parse(rawBody);

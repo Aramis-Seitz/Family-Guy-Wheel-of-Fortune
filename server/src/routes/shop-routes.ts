@@ -9,4 +9,4 @@ export const shopRoutes = Router();
 
 shopRoutes.get("/assets", handleGetShopAssets);
 shopRoutes.get("/categories", handleGetAssetCategories);
-shopRoutes.post("/purchase", handlePurchaseShopAsset);
+shopRoutes.post("/purchases", handlePurchaseShopAsset);

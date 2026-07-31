@@ -34,5 +34,5 @@ export const handlePurchaseShopAsset = asyncHandler(async (req: HttpRequest, res
     }
 
     const result = await purchaseAsset(req.userId!, parsedBody.data.assetId);
-    res.status(200).json(PurchaseResponseSchema.parse(result));
+    res.status(201).json(PurchaseResponseSchema.parse(result));
 });

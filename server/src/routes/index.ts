@@ -11,5 +11,5 @@ apiRoutes.use(requireAuth);
 
 apiRoutes.use("/users", usersRoutes);
 apiRoutes.use("/shop", shopRoutes);
-apiRoutes.use("/room", roomRoutes);
+apiRoutes.use("/rooms", roomRoutes);
 apiRoutes.use("/spin", spinRoutes);

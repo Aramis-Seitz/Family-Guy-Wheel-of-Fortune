@@ -2,7 +2,6 @@ import {
     createAssetOwnership,
     getAssetById,
     listAssets,
-    listSelectedAssetIds,
     userOwnsAsset
 } from "../repositories/asset-repository";
 import { getCoinsByUserId, updateCoinsByUserId } from "../repositories/profile-repository";
@@ -11,10 +10,6 @@ import type { Asset, PurchaseResponseBody } from "shared";
 
 export async function getAssets(): Promise<Asset[]> {
     return listAssets();
-}
-
-export async function getSelectedAssetIds(userId: string): Promise<string[]> {
-    return listSelectedAssetIds(userId);
 }
 
 export async function purchaseAsset(userId: string, assetId: string): Promise<PurchaseResponseBody> {

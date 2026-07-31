@@ -9,7 +9,7 @@ import {
 } from "../controllers/user-controller";
 import {
     handleGetOwnedAssets,
-    handleGetSelectedAssetIds,
+    handleGetSelectedAssets,
     handleSelectAsset,
     handleGetSavedWheels,
     handleSaveSavedWheels,
@@ -26,7 +26,7 @@ usersRoutes.get("/:userId/coins", handleGetUserCoins);
 usersRoutes.patch("/:userId/coins", handlePatchUserCoins);
 usersRoutes.get("/:userId/inventory/assets", handleGetOwnedAssets);
 usersRoutes.post("/:userId/inventory/default-assets", handleEnsureDefaultAssets);
-usersRoutes.get("/:userId/inventory/selected-assets", handleGetSelectedAssetIds);
+usersRoutes.get("/:userId/inventory/selected-assets", handleGetSelectedAssets);
 usersRoutes.post("/:userId/inventory/selected-assets", handleSelectAsset);
 usersRoutes.get("/:userId/saved-wheels", handleGetSavedWheels);
 usersRoutes.post("/:userId/saved-wheels", handleSaveSavedWheels);

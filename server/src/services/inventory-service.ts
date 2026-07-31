@@ -1,6 +1,7 @@
 import { AppError } from "../lib/errors";
 import {
     listOwnedAssets,
+    listSelectedAssets,
     userSelectedAsset,
     getAssetById,
     createAssetSelection,
@@ -10,6 +11,10 @@ import type { Asset, SavedWheel, SelectResponseBody } from "shared";
 
 export async function getOwnedAssets(userId: string): Promise<Asset[]> {
     return listOwnedAssets(userId);
+}
+
+export async function getSelectedAssets(userId: string): Promise<Asset[]> {
+    return listSelectedAssets(userId);
 }
 
 export async function selectAsset(userId: string, assetId: string): Promise<SelectResponseBody> {

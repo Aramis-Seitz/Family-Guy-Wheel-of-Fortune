@@ -45,14 +45,22 @@ export async function listOwnedAssets(userId: string): Promise<Asset[]> {
         .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
 }
 
-export async function listSelectedAssetIds(userId: string): Promise<string[]> {
+type AssetSelectionRow = {
+    asset?: Asset | Asset[] | null;
+};
+
+export async function listSelectedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient
         .from("asset_selection")
-        .select("asset_id")
+        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
         .eq("user_id", userId);
 
     if (error) throw error;
-    return (data ?? []).map((row) => row.asset_id as string);
+
+    const rows = (data ?? []) as AssetSelectionRow[];
+    return rows
+        .map((row) => row.asset)
+        .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
 }
 
 export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {

@@ -36,7 +36,7 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
   if (!accessToken) return null;
 
   try {
-    const rawBody = await postJson("/api/spin/award-coins", { spinToken, winnerName }, {
+    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winnerName }, {
       token: accessToken,
       errorFallbackKey: "api.spin.awardFailed"
     });

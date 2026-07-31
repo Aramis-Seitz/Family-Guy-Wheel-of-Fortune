@@ -1,7 +1,7 @@
 import { filterAssetsByCategory, loadInventoryByCategory, inventoryAssetGrid } from "./inventory"
 import type { InventoryCategory } from "./inventory-tabs";
 import type { Asset } from "shared";
-import { getSelectedAssetIds, selectAsset } from "../api/inventory-api";
+import { getSelectedAssets, selectAsset } from "../api/inventory-api";
 import { showToast } from "../shared/toast";
 import { createAssetCard } from "../shared/asset-card";
 import { applySelectedAsset } from "../shared/asset-selection";
@@ -10,7 +10,7 @@ import { t } from "../app/i18n";
 let currentSelectedAssetIds: string[] = [];
 
 export async function refreshSelectedAssetIds(): Promise<void> {
-    currentSelectedAssetIds = await getSelectedAssetIds();
+    currentSelectedAssetIds = (await getSelectedAssets()).map(asset => asset.id);
 }
 
 function isAssetSelected(assetId: string): boolean {

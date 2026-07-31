@@ -3,7 +3,6 @@ import {
     SelectResponseSchema,
     SavedWheelResponseSchema,
     AssetsResponseSchema,
-    AssetIdsResponseSchema,
 } from "shared";
 import type { SavedWheel, Asset } from "shared";
 
@@ -21,13 +20,13 @@ export async function getOwnedAssets(): Promise<Asset[]> {
     return body.assets;
 }
 
-export async function getSelectedAssetIds(): Promise<string[]> {
+export async function getSelectedAssets(): Promise<Asset[]> {
     const userId = await getCurrentUserId();
     const rawBody = await getJson(`/api/users/${userId}/inventory/selected-assets`, {
         errorFallbackKey: "api.inventory.loadAssetIdsFailed"
     });
-    const body = AssetIdsResponseSchema.parse(rawBody);
-    return body.assetIds;
+    const body = AssetsResponseSchema.parse(rawBody);
+    return body.assets;
 }
 
 export async function selectAsset(assetId: string): Promise<SelectAssetResult> {

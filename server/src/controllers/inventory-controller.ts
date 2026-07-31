@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { getOwnedAssets, selectAsset, getSavedWheels } from "../services/inventory-service";
-import { getSelectedAssetIds } from "../services/shop-service";
+import { getOwnedAssets, getSelectedAssets, selectAsset, getSavedWheels } from "../services/inventory-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import { deleteWheel } from "../services/inventory-service";
@@ -8,7 +7,6 @@ import { saveSavedWheels } from "../services/inventory-service";
 import {
     SavedWheelResponseSchema,
     AssetsResponseSchema,
-    AssetIdsResponseSchema,
     SelectResponseSchema,
 } from "shared";
 
@@ -17,9 +15,9 @@ export const handleGetOwnedAssets = asyncHandler(async (req: HttpRequest, res: H
     res.status(200).json(AssetsResponseSchema.parse({ assets }));
 });
 
-export const handleGetSelectedAssetIds = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const assetIds = await getSelectedAssetIds(req.params!.userId!);
-    res.status(200).json(AssetIdsResponseSchema.parse({ assetIds }));
+export const handleGetSelectedAssets = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const assets = await getSelectedAssets(req.params!.userId!);
+    res.status(200).json(AssetsResponseSchema.parse({ assets }));
 });
 
 const SelectRequestSchema = z.object({

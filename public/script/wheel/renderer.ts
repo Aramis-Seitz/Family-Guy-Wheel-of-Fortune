@@ -1,31 +1,26 @@
 import { requiredElement } from "../shared/dom-helpers";
 
-const SEGMENT_COLOR_COUNT = 13;
+export const SEGMENT_COLORS: string[] = [
+  "#f4d87e",
+  "#f4a96b",
+  "#f4a0a0",
+  "#a8d8f0",
+  "#c5b8f0",
+  "#ae945d",
+  "#8a78c5",
+  "#745bc6",
+  "#312260",
+  "#1f1542",
+  "#3c287b",
+  "rgb(141, 116, 225)",
+  "#504672",
+];
 
-export const SEGMENT_COLORS: string[] = Array.from(
-  { length: SEGMENT_COLOR_COUNT },
-  (_, index) => `var(--wheel-segment-${index + 1})`,
-);
-
-export const SEGMENT_TEXT_COLORS: string[] = Array.from(
-  { length: SEGMENT_COLOR_COUNT },
-  (_, index) => `var(--wheel-segment-text-${index + 1})`,
-);
 
 export function getSegmentColor(index: number): string {
   return SEGMENT_COLORS[index % SEGMENT_COLORS.length];
 }
 
-export function getSegmentTextColor(index: number): string {
-  return SEGMENT_TEXT_COLORS[index % SEGMENT_TEXT_COLORS.length];
-}
-
-export function getResolvedSegmentColor(index: number): string {
-  const propertyIndex = (index % SEGMENT_COLOR_COUNT) + 1;
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(`--wheel-segment-${propertyIndex}`)
-    .trim();
-}
 
 export interface Point {
   x: number;
@@ -63,7 +58,7 @@ function createWheelSegmentPath(
     `M ${WHEEL_CENTER.x} ${WHEEL_CENTER.y} L ${startPoint.x} ${startPoint.y} A ${WHEEL_RADIUS} ${WHEEL_RADIUS} 0 ${largeArcFlag} 1 ${endPoint.x} ${endPoint.y} Z`
   );
   path.setAttribute("fill", color);
-  path.setAttribute("stroke", "currentColor");
+  path.setAttribute("stroke", "black");
   path.setAttribute("stroke-width", "1");
 
   return path;
@@ -83,7 +78,7 @@ function createWheelLabel(
   const text = document.createElementNS(SVG_NS, "text");
   text.setAttribute("x", String(labelPoint.x));
   text.setAttribute("y", String(labelPoint.y));
-  text.setAttribute("fill", getSegmentTextColor(segmentIndex));
+  text.setAttribute("fill", "black");
   text.setAttribute("font-size", "10");
   text.setAttribute("font-weight", "bold");
   text.setAttribute("text-anchor", "middle");
@@ -119,14 +114,14 @@ export function generateWheel(names: string[]): void {
     circle.setAttribute("cy", String(WHEEL_CENTER.y));
     circle.setAttribute("r", String(WHEEL_RADIUS));
     circle.setAttribute("fill", getSegmentColor(0));
-    circle.setAttribute("stroke", "currentColor");
+    circle.setAttribute("stroke", "black");
     circle.setAttribute("stroke-width", "1");
     wheelElement.appendChild(circle);
 
     const text = document.createElementNS(SVG_NS, "text");
     text.setAttribute("x", String(WHEEL_CENTER.x));
     text.setAttribute("y", String(WHEEL_CENTER.y));
-    text.setAttribute("fill", getSegmentTextColor(0));
+    text.setAttribute("fill", "black");
     text.setAttribute("font-size", "10");
     text.setAttribute("font-weight", "bold");
     text.setAttribute("text-anchor", "middle");

@@ -108,10 +108,11 @@
 
 #wheel-empty-companion-overlay {
     position: absolute;
-    top: 28%;
-    right: 12%;
-    width: min(24vw, 160px);
+    top: 20%;
+    left: 48%;
+    width: min(26vw, 160px);
     max-width: 160px;
+    transform: translateX(-50%);
     height: auto;
     z-index: 3;
     pointer-events: none;

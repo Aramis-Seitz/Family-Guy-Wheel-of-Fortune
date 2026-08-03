@@ -80,7 +80,7 @@
     --wheel-segment-13: var(--surface);
     --wheel-segment-text-13: var(--surface-text);
     --wheel-stroke: var(--border);
-    --wheel-ring-highlight: #FF8A24;
+    --wheel-ring-highlight: #D92B1F;
     --wheel-ring-shadow: #D92B1F;
     --wheel-ring-inner: #29140E;
     --wheel-ring-glow: rgba(255, 76, 36, 0.52);

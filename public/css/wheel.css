@@ -2,6 +2,7 @@
     --wheel-ring-width: 3px;
 
     position: relative;
+    z-index: 1;
     width: 500px;
     height: 500px;
     padding: var(--wheel-ring-width);
@@ -95,6 +96,8 @@
 }
 
 #wheel-companion-image {
+    position: relative;
+    z-index: 2;
     justify-self: end;
     height: 350px;
 }

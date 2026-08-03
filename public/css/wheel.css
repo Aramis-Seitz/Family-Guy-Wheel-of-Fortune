@@ -1,6 +1,31 @@
-#wheel-svg {
+.wheel-frame {
+    --wheel-ring-width: 8px;
+
+    position: relative;
     width: 500px;
     height: 500px;
+    padding: var(--wheel-ring-width);
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--wheel-ring-highlight), var(--wheel-ring-shadow));
+    box-shadow: 0 12px 28px var(--wheel-ring-glow);
+}
+
+.wheel-frame::after {
+    content: "";
+    position: absolute;
+    inset: var(--wheel-ring-width);
+    border: 3px solid var(--wheel-ring-inner);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+#wheel-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--background);
     color: var(--wheel-stroke);
 }
 

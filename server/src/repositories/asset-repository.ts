@@ -1,10 +1,6 @@
-import { z } from "zod";
 import { supabaseClient } from "../lib/supabase-client";
 import { AppError } from "../lib/errors";
 import type { Asset } from "shared";
-
-export const AssetCategorySchema = z.enum(["sound", "companion"]);
-export type AssetCategory = z.infer<typeof AssetCategorySchema>;
 
 export async function listAssets(): Promise<Asset[]> {
     const { data, error } = await supabaseClient
@@ -49,24 +45,22 @@ export async function listOwnedAssets(userId: string): Promise<Asset[]> {
         .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
 }
 
-export async function listSelectedAssetIds(userId: string): Promise<string[]> {
+type AssetSelectionRow = {
+    asset?: Asset | Asset[] | null;
+};
+
+export async function listSelectedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient
         .from("asset_selection")
-        .select("asset_id")
+        .select("asset:asset_selection_asset_category_fk(id, name, category, price_coins, asset_url)")
         .eq("user_id", userId);
 
     if (error) throw error;
-    return (data ?? []).map((row) => row.asset_id as string);
-}
 
-export async function listAssetCategories(): Promise<AssetCategory[]> {
-    const { data, error } = await supabaseClient
-        .from("asset")
-        .select("category");
-
-    if (error) throw error;
-
-    return [...new Set((data ?? []).map((row) => row.category as AssetCategory))];
+    const rows = (data ?? []) as AssetSelectionRow[];
+    return rows
+        .map((row) => row.asset)
+        .flatMap((asset) => (Array.isArray(asset) ? asset : asset ? [asset] : []));
 }
 
 export async function userOwnsAsset(userId: string, assetId: string): Promise<boolean> {

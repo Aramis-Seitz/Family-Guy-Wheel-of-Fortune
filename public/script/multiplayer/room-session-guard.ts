@@ -4,20 +4,23 @@ import { leaveRoomOnUnload } from '../api/room-api';
 
 export function initRoomUnloadGuard(getActiveRoomKey: () => string | null): void {
   let cachedToken = '';
+  let cachedUserId = '';
 
   void supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
     cachedToken = session?.access_token ?? '';
+    cachedUserId = session?.user.id ?? '';
   });
 
   supabaseClient.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
     cachedToken = session?.access_token ?? '';
+    cachedUserId = session?.user.id ?? '';
   });
 
   window.addEventListener('pagehide', (event) => {
     if (event.persisted) return;
     const roomKey = getActiveRoomKey();
-    if (!roomKey || !cachedToken) return;
-    leaveRoomOnUnload(roomKey, cachedToken);
+    if (!roomKey || !cachedToken || !cachedUserId) return;
+    leaveRoomOnUnload(roomKey, cachedUserId, cachedToken);
   });
 }
 

@@ -1,20 +1,13 @@
-import { getOwnedAssets, getSelectedAssetIds } from "../api/inventory-api";
+import { getSelectedAssets } from "../api/inventory-api";
 import { optionalElement } from "./dom-helpers";
 import { preloadTickBuffer } from "../wheel/sound";
 import type { Asset } from "shared";
 
 export async function applyActiveAssets(): Promise<void> {
     try {
-        const [selectedIds, ownedAssets] = await Promise.all([
-            getSelectedAssetIds(),
-            getOwnedAssets()
-        ]);
-        const selectedSound = ownedAssets.find(
-            a => a.category === "sound" && selectedIds.includes(a.id)
-        );
-        const selectedCompanion = ownedAssets.find(
-            a => a.category === "companion" && selectedIds.includes(a.id)
-        );
+        const selectedAssets = await getSelectedAssets();
+        const selectedSound = selectedAssets.find(a => a.category === "sound");
+        const selectedCompanion = selectedAssets.find(a => a.category === "companion");
         if (selectedSound) void preloadTickBuffer(selectedSound.asset_url);
         if (selectedCompanion) applyActiveCompanion(selectedCompanion.asset_url);
     } catch {

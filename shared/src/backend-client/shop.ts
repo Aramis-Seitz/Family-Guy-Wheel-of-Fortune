@@ -14,11 +14,6 @@ export const AssetsResponseSchema = z.object({
 });
 export type AssetsResponseBody = z.infer<typeof AssetsResponseSchema>;
 
-export const AssetIdsResponseSchema = z.object({
-    assetIds: z.array(z.string()),
-});
-export type AssetIdsResponseBody = z.infer<typeof AssetIdsResponseSchema>;
-
 export const PurchaseResponseSchema = z.object({
     success: z.literal(true),
     coins: z.number(),

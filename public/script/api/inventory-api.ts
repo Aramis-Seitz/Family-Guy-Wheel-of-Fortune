@@ -1,9 +1,8 @@
-import { getJson, postJson } from "./api-helpers";
+import { getJson, postJson, deleteJson, getCurrentUserId } from "./api-helpers";
 import {
     SelectResponseSchema,
     SavedWheelResponseSchema,
     AssetsResponseSchema,
-    AssetIdsResponseSchema,
 } from "shared";
 import type { SavedWheel, Asset } from "shared";
 
@@ -13,19 +12,21 @@ export type SelectAssetResult = {
 };
 
 export async function getOwnedAssets(): Promise<Asset[]> {
-    const rawBody = await getJson("/api/inventory/assets", {
+    const userId = await getCurrentUserId();
+    const rawBody = await getJson(`/api/users/${userId}/inventory/assets`, {
         errorFallbackKey: "api.inventory.loadAssetsFailed"
     });
     const body = AssetsResponseSchema.parse(rawBody);
     return body.assets;
 }
 
-export async function getSelectedAssetIds(): Promise<string[]> {
-    const rawBody = await getJson("/api/inventory/selected-asset-ids", {
-        errorFallbackKey: "api.inventory.loadAssetIdsFailed"
+export async function getSelectedAssets(): Promise<Asset[]> {
+    const userId = await getCurrentUserId();
+    const rawBody = await getJson(`/api/users/${userId}/inventory/selected-assets`, {
+        errorFallbackKey: "api.inventory.loadSelectedAssetsFailed"
     });
-    const body = AssetIdsResponseSchema.parse(rawBody);
-    return body.assetIds;
+    const body = AssetsResponseSchema.parse(rawBody);
+    return body.assets;
 }
 
 export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
@@ -33,7 +34,8 @@ export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
         throw new Error("assetId is required");
     }
 
-    const rawBody = await postJson("/api/inventory/select", { assetId }, {
+    const userId = await getCurrentUserId();
+    const rawBody = await postJson(`/api/users/${userId}/inventory/selected-assets`, { assetId }, {
         errorFallbackKey: "api.inventory.selectAssetFailed"
     });
     const body = SelectResponseSchema.parse(rawBody);
@@ -45,13 +47,15 @@ export async function selectAsset(assetId: string): Promise<SelectAssetResult> {
 }
 
 export async function deleteSavedWheel(wheelId: string): Promise<void> {
-    await postJson("/api/inventory/delete-saved-wheel", { wheelId }, {
+    const userId = await getCurrentUserId();
+    await deleteJson(`/api/users/${userId}/saved-wheels/${wheelId}`, {
         errorFallbackKey: "api.inventory.deleteWheelFailed"
     });
 }
 
 export async function getSavedWheels(): Promise<SavedWheel[]> {
-    const rawBody = await getJson("/api/inventory/saved-wheels", {
+    const userId = await getCurrentUserId();
+    const rawBody = await getJson(`/api/users/${userId}/saved-wheels`, {
         errorFallbackKey: "api.inventory.loadWheelsFailed",
     });
     const body = SavedWheelResponseSchema.parse(rawBody);
@@ -59,7 +63,8 @@ export async function getSavedWheels(): Promise<SavedWheel[]> {
 }
 
 export async function saveSavedWheels(title: string, url: string): Promise<void> {
-    await postJson("/api/inventory/save-saved-wheel", { title, url }, {
+    const userId = await getCurrentUserId();
+    await postJson(`/api/users/${userId}/saved-wheels`, { title, url }, {
         errorFallbackKey: "api.inventory.saveFailed",
     });
 }

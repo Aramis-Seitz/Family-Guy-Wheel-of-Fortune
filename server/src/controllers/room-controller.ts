@@ -10,95 +10,82 @@ import {
 
 export const handleCreateRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const result = await createRoom(req.userId!);
-    res.status(200).json(CreateRoomResponseSchema.parse(result));
-});
-
-const RoomKeyRequestSchema = z.object({
-    roomKey: z.string().min(1),
+    res.status(201).json(CreateRoomResponseSchema.parse(result));
 });
 
 export const handleJoinRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
-        return;
-    }
-
-    const result = await joinRoom(req.userId!, parsedBody.data.roomKey);
-    res.status(200).json(JoinRoomResponseSchema.parse(result));
+    const roomKey = req.params!.roomKey!;
+    const result = await joinRoom(req.userId!, roomKey);
+    res.status(201).json(JoinRoomResponseSchema.parse(result));
 });
 
 export const handleLeaveRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = RoomKeyRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
-        return;
-    }
-
-    await leaveRoom(req.userId!, parsedBody.data.roomKey);
+    const roomKey = req.params!.roomKey!;
+    const userId = req.params!.userId!;
+    await leaveRoom(userId, roomKey);
     res.status(200).json({ ok: true });
 });
 
 const RoomSpinRequestSchema = z.object({
-    roomKey: z.string().min(1),
     direction: z.enum(["left", "right"]),
 });
 
 export const handleSpinRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = RoomSpinRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey or invalid direction" });
+        res.status(400).json({ error: "Invalid direction" });
         return;
     }
 
-    const result = await spinRoom(req.userId!, parsedBody.data.roomKey, parsedBody.data.direction);
-    res.status(200).json(SpinRandomResponseSchema.parse(result));
+    const roomKey = req.params!.roomKey!;
+    const result = await spinRoom(req.userId!, roomKey, parsedBody.data.direction);
+    res.status(201).json(SpinRandomResponseSchema.parse(result));
 });
 
 const ResetRoomRequestSchema = z.object({
-    roomKey: z.string().min(1),
     closeWinnerModal: z.boolean().optional(),
 });
 
 export const handleResetRoom = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = ResetRoomRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey" });
+        res.status(400).json({ error: "Invalid body" });
         return;
     }
 
-    await resetRoom(req.userId!, parsedBody.data.roomKey, parsedBody.data.closeWinnerModal ?? false);
+    const roomKey = req.params!.roomKey!;
+    await resetRoom(req.userId!, roomKey, parsedBody.data.closeWinnerModal ?? false);
     res.status(200).json({ ok: true });
 });
 
 const SetMultiplierRequestSchema = z.object({
-    roomKey: z.string().min(1),
     multiplier: z.number(),
 });
 
 export const handleSetMultiplier = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SetMultiplierRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey or multiplier" });
+        res.status(400).json({ error: "Missing multiplier" });
         return;
     }
 
-    await setMultiplier(req.userId!, parsedBody.data.roomKey, parsedBody.data.multiplier);
+    const roomKey = req.params!.roomKey!;
+    await setMultiplier(req.userId!, roomKey, parsedBody.data.multiplier);
     res.status(200).json({ ok: true });
 });
 
 const SetNamesRequestSchema = z.object({
-    roomKey: z.string().min(1),
     names: z.array(z.string()),
 });
 
 export const handleUpdateNames = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = SetNamesRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing roomKey or names" });
+        res.status(400).json({ error: "Missing names" });
         return;
     }
 
-    await setRoomNames(req.userId!, parsedBody.data.roomKey, parsedBody.data.names);
+    const roomKey = req.params!.roomKey!;
+    await setRoomNames(req.userId!, roomKey, parsedBody.data.names);
     res.status(200).json({ ok: true });
 });

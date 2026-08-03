@@ -6,21 +6,21 @@ import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 
 export const handleGenerateSpin = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const result = await generateSpin(req.userId!);
-    res.status(200).json(SpinRandomResponseSchema.parse(result));
+    res.status(201).json(SpinRandomResponseSchema.parse(result));
 });
 
 const AwardCoinsRequestSchema = z.object({
-    spinToken: z.string().min(1),
     winnerName: z.string().min(1),
 });
 
 export const handleAwardCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = AwardCoinsRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing spinToken or winnerName" });
+        res.status(400).json({ error: "Missing winnerName" });
         return;
     }
 
-    const result = await awardCoins(req.userId!, parsedBody.data.spinToken, parsedBody.data.winnerName);
+    const spinToken = req.params!.spinToken!;
+    const result = await awardCoins(req.userId!, spinToken, parsedBody.data.winnerName);
     res.status(200).json(AwardCoinsResponseSchema.parse(result));
 });

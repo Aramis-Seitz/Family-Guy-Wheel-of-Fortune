@@ -1,17 +1,15 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/require-auth";
-import { userRoutes } from "./user-routes";
+import { usersRoutes } from "./users-routes";
 import { shopRoutes } from "./shop-routes";
-import { inventoryRoutes } from "./inventory-routes";
 import { roomRoutes } from "./room-routes";
-import { spinRoutes } from "./spin-routes";
+import { spinsRoutes } from "./spins-routes";
 
 export const apiRoutes = Router();
 
 apiRoutes.use(requireAuth);
 
-apiRoutes.use("/user", userRoutes);
+apiRoutes.use("/users", usersRoutes);
 apiRoutes.use("/shop", shopRoutes);
-apiRoutes.use("/inventory", inventoryRoutes);
-apiRoutes.use("/room", roomRoutes);
-apiRoutes.use("/spin", spinRoutes);
+apiRoutes.use("/rooms", roomRoutes);
+apiRoutes.use("/spins", spinsRoutes);

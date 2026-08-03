@@ -11,13 +11,13 @@ export async function fetchRandomNumber(
 ): Promise<SpinRandomResponseBody> {
 
   const rawData = await postJson(
-    "/api/spin/random",
+    "/api/spins",
     { names, currentRotation, direction, multiplier }, {
     errorFallbackKey: "api.spin.randomFailed"
   });
   const data = SpinRandomResponseSchema.parse(rawData);
 
-  console.log("[SPIN] /api/spin/random Daten:", {
+  console.log("[SPIN] /api/spins Daten:", {
     ranNum: data.ranNum,
     spinToken: data.spinToken || "LEER ← Backend-Env-Variablen fehlen wahrscheinlich!",
   });
@@ -36,7 +36,7 @@ export async function awardCoins(spinToken: string, winnerName: string): Promise
   if (!accessToken) return null;
 
   try {
-    const rawBody = await postJson("/api/spin/award-coins", { spinToken, winnerName }, {
+    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winnerName }, {
       token: accessToken,
       errorFallbackKey: "api.spin.awardFailed"
     });

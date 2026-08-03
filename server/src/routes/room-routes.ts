@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireSelf } from "../middleware/require-self";
 import {
     handleCreateRoom,
     handleJoinRoom,
@@ -11,10 +12,12 @@ import {
 
 export const roomRoutes = Router();
 
-roomRoutes.post("/create", handleCreateRoom);
-roomRoutes.post("/join", handleJoinRoom);
-roomRoutes.post("/leave", handleLeaveRoom);
-roomRoutes.post("/spin", handleSpinRoom);
-roomRoutes.post("/reset", handleResetRoom);
-roomRoutes.post("/multiplier", handleSetMultiplier);
-roomRoutes.post("/wheel-items", handleUpdateNames);
+roomRoutes.param("userId", requireSelf);
+
+roomRoutes.post("/", handleCreateRoom);
+roomRoutes.patch("/:roomKey", handleResetRoom);
+roomRoutes.patch("/:roomKey/multiplier", handleSetMultiplier);
+roomRoutes.post("/:roomKey/players", handleJoinRoom);
+roomRoutes.delete("/:roomKey/players/:userId", handleLeaveRoom);
+roomRoutes.post("/:roomKey/spins", handleSpinRoom);
+roomRoutes.patch("/:roomKey/names-in-wheel-list", handleUpdateNames);

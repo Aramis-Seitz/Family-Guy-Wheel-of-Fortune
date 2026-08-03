@@ -1,5 +1,5 @@
 import { getJson, postJson } from "./api-helpers";
-import { AssetsResponseSchema, AssetIdsResponseSchema, PurchaseResponseSchema } from "shared";
+import { AssetsResponseSchema, PurchaseResponseSchema } from "shared";
 import type { Asset } from "shared";
 
 export type PurchaseAssetResult = {
@@ -16,20 +16,12 @@ export async function getShopAssets(): Promise<Asset[]> {
     return body.assets;
 }
 
-export async function getOwnedAssetIds(): Promise<string[]> {
-    const rawBody = await getJson("/api/shop/owned-asset-ids", {
-        errorFallbackKey: "api.shop.loadOwnedFailed"
-    });
-    const body = AssetIdsResponseSchema.parse(rawBody);
-    return body.assetIds;
-}
-
 export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResult> {
     if (!assetId) {
         throw new Error("assetId is required");
     }
 
-    const rawBody = await postJson("/api/shop/purchase", { assetId }, {
+    const rawBody = await postJson("/api/shop/purchases", { assetId }, {
         errorFallbackKey: "api.shop.purchaseFailed"
     });
     const body = PurchaseResponseSchema.parse(rawBody);

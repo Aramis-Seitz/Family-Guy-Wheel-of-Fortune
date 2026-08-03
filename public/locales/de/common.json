@@ -18,7 +18,7 @@
         "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
         "inventory": {
             "loadAssetsFailed": "Assets konnten nicht geladen werden.",
-            "loadAssetIdsFailed": "Ausgewählte Assets konnten nicht geladen werden.",
+            "loadSelectedAssetsFailed": "Ausgewählte Assets konnten nicht geladen werden.",
             "selectAssetFailed": "Das Asset konnte nicht ausgewählt werden.",
             "deleteWheelFailed": "Das Rad konnte nicht gelöscht werden.",
             "loadWheelsFailed": "Gespeicherte Räder konnten nicht geladen werden.",
@@ -42,7 +42,7 @@
         "user": {
             "loadCoinsFailed": "Coins konnten nicht geladen werden.",
             "loadProfileFailed": "Das Profil konnte nicht geladen werden.",
-            "setCoinsFailed": "Coins konnten nicht aktualisiert werden.",
+            "addCoinsFailed": "Coins konnten nicht aktualisiert werden.",
             "defaultAssetsFailed": "Standard-Assets konnten nicht eingerichtet werden.",
             "subtractCoinsFailed": "Coins konnten nicht abgezogen werden."
         },

@@ -52,7 +52,7 @@ type AssetSelectionRow = {
 export async function listSelectedAssets(userId: string): Promise<Asset[]> {
     const { data, error } = await supabaseClient
         .from("asset_selection")
-        .select("asset:asset_id(id, name, category, price_coins, asset_url)")
+        .select("asset:asset_selection_asset_category_fk(id, name, category, price_coins, asset_url)")
         .eq("user_id", userId);
 
     if (error) throw error;

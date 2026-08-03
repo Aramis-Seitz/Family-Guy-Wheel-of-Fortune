@@ -12,8 +12,8 @@
     /* Light theme: the only source of fixed application colors. */
     --background: #F9F6ED;
     --text: #2E2E2E;
-    --button-bg: #2E2E2E;
-    --button-text: #F9F6ED;
+    --button-bg: #ffa31a;
+    --button-text: #2E2E2E;
     --input-bg: #F1F1F1;
     --input-text: #2E2E2E;
     --input-placeholder: #979797;
@@ -85,7 +85,7 @@
     color-scheme: dark;
     --background: #000000;
     --text: #F9F6ED;
-    --button-bg: #979797;
+    --button-bg: #ffa31a;
     --button-text: #000000;
     --input-bg: #91908A;
     --input-text: #000000;

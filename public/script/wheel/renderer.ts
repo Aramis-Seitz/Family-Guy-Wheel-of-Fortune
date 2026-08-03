@@ -1,19 +1,10 @@
 import { requiredElement } from "../shared/dom-helpers";
 
 export const SEGMENT_COLORS: string[] = [
-  "#f4d87e",
-  "#f4a96b",
-  "#f4a0a0",
-  "#a8d8f0",
-  "#c5b8f0",
-  "#ae945d",
-  "#8a78c5",
-  "#745bc6",
-  "#312260",
-  "#1f1542",
-  "#3c287b",
-  "rgb(141, 116, 225)",
-  "#504672",
+  "#F77D18",
+  "#E22627",
+  "#FFA31A",
+  "#FF4C4C"
 ];
 
 

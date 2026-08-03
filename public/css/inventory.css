@@ -14,15 +14,23 @@
     color: #ffffff;
 }
 
-.sec-btn:hover {
+.inventory-btn.sec-btn,
+.shop-btn.sec-btn,
+.names-in-wheel-list__share-btn.sec-btn {
+    background-color: var(--button-secondary-bg);
+    color: #ffffff;
+}
+
+.sec-btn:hover,
+.inventory-btn.sec-btn:hover,
+.shop-btn.sec-btn:hover,
+.names-in-wheel-list__share-btn.sec-btn:hover {
     filter: brightness(1.12);
 }
 
-.inventory-btn:hover {
-    filter: brightness(1.12);
-}
-
-.inventory-btn:active {
+.inventory-btn.sec-btn:active,
+.shop-btn.sec-btn:active,
+.names-in-wheel-list__share-btn.sec-btn:active {
     filter: brightness(0.9);
 }
 

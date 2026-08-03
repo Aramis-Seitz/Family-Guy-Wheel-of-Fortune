@@ -1,5 +1,5 @@
 .wheel-frame {
-    --wheel-ring-width: 8px;
+    --wheel-ring-width: 3px;
 
     position: relative;
     width: 500px;

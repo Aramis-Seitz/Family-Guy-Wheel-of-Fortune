@@ -105,6 +105,18 @@
     --border: var(--button-bg);
 }
 
+[data-theme="light"] .theme-toggle-btn {
+    background: #1b1b1b;
+    border-color: #1b1b1b;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #1b1b1b;
+}
+
 *,
 *::before,
 *::after {

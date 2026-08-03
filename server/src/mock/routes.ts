@@ -1,95 +1,87 @@
-import { Router } from 'express';
-import { randomUUID } from 'crypto';
-import {
-  store,
-  findProfile,
-  findProfileByEmail,
-  findProfileByUsername,
-  createProfile,
-  getSavedLinks,
-  createSavedLink,
-  deleteSavedLink,
-} from './store';
-
-export function decodeMockJwt(jwt: string): { id: string; email: string; username: string; date_of_birth?: string | null } | null {
-  if (!jwt.startsWith('mock_')) return null;
-  try {
-    return JSON.parse(Buffer.from(jwt.slice(5), 'base64').toString('utf8'));
-  } catch {
-    return null;
-  }
-}
+import { Router } from "express";
+import { randomUUID } from "crypto";
+import { store, appendChatMessage, getChatMessagesSince } from "./store";
+import { encodeMockJwt } from "./jwt";
 
 export const mockRouter = Router();
 
-mockRouter.post('/auth/signup', (req, res) => {
-  const { email, password, username, date_of_birth } = req.body ?? {};
+// --- Auth -------------------------------------------------------------
+// Ersetzt Supabase Auth (auth.users). Legt bewusst KEIN profiles-Row an —
+// genau wie in Produktion passiert das erst über POST /api/user/register
+// (siehe registerUser in user-service.ts), damit der Mock denselben
+// zweistufigen Signup-Flow abbildet.
 
-  if (!email || !password || !username) {
-    res.status(400).json({ error: 'email, password und username erforderlich' });
-    return;
-  }
+mockRouter.post("/auth/signup", (req, res) => {
+    const { email, password, username, date_of_birth } = req.body ?? {};
 
-  if (findProfileByEmail(email)) {
-    res.status(400).json({ error: 'Diese E-Mail ist bereits registriert' });
-    return;
-  }
+    if (!email || !password || !username) {
+        res.status(400).json({ error: "email, password und username erforderlich" });
+        return;
+    }
 
-  const id = randomUUID();
-  createProfile({ id, email, username, date_of_birth: date_of_birth ?? null, password });
+    if (store.authUsers.some((u) => u.email.toLowerCase() === String(email).toLowerCase())) {
+        res.status(400).json({ error: "Diese E-Mail ist bereits registriert" });
+        return;
+    }
 
-  const payload = Buffer.from(JSON.stringify({ id, email, username, date_of_birth: date_of_birth ?? null })).toString('base64');
-  res.json({ token: `mock_${payload}`, user: { id, email, user_metadata: { username, date_of_birth: date_of_birth ?? null } } });
+    const id = randomUUID();
+    const dob = date_of_birth ?? null;
+    store.authUsers.push({ id, email, username, password, date_of_birth: dob });
+
+    const token = encodeMockJwt({ id, email, username, date_of_birth: dob });
+    res.json({ token, user: { id, email, user_metadata: { username, date_of_birth: dob } } });
 });
 
-mockRouter.post('/auth/login', (req, res) => {
-  const { email, password } = req.body ?? {};
+mockRouter.post("/auth/login", (req, res) => {
+    const { email, password } = req.body ?? {};
 
-  const profile = findProfileByEmail(email ?? '');
-  if (!profile || profile.password !== password) {
-    res.status(401).json({ error: 'Ungültige E-Mail oder Passwort' });
-    return;
-  }
+    const user = store.authUsers.find((u) => u.email.toLowerCase() === String(email ?? "").toLowerCase());
+    if (!user || user.password !== password) {
+        res.status(401).json({ error: "Ungültige E-Mail oder Passwort" });
+        return;
+    }
 
-  const { id, username } = profile;
-  const payload = Buffer.from(JSON.stringify({ id, email: profile.email, username, date_of_birth: profile.date_of_birth })).toString('base64');
-  res.json({ token: `mock_${payload}`, user: { id, email: profile.email, user_metadata: { username, date_of_birth: profile.date_of_birth } } });
+    const token = encodeMockJwt({ id: user.id, email: user.email, username: user.username, date_of_birth: user.date_of_birth });
+    res.json({
+        token,
+        user: { id: user.id, email: user.email, user_metadata: { username: user.username, date_of_birth: user.date_of_birth } },
+    });
 });
 
-mockRouter.get('/profile/by-username/:username', (req, res) => {
-  const profile = findProfileByUsername(req.params.username);
-  if (!profile) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json({ id: profile.id, username: profile.username, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
+// --- Realtime -----------------------------------------------------------
+// Supabase Realtime (postgres_changes/broadcast) gibt es im Mock nicht.
+// Der Frontend-Mock-Client pollt diese Endpunkte stattdessen, um Room- und
+// Chat-Updates zwischen mehreren Tabs/Browsern zu simulieren.
+
+mockRouter.get("/realtime/rooms/:roomKey", (req, res) => {
+    const room = store.rooms.find((r) => r.room_key === req.params.roomKey);
+    if (!room) {
+        res.status(404).json({ error: "Not found" });
+        return;
+    }
+    res.json({
+        players: room.players,
+        names_in_wheel: room.names_in_wheel,
+        last_spin: room.last_spin,
+        spun_at: room.spun_at,
+        multiplier: room.multiplier,
+        spin_direction: room.spin_direction,
+        wheel_reset_at: room.wheel_reset_at,
+        winner_modal_close_at: room.winner_modal_close_at,
+    });
 });
 
-mockRouter.get('/profile/:userId', (req, res) => {
-  const profile = findProfile(req.params.userId);
-  if (!profile) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json({ id: profile.id, username: profile.username, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
+mockRouter.get("/realtime/chat/:roomKey", (req, res) => {
+    const since = Number(req.query.since ?? 0) || 0;
+    res.json(getChatMessagesSince(req.params.roomKey, since));
 });
 
-mockRouter.post('/profile', (req, res) => {
-  const { id, username, email, date_of_birth } = req.body ?? {};
-  if (findProfile(id)) {
-    // already created during signup – silent no-op
-    res.status(409).json({ error: 'Already exists' });
-    return;
-  }
-  const profile = createProfile({ id, username, email, date_of_birth: date_of_birth ?? null, password: '' });
-  res.json(profile);
-});
-
-mockRouter.get('/saved_wheels/:userId', (req, res) => {
-  res.json(getSavedLinks(req.params.userId));
-});
-
-mockRouter.post('/saved_wheels', (req, res) => {
-  const { user_id, wheel_title, url } = req.body ?? {};
-  const link = createSavedLink({ user_id, wheel_title, url });
-  res.json(link);
-});
-
-mockRouter.delete('/saved_wheels/:id', (req, res) => {
-  deleteSavedLink(req.params.id);
-  res.json({ success: true });
+mockRouter.post("/realtime/chat/:roomKey", (req, res) => {
+    const { event, payload } = req.body ?? {};
+    if (!event || payload === undefined) {
+        res.status(400).json({ error: "event und payload erforderlich" });
+        return;
+    }
+    const msg = appendChatMessage(req.params.roomKey, event, payload);
+    res.json(msg);
 });

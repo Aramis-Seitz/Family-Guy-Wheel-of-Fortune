@@ -7,7 +7,9 @@
     padding: var(--wheel-ring-width);
     border-radius: 50%;
     background: linear-gradient(145deg, var(--wheel-ring-highlight), var(--wheel-ring-shadow));
-    box-shadow: 0 12px 28px var(--wheel-ring-glow);
+    box-shadow:
+        0 0 18px 4px var(--wheel-ring-glow),
+        0 0 42px 10px var(--wheel-ring-glow-soft);
 }
 
 .wheel-frame::after {

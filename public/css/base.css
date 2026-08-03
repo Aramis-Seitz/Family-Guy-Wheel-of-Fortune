@@ -83,7 +83,8 @@
     --wheel-ring-highlight: #FF8A24;
     --wheel-ring-shadow: #D92B1F;
     --wheel-ring-inner: #29140E;
-    --wheel-ring-glow: rgba(255, 76, 36, 0.28);
+    --wheel-ring-glow: rgba(255, 76, 36, 0.48);
+    --wheel-ring-glow-soft: rgba(255, 76, 36, 0.22);
 }
 
 [data-theme="dark"] {

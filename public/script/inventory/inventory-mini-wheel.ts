@@ -3,7 +3,7 @@ import {
   SVG_NS,
   getPointOnCircle,
   getSegmentColor,
-  getSegmentTextColor,
+  
 } from "../wheel/renderer";
 
 export function createMiniWheel(names: string[], size = 70): SVGSVGElement {
@@ -47,7 +47,7 @@ function createMiniSegment(index: number, count: number): SVGPathElement {
   );
 
   path.setAttribute("fill", getSegmentColor(index));
-  path.setAttribute("stroke", "currentColor");
+  path.setAttribute("stroke", "black");
   path.setAttribute("stroke-width", "0.5");
 
   return path;
@@ -69,7 +69,7 @@ function createMiniLabel(
 
   text.setAttribute("x", String(point.x));
   text.setAttribute("y", String(point.y));
-  text.setAttribute("fill", getSegmentTextColor(index));
+  text.setAttribute("fill", "black");
   text.setAttribute("font-size", "8");
   text.setAttribute("text-anchor", "middle");
   text.setAttribute("dominant-baseline", "middle");

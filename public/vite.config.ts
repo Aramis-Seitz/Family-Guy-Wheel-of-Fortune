@@ -2,9 +2,6 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  optimizeDeps: {
-    include: ['shared'],
-  },
   server: {
     proxy: {
       '/api': 'http://localhost:3000',

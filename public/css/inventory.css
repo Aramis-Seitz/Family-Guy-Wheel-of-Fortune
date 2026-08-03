@@ -9,6 +9,15 @@
     cursor: pointer;
 }
 
+.sec-btn {
+    background-color: var(--button-secondary-bg);
+    color: #ffffff;
+}
+
+.sec-btn:hover {
+    filter: brightness(1.12);
+}
+
 .inventory-btn:hover {
     filter: brightness(1.12);
 }

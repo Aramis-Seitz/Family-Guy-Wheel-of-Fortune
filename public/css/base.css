@@ -13,6 +13,7 @@
     --background: #F9F6ED;
     --text: #2E2E2E;
     --button-bg: #ffa31a;
+    --button-secondary-bg: #808080;
     --button-text: #2E2E2E;
     --input-bg: #F1F1F1;
     --input-text: #2E2E2E;
@@ -86,6 +87,7 @@
     --background: #000000;
     --text: #F9F6ED;
     --button-bg: #ffa31a;
+    --button-secondary-bg: #808080;
     --button-text: #000000;
     --input-bg: #91908A;
     --input-text: #000000;

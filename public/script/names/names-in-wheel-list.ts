@@ -1,5 +1,5 @@
 import { applyDisabledStyle, spinLeftBtn, spinRightBtn } from "../wheel/spin";
-import { wheelEmptyCompanionOverlay, wheelEmptyHint } from "../multiplayer/room-players-sidebar";
+import { wheelEmptyHint } from "../multiplayer/room-players-sidebar";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { requiredElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
@@ -98,14 +98,9 @@ function renderNamesInWheelList(names: string[]): void {
 export const emptyHint = requiredElement<HTMLParagraphElement>("name-empty-hint");
 
 export function updateEmptyState(): void {
-  const isEmpty = getSegmentCountOfWheelList() === 0;
-
-  emptyHint.style.display = isEmpty ? "block" : "none";
+  emptyHint.style.display = getSegmentCountOfWheelList() === 0 ? "block" : "none";
   if (wheelEmptyHint) {
-    wheelEmptyHint.classList.toggle("hidden", !isEmpty);
-  }
-  if (wheelEmptyCompanionOverlay) {
-    wheelEmptyCompanionOverlay.classList.toggle("hidden", !isEmpty);
+    wheelEmptyHint.classList.toggle("hidden", getSegmentCountOfWheelList() > 0);
   }
 }
 

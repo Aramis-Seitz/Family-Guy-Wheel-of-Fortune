@@ -95,22 +95,38 @@
     display: none;
 }
 
-#wheel-companion-image {
+.wheel-companion {
     position: relative;
     z-index: 2;
     justify-self: end;
     height: 350px;
 }
 
+#wheel-companion-image {
+    display: block;
+    width: auto;
+    height: 100%;
+}
+
 #wheel-empty-companion-overlay {
     position: absolute;
-    top: 18px;
-    right: 18px;
-    width: min(28vw, 180px);
-    max-width: 180px;
-    height: auto;
+    top: 10%;
+    left: 50%;
+    width: min(65%, 220px);
+    aspect-ratio: 728 / 224;
+    transform: translateX(-50%);
+    overflow: hidden;
     z-index: 3;
     pointer-events: none;
+}
+
+#wheel-empty-companion-overlay img {
+    position: absolute;
+    top: -130.36%;
+    left: -19.37%;
+    width: 140.66%;
+    max-width: none;
+    height: auto;
 }
 
 #wheel {

@@ -100,7 +100,7 @@ export function setHostControlsVisibility(): void {
 }
 
 export const wheelEmptyHint = optionalElement<HTMLDivElement>("wheel-empty-hint");
-export const wheelEmptyCompanionOverlay = optionalElement<HTMLImageElement>("wheel-empty-companion-overlay");
+export const wheelEmptyCompanionOverlay = optionalElement<HTMLDivElement>("wheel-empty-companion-overlay");
 
 export function updateWheelEmptyState(): void {
   const isEmpty = getNamesInWheelList().length === 0;

@@ -1,11 +1,12 @@
 .legal-links {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    position: static;
     display: flex;
     flex-direction: row;
+    justify-content: flex-end;
     gap: 8px;
-    z-index: 9999;
+    z-index: auto;
+    width: 100%;
+    padding: 0 clamp(0.75rem, 1.5vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.5rem);
 }
 
 .legal-links__link--imprint,

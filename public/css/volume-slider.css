@@ -1,20 +1,30 @@
 .volume {
-    position: fixed;
-    top: 100px;
-    left: 10px;
-    z-index: 1000;
+    position: static;
+    justify-self: end;
+    z-index: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+    width: clamp(9rem, 18vw, 14rem);
+    min-width: 0;
     background: var(--auth-bg);
     color: var(--auth-text);
     border: 1px solid var(--border);
-    padding: 10px;
+    padding: clamp(0.5rem, 1vw, 0.75rem);
     border-radius: 8px;
 }
 
 .volume__header {
+    grid-column: 1 / -1;
     display: flex;
-    align-items: left;
+    align-items: center;
     gap: 8px;
     margin-bottom: 5px;
+}
+
+.volume input {
+    width: 100%;
+    min-width: 0;
 }
 
 .volume label {
@@ -22,6 +32,8 @@
     font-weight: bold;
     display: block;
     margin-bottom: 0;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .volume__icon-btn {

@@ -1,16 +1,24 @@
 #user-area {
-    position: fixed;
-    top: 0.35rem;
-    right: 16rem;
-    z-index: 9999;
+    position: static;
+    justify-self: start;
+    z-index: auto;
     background: var(--user-area-bg);
     color: var(--user-area-text);
-    padding: 10px 14px;
+    padding: clamp(0.5rem, 1vw, 0.75rem);
     border: 2px solid var(--user-area-border);
     border-radius: 10px;
     display: flex;
-    gap: 10px;
+    gap: clamp(0.35rem, 0.8vw, 0.75rem);
     align-items: center;
+    max-width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+#user-profile-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #auth-button {

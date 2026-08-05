@@ -1,12 +1,13 @@
 .multiplier {
-    position: fixed;
-    top: 20px;
-    left: 10px;
-    z-index: 1000;
+    position: static;
+    z-index: auto;
+    flex: 1 1 6rem;
+    max-width: 11rem;
+    min-width: 5.5rem;
     background: var(--auth-bg);
     color: var(--auth-text);
     border: 1px solid var(--border);
-    padding: 10px;
+    padding: 0.45rem 0.6rem;
     border-radius: 8px;
 }
 
@@ -15,11 +16,19 @@
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
+    font-size: 0.72rem;
+    white-space: nowrap;
 }
 
 .multiplier__header {
     display: flex;
-    align-items: left;
+    align-items: center;
     gap: 8px;
-    margin-bottom: 5px;
+    margin-bottom: 0.25rem;
+}
+
+.multiplier input {
+    display: block;
+    width: 100%;
+    min-width: 0;
 }

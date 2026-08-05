@@ -1,12 +1,9 @@
-.app-header {
-    display: flex;
-    justify-content: flex-end;
-    padding: 1rem;
-}
-
 .app-header__language-switcher {
     display: inline-flex;
+    align-items: center;
+    justify-self: center;
     gap: 0.35rem;
+    min-width: 0;
 }
 
 .lang-btn,
@@ -34,8 +31,5 @@
 }
 
 .app-header--overlay {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 10000;
+    position: relative;
 }

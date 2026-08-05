@@ -1,14 +1,17 @@
 #room-panel {
-  position: fixed;
-  top: 270px;
-  left: 20px;
-  z-index: 9000;
+  position: static;
+  align-self: center;
+  z-index: auto;
   background: var(--room-console-bg);
   color: var(--room-console-text);
-  padding: 14px 16px;
+  padding: clamp(0.65rem, 1.2vw, 1rem);
   border: 2px solid var(--border);
   border-radius: 16px;
-  min-width: 210px;
+  width: 100%;
+  min-width: 0;
+  max-width: 20rem;
+  max-height: min(68dvh, 36rem);
+  overflow: auto;
   font-family: inherit;
   box-shadow: 0 4px 16px var(--shadow-soft);
 }
@@ -31,12 +34,15 @@
 .room__join {
   display: flex;
   gap: 6px;
+  min-width: 0;
 }
 
 #room-key-input {
   flex: 1;
-  padding: 7px 10px;
-  font-size: 0.85rem;
+  width: 100%;
+  min-width: 0;
+  padding: 7px 6px;
+  font-size: 0.75rem;
   text-transform: uppercase;
   border: 1.5px solid var(--border);
   border-radius: 100px;
@@ -84,6 +90,8 @@
 #room-join-btn {
   background: var(--button-bg);
   color: var(--button-text);
+  padding-inline: 8px;
+  font-size: 0.75rem;
 }
 
 #room-join-btn:hover {
@@ -170,14 +178,21 @@
 
 /* Centered input when wheel is empty */
 .name-centered-input {
-  position: fixed;
+  position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 9500;
+  z-index: 4;
   display: flex;
   gap: 8px;
   align-items: center;
+  width: min(75%, 20rem);
+  min-width: 0;
+}
+
+.name-centered-input .names-in-wheel-list__add-row {
+  width: 100%;
+  min-width: 0;
 }
 
 .name-centered-input .names-in-wheel-list__add-row {

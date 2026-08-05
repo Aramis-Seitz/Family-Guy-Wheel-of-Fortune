@@ -1,16 +1,134 @@
-.container {
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    overflow-x: auto;
+}
+
+.app-header {
     display: grid;
-    grid-template-columns: 1fr 400px 1fr;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    min-height: 100vh;
-    isolation: isolate;
+    gap: clamp(0.5rem, 1.5vw, 2rem);
+    width: 100%;
+    min-width: 0;
+    padding: clamp(0.75rem, 1.5vw, 1.5rem);
+    position: relative;
+    z-index: 10;
+}
+
+.app-header > * {
+    min-width: 0;
+}
+
+.app-layout {
+    --wheel-size: clamp(15rem, min(34vw, 55vh), 31.25rem);
+
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.9fr) minmax(22rem, 2.6fr) minmax(11rem, 1fr);
+    align-items: center;
+    gap: clamp(0.5rem, 1.25vw, 1.5rem);
+    flex: 1 1 auto;
+    width: min(100%, 120rem);
+    min-width: 0;
+    min-height: 0;
+    margin-inline: auto;
+    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.5rem, 1.2vh, 1rem);
+    min-width: 0;
+}
+
+.game-stage {
+    display: grid;
+    grid-template-columns: minmax(3.5rem, 1fr) minmax(15rem, var(--wheel-size)) minmax(3.5rem, 1fr);
+    grid-template-areas:
+        "preview-left wheel preview-right"
+        "actions actions actions";
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 1vw, 1rem);
+    width: 100%;
+    max-width: 70rem;
+    min-width: 0;
+}
+
+.wheel-center {
+    grid-area: wheel;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.game-stage__preview {
+    width: min(100%, clamp(4.5rem, 10vw, 10rem));
+    max-height: var(--wheel-size);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.game-stage__preview--left {
+    grid-area: preview-left;
+    justify-self: end;
+}
+
+.game-stage__preview--right {
+    grid-area: preview-right;
+    justify-self: start;
+}
+
+.bottom-action-bar {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.25rem, 0.65vw, 0.65rem);
+    justify-self: center;
+    width: min(100%, 42rem);
+    min-width: 0;
+    padding-top: clamp(0.25rem, 0.8vh, 0.75rem);
+}
+
+.bottom-action-bar > button {
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 0.45rem;
+    white-space: nowrap;
+}
+
+.bottom-action-bar > .spin__btn,
+.bottom-action-bar > #reset-btn {
+    padding: 0.45rem;
+    font-size: 0.72rem;
+}
+
+.secondary-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 1vw, 1rem);
+    min-width: 0;
+}
+
+.secondary-action-bar > button {
+    min-width: 0;
+    padding: 0.6rem clamp(0.75rem, 1.2vw, 1.25rem);
+    font-size: 0.85rem;
+    white-space: nowrap;
 }
 
 .panel {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    width: 280px;
-    justify-self: center;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: 20rem;
 }
 

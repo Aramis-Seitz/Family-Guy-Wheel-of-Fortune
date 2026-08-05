@@ -1,27 +1,47 @@
 import { requiredElement } from "../shared/dom-helpers";
 import { formatMultiplier } from "../app/format";
 
-export const multiplierSlider = requiredElement<HTMLInputElement>("multiplier-slider");
+export const MULTIPLIER_VALUES = [1, 1.25, 1.5, 1.75, 2] as const;
+export const DEFAULT_MULTIPLIER = MULTIPLIER_VALUES[0];
+export const MULTIPLIER_CHANGE_EVENT = "multiplier-change";
+
+type Multiplier = typeof MULTIPLIER_VALUES[number];
+
+export const multiplierButton = requiredElement<HTMLButtonElement>("multiplier-button");
 export const multiplierValue = requiredElement<HTMLSpanElement>("multiplier-value");
 
-export function setMultiplierSlider(multiplier: number): void {
-  multiplierSlider.value = `${multiplier}`;
+let currentMultiplier: Multiplier = DEFAULT_MULTIPLIER;
+
+function normalizeMultiplier(multiplier: number): Multiplier {
+  if (!Number.isFinite(multiplier)) return DEFAULT_MULTIPLIER;
+
+  return MULTIPLIER_VALUES.reduce((closest, candidate) =>
+    Math.abs(candidate - multiplier) < Math.abs(closest - multiplier) ? candidate : closest
+  );
+}
+
+export function setMultiplierControlValue(multiplier: number): void {
+  currentMultiplier = normalizeMultiplier(multiplier);
+  updateMultiplierDisplay();
 }
 
 export function updateMultiplierDisplay(): void {
-  if (!multiplierSlider || !multiplierValue) return;
-  multiplierValue.textContent = formatMultiplier(Number(multiplierSlider.value));
+  multiplierValue.textContent = formatMultiplier(currentMultiplier);
 }
 
-export function initMultiplierSlider(): void {
-  multiplierSlider?.addEventListener("input", updateMultiplierDisplay);
+function advanceMultiplier(): void {
+  const currentIndex = MULTIPLIER_VALUES.indexOf(currentMultiplier);
+  currentMultiplier = MULTIPLIER_VALUES[(currentIndex + 1) % MULTIPLIER_VALUES.length];
+  updateMultiplierDisplay();
+  multiplierButton.dispatchEvent(new Event(MULTIPLIER_CHANGE_EVENT));
+}
+
+export function initMultiplierButton(): void {
+  multiplierButton.addEventListener("click", advanceMultiplier);
   updateMultiplierDisplay();
   window.addEventListener("app:language-changed", updateMultiplierDisplay);
 }
 
-export const DEFAULT_MULTIPLIER: number = 1;
-
 export function getMultiplier(): number {
-  const value = parseFloat(multiplierSlider.value);
-  return Number.isNaN(value) ? DEFAULT_MULTIPLIER : value;
+  return currentMultiplier;
 }

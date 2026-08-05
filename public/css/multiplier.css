@@ -1,34 +1,11 @@
 .multiplier {
     position: static;
     z-index: auto;
-    flex: 1 1 6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
     max-width: 11rem;
     min-width: 5.5rem;
-    background: var(--auth-bg);
-    color: var(--auth-text);
-    border: 1px solid var(--border);
-    padding: 0.45rem 0.6rem;
-    border-radius: 8px;
-}
-
-.multiplier label {
-    color: var(--auth-text);
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    font-size: 0.72rem;
     white-space: nowrap;
-}
-
-.multiplier__header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 0.25rem;
-}
-
-.multiplier input {
-    display: block;
-    width: 100%;
-    min-width: 0;
 }

@@ -5,7 +5,12 @@ import {
   MIN_SPIN_ROTATIONS,
 } from "../wheel/spin";
 import type { Direction } from "../wheel/spin";
-import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay, multiplierSlider } from "../wheel/multiplier";
+import {
+  getMultiplier,
+  MULTIPLIER_CHANGE_EVENT,
+  multiplierButton,
+  setMultiplierControlValue,
+} from "../wheel/multiplier";
 import { hideWinnerModal } from "../wheel/winner";
 import { initChat, destroyChat } from "./room-chat";
 import { showToast } from "../shared/toast";
@@ -61,7 +66,7 @@ function clearRoom(): void {
   if (roomKeyDisplay) roomKeyDisplay.textContent = '';
   if (roomInfo) roomInfo.classList.add('hidden');
   if (multiplierSyncListener) {
-    multiplierSlider?.removeEventListener('input', multiplierSyncListener);
+    multiplierButton.removeEventListener(MULTIPLIER_CHANGE_EVENT, multiplierSyncListener);
     multiplierSyncListener = null;
   }
   applyGameModeLock();
@@ -137,7 +142,7 @@ function finishRoomSetup(roomKey: string): void {
     handleRoomSpinEvent,
     syncRoomPlayers,
     onRoomClosed,
-    (multiplier) => { setMultiplierSlider(multiplier); updateMultiplierDisplay(); },
+    setMultiplierControlValue,
     setNamesFromRoom,
     handleWheelResetEvent,
     handleWinnerModalCloseEvent
@@ -174,7 +179,7 @@ export async function executeCreateRoom(): Promise<void> {
       if (!activeRoomKey) return;
       void setMultiplier(activeRoomKey, getMultiplier());
     };
-    multiplierSlider?.addEventListener('input', multiplierSyncListener);
+    multiplierButton.addEventListener(MULTIPLIER_CHANGE_EVENT, multiplierSyncListener);
     showToast({ message: t('room.created', { roomKey }), type: 'success' });
   } catch (error) {
     console.error('[ROOM] Erstellen fehlgeschlagen:', error);
@@ -192,8 +197,7 @@ export async function executeJoinRoom(roomKey: string): Promise<void> {
     setRoomActive(roomKey, false);
     initRoomPlayers(players);
     setNamesFromRoom(names ?? []);
-    setMultiplierSlider(multiplier);
-    updateMultiplierDisplay();
+    setMultiplierControlValue(multiplier);
     finishRoomSetup(roomKey);
     showToast({ message: t('room.joined', { roomKey }), type: 'success' });
   } catch (error) {

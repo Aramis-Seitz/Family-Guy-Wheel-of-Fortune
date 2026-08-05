@@ -2,7 +2,7 @@ import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./so
 import { fetchRandomNumber } from "../api/spin-api";
 import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked } from "../names/names-in-wheel-list";
 import { announceWinner, resolveWinner, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
-import { getMultiplier, multiplierSlider } from "./multiplier";
+import { getMultiplier, multiplierButton } from "./multiplier";
 import { wheelElement } from "./renderer";
 import { bulkAddToWheelBtn, getPlayerToggleButtons } from "../multiplayer/room-players-sidebar";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
@@ -38,7 +38,7 @@ export const spinRightBtn = requiredElement<HTMLButtonElement>("spin-right-btn")
 export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
 
 function getSpinRelatedElements(): SpinElement[] {
-  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierSlider, getPlayerToggleButtons()];
+  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierButton, getPlayerToggleButtons()];
 
   if (bulkAddToWheelBtn) {
     elements.push(bulkAddToWheelBtn);

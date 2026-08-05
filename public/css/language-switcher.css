@@ -1,8 +1,10 @@
 .app-header__language-switcher {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     justify-self: center;
     gap: 0.35rem;
+    width: var(--top-control-width);
     min-width: 0;
 }
 

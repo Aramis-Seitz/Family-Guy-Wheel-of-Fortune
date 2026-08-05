@@ -16,11 +16,13 @@
 @import url('shop.css');
 
 .video-corner-container {
-    position: relative;
-    width: min(100%, clamp(4.5rem, 10vw, 10rem));
+    position: fixed;
+    left: clamp(0.75rem, 1.5vw, 1.5rem);
+    bottom: clamp(0.75rem, 1.5vw, 1.5rem);
+    width: clamp(8rem, 14vw, 14rem);
     height: auto;
     aspect-ratio: 4 / 3;
-    z-index: auto;
+    z-index: 5;
     overflow: hidden;
     border-radius: 8px;
     box-shadow: 0 4px 8px var(--shadow-strong);

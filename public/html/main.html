@@ -181,6 +181,13 @@
         </aside>
 
         <section class="game-area">
+            <nav class="secondary-action-bar" aria-label="Wheel actions">
+                <button class="names-in-wheel-list__share-btn sec-btn" id="share-names-in-wheel-list-btn"
+                    data-i18n="html.share">Share</button>
+                <button class="inventory-btn sec-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
+                <button class="shop-btn sec-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
+            </nav>
+
             <div class="game-stage">
                 <div class="wheel-companion game-stage__preview game-stage__preview--left">
                     <img id="wheel-companion-image" data-i18n-alt="a11y.companion" alt="Wheel companion">
@@ -209,13 +216,6 @@
                     </div>
                 </div>
 
-                <div class="video-corner-container game-stage__preview game-stage__preview--right">
-                    <video id="background-video" autoplay loop muted playsinline>
-                        <source src="/resources/wirkaufendeinauto.mp4" type="video/mp4">
-                        <span data-i18n="html.videoFallback">Your browser does not support the video tag.</span>
-                    </video>
-                </div>
-
                 <div class="bottom-action-bar">
                     <button class="spin__btn" id="spin-left-btn" type="button" data-i18n="html.spinLeft">SPIN
                         LEFT</button>
@@ -232,13 +232,6 @@
                     </div>
                 </div>
             </div>
-
-            <nav class="secondary-action-bar" aria-label="Wheel actions">
-                <button class="names-in-wheel-list__share-btn sec-btn" id="share-names-in-wheel-list-btn"
-                    data-i18n="html.share">Share</button>
-                <button class="inventory-btn sec-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
-                <button class="shop-btn sec-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
-            </nav>
         </section>
 
         <aside class="panel">
@@ -263,6 +256,13 @@
                 data-i18n="html.noNames">No names yet. Add some!</p>
         </aside>
     </main>
+
+    <div class="video-corner-container">
+        <video id="background-video" autoplay loop muted playsinline>
+            <source src="/resources/wirkaufendeinauto.mp4" type="video/mp4">
+            <span data-i18n="html.videoFallback">Your browser does not support the video tag.</span>
+        </video>
+    </div>
 
     <div id="winner-modal" class="winner-modal hidden">
         <div class="winner-modal__content">

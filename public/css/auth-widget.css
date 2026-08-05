@@ -10,7 +10,8 @@
     display: flex;
     gap: clamp(0.35rem, 0.8vw, 0.75rem);
     align-items: center;
-    max-width: 100%;
+    width: max-content;
+    max-width: clamp(14.5rem, 17vw, 18rem);
     min-width: 0;
     white-space: nowrap;
 }

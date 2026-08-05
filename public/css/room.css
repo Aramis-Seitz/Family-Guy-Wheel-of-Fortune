@@ -1,6 +1,6 @@
 #room-panel {
   position: static;
-  align-self: center;
+  align-self: start;
   z-index: auto;
   background: var(--room-console-bg);
   color: var(--room-console-text);

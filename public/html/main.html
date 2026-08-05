@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="html.mainTitle">Family Guy Wheel of Fortune!</title>
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/main.css">
@@ -43,19 +44,26 @@
     </div>
 
     <header class="app-header app-header--overlay">
+        <div id="user-area">
+            <span id="user-coin-display" style="display:none; margin-right:8px;">🪙 0</span>
+            <span id="user-profile-name" data-i18n="profile.notLoggedIn">Not logged in</span>
+            <button id="auth-button" type="button" data-i18n="profile.login">Login</button>
+        </div>
         <div class="app-header__language-switcher" aria-label="Language selection">
             <button class="lang-btn" type="button" data-language="de">DE</button>
             <button class="lang-btn" type="button" data-language="en">EN</button>
         </div>
+        <div class="volume">
+            <div class="volume__header">
+                <label for="volume-slider">
+                    <span data-i18n="html.volume">Volume</span>: <span id="volume-value"></span>%
+                </label>
+            </div>
+            <input type="range" id="volume-slider" min="0" max="100" step="1" value="50">
+            <button id="volume-icon" type="button" class="volume__icon-btn" data-i18n-title="a11y.mute"
+                title="Mute">🔉</button>
+        </div>
     </header>
-
-    <button class="spin__btn" id="spin-left-btn" type="button" data-i18n="html.spinLeft">SPIN LEFT</button>
-    <button class="spin__btn" id="spin-right-btn" type="button" data-i18n="html.spinRight">SPIN RIGHT</button>
-    <button id="reset-btn" type="button" data-i18n="html.reset">RESET</button>
-    <button class="names-in-wheel-list__share-btn sec-btn" id="share-names-in-wheel-list-btn"
-        data-i18n="html.share">Share</button>
-    <button class="inventory-btn sec-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
-    <button class="shop-btn sec-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
 
     <dialog id="inventory-modal">
         <div id="inventory-modal-content" class="inventory-modal__content">
@@ -142,90 +150,104 @@
         </div>
     </dialog>
 
-    <div id="user-area">
-        <span id="user-coin-display" style="display:none; margin-right:8px;">🪙 0</span>
-        <span id="user-profile-name" data-i18n="profile.notLoggedIn">Not logged in</span>
-        <button id="auth-button" type="button" data-i18n="profile.login">Login</button>
-    </div>
-
-    <div id="room-panel">
-        <h3 data-i18n="html.multiplayer">Multiplayer</h3>
-        <div class="room__controls" id="room-controls">
-            <button id="room-create-btn" class="room__btn" type="button" data-i18n="html.createRoom" disabled>Create
-                room</button>
-            <div class="room__join">
-                <input type="text" id="room-key-input" data-i18n-placeholder="html.roomCode" placeholder="Code"
-                    maxlength="6" autocomplete="off">
-                <button id="room-join-btn" class="room__btn" type="button" data-i18n="html.join" disabled>Join</button>
-            </div>
-        </div>
-        <div id="room-info" class="hidden">
-            <div class="room__key-row">
-                <span class="room__key-label" data-i18n="html.roomCodeLabel">Room:</span>
-                <span id="room-key-display"></span>
-                <button id="room-copy-key-btn" class="room__btn room__btn--copy" type="button"
-                    data-i18n-title="html.roomCode" title="Code">&#128203;</button>
-                <button id="room-leave-btn" class="room__btn" type="button" data-i18n="html.leave">Leave</button>
-            </div>
-            <p class="room__players-label" data-i18n="html.players">Players:</p>
-            <ul id="room-players-list"></ul>
-            <button id="room-bulk-add-btn" class="room__btn room__btn--small hidden" type="button"
-                data-i18n="room.bulkAdd">Add all to wheel</button>
-            <div id="chat-section">
-                <div id="chat-header" class="chat__header">
-                    <span class="chat__label" data-i18n="html.chat">💬 Chat</span>
-                    <span id="chat-toggle-btn" class="chat__toggle-btn" aria-expanded="false">▼</span>
+    <main class="app-layout">
+        <aside id="room-panel">
+            <h3 data-i18n="html.multiplayer">Multiplayer</h3>
+            <div class="room__controls" id="room-controls">
+                <button id="room-create-btn" class="room__btn" type="button" data-i18n="html.createRoom" disabled>Create
+                    room</button>
+                <div class="room__join">
+                    <input type="text" id="room-key-input" data-i18n-placeholder="html.roomCode" placeholder="Code"
+                        maxlength="6" autocomplete="off">
+                    <button id="room-join-btn" class="room__btn" type="button" data-i18n="html.join"
+                        disabled>Join</button>
                 </div>
-                <div id="chat-body" class="chat__body--collapsed">
-                    <ul id="chat-messages"></ul>
-                    <div class="chat__input-row">
-                        <input type="text" id="chat-input" data-i18n-placeholder="html.enterMessage"
-                            placeholder="Enter message" maxlength="200" autocomplete="off">
-                        <button id="chat-send-btn" class="chat__send-btn" type="button"
-                            data-i18n-aria-label="a11y.sendMessage" aria-label="Send message">&#10148;</button>
+            </div>
+            <div id="room-info" class="hidden">
+                <div class="room__key-row">
+                    <span class="room__key-label" data-i18n="html.roomCodeLabel">Room:</span>
+                    <span id="room-key-display"></span>
+                    <button id="room-copy-key-btn" class="room__btn room__btn--copy" type="button"
+                        data-i18n-title="html.roomCode" title="Code">&#128203;</button>
+                    <button id="room-leave-btn" class="room__btn" type="button" data-i18n="html.leave">Leave</button>
+                </div>
+                <p class="room__players-label" data-i18n="html.players">Players:</p>
+                <ul id="room-players-list"></ul>
+                <button id="room-bulk-add-btn" class="room__btn room__btn--small hidden" type="button"
+                    data-i18n="room.bulkAdd">Add all to wheel</button>
+                <div id="chat-section">
+                    <div id="chat-header" class="chat__header">
+                        <span class="chat__label" data-i18n="html.chat">💬 Chat</span>
+                        <span id="chat-toggle-btn" class="chat__toggle-btn" aria-expanded="false">▼</span>
+                    </div>
+                    <div id="chat-body" class="chat__body--collapsed">
+                        <ul id="chat-messages"></ul>
+                        <div class="chat__input-row">
+                            <input type="text" id="chat-input" data-i18n-placeholder="html.enterMessage"
+                                placeholder="Enter message" maxlength="200" autocomplete="off">
+                            <button id="chat-send-btn" class="chat__send-btn" type="button"
+                                data-i18n-aria-label="a11y.sendMessage" aria-label="Send message">&#10148;</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </aside>
 
-    <div class="container">
-        <div class="wheel-companion">
-            <img id="wheel-companion-image" data-i18n-alt="a11y.companion" alt="Wheel companion">
-            <div id="wheel-empty-companion-overlay" class="hidden" aria-hidden="true">
-                <img src="/resources/Sunglass.png" alt="">
+        <section class="game-area">
+            <nav class="secondary-action-bar" aria-label="Wheel actions">
+                <button class="names-in-wheel-list__share-btn sec-btn" id="share-names-in-wheel-list-btn"
+                    data-i18n="html.share">Share</button>
+                <button class="inventory-btn sec-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
+                <button class="shop-btn sec-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
+            </nav>
+
+            <div class="game-stage">
+                <div class="wheel-companion game-stage__preview game-stage__preview--left">
+                    <img id="wheel-companion-image" data-i18n-alt="a11y.companion" alt="Wheel companion">
+                    <div id="wheel-empty-companion-overlay" class="hidden" aria-hidden="true">
+                        <img src="/resources/Sunglass.png" alt="">
+                    </div>
+                </div>
+                <div class="wheel-center">
+                    <div id="wheel-empty-hint" class="wheel__empty-hint hidden" data-i18n="html.wheelEmpty">Enter
+                        names in the list to build the wheel.
+                    </div>
+                    <div class="wheel-frame">
+                        <svg id="wheel-svg" viewBox="0 0 200 200">
+                            <g id="wheel"></g>
+                        </svg>
+                    </div>
+
+                    <!-- centered input shown when wheel empty -->
+                    <div id="name-centered-input" class="name-centered-input name-centered-input--hidden">
+                        <div class="names-in-wheel-list__add-row">
+                            <input type="text" id="name-input-centered" data-i18n-placeholder="html.enterName"
+                                placeholder="Enter name…" />
+                            <button class="names-in-wheel-list__add-btn" id="add-name-btn-centered"
+                                data-i18n-aria-label="a11y.addName" aria-label="Add name">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-action-bar">
+                    <button class="spin__btn" id="spin-left-btn" type="button" data-i18n="html.spinLeft">SPIN
+                        LEFT</button>
+                    <button class="spin__btn" id="spin-right-btn" type="button" data-i18n="html.spinRight">SPIN
+                        RIGHT</button>
+                    <button id="reset-btn" type="button" data-i18n="html.reset">RESET</button>
+                    <div class="multiplier">
+                        <div class="multiplier__header">
+                            <label for="multiplier-slider">
+                                <span data-i18n="html.power">Power</span>: <span id="multiplier-value">1</span>x
+                            </label>
+                        </div>
+                        <input type="range" id="multiplier-slider" min="1" max="2" step="0.1" value="1">
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="wheel-empty-hint" class="wheel__empty-hint hidden" data-i18n="html.wheelEmpty">Enter names in the list
-            to build the wheel.
-        </div>
-        <div class="wheel-frame">
-            <svg id="wheel-svg" viewBox="0 0 200 200">
-                <g id="wheel"></g>
-            </svg>
-        </div>
+        </section>
 
-        <div class="multiplier">
-            <div class="multiplier__header">
-                <label for="multiplier-slider">
-                    <span data-i18n="html.power">Power</span>: <span id="multiplier-value">1</span>x
-                </label>
-            </div>
-            <input type="range" id="multiplier-slider" min="1" max="2" step="0.1" value="1">
-        </div>
-
-        <div class="volume">
-            <div class="volume__header">
-                <label for="volume-slider">
-                    <span data-i18n="html.volume">Volume</span>: <span id="volume-value"></span>%
-                </label>
-            </div>
-            <input type="range" id="volume-slider" min="0" max="100" step="1" value="50">
-            <button id="volume-icon" type="button" class="volume__icon-btn" data-i18n-title="a11y.mute"
-                title="Mute">🔉</button>
-        </div>
-
-        <div class="panel">
+        <aside class="panel">
             <div class="names-in-wheel-list__add-row" id="name-sidebar-add-row">
                 <input type="text" id="name-input" data-i18n-placeholder="html.enterName" placeholder="Enter name…" />
                 <button class="names-in-wheel-list__add-btn" id="add-name-btn" data-i18n-aria-label="a11y.addName"
@@ -245,35 +267,26 @@
                 entries required.</p>
             <p class="names-in-wheel-list__empty-hint" id="name-empty-hint" style="display:none"
                 data-i18n="html.noNames">No names yet. Add some!</p>
-        </div>
+        </aside>
+    </main>
 
-        <!-- centered input shown when wheel empty -->
-        <div id="name-centered-input" class="name-centered-input name-centered-input--hidden">
-            <div class="names-in-wheel-list__add-row">
-                <input type="text" id="name-input-centered" data-i18n-placeholder="html.enterName"
-                    placeholder="Enter name…" />
-                <button class="names-in-wheel-list__add-btn" id="add-name-btn-centered"
-                    data-i18n-aria-label="a11y.addName" aria-label="Add name">+</button>
-            </div>
-        </div>
-
-        <div id="winner-modal" class="winner-modal hidden">
-            <div class="winner-modal__content">
-                <h2 data-i18n="html.winner">🎉 Winner!</h2>
-                <p id="winner-modal-text">-</p>
-                <button id="winner-modal-close-btn" data-i18n="html.ok">OK</button>
-                <button id="winner-modal-remove-btn" data-i18n="html.remove">REMOVE</button>
-            </div>
-        </div>
-        <div class="video-corner-container">
-            <video id="background-video" autoplay loop muted playsinline>
-                <source src="/resources/wirkaufendeinauto.mp4" type="video/mp4">
-                <span data-i18n="html.videoFallback">Your browser does not support the video tag.</span>
-            </video>
-        </div>
-
-        <canvas id="winner-modal-confetti-canvas"></canvas>
+    <div class="video-corner-container">
+        <video id="background-video" autoplay loop muted playsinline>
+            <source src="/resources/wirkaufendeinauto.mp4" type="video/mp4">
+            <span data-i18n="html.videoFallback">Your browser does not support the video tag.</span>
+        </video>
     </div>
+
+    <div id="winner-modal" class="winner-modal hidden">
+        <div class="winner-modal__content">
+            <h2 data-i18n="html.winner">🎉 Winner!</h2>
+            <p id="winner-modal-text">-</p>
+            <button id="winner-modal-close-btn" data-i18n="html.ok">OK</button>
+            <button id="winner-modal-remove-btn" data-i18n="html.remove">REMOVE</button>
+        </div>
+    </div>
+
+    <canvas id="winner-modal-confetti-canvas"></canvas>
 
     <div class="legal-links">
 

@@ -1,12 +1,15 @@
-.app-header {
+.app-header__language-switcher {
     display: flex;
-    justify-content: flex-end;
-    padding: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+    justify-self: center;
+    gap: 0.35rem;
+    width: var(--top-control-width);
+    min-width: 0;
 }
 
-.app-header__language-switcher {
-    display: inline-flex;
-    gap: 0.35rem;
+.app-header__language-switcher .theme-toggle-btn {
+    margin-left: auto;
 }
 
 .lang-btn,
@@ -34,8 +37,5 @@
 }
 
 .app-header--overlay {
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 10000;
+    position: relative;
 }

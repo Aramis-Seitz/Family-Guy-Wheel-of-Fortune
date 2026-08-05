@@ -15,44 +15,48 @@
     <link rel="stylesheet" href="../css/language-switcher.css">
 </head>
 
-<body>
-    <header class="app-header app-header--overlay">
-        <div class="app-header__language-switcher" aria-label="Language selection">
-            <button class="lang-btn" type="button" data-language="de">DE</button>
-            <button class="lang-btn" type="button" data-language="en">EN</button>
+<body class="login-page">
+    <div class="login-page__content">
+        <header class="app-header app-header--overlay">
+            <div class="app-header__language-switcher" aria-label="Language selection">
+                <button class="lang-btn" type="button" data-language="de">DE</button>
+                <button class="lang-btn" type="button" data-language="en">EN</button>
+            </div>
+        </header>
+        <div class="auth-widget">
+            <input type="checkbox" id="auth-widget-toggle" class="auth-widget__toggle-checkbox" aria-hidden="true" />
+
+            <main>
+
+                <section data-i18n-aria-label="html.loginForm" aria-label="Login Form"
+                    class="auth-widget__form auth-widget__form--login">
+                    <form action="main.html" method="post" id="login-form" autocomplete="on">
+                        <h2 data-i18n="html.login">Login</h2>
+                        <div class="auth-widget__input-field">
+                            <label data-i18n="html.email" for="login-email">Email</label>
+                            <input type="email" id="login-email" name="email" autocomplete="username" inputmode="email"
+                                required aria-required="true" />
+                        </div>
+                        <div class="auth-widget__input-field">
+                            <label data-i18n="html.password" for="login-password">Password</label>
+                            <input type="password" id="login-password" name="password" autocomplete="current-password"
+                                required aria-required="true" />
+                        </div>
+                        <button data-i18n="html.login" type="submit">Login</button>
+                        <div class="auth-widget__register-link">
+                            <p data-i18n="html.noAccount">Don't have an account?</p>
+                            <a data-i18n="html.signup" href="signup.html">Sign up</a>
+                        </div>
+                        <div class="legal-links">
+                            <a data-i18n="html.imprint" href="imprint.html"
+                                class="legal-links__link--imprint">Imprint</a>
+                            <a data-i18n="html.privacy" href="privacy.html"
+                                class="legal-links__link--privacy">Privacy</a>
+                        </div>
+                    </form>
+                </section>
+            </main>
         </div>
-    </header>
-    <div class="auth-widget">
-        <input type="checkbox" id="auth-widget-toggle" class="auth-widget__toggle-checkbox" aria-hidden="true" />
-
-        <main>
-
-            <section data-i18n-aria-label="html.loginForm" aria-label="Login Form"
-                class="auth-widget__form auth-widget__form--login">
-                <form action="main.html" method="post" id="login-form" autocomplete="on">
-                    <h2 data-i18n="html.login">Login</h2>
-                    <div class="auth-widget__input-field">
-                        <label data-i18n="html.email" for="login-email">Email</label>
-                        <input type="email" id="login-email" name="email" autocomplete="username" inputmode="email"
-                            required aria-required="true" />
-                    </div>
-                    <div class="auth-widget__input-field">
-                        <label data-i18n="html.password" for="login-password">Password</label>
-                        <input type="password" id="login-password" name="password" autocomplete="current-password"
-                            required aria-required="true" />
-                    </div>
-                    <button data-i18n="html.login" type="submit">Login</button>
-                    <div class="auth-widget__register-link">
-                        <a data-i18n="html.signup" href="signup.html">Sign up</a>
-                        <p data-i18n="html.noAccount">Don't have an account?</p>
-                    </div>
-                    <div class="legal-links">
-                        <a data-i18n="html.imprint" href="imprint.html" class="legal-links__link--imprint">Imprint</a>
-                        <a data-i18n="html.privacy" href="privacy.html" class="legal-links__link--privacy">Privacy</a>
-                    </div>
-                </form>
-            </section>
-        </main>
     </div>
 
 

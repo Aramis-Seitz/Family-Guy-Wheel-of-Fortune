@@ -17,26 +17,20 @@
 
 .video-corner-container {
     position: fixed;
-    bottom: 60px;
-    right: 20px;
-    width: 250px;
+    left: clamp(0.75rem, 1.5vw, 1.5rem);
+    bottom: clamp(0.75rem, 1.5vw, 1.5rem);
+    width: clamp(8rem, 14vw, 14rem);
     height: auto;
-    z-index: 1000;
+    aspect-ratio: 4 / 3;
+    z-index: 5;
     overflow: hidden;
     border-radius: 8px;
     box-shadow: 0 4px 8px var(--shadow-strong);
 }
 
 .video-corner-container video {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-@media (max-width: 768px) {
-    .video-corner-container {
-        width: 180px;
-        bottom: 10px;
-        right: 10px;
-    }
 }

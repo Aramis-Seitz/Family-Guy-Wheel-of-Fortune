@@ -10,6 +10,50 @@ body {
     min-height: 100vh;
 }
 
+.login-page__content {
+    display: grid;
+    grid-template-rows: auto auto;
+    justify-items: center;
+    gap: 0.75rem;
+    width: min(calc(100% - 2rem), 20rem);
+}
+
+.login-page .app-header {
+    display: block;
+    width: 100%;
+    padding: 0;
+}
+
+.login-page .app-header__language-switcher {
+    justify-self: auto;
+    width: 100%;
+}
+
+.login-page .auth-widget,
+.login-page .auth-widget main,
+.login-page .auth-widget__form {
+    width: 100%;
+}
+
+.login-page .legal-links {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 4px 4px minmax(0, 1fr);
+    gap: 0;
+    width: 100%;
+    margin-top: clamp(0.75rem, 1.5vh, 1rem);
+    padding-inline: 0;
+}
+
+.login-page .legal-links__link--imprint {
+    grid-column: 1;
+    justify-self: end;
+}
+
+.login-page .legal-links__link--privacy {
+    grid-column: 4;
+    justify-self: start;
+}
+
 .auth-widget {
     display: flex;
     justify-content: center;

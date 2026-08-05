@@ -3,8 +3,9 @@
 
     position: relative;
     z-index: 1;
-    width: 500px;
-    height: 500px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
     padding: var(--wheel-ring-width);
     border-radius: 50%;
     background: linear-gradient(145deg, var(--wheel-ring-highlight), var(--wheel-ring-shadow));
@@ -78,10 +79,6 @@
     transform: translateY(-50%) rotate(45deg);
 }
 
-.container {
-    position: relative;
-}
-
 .name-centered-input.name-centered-input--host-disabled {
     opacity: 0.6;
 }
@@ -98,14 +95,15 @@
 .wheel-companion {
     position: relative;
     z-index: 2;
-    justify-self: end;
-    height: 350px;
+    height: auto;
 }
 
 #wheel-companion-image {
     display: block;
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
+    max-height: var(--wheel-size);
+    object-fit: contain;
 }
 
 #wheel-empty-companion-overlay {

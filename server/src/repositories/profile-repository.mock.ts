@@ -28,8 +28,10 @@ export const getUserIdByUsername: typeof Real.getUserIdByUsername = async (usern
 };
 
 export const insertProfile: typeof Real.insertProfile = async (userId, username, email, dateOfBirth) => {
-    if (store.profiles.some((p) => p.id === userId)) {
-        throw { message: "duplicate key value violates unique constraint", code: "23505" };
-    }
-    store.profiles.push({ id: userId, username, email, date_of_birth: dateOfBirth, coins: 1 });
+    // Im Mock legt /api/mock/auth/signup die profiles-Row schon direkt an
+    // (dort liegt auch das Passwort fürs Mock-Login) - dieser Aufruf hier
+    // kommt danach trotzdem vom selben zweistufigen Frontend-Flow wie in
+    // Produktion und muss deshalb ein no-op statt ein Fehler sein.
+    if (store.profiles.some((p) => p.id === userId)) return;
+    store.profiles.push({ id: userId, username, email, date_of_birth: dateOfBirth, password: "", coins: 1 });
 };

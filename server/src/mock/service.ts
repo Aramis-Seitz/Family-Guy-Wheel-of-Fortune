@@ -1,21 +1,30 @@
-import { store } from "./store";
-import { decodeMockJwt } from "./jwt";
+import { decodeMockJwt } from "./routes";
+import { findProfile } from "./store";
 
 // Die Repositories in server/src/repositories/*.mock.ts greifen seit dem
 // Umbau direkt auf den In-Memory-Store zu, statt über einen generischen
 // PostgREST-Query-Builder zu gehen. Übrig bleibt hier nur noch auth.getUser,
 // weil auth-service.ts direkt gegen den Supabase-Client-Typ programmiert.
 
-    return { data: null, error: { message: `Unsupported: ${t}.${this._op}` } };
-  }
-}
-
-export function createMockSupabaseClient() {
-    return {
-        auth: {
-            async getUser(jwt: string) {
-                return getUser(jwt);
+export function createMockServiceClient() {
+  return {
+    auth: {
+      async getUser(jwt: string) {
+        const decoded = decodeMockJwt(jwt);
+        if (!decoded) return { data: { user: null }, error: { message: "Invalid mock token" } };
+        const profile = findProfile(decoded.id);
+        if (!profile) return { data: { user: null }, error: { message: "User not found" } };
+        return {
+          data: {
+            user: {
+              id: decoded.id,
+              email: decoded.email,
+              user_metadata: { username: decoded.username, date_of_birth: profile.date_of_birth },
             },
-        },
-    };
+          },
+          error: null,
+        };
+      },
+    },
+  };
 }

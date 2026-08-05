@@ -19,8 +19,11 @@ export const listOwnedAssets: typeof Real.listOwnedAssets = async (userId) => {
         .filter((a): a is Asset => !!a);
 };
 
-export const listSelectedAssetIds: typeof Real.listSelectedAssetIds = async (userId) => {
-    return store.asset_selection.filter((s) => s.user_id === userId).map((s) => s.asset_id);
+export const listSelectedAssets: typeof Real.listSelectedAssets = async (userId) => {
+    return store.asset_selection
+        .filter((s) => s.user_id === userId)
+        .map((s) => store.asset.find((a) => a.id === s.asset_id))
+        .filter((a): a is Asset => !!a);
 };
 
 export const listAssetCategories: typeof Real.listAssetCategories = async () => {

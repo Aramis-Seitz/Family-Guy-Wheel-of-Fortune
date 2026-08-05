@@ -1,4 +1,4 @@
-import { supabaseClient } from "../lib/supabase-client";
+import { createServiceClient } from "../mock/supabase";
 import type { HttpHeaders } from "../controllers/response";
 
 function headerValue(value: string | string[] | undefined): string {
@@ -15,7 +15,7 @@ export function extractBearerToken(headers?: HttpHeaders): string {
 export async function resolveUserIdFromToken(token: string): Promise<string | null> {
     if (!token) return null;
 
-    const { data: { user }, error } = await supabaseClient.auth.getUser(token);
+    const { data: { user }, error } = await createServiceClient().auth.getUser(token);
     if (error || !user) return null;
     return user.id;
 }

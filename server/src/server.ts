@@ -36,11 +36,15 @@ app.options("*", cors(corsOptions));
 app.use(['/login.html', '/main.html', '/signup.html'], requireBasicAuthExpress);
 app.use(express.static(path.resolve(__dirname, "../../public/dist/html")));
 app.use(express.static(path.resolve(__dirname, "../../public/dist")));
-app.use('/api', apiRoutes);
-
+// Muss vor apiRoutes gemountet werden: '/api' matcht als Präfix auch
+// '/api/mock/...', sonst würde apiRoutes' requireAuth jede Mock-Anfrage
+// (die keinen echten Bearer-Token hat) mit 401 abfangen, bevor sie den
+// Mock-Router überhaupt erreicht.
 if (USE_MOCK) {
   app.use('/api/mock', mockRouter);
 }
+
+app.use('/api', apiRoutes);
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {

@@ -81,7 +81,7 @@
     transform: translateY(-50%);
     font-size: 20px;
     font-weight: 700;
-    color: var(--surface-text);
+    color: #ffffff;
 }
 
 .shop-modal__close-btn {
@@ -91,7 +91,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--surface-text);
+    color: #ffffff;
     font-size: 20px;
     cursor: pointer;
     padding: 0.25rem;

@@ -155,7 +155,7 @@
 }
 
 .inventory-modal__card--empty {
-    background: var(--surface);
+    background: var(--input-bg);
     border: 1px dashed var(--border);
     color: var(--surface-text);
 }

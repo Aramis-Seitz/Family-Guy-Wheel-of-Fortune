@@ -128,7 +128,7 @@ body {
     flex-direction: column;
     gap: var(--space-3);
     align-self: start;
-    justify-self: stretch;
+    justify-self: end;
     width: 100%;
     min-width: 0;
     max-width: 20rem;

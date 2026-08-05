@@ -8,6 +8,7 @@ import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import type { SpinConfig } from "./spin";
 import { t } from "../app/i18n";
+import { SEGMENT_COLORS } from "./renderer";
 
 export const POINTER_OFFSET_DEG: number = 270;
 export const FULL_CIRCLE_DEG: number = 360;

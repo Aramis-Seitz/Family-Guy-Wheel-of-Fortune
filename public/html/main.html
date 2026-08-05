@@ -39,10 +39,10 @@
     <button class="spin__btn" id="spin-left-btn" type="button" data-i18n="html.spinLeft">SPIN LEFT</button>
     <button class="spin__btn" id="spin-right-btn" type="button" data-i18n="html.spinRight">SPIN RIGHT</button>
     <button id="reset-btn" type="button" data-i18n="html.reset">RESET</button>
-    <button class="names-in-wheel-list__share-btn" id="share-names-in-wheel-list-btn"
+    <button class="names-in-wheel-list__share-btn sec-btn" id="share-names-in-wheel-list-btn"
         data-i18n="html.share">Share</button>
-    <button class="inventory-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
-    <button class="shop-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
+    <button class="inventory-btn sec-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
+    <button class="shop-btn sec-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
 
     <dialog id="inventory-modal">
         <div id="inventory-modal-content" class="inventory-modal__content">
@@ -177,13 +177,20 @@
     </div>
 
     <div class="container">
-        <img id="wheel-companion-image" data-i18n-alt="a11y.companion" alt="Wheel companion">
+        <div class="wheel-companion">
+            <img id="wheel-companion-image" data-i18n-alt="a11y.companion" alt="Wheel companion">
+            <div id="wheel-empty-companion-overlay" class="hidden" aria-hidden="true">
+                <img src="/resources/Sunglass.png" alt="">
+            </div>
+        </div>
         <div id="wheel-empty-hint" class="wheel__empty-hint hidden" data-i18n="html.wheelEmpty">Enter names in the list
             to build the wheel.
         </div>
-        <svg id="wheel-svg" viewBox="0 0 200 200">
-            <g id="wheel"></g>
-        </svg>
+        <div class="wheel-frame">
+            <svg id="wheel-svg" viewBox="0 0 200 200">
+                <g id="wheel"></g>
+            </svg>
+        </div>
 
         <div class="multiplier">
             <div class="multiplier__header">

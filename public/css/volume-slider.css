@@ -3,7 +3,9 @@
     top: 100px;
     left: 10px;
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--auth-bg);
+    color: var(--auth-text);
+    border: 1px solid var(--border);
     padding: 10px;
     border-radius: 8px;
 }
@@ -16,7 +18,7 @@
 }
 
 .volume label {
-    color: white;
+    color: var(--auth-text);
     font-weight: bold;
     display: block;
     margin-bottom: 0;
@@ -25,6 +27,7 @@
 .volume__icon-btn {
     background: none;
     border: none;
+    color: currentColor;
     font-size: 20px;
     cursor: pointer;
     padding: 0;
@@ -34,7 +37,7 @@
 }
 
 .volume__icon-btn:hover {
-    transform: scale(1.15);
+    filter: brightness(1.12);
 }
 
 .volume__icon-btn:active {

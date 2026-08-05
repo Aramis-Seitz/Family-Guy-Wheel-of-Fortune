@@ -3,10 +3,10 @@
     border: none;
     border-radius: 14px;
     background: var(--surface);
-    color: var(--text);
+    color: var(--surface-text);
     padding: 0;
     width: min(380px, 92vw);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .12);
+    box-shadow: 0 20px 60px var(--shadow-soft);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -14,7 +14,7 @@
 }
 
 #save-wheel-modal::backdrop {
-    background: rgba(0, 0, 0, .5);
+    background: var(--backdrop);
     backdrop-filter: blur(3px);
 }
 
@@ -28,7 +28,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
 }
 
 .save-wheel-modal__header h3 {
@@ -40,16 +40,15 @@
     background: none;
     border: 1px solid var(--border);
     border-radius: 8px;
-    color: var(--muted);
+    color: var(--surface-text);
     padding: 3px 10px;
     font-size: 0.82rem;
     cursor: pointer;
-    transition: color .15s, border-color .15s;
+    transition: filter .15s, opacity .15s;
 }
 
 #save-wheel-modal-close-btn:hover {
-    color: var(--text);
-    border-color: var(--primary);
+    filter: brightness(1.12);
 }
 
 .save-wheel-modal__body {
@@ -67,16 +66,16 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: #888;
+    color: var(--surface-text);
 }
 
 #save-wheel-input {
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: var(--input-bg);
+    border: 1px solid var(--input-placeholder);
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 15px;
-    color: var(--text);
+    color: var(--input-text);
     width: 100%;
     outline: none;
     font-family: 'Segoe UI', sans-serif;
@@ -84,8 +83,8 @@
 }
 
 #save-wheel-input:focus {
-    border-color: #00a2ff;
-    box-shadow: 0 0 0 3px rgba(0, 162, 255, .18);
+    border-color: var(--input-focus-ring);
+    box-shadow: 0 0 0 3px var(--input-placeholder);
 }
 
 .save-wheel-modal__footer {
@@ -93,29 +92,28 @@
     justify-content: flex-end;
     gap: 10px;
     padding: 14px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--border);
 }
 
 #save-wheel-modal-cancel-btn {
-    background: none;
-    border: 1px solid #444;
+    background: var(--surface);
+    border: 1px solid var(--surface-text);
     border-radius: 8px;
-    color: #aaa;
+    color: var(--surface-text);
     padding: 8px 16px;
     font-size: 13px;
     cursor: pointer;
     font-family: 'Segoe UI', sans-serif;
-    transition: all .15s;
+    transition: filter .15s, opacity .15s;
 }
 
 #save-wheel-modal-cancel-btn:hover {
-    color: #fff;
-    border-color: #888;
+    filter: brightness(0.94);
 }
 
 #save-wheel-modal-confirm-btn {
-    background: #00a2ff;
-    color: #111;
+    background: var(--button-bg);
+    color: var(--button-text);
     border: none;
     border-radius: 8px;
     padding: 8px 20px;
@@ -128,7 +126,6 @@
 
 #save-wheel-modal-confirm-btn:hover {
     filter: brightness(1.1);
-    transform: translateY(-1px);
 }
 
 #save-wheel-modal-confirm-btn:active {

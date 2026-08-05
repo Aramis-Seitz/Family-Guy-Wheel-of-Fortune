@@ -4,7 +4,7 @@
     right: 16rem;
     z-index: 9999;
     background: var(--user-area-bg);
-    color: #fff;
+    color: var(--user-area-text);
     padding: 10px 14px;
     border: 2px solid var(--user-area-border);
     border-radius: 10px;
@@ -16,9 +16,9 @@
 #auth-button {
     padding: 6px 10px;
     cursor: pointer;
-    background: var(--user-area-bg);
-    color: #fff;
-    border: 1px solid var(--user-area-border);
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: 1px solid var(--button-bg);
 }
 
 #user-profile-name.user-profile-name--clickable {
@@ -26,7 +26,7 @@
 }
 
 #user-profile-name.user-profile-name--clickable:hover {
-    text-decoration: underline;
+    opacity: 0.75;
 }
 
 #auth-widget-toggle:checked~main .auth-widget__form--login {
@@ -53,12 +53,12 @@
 }
 
 .auth-widget__forget-link a {
-    color: #bbb;
+    color: currentColor;
     text-decoration: none;
 }
 
 .auth-widget__forget-link a:hover {
-    text-decoration: underline;
+    opacity: 0.75;
 }
 
 .auth-widget__input-field {
@@ -76,10 +76,10 @@
 #signup-form .auth-widget__input-field input,
 .auth-widget__form .auth-widget__input-field input {
     padding: 10px;
-    border: 1px solid var(--border) !important;
+    border: 1px solid var(--input-placeholder) !important;
     border-radius: 8px !important;
-    background: #8e8e8e !important;
-    color: #111 !important;
+    background: var(--input-bg) !important;
+    color: var(--input-text) !important;
     font-size: 14px;
 }
 
@@ -87,5 +87,5 @@
 #signup-form .auth-widget__input-field input:focus,
 .auth-widget__form .auth-widget__input-field input:focus {
     outline: none;
-    border-color: #555 !important;
+    border-color: var(--input-focus-ring) !important;
 }

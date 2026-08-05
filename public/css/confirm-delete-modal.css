@@ -3,10 +3,10 @@
     border: none;
     border-radius: 14px;
     background: var(--surface);
-    color: var(--text);
+    color: var(--surface-text);
     padding: 0;
     width: min(360px, 92vw);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .12);
+    box-shadow: 0 20px 60px var(--shadow-soft);
     position: fixed;
     top: 50%;
     left: 50%;
@@ -14,7 +14,7 @@
 }
 
 #confirm-delete-modal::backdrop {
-    background: rgba(0, 0, 0, .5);
+    background: var(--backdrop);
     backdrop-filter: blur(3px);
 }
 
@@ -25,7 +25,7 @@
 
 .confirm-delete-modal__header {
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
 }
 
 .confirm-delete-modal__header h3 {
@@ -37,12 +37,12 @@
 .confirm-delete-modal__body {
     padding: 20px;
     font-size: 0.9rem;
-    color: var(--muted);
+    color: var(--surface-text);
     line-height: 1.5;
 }
 
 .confirm-delete-modal__body strong {
-    color: #fff;
+    color: var(--surface-text);
     font-weight: 700;
 }
 
@@ -51,29 +51,28 @@
     justify-content: flex-end;
     gap: 10px;
     padding: 14px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--border);
 }
 
 #confirm-delete-modal-cancel-btn {
-    background: none;
-    border: 1px solid #444;
+    background: var(--surface);
+    border: 1px solid var(--surface-text);
     border-radius: 8px;
-    color: #aaa;
+    color: var(--surface-text);
     padding: 8px 16px;
     font-size: 13px;
     font-family: 'Segoe UI', sans-serif;
     cursor: pointer;
-    transition: all .15s;
+    transition: filter .15s, opacity .15s;
 }
 
 #confirm-delete-modal-cancel-btn:hover {
-    color: #fff;
-    border-color: #888;
+    filter: brightness(0.94);
 }
 
 #confirm-delete-modal-confirm-btn {
-    background: #dc2626;
-    color: #fff;
+    background: var(--button-bg);
+    color: var(--button-text);
     border: none;
     border-radius: 8px;
     padding: 8px 20px;
@@ -86,7 +85,6 @@
 
 #confirm-delete-modal-confirm-btn:hover {
     filter: brightness(1.15);
-    transform: translateY(-1px);
 }
 
 #confirm-delete-modal-confirm-btn:active {

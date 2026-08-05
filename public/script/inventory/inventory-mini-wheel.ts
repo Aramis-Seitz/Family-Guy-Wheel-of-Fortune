@@ -1,4 +1,10 @@
-import { FULL_CIRCLE_RADIANS, SVG_NS, getSegmentColor, getPointOnCircle } from "../wheel/renderer";
+import {
+  FULL_CIRCLE_RADIANS,
+  SVG_NS,
+  getPointOnCircle,
+  getSegmentColor,
+  
+} from "../wheel/renderer";
 
 export function createMiniWheel(names: string[], size = 70): SVGSVGElement {
   const svg = document.createElementNS(SVG_NS, "svg");

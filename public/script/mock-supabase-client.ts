@@ -24,6 +24,13 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
+type AuthChangeCallback = (event: string, session: MockSession | null) => void;
+const authListeners: AuthChangeCallback[] = [];
+
+function notifyAuthListeners(event: string, session: MockSession | null) {
+  for (const cb of authListeners) cb(event, session);
+}
+
 function projectRow(row: any, cols: string) {
   if (!cols || cols === '*') return { ...row };
   const result: Record<string, unknown> = {};
@@ -154,10 +161,42 @@ class MockQueryBuilder {
   }
 }
 
-const noopChannel = {
-  on(..._args: any[]) { return noopChannel; },
-  subscribe() { return noopChannel; },
-};
+// Supabase Realtime "broadcast" is peer-to-peer (no DB involved), so it can
+// be mocked with BroadcastChannel: it relays messages between same-origin
+// tabs/windows, which is exactly how multiplayer is tested locally against
+// the mock backend (two tabs, same room). "postgres_changes" subscriptions
+// (coin-updates, room sync) would need a real DB change stream from the
+// server and stay inert here - on()/subscribe() are still chainable so
+// callers don't crash, they just never receive events.
+class MockRealtimeChannel {
+  private bc: BroadcastChannel;
+  private listeners: { event: string; cb: (arg: { payload: unknown }) => void }[] = [];
+
+  constructor(name: string) {
+    this.bc = new BroadcastChannel(`mock-realtime:${name}`);
+    this.bc.onmessage = (ev: MessageEvent<{ event: string; payload: unknown }>) => {
+      for (const l of this.listeners) {
+        if (l.event === ev.data.event) l.cb({ payload: ev.data.payload });
+      }
+    };
+  }
+
+  on(type: string, filter: { event: string }, cb: (arg: { payload: unknown }) => void) {
+    if (type === 'broadcast') this.listeners.push({ event: filter.event, cb });
+    return this;
+  }
+
+  subscribe() { return this; }
+
+  async send(msg: { type: string; event: string; payload: unknown }) {
+    if (msg.type === 'broadcast') this.bc.postMessage({ event: msg.event, payload: msg.payload });
+    return 'ok';
+  }
+
+  close() {
+    this.bc.close();
+  }
+}
 
 export function createMockClient() {
   return {
@@ -170,7 +209,9 @@ export function createMockClient() {
         });
         const body = await res.json();
         if (!res.ok) return { data: null, error: { message: body.error } };
-        saveSession({ access_token: body.token, user: body.user });
+        const session = { access_token: body.token, user: body.user };
+        saveSession(session);
+        notifyAuthListeners('SIGNED_IN', session);
         return { data: body, error: null };
       },
 
@@ -184,7 +225,9 @@ export function createMockClient() {
         });
         const body = await res.json();
         if (!res.ok) return { data: { user: null }, error: { message: body.error } };
-        saveSession({ access_token: body.token, user: body.user });
+        const session = { access_token: body.token, user: body.user };
+        saveSession(session);
+        notifyAuthListeners('SIGNED_IN', session);
         return { data: { user: body.user }, error: null };
       },
 
@@ -201,7 +244,22 @@ export function createMockClient() {
 
       async signOut() {
         clearSession();
+        notifyAuthListeners('SIGNED_OUT', null);
         return { error: null };
+      },
+
+      onAuthStateChange(callback: AuthChangeCallback) {
+        authListeners.push(callback);
+        return {
+          data: {
+            subscription: {
+              unsubscribe() {
+                const i = authListeners.indexOf(callback);
+                if (i >= 0) authListeners.splice(i, 1);
+              },
+            },
+          },
+        };
       },
     },
 
@@ -209,8 +267,13 @@ export function createMockClient() {
       return new MockQueryBuilder(table);
     },
 
-    channel(_name: string) {
-      return noopChannel;
+    channel(name: string) {
+      return new MockRealtimeChannel(name);
+    },
+
+    removeChannel(channel: MockRealtimeChannel) {
+      channel.close();
+      return Promise.resolve('ok');
     },
   };
 }

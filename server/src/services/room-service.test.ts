@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { leaveRoom } from "./room-service";
 
-// Mocke die Abhängigkeiten, die in leaveRoom verwendet werden
 vi.mock("../repositories/room-repository", () => ({
     insertRoom: vi.fn(),
     getRoomByKey: vi.fn(),
@@ -31,10 +30,9 @@ import {
     removePlayerFromRoom,
 } from "../repositories/room-repository";
 
-
 describe("leaveRoom", () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.resetAllMocks();
     });
 
     it("schliesst den room, wenn der host den room verlaesst", async () => {
@@ -45,7 +43,7 @@ describe("leaveRoom", () => {
             players: [],
         });
 
-        await expect(leaveRoom("host-1", "ABC123")).resolves.toBeUndefined();
+        await leaveRoom("host-1", "ABC123");
 
         expect(getRoomByKey).toHaveBeenCalledWith("ABC123");
         expect(clearRoomPlayers).toHaveBeenCalledWith("ABC123");
@@ -61,7 +59,7 @@ describe("leaveRoom", () => {
             players: [],
         });
 
-        await expect(leaveRoom("guest-1", "ABC123")).resolves.toBeUndefined();
+        await leaveRoom("guest-1", "ABC123");
 
         expect(getRoomByKey).toHaveBeenCalledWith("ABC123");
         expect(removePlayerFromRoom).toHaveBeenCalledWith("ABC123", "guest-1");
@@ -72,12 +70,13 @@ describe("leaveRoom", () => {
     it("wirft 404, wenn room nicht existiert", async () => {
         vi.mocked(getRoomByKey).mockResolvedValueOnce(null);
 
-        await expect(leaveRoom("any-user", "ABC123")).rejects.toMatchObject({
+        const result = leaveRoom("any-user", "ABC123");
+
+        await expect(result).rejects.toMatchObject({
             name: "AppError",
             statusCode: 404,
             message: "Room not found",
         });
-
         expect(clearRoomPlayers).not.toHaveBeenCalled();
         expect(deleteRoomByKey).not.toHaveBeenCalled();
         expect(removePlayerFromRoom).not.toHaveBeenCalled();
@@ -90,11 +89,12 @@ describe("leaveRoom", () => {
             host_id: "host-1",
             players: [],
         });
-
         const clearError = new Error("clear failed");
         vi.mocked(clearRoomPlayers).mockRejectedValueOnce(clearError);
 
-        await expect(leaveRoom("host-1", "ABC123")).rejects.toBe(clearError);
+        const result = leaveRoom("host-1", "ABC123");
+
+        await expect(result).rejects.toBe(clearError);
         expect(deleteRoomByKey).not.toHaveBeenCalled();
     });
 
@@ -105,11 +105,12 @@ describe("leaveRoom", () => {
             host_id: "host-1",
             players: [],
         });
-
         const deleteError = new Error("delete failed");
         vi.mocked(deleteRoomByKey).mockRejectedValueOnce(deleteError);
 
-        await expect(leaveRoom("host-1", "ABC123")).rejects.toBe(deleteError);
+        const result = leaveRoom("host-1", "ABC123");
+
+        await expect(result).rejects.toBe(deleteError);
     });
 
     it("reicht den fehler durch, wenn removePlayerFromRoom fehlschlaegt", async () => {
@@ -119,10 +120,11 @@ describe("leaveRoom", () => {
             host_id: "host-1",
             players: [],
         });
-
         const removeError = new Error("remove failed");
         vi.mocked(removePlayerFromRoom).mockRejectedValueOnce(removeError);
 
-        await expect(leaveRoom("guest-1", "ABC123")).rejects.toBe(removeError);
+        const result = leaveRoom("guest-1", "ABC123");
+
+        await expect(result).rejects.toBe(removeError);
     });
 });

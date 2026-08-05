@@ -20,6 +20,7 @@ import { localizeHtmlElements } from "./html-localization";
 import { initI18n, t } from "./i18n";
 import { initLanguageSwitcher } from "./language-switcher";
 import { initTheme } from "./theme";
+import { showLoadingScreenFor } from "./loading-screen";
 
 
 async function initApp(): Promise<void> {
@@ -27,7 +28,7 @@ async function initApp(): Promise<void> {
   localizeHtmlElements();
   initTheme();
   initLanguageSwitcher();
-  if (await redirectIfNoSession()) return;
+  if (false && await redirectIfNoSession()) return;
   initRoomUnloadGuard(() => activeRoomKey);
   initNamesInWheelList();
   initAddNameInput();
@@ -48,4 +49,4 @@ async function initApp(): Promise<void> {
   enableRoomButtons();
 }
 
-void initApp();
+void showLoadingScreenFor(initApp());

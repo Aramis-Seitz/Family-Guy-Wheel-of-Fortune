@@ -20,6 +20,8 @@
     --input-placeholder: #979797;
     --surface: #FFFFFF;
     --surface-text: #2E2E2E;
+    --modal-surface: #FFFFFF;
+    --modal-text: #2E2E2E;
     --auth-bg: #FFFFFF;
     --auth-text: #2E2E2E;
     --login-container-bg: var(--auth-bg);
@@ -102,6 +104,8 @@
     --auth-bg: #161618;
     --auth-text: #FFFFFF;
     --login-container-bg: #333333;
+    --modal-surface: #2E2E2E;
+    --modal-text: #F9F6ED;
     --border: var(--button-bg);
 }
 

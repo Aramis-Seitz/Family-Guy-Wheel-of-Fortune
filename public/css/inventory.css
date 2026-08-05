@@ -81,11 +81,11 @@
     width: 90%;
     max-width: 1100px;
     max-height: 85vh;
-    background: var(--surface);
+    background: var(--modal-surface);
     border-radius: 20px;
     border: 1px solid var(--border);
     padding: 20px;
-    color: var(--surface-text);
+    color: var(--modal-text);
     box-shadow: 0 30px 80px var(--shadow-soft);
     transform: scale(0.95);
     transition: transform 0.25s ease;

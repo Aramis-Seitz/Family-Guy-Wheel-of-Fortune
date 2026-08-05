@@ -139,44 +139,45 @@
 
     <main class="app-layout">
         <aside id="room-panel">
-        <h3 data-i18n="html.multiplayer">Multiplayer</h3>
-        <div class="room__controls" id="room-controls">
-            <button id="room-create-btn" class="room__btn" type="button" data-i18n="html.createRoom" disabled>Create
-                room</button>
-            <div class="room__join">
-                <input type="text" id="room-key-input" data-i18n-placeholder="html.roomCode" placeholder="Code"
-                    maxlength="6" autocomplete="off">
-                <button id="room-join-btn" class="room__btn" type="button" data-i18n="html.join" disabled>Join</button>
-            </div>
-        </div>
-        <div id="room-info" class="hidden">
-            <div class="room__key-row">
-                <span class="room__key-label" data-i18n="html.roomCodeLabel">Room:</span>
-                <span id="room-key-display"></span>
-                <button id="room-copy-key-btn" class="room__btn room__btn--copy" type="button"
-                    data-i18n-title="html.roomCode" title="Code">&#128203;</button>
-                <button id="room-leave-btn" class="room__btn" type="button" data-i18n="html.leave">Leave</button>
-            </div>
-            <p class="room__players-label" data-i18n="html.players">Players:</p>
-            <ul id="room-players-list"></ul>
-            <button id="room-bulk-add-btn" class="room__btn room__btn--small hidden" type="button"
-                data-i18n="room.bulkAdd">Add all to wheel</button>
-            <div id="chat-section">
-                <div id="chat-header" class="chat__header">
-                    <span class="chat__label" data-i18n="html.chat">💬 Chat</span>
-                    <span id="chat-toggle-btn" class="chat__toggle-btn" aria-expanded="false">▼</span>
+            <h3 data-i18n="html.multiplayer">Multiplayer</h3>
+            <div class="room__controls" id="room-controls">
+                <button id="room-create-btn" class="room__btn" type="button" data-i18n="html.createRoom" disabled>Create
+                    room</button>
+                <div class="room__join">
+                    <input type="text" id="room-key-input" data-i18n-placeholder="html.roomCode" placeholder="Code"
+                        maxlength="6" autocomplete="off">
+                    <button id="room-join-btn" class="room__btn" type="button" data-i18n="html.join"
+                        disabled>Join</button>
                 </div>
-                <div id="chat-body" class="chat__body--collapsed">
-                    <ul id="chat-messages"></ul>
-                    <div class="chat__input-row">
-                        <input type="text" id="chat-input" data-i18n-placeholder="html.enterMessage"
-                            placeholder="Enter message" maxlength="200" autocomplete="off">
-                        <button id="chat-send-btn" class="chat__send-btn" type="button"
-                            data-i18n-aria-label="a11y.sendMessage" aria-label="Send message">&#10148;</button>
+            </div>
+            <div id="room-info" class="hidden">
+                <div class="room__key-row">
+                    <span class="room__key-label" data-i18n="html.roomCodeLabel">Room:</span>
+                    <span id="room-key-display"></span>
+                    <button id="room-copy-key-btn" class="room__btn room__btn--copy" type="button"
+                        data-i18n-title="html.roomCode" title="Code">&#128203;</button>
+                    <button id="room-leave-btn" class="room__btn" type="button" data-i18n="html.leave">Leave</button>
+                </div>
+                <p class="room__players-label" data-i18n="html.players">Players:</p>
+                <ul id="room-players-list"></ul>
+                <button id="room-bulk-add-btn" class="room__btn room__btn--small hidden" type="button"
+                    data-i18n="room.bulkAdd">Add all to wheel</button>
+                <div id="chat-section">
+                    <div id="chat-header" class="chat__header">
+                        <span class="chat__label" data-i18n="html.chat">💬 Chat</span>
+                        <span id="chat-toggle-btn" class="chat__toggle-btn" aria-expanded="false">▼</span>
+                    </div>
+                    <div id="chat-body" class="chat__body--collapsed">
+                        <ul id="chat-messages"></ul>
+                        <div class="chat__input-row">
+                            <input type="text" id="chat-input" data-i18n-placeholder="html.enterMessage"
+                                placeholder="Enter message" maxlength="200" autocomplete="off">
+                            <button id="chat-send-btn" class="chat__send-btn" type="button"
+                                data-i18n-aria-label="a11y.sendMessage" aria-label="Send message">&#10148;</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </aside>
 
         <section class="game-area">
@@ -264,12 +265,12 @@
     </main>
 
     <div id="winner-modal" class="winner-modal hidden">
-            <div class="winner-modal__content">
-                <h2 data-i18n="html.winner">🎉 Winner!</h2>
-                <p id="winner-modal-text">-</p>
-                <button id="winner-modal-close-btn" data-i18n="html.ok">OK</button>
-                <button id="winner-modal-remove-btn" data-i18n="html.remove">REMOVE</button>
-            </div>
+        <div class="winner-modal__content">
+            <h2 data-i18n="html.winner">🎉 Winner!</h2>
+            <p id="winner-modal-text">-</p>
+            <button id="winner-modal-close-btn" data-i18n="html.ok">OK</button>
+            <button id="winner-modal-remove-btn" data-i18n="html.remove">REMOVE</button>
+        </div>
     </div>
 
     <canvas id="winner-modal-confetti-canvas"></canvas>

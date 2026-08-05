@@ -17,7 +17,7 @@ body {
     z-index: 10;
 }
 
-.app-header > * {
+.app-header>* {
     min-width: 0;
 }
 
@@ -94,15 +94,15 @@ body {
     padding-top: clamp(0.25rem, 0.8vh, 0.75rem);
 }
 
-.bottom-action-bar > button {
+.bottom-action-bar>button {
     flex: 0 0 auto;
     min-width: 0;
     padding: 0.45rem;
     white-space: nowrap;
 }
 
-.bottom-action-bar > .spin__btn,
-.bottom-action-bar > #reset-btn {
+.bottom-action-bar>.spin__btn,
+.bottom-action-bar>#reset-btn {
     padding: 0.45rem;
     font-size: 0.72rem;
 }
@@ -115,7 +115,7 @@ body {
     min-width: 0;
 }
 
-.secondary-action-bar > button {
+.secondary-action-bar>button {
     min-width: 0;
     padding: 0.6rem clamp(0.75rem, 1.2vw, 1.25rem);
     font-size: 0.85rem;
@@ -131,4 +131,3 @@ body {
     min-width: 0;
     max-width: 20rem;
 }
-

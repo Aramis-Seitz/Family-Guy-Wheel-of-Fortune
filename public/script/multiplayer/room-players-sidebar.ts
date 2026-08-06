@@ -77,8 +77,7 @@ export function setHostControlsVisibility(): void {
   // fokussierbaren Bereich genommen. Die serverseitige Host-Prüfung bleibt
   // dabei die verbindliche Sicherheitsgrenze.
   [
-    "spin-left-btn",
-    "spin-right-btn",
+    "spin-btn",
     "reset-btn",
     "name-sidebar-add-row",
     "name-centered-input",

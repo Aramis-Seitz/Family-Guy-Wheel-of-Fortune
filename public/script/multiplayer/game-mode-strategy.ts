@@ -1,7 +1,7 @@
 import {
   spinWheelWithRandomSteps, lockAllSpinElements, applyGameModeLock,
   resetWheelRotation,
-  spinLeftBtn, spinRightBtn, resetBtn,
+  spinBtn, resetBtn,
 } from "../wheel/spin";
 import type { Direction, SpinElement } from "../wheel/spin";
 import { multiplierButton } from "../wheel/multiplier";
@@ -227,7 +227,7 @@ export class GuestModeStrategy implements GameModeStrategy {
   }
 
   getRoleLockedElements(): SpinElement[] {
-    return [multiplierButton, resetBtn, spinLeftBtn, spinRightBtn, input, addBtn, getRemoveBtn()];
+    return [multiplierButton, resetBtn, spinBtn, input, addBtn, getRemoveBtn()];
   }
 
   async addNameToWheel(rawName: string): Promise<void> {

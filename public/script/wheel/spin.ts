@@ -32,13 +32,12 @@ function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-export const spinLeftBtn = requiredElement<HTMLButtonElement>("spin-left-btn");
-export const spinRightBtn = requiredElement<HTMLButtonElement>("spin-right-btn");
+export const spinBtn = requiredElement<HTMLButtonElement>("spin-btn");
 
 export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
 
 function getSpinRelatedElements(): SpinElement[] {
-  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, spinRightBtn, multiplierButton, getPlayerToggleButtons()];
+  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinBtn, multiplierButton, getPlayerToggleButtons()];
 
   if (bulkAddToWheelBtn) {
     elements.push(bulkAddToWheelBtn);
@@ -222,7 +221,7 @@ export function applyGameModeLock(): void {
   const hasEnoughItems = getNamesInWheelList().length >= MIN_ITEMS;
   const locked: SpinElement[] = [...getCurrentMode().getRoleLockedElements()];
   if (!hasEnoughItems) {
-    locked.push(spinLeftBtn, spinRightBtn);
+    locked.push(spinBtn);
   }
 
   setElementsDisabled(getRoleLockableElements(), false);
@@ -234,12 +233,9 @@ export function applyGameModeLock(): void {
 }
 
 export function initWheelControls(): void {
-  spinLeftBtn.addEventListener("click", () => {
-    void getCurrentMode().onSpinClick("left");
-  });
-
-  spinRightBtn.addEventListener("click", () => {
-    void getCurrentMode().onSpinClick("right");
+  spinBtn.addEventListener("click", () => {
+    const direction: Direction = Math.random() < 0.5 ? "left" : "right";
+    void getCurrentMode().onSpinClick(direction);
   });
 
   resetBtn.addEventListener("click", () => {

@@ -20,6 +20,8 @@ import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBo
 
 const MAX_WHEEL_NAMES = 16;
 const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
+// Muss mit MAX_NAME_LENGTH in public/script/shared/validation.ts übereinstimmen.
+const MAX_WHEEL_NAME_LENGTH = 20;
 
 function generateRoomKey(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -57,6 +59,9 @@ function validateRoomNames(names: string[]): string[] {
     const normalizedNames = names.map((name) => name.trim());
     if (normalizedNames.some((name) => !name || !WHEEL_NAME_PATTERN.test(name))) {
         throw new AppError("Wheel names must contain only letters, numbers, or apostrophes", 400);
+    }
+    if (normalizedNames.some((name) => name.length > MAX_WHEEL_NAME_LENGTH)) {
+        throw new AppError(`Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`, 400);
     }
     return normalizedNames;
 }

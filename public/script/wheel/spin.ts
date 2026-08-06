@@ -33,6 +33,14 @@ function updateWheelRotation(): void {
 }
 
 export const spinBtn = requiredElement<HTMLButtonElement>("spin-btn");
+const MIN_SPIN_DRAG_DISTANCE = 8;
+
+interface SpinGesture {
+  pointerId: number;
+  startX: number;
+}
+
+let spinGesture: SpinGesture | null = null;
 
 export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
 
@@ -232,10 +240,39 @@ export function applyGameModeLock(): void {
   profileName?.classList.toggle("user-profile-name--clickable", !isNameEditingLocked());
 }
 
+function startSpin(direction: Direction): void {
+  void getCurrentMode().onSpinClick(direction);
+}
+
+function handleSpinPointerDown(event: PointerEvent): void {
+  if (!event.isPrimary || event.button !== 0) return;
+  spinGesture = { pointerId: event.pointerId, startX: event.clientX };
+  spinBtn.setPointerCapture(event.pointerId);
+}
+
+function handleSpinPointerUp(event: PointerEvent): void {
+  if (!spinGesture || spinGesture.pointerId !== event.pointerId) return;
+
+  const horizontalDistance = event.clientX - spinGesture.startX;
+  spinGesture = null;
+  if (spinBtn.hasPointerCapture(event.pointerId)) spinBtn.releasePointerCapture(event.pointerId);
+  if (Math.abs(horizontalDistance) < MIN_SPIN_DRAG_DISTANCE) return;
+
+  startSpin(horizontalDistance < 0 ? "left" : "right");
+}
+
+function cancelSpinGesture(event: PointerEvent): void {
+  if (spinGesture?.pointerId !== event.pointerId) return;
+  spinGesture = null;
+}
+
 export function initWheelControls(): void {
-  spinBtn.addEventListener("click", () => {
-    const direction: Direction = Math.random() < 0.5 ? "left" : "right";
-    void getCurrentMode().onSpinClick(direction);
+  spinBtn.addEventListener("pointerdown", handleSpinPointerDown);
+  spinBtn.addEventListener("pointerup", handleSpinPointerUp);
+  spinBtn.addEventListener("pointercancel", cancelSpinGesture);
+  spinBtn.addEventListener("click", (event) => {
+    if (event.detail !== 0) return;
+    startSpin(Math.random() < 0.5 ? "left" : "right");
   });
 
   resetBtn.addEventListener("click", () => {

@@ -39,5 +39,7 @@ npm run build
 ## 5. Merge-Regel (GitHub)
 - In Branch Protection/Ruleset fuer main:
   - Require status checks to pass before merging
+  - Require branches to be up to date before merging
+  - Do not allow bypassing the above settings
   - Required Checks: lint, test, typecheck, validate-locales, build
 - Ergebnis: Fehlerhafte PRs koennen nicht auf main gemergt werden.

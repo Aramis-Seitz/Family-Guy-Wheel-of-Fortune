@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  validate:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,21 +31,102 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Fix optional dependencies
+        run: npm install --ignore-scripts
+
       - name: Unit Tests
         run: npm run test
+
+  typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Fix optional dependencies
+        run: npm install --ignore-scripts
 
       - name: Typecheck
         run: npm run typecheck
 
+  validate-locales:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Fix optional dependencies
+        run: npm install --ignore-scripts
+
       - name: Validate locales
         run: npm run check:i18n
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Fix optional dependencies
+        run: npm install --ignore-scripts
 
       - name: Build
         run: npm run build
 
   supabase-migrations:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: validate
+    needs:
+      - lint
+      - test
+      - typecheck
+      - validate-locales
+      - build
     runs-on: ubuntu-latest
 
     steps:

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --project tsconfig.json && vite build && node -e \"require('fs').cpSync('resources','dist/resources',{recursive:true}); require('fs').cpSync('locales','dist/locales',{recursive:true})\"",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "devDependencies": {

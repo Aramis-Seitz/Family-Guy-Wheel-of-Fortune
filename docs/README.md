@@ -15,3 +15,4 @@ Detaillierte Guides und Setups für das Family Guy Wheel of Fortune Projekt.
 
 - **[Commit-Konventionen](./guides/commit-conventions.md)** — Regeln für aussagekräftige Commits
 - **[ESLint](./guides/eslint.md)** — Setup, Benutzung und Regeln für Linting
+- **[Codespace CI Workflow](./guides/codespace-ci-workflow.md)** — Kurzablauf fuer lokale Checks, PR-Validierung und Merge-Blocking

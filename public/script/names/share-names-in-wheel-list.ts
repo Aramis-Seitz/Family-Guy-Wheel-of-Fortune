@@ -1,7 +1,6 @@
 import { getMultiplier, setMultiplierControlValue } from "../wheel/multiplier";
 import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list";
 import { showToast } from "../shared/toast";
-import { requiredElement } from "../shared/dom-helpers";
 import { t } from "../app/i18n";
 
 export function generateShareLink(): string {
@@ -38,31 +37,34 @@ export function loadInformationFromUrl(): void {
     setMultiplierControlValue(powerValue);
 }
 
-const shareBtn = requiredElement<HTMLButtonElement>("share-names-in-wheel-list-btn");
+let initialized = false;
+
+async function handleShareClick(): Promise<void> {
+    const link = generateShareLink();
+
+    try {
+        await navigator.clipboard.writeText(link);
+        showToast({
+            message: t("names.copySuccess"),
+            type: "success"
+        });
+    } catch (error) {
+        console.error("Could not copy link:", error);
+        showToast({
+            message: t("names.copyFailed"),
+            type: "error"
+        });
+    }
+}
 
 export function initShareFeature(): void {
-    console.log("initShareFeature loaded");
-    console.log("shareBtn:", shareBtn);
+    if (initialized) return;
+    initialized = true;
 
-    shareBtn?.addEventListener("click", async () => {
-        console.log("share button clicked");
-
-        const link = generateShareLink();
-        console.log("Share link:", link);
-
-        try {
-            await navigator.clipboard.writeText(link);
-            showToast({
-                message: t("names.copySuccess"),
-                type: "success"
-            });
-        } catch (error) {
-            console.error("Could not copy link:", error);
-            showToast({
-                message: t("names.copyFailed"),
-                type: "error"
-            });
-        }
+    document.querySelectorAll<HTMLButtonElement>("[data-share-trigger]").forEach((button) => {
+        button.addEventListener("click", () => {
+            void handleShareClick();
+        });
     });
 
     loadInformationFromUrl();

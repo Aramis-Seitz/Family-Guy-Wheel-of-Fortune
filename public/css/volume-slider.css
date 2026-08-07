@@ -14,6 +14,11 @@
     border-radius: 8px;
 }
 
+.mobile-menu__volume {
+    width: 100%;
+    justify-self: stretch;
+}
+
 .volume__header {
     grid-column: 1 / -1;
     display: flex;

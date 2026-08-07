@@ -49,21 +49,56 @@
             <span id="user-profile-name" data-i18n="profile.notLoggedIn">Not logged in</span>
             <button id="auth-button" type="button" data-i18n="profile.login">Login</button>
         </div>
-        <div class="app-header__language-switcher" aria-label="Language selection">
-            <button class="lang-btn" type="button" data-language="de">DE</button>
-            <button class="lang-btn" type="button" data-language="en">EN</button>
-        </div>
-        <div class="volume">
-            <div class="volume__header">
-                <label for="volume-slider">
-                    <span data-i18n="html.volume">Volume</span>: <span id="volume-value"></span>%
-                </label>
+        <div class="app-header__controls">
+            <div class="app-header__language-switcher" aria-label="Language selection">
+                <button class="lang-btn" type="button" data-language="de">DE</button>
+                <button class="lang-btn" type="button" data-language="en">EN</button>
+                <button class="theme-toggle-btn" type="button" aria-label="Toggle theme">🌙 Dark</button>
             </div>
-            <input type="range" id="volume-slider" min="0" max="100" step="1" value="50">
-            <button id="volume-icon" type="button" class="volume__icon-btn" data-i18n-title="a11y.mute"
-                title="Mute">🔉</button>
+            <div class="volume">
+                <div class="volume__header">
+                    <label for="volume-slider">
+                        <span data-i18n="html.volume">Volume</span>: <span id="volume-value"></span>%
+                    </label>
+                </div>
+                <input type="range" id="volume-slider" min="0" max="100" step="1" value="50">
+                <button id="volume-icon" type="button" class="volume__icon-btn" data-i18n-title="a11y.mute"
+                    title="Mute">🔉</button>
+            </div>
         </div>
+        <button class="app-header__menu-toggle" id="mobile-menu-toggle" type="button" aria-expanded="false"
+            aria-controls="mobile-menu-overlay" aria-label="Open menu">☰</button>
     </header>
+
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay" aria-hidden="true">
+        <div class="mobile-menu-overlay__panel" role="dialog" aria-modal="true" aria-label="Mobile menu">
+            <div class="mobile-menu-overlay__header">
+                <button class="mobile-menu-overlay__close" id="mobile-menu-close-btn" type="button" aria-label="Close menu">✕</button>
+            </div>
+            <div class="mobile-menu-overlay__section">
+                <div class="app-header__language-switcher app-header__language-switcher--mobile" aria-label="Language selection">
+                    <button class="lang-btn" type="button" data-language="de">DE</button>
+                    <button class="lang-btn" type="button" data-language="en">EN</button>
+                    <button class="theme-toggle-btn" type="button" aria-label="Toggle theme" data-theme-toggle="true">🌙 Dark</button>
+                </div>
+                <div class="volume mobile-menu__volume">
+                    <div class="volume__header">
+                        <label for="volume-slider-mobile">
+                            <span data-i18n="html.volume">Volume</span>: <span id="volume-value-mobile"></span>%
+                        </label>
+                    </div>
+                    <input type="range" id="volume-slider-mobile" min="0" max="100" step="1" value="50">
+                    <button id="volume-icon-mobile" type="button" class="volume__icon-btn" data-i18n-title="a11y.mute"
+                        title="Mute">🔉</button>
+                </div>
+                <button class="names-in-wheel-list__share-btn sec-btn mobile-menu__action" type="button" data-share-trigger>Share</button>
+                <div class="legal-links mobile-menu__legal-links">
+                    <a href="imprint.html" class="legal-links__link--imprint" data-i18n="html.imprint">Imprint</a>
+                    <a href="privacy.html" class="legal-links__link--privacy" data-i18n="html.privacy">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <dialog id="inventory-modal">
         <div id="inventory-modal-content" class="inventory-modal__content">
@@ -196,7 +231,7 @@
         <section class="game-area">
             <nav class="secondary-action-bar" aria-label="Wheel actions">
                 <button class="names-in-wheel-list__share-btn sec-btn" id="share-names-in-wheel-list-btn"
-                    data-i18n="html.share">Share</button>
+                    data-i18n="html.share" data-share-trigger>Share</button>
                 <button class="inventory-btn sec-btn" id="inventory-btn" data-i18n="html.inventory">INVENTORY</button>
                 <button class="shop-btn sec-btn" id="shop-btn" data-i18n="html.shop">SHOP</button>
             </nav>

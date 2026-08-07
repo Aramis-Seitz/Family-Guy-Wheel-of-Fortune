@@ -17,6 +17,15 @@
   box-shadow: 0 4px 16px var(--shadow-soft);
 }
 
+@media (max-width: 900px) {
+  #room-panel {
+    max-width: none;
+    max-height: none;
+    border-radius: 14px;
+    padding: 0.75rem;
+  }
+}
+
 #room-panel h3 {
   margin: 0 0 10px 0;
   font-size: 0.85rem;

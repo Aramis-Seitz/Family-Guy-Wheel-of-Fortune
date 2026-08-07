@@ -23,9 +23,59 @@ import { initTheme } from "./theme";
 import { showLoadingScreenFor } from "./loading-screen";
 
 
+function initMobileMenu(): void {
+  const toggle = document.getElementById("mobile-menu-toggle") as HTMLButtonElement | null;
+  const overlay = document.getElementById("mobile-menu-overlay") as HTMLDivElement | null;
+  const closeButton = document.getElementById("mobile-menu-close-btn") as HTMLButtonElement | null;
+
+  if (!toggle || !overlay) return;
+
+  const closeMenu = (): void => {
+    overlay.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  };
+
+  const openMenu = (): void => {
+    overlay.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+
+  toggle.addEventListener("click", () => {
+    if (overlay.classList.contains("is-open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  closeButton?.addEventListener("click", closeMenu);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 900) {
+      closeMenu();
+    }
+  });
+}
+
 async function initApp(): Promise<void> {
   await initI18n();
   localizeHtmlElements();
+  initMobileMenu();
   initTheme();
   initLanguageSwitcher();
   if (false && await redirectIfNoSession()) return;

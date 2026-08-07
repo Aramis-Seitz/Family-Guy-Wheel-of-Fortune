@@ -23,6 +23,6 @@ export function formatTime(value: string | number | Date): string {
 
 export function formatMultiplier(value: number): string {
     return new Intl.NumberFormat(getLanguage(), {
-        maximumFractionDigits: 1,
+        maximumFractionDigits: 2,
     }).format(value);
 }

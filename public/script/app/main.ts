@@ -6,7 +6,7 @@ import { initNamesInWheelList } from "../names/names-in-wheel-list";
 import { initShareFeature } from "../names/share-names-in-wheel-list";
 import { initProfileUI } from "../profile/profiles";
 import { initWheelControls } from "../wheel/spin";
-import { initMultiplierSlider } from "../wheel/multiplier";
+import { initMultiplierButton } from "../wheel/multiplier";
 import { initVolumeSlider } from "../wheel/volume";
 import { preloadStaticSounds } from "../wheel/sound";
 import { initWinnerModal } from "../wheel/winner";
@@ -32,7 +32,7 @@ async function initApp(): Promise<void> {
   initRoomUnloadGuard(() => activeRoomKey);
   initNamesInWheelList();
   initAddNameInput();
-  initMultiplierSlider();
+  initMultiplierButton();
   initVolumeSlider();
   void preloadStaticSounds();
   initWheelControls();

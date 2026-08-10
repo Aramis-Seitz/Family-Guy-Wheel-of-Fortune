@@ -1,17 +1,64 @@
+/* =========================================================
+   GLOBAL LAYOUT VARIABLES
+   ========================================================= */
+
 body {
-    --top-control-width: clamp(14.835rem, calc(9.335rem + 9.2vw), 18.835rem);
+    /*
+     * Das Grid wird von Header und Main gemeinsam benutzt.
+     * Dadurch bleiben beide Bereiche horizontal exakt
+     * aufeinander ausgerichtet.
+     */
+    --layout-columns:
+        minmax(9rem, 0.9fr)
+        minmax(22rem, 2.6fr)
+        minmax(11rem, 1fr);
+
+    /*
+     * Breite für:
+     * - DE
+     * - EN
+     * - Light
+     *
+     * und gleichzeitig:
+     * - Teilen
+     * - Inventar
+     * - Shop
+     */
+    --top-control-width: clamp(
+        17rem,
+        calc(10rem + 11vw),
+        21rem
+    );
+
+    /*
+     * Maximale Breite des rechten Bereichs.
+     *
+     * Wird sowohl für .volume als auch für .panel
+     * verwendet.
+     */
+    --right-column-width: 20rem;
 
     display: flex;
     flex-direction: column;
+
     min-height: 100dvh;
+
     overflow-x: hidden;
 }
+
+
+/* =========================================================
+   USER AREA
+   ========================================================= */
 
 #user-area {
     display: flex;
     align-items: center;
+
     gap: 0.5rem;
+
     min-width: 0;
+
     flex-wrap: wrap;
 }
 
@@ -23,75 +70,172 @@ body {
 #auth-button {
     min-height: 44px;
     min-width: 44px;
+
     padding: 0.5rem 0.75rem;
+
     border-radius: 999px;
 }
+
+
+/* =========================================================
+   APP HEADER
+   ========================================================= */
 
 .app-header {
     display: grid;
-    grid-template-columns: minmax(9rem, 0.9fr) minmax(22rem, 2.6fr) minmax(11rem, 1fr);
+
+    /*
+     * Exakt dasselbe Grid wie .app-layout.
+     */
+    grid-template-columns: var(--layout-columns);
+
     align-items: center;
-    gap: clamp(0.5rem, 1.25vw, 1.5rem);
+
+    gap: clamp(
+        0.5rem,
+        1.25vw,
+        1.5rem
+    );
+
     width: 100%;
+
     min-width: 0;
-    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+
+    padding: clamp(
+        0.5rem,
+        1.5vw,
+        1.5rem
+    );
+
     position: relative;
+
     z-index: 10;
 }
 
-.app-header__controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(0.5rem, 1vw, 1rem);
+.app-header > * {
     min-width: 0;
 }
 
+.app-header__controls {
+    display: contents;
+}
+
+.app-header__language-switcher {
+    grid-column: 2;
+    grid-row: 1;
+
+    display: flex;
+    align-items: center;
+
+    width: var(--top-control-width);
+    min-width: 0;
+
+    justify-self: center;
+
+    gap: 0.35rem;
+}
+
+.app-header__language-switcher > .lang-btn {
+    flex: 0 0 auto;
+}
+
+.app-header__language-switcher > .theme-toggle-btn {
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.app-header__controls > .volume {
+    grid-column: 3;
+    grid-row: 1;
+
+    width: 100%;
+    max-width: var(--right-column-width);
+    min-width: 0;
+
+    justify-self: end;
+}
+
+/* =========================================================
+   MOBILE MENU TOGGLE
+   ========================================================= */
+
 .app-header__menu-toggle {
     display: none;
+
     justify-self: end;
+
     align-items: center;
     justify-content: center;
+
     width: 44px;
     height: 44px;
+
     border-radius: 999px;
+
     border: 1px solid var(--border);
+
     background: var(--auth-bg);
     color: var(--auth-text);
+
     font-size: 1.35rem;
+
     cursor: pointer;
-    transition: transform var(--transition), background var(--transition), opacity var(--transition);
+
+    transition:
+        transform var(--transition),
+        background var(--transition),
+        opacity var(--transition);
 }
 
 .app-header__menu-toggle:hover {
     transform: scale(1.02);
 }
 
+
+/* =========================================================
+   MOBILE MENU OVERLAY
+   ========================================================= */
+
 .mobile-menu-overlay {
     position: fixed;
+
     inset: 0;
+
     z-index: 30;
+
     display: flex;
+
     justify-content: flex-end;
+
     background: rgba(0, 0, 0, 0.45);
+
     opacity: 0;
+
     pointer-events: none;
+
     transition: opacity var(--transition);
 }
 
 .mobile-menu-overlay.is-open {
     opacity: 1;
+
     pointer-events: auto;
 }
 
 .mobile-menu-overlay__panel {
     width: min(92vw, 22rem);
+
     height: 100%;
+
     padding: 1rem;
+
     background: var(--modal-surface);
     color: var(--modal-text);
+
     box-shadow: -12px 0 32px var(--shadow-strong);
+
     transform: translateX(100%);
+
     transition: transform var(--transition);
 }
 
@@ -101,31 +245,43 @@ body {
 
 .mobile-menu-overlay__header {
     display: flex;
+
     justify-content: flex-end;
+
     margin-bottom: 1rem;
 }
 
 .mobile-menu-overlay__close {
     width: 44px;
     height: 44px;
+
     border-radius: 999px;
+
     border: 1px solid var(--border);
+
     background: var(--auth-bg);
     color: var(--auth-text);
+
     font-size: 1.25rem;
+
     cursor: pointer;
 }
 
 .mobile-menu-overlay__section {
     display: flex;
+
     flex-direction: column;
+
     gap: 0.9rem;
 }
 
 .mobile-menu__action {
     width: 100%;
+
     min-height: 44px;
+
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 }
@@ -134,47 +290,368 @@ body {
     justify-content: center;
 }
 
-.app-header>* {
-    min-width: 0;
-}
+
+/* =========================================================
+   APP LAYOUT
+   ========================================================= */
 
 .app-layout {
-    --wheel-size: clamp(15rem, min(34vw, 55vh), 31.25rem);
+    --wheel-size: clamp(
+        15rem,
+        min(34vw, 55vh),
+        31.25rem
+    );
 
     display: grid;
-    grid-template-columns: minmax(9rem, 0.9fr) minmax(22rem, 2.6fr) minmax(11rem, 1fr);
+
+    /*
+     * Exakt dasselbe Grid wie im Header.
+     */
+    grid-template-columns: var(--layout-columns);
+
     align-items: center;
-    gap: clamp(0.5rem, 1.25vw, 1.5rem);
+
+    gap: clamp(
+        0.5rem,
+        1.25vw,
+        1.5rem
+    );
+
     flex: 1 1 auto;
+
     width: min(100%, 120rem);
+
     min-width: 0;
+
     min-height: 0;
+
     margin-inline: auto;
-    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+
+    padding: clamp(
+        0.5rem,
+        1.5vw,
+        1.5rem
+    );
 }
 
+
+/* =========================================================
+   GAME AREA
+   ========================================================= */
+
+.game-area {
+    display: grid;
+
+    grid-template-rows:
+        auto
+        minmax(0, 1fr);
+
+    align-self: stretch;
+
+    justify-items: center;
+
+    gap: clamp(
+        0.5rem,
+        1.2vh,
+        1rem
+    );
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   SECONDARY ACTION BAR
+   ========================================================= */
+
+/*
+ * Enthält:
+ *
+ * Teilen | Inventar | Shop
+ *
+ * Diese Breite ist absichtlich identisch mit
+ * .app-header__language-switcher.
+ */
+.secondary-action-bar {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: clamp(
+        0.6rem,
+        1vw,
+        1rem
+    );
+
+    width: var(--top-control-width);
+
+    min-width: 0;
+}
+
+
+/*
+ * Secondary Buttons größer machen.
+ */
+.secondary-action-bar > button {
+    flex: 0 0 auto;
+
+    min-width: 0;
+
+    min-height: 44px;
+
+    padding:
+        0.75rem
+        clamp(
+            1rem,
+            1.4vw,
+            1.4rem
+        );
+
+    font-size: 0.95rem;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   GAME STAGE
+   ========================================================= */
+
+.game-stage {
+    display: grid;
+
+    grid-template-columns:
+        minmax(3.5rem, 1fr)
+        minmax(15rem, var(--wheel-size))
+        minmax(3.5rem, 1fr);
+
+    grid-template-areas:
+        "preview-left wheel ."
+        "actions actions actions";
+
+    align-items: center;
+
+    justify-content: center;
+
+    column-gap: clamp(
+        0.5rem,
+        1vw,
+        1rem
+    );
+
+    row-gap: clamp(
+        3rem,
+        6vh,
+        4rem
+    );
+
+    width: 100%;
+
+    max-width: 70rem;
+
+    min-width: 0;
+
+    align-self: center;
+}
+
+
+/* =========================================================
+   WHEEL
+   ========================================================= */
+
+.wheel-center {
+    grid-area: wheel;
+
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
+.game-stage__preview {
+    width: min(
+        100%,
+        clamp(
+            4.5rem,
+            10vw,
+            10rem
+        )
+    );
+
+    max-height: var(--wheel-size);
+
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.game-stage__preview--left {
+    grid-area: preview-left;
+
+    justify-self: end;
+}
+
+
+/* =========================================================
+   BOTTOM ACTION BAR
+   ========================================================= */
+
+.bottom-action-bar {
+    grid-area: actions;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: clamp(
+        0.25rem,
+        0.65vw,
+        0.65rem
+    );
+
+    justify-self: center;
+
+    width: min(100%, 42rem);
+
+    min-width: 0;
+
+    padding-top: clamp(
+        0.25rem,
+        0.8vh,
+        0.75rem
+    );
+}
+
+.bottom-action-bar > button {
+    flex: 0 0 auto;
+
+    min-width: 0;
+
+    padding: 0.5rem;
+
+    font-size: 1.3rem;
+
+    white-space: nowrap;
+}
+
+.bottom-action-bar > .spin__btn,
+.bottom-action-bar > #reset-btn {
+    padding: 0.5rem;
+
+    font-size: 1.3rem;
+}
+
+
+/* =========================================================
+   RIGHT PANEL / NAME LIST
+   ========================================================= */
+
+.panel {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-3);
+
+    align-self: start;
+
+    justify-self: end;
+
+    width: 100%;
+
+    /*
+     * Gleiche maximale Breite wie Volume.
+     */
+    max-width: var(--right-column-width);
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
 @media (max-width: 900px) {
+
     body {
         overflow-x: hidden;
     }
 
+    .legal-links, 
+    a[href*="impressum"], 
+    a[href*="datenschutz"] {
+        display: none !important;
+    }
+
+    .mobile-menu-overlay .legal-links,
+    .mobile-menu-overlay a[href*="impressum"],
+    .mobile-menu-overlay a[href*="datenschutz"],
+    .mobile-menu__legal-links {
+        display: flex !important; 
+    }
+
+    .app-layout {
+        --mobile-panel-height: clamp(10rem, 13vh, 13rem);
+    }
+
+
+    /* -----------------------------------------------------
+       HEADER
+       ----------------------------------------------------- */
+
     .app-header {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+
         align-items: center;
+
         gap: 0.75rem;
+
         padding: 0.75rem;
     }
 
+
+    /*
+     * Desktop Controls verschwinden auf Mobile.
+     */
     .app-header__controls {
         display: none;
     }
 
+
+    /*
+     * Mobile Menübutton anzeigen.
+     */
     .app-header__menu-toggle {
         display: inline-flex;
+
+        /*
+         * Das Element befindet sich automatisch rechts
+         * neben dem Userbereich.
+         */
+        grid-column: 2;
     }
+
+
+    /* -----------------------------------------------------
+       USER AREA
+       ----------------------------------------------------- */
 
     #user-area {
         font-size: 0.78rem;
+
         gap: 0.35rem;
     }
 
@@ -182,73 +659,194 @@ body {
         font-size: 0.8rem;
     }
 
+
+    /* -----------------------------------------------------
+       APP LAYOUT
+       ----------------------------------------------------- */
+
     .app-layout {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        grid-template-rows:
+            var(--mobile-panel-height)
+            auto;
+
         grid-template-areas:
             "room panel"
             "game game";
+
         gap: 0.75rem;
+
         padding: 0.75rem;
     }
+
+
+    /* -----------------------------------------------------
+       ROOM PANEL
+       ----------------------------------------------------- */
 
     #room-panel {
         grid-area: room;
+
+        width: 100%;
+        height: var(--mobile-panel-height);
+        min-width: 0;
+        min-height: 0;
         max-width: none;
-        max-height: none;
+        max-height: var(--mobile-panel-height);
+
         padding: 0.75rem;
+
+        overflow-x: hidden;
+        overflow-y: auto;
     }
+
+
+    /* -----------------------------------------------------
+       NAME PANEL
+       ----------------------------------------------------- */
 
     .panel {
         grid-area: panel;
+
+        width: 100%;
+        height: var(--mobile-panel-height);
+        min-width: 0;
+        min-height: 0;
         max-width: none;
+        max-height: var(--mobile-panel-height);
+
         padding: 0.75rem;
+
+        border: 2px solid var(--border);
+
+        border-radius: 14px;
+
+        background: var(--surface);
+
+        justify-self: stretch;
+
+        align-self: stretch;
+
+        overflow-x: hidden;
+        overflow-y: auto;
     }
+
+
+    /* -----------------------------------------------------
+       GAME AREA
+       ----------------------------------------------------- */
 
     .game-area {
         grid-area: game;
+
         gap: 0.75rem;
     }
 
+
+    /* -----------------------------------------------------
+       SECONDARY ACTION BAR
+       ----------------------------------------------------- */
+
     .secondary-action-bar {
         width: 100%;
+
         justify-content: center;
+
         flex-wrap: wrap;
     }
 
+    .secondary-action-bar > button {
+        min-height: 44px;
+
+        padding:
+            0.7rem
+            0.9rem;
+
+        font-size: 0.9rem;
+    }
+
+
+    /* -----------------------------------------------------
+       GAME STAGE
+       ----------------------------------------------------- */
+
     .game-stage {
         grid-template-columns: 1fr;
+
         grid-template-areas:
             "wheel"
             "preview"
             "actions";
+
         row-gap: 0.75rem;
+
         max-width: 100%;
     }
+
+
+    /* -----------------------------------------------------
+       WHEEL
+       ----------------------------------------------------- */
 
     .wheel-center {
-        width: min(100%, 28rem);
+        width: min(
+            100%,
+            18rem
+        );
+
         justify-self: center;
     }
 
-    .game-stage__preview {
-        grid-area: preview;
-        justify-self: center;
-        width: min(100%, 10rem);
-        max-width: 100%;
-    }
 
-    .game-stage__preview--left {
-        justify-self: center;
-    }
+    /* -----------------------------------------------------
+       PREVIEW
+       ----------------------------------------------------- */
+
+.game-stage {
+    /* 1. Drei Spalten statt einer definieren: links Bild, mitte Rad, rechts Platz */
+    grid-template-columns: minmax(4rem, 1fr) minmax(14rem, var(--wheel-size)) 1fr;
+
+    /* 2. Layout-Bereiche nebeneinander festlegen */
+    grid-template-areas:
+        "preview-left wheel ."
+        "actions actions actions";
+
+    align-items: center; /* Zentriert die Elemente vertikal zueinander */
+    row-gap: 0.75rem;
+    max-width: 100%;
+}
+
+.game-stage__preview--left {
+    /* Ausrichtung nach rechts schieben, damit es nah am Rad liegt */
+    justify-self: end; 
+    align-self: center; /* Stellt mittige Höhe zum Rad sicher */
+}
+
+
+    /* -----------------------------------------------------
+       BOTTOM ACTION BAR
+       ----------------------------------------------------- */
 
     .bottom-action-bar {
         width: 100%;
+
         display: grid;
-        grid-template-columns: 1fr 1fr;
+
+        grid-template-columns:
+            1fr
+            1fr;
+
         grid-template-areas:
             "power reset"
             "spin-left spin-left";
+
         gap: 0.5rem;
+
         padding-top: 0;
     }
 
@@ -270,123 +868,13 @@ body {
 
     .bottom-action-bar > button {
         width: 100%;
+
         min-height: 44px;
-        padding: 0.7rem 0.85rem;
+
+        padding:
+            0.7rem
+            0.85rem;
+
         font-size: 0.9rem;
-    }
-}
-
-.game-area {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    align-self: stretch;
-    justify-items: center;
-    gap: clamp(0.5rem, 1.2vh, 1rem);
-    min-width: 0;
-}
-
-.game-stage {
-    display: grid;
-    grid-template-columns: minmax(3.5rem, 1fr) minmax(15rem, var(--wheel-size)) minmax(3.5rem, 1fr);
-    grid-template-areas:
-        "preview-left wheel ."
-        "actions actions actions";
-    align-items: center;
-    justify-content: center;
-    column-gap: clamp(0.5rem, 1vw, 1rem);
-    row-gap: clamp(3rem, 6vh, 4rem);
-    width: 100%;
-    max-width: 70rem;
-    min-width: 0;
-    align-self: center;
-}
-
-.wheel-center {
-    grid-area: wheel;
-    position: relative;
-    width: 100%;
-    min-width: 0;
-}
-
-.game-stage__preview {
-    width: min(100%, clamp(4.5rem, 10vw, 10rem));
-    max-height: var(--wheel-size);
-    min-width: 0;
-    overflow: hidden;
-}
-
-.game-stage__preview--left {
-    grid-area: preview-left;
-    justify-self: end;
-}
-
-.bottom-action-bar {
-    grid-area: actions;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(0.25rem, 0.65vw, 0.65rem);
-    justify-self: center;
-    width: min(100%, 42rem);
-    min-width: 0;
-    padding-top: clamp(0.25rem, 0.8vh, 0.75rem);
-}
-
-.bottom-action-bar>button {
-    flex: 0 0 auto;
-    min-width: 0;
-    padding: 0.45rem;
-    white-space: nowrap;
-}
-
-.bottom-action-bar>.spin__btn,
-.bottom-action-bar>#reset-btn {
-    padding: 0.45rem;
-    font-size: 0.72rem;
-}
-
-.secondary-action-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(0.5rem, 1vw, 1rem);
-    width: var(--top-control-width);
-    min-width: 0;
-}
-
-@media (max-width: 900px) {
-    .secondary-action-bar {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-.secondary-action-bar>button {
-    min-width: 0;
-    padding: 0.6rem clamp(0.75rem, 1.2vw, 1.25rem);
-    font-size: 0.85rem;
-    white-space: nowrap;
-}
-
-.panel {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    align-self: start;
-    justify-self: end;
-    width: 100%;
-    min-width: 0;
-    max-width: 20rem;
-}
-
-@media (max-width: 900px) {
-    .panel {
-        justify-self: start;
-        align-self: start;
-        max-width: none;
-        padding: 0.75rem;
-        border: 2px solid var(--border);
-        border-radius: 14px;
-        background: var(--surface);
     }
 }

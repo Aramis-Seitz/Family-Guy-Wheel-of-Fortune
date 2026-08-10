@@ -1,4 +1,4 @@
-import { getMultiplier, setMultiplierSlider, updateMultiplierDisplay } from "../wheel/multiplier";
+import { getMultiplier, setMultiplierControlValue } from "../wheel/multiplier";
 import { getNamesInWheelList, replaceNames } from "./names-in-wheel-list";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
@@ -35,8 +35,7 @@ export function loadInformationFromUrl(): void {
     const powerParam = params.get("power");
     const powerValue: number = Number(powerParam);
     if (!Number.isFinite(powerValue) || powerValue < 1 || powerValue > 2) return;
-    setMultiplierSlider(powerValue);
-    updateMultiplierDisplay();
+    setMultiplierControlValue(powerValue);
 }
 
 const shareBtn = requiredElement<HTMLButtonElement>("share-names-in-wheel-list-btn");

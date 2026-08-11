@@ -34,7 +34,7 @@ describe("generateSpin", () => {
         });
     });
 
-    it("persists a freshly generated UUID for the given user, calling each dependency exactly once", async () => {
+    it("persists a freshly generated UUID for the given user", async () => {
         vi.mocked(randomUUID).mockReturnValue(generatedUuid);
         vi.mocked(getSecureRandomNumber).mockReturnValue(180);
         vi.mocked(insertSpinToken).mockResolvedValue("persisted-spin-token");
@@ -42,7 +42,17 @@ describe("generateSpin", () => {
         await generateSpin(userId);
 
         expect(insertSpinToken).toHaveBeenCalledWith(generatedUuid, userId);
+    });
+
+    it("calling each dependency exactly once", async () => {
+        vi.mocked(randomUUID).mockReturnValue(generatedUuid);
+        vi.mocked(getSecureRandomNumber).mockReturnValue(180);
+        vi.mocked(insertSpinToken).mockResolvedValue("persisted-spin-token");
+
+        await generateSpin(userId);
+
         expect(randomUUID).toHaveBeenCalledTimes(1);
+        expect(getSecureRandomNumber).toHaveBeenCalledTimes(1);
         expect(insertSpinToken).toHaveBeenCalledTimes(1);
     });
 
@@ -51,6 +61,8 @@ describe("generateSpin", () => {
         vi.mocked(getSecureRandomNumber).mockReturnValue(180);
         vi.mocked(insertSpinToken).mockRejectedValueOnce(new Error("database unavailable"));
 
-        await expect(generateSpin(userId)).rejects.toThrow("database unavailable");
+        const result = generateSpin(userId);
+
+        await expect(result).rejects.toThrow("database unavailable");
     });
 });

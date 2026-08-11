@@ -8,38 +8,52 @@ interface UserProfileState {
     isAuthenticated: boolean;
 }
 
+type ProfileDataListener = (state: UserProfileState) => void;
+
 export class ProfileData {
     private currentState: UserProfileState = {
         username: null,
         coins: 0,
         isAuthenticated: false,
     };
+    private listeners = new Set<ProfileDataListener>();
 
     public async initializeProfile(): Promise<void> {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
         if (error || !session?.user) {
-            this.currentState = { username: null, coins: 0, isAuthenticated: false };
+            this.setState({ username: null, coins: 0, isAuthenticated: false });
             return;
         }
 
         const profile = await getUserProfile();
-        this.currentState = {
+        this.setState({
             username: profile?.username ?? null,
             coins: profile?.coins ?? 0,
             isAuthenticated: true,
-        };
+        });
 
         this.subscribeToCoinUpdates(session.user.id);
     }
 
     public async refreshCoins(): Promise<void> {
         const coins = await getUserCoins();
-        this.currentState = { ...this.currentState, coins };
+        this.setState({ ...this.currentState, coins });
     }
 
     // Das UI holt sich die Daten nur über eine Leseschnittstelle
     public getState(): UserProfileState {
         return { ...this.currentState };
+    }
+
+    // UI-Komponenten registrieren sich hier, um über Änderungen informiert zu werden.
+    public subscribe(listener: ProfileDataListener): () => void {
+        this.listeners.add(listener);
+        return () => this.listeners.delete(listener);
+    }
+
+    private setState(newState: UserProfileState): void {
+        this.currentState = newState;
+        this.listeners.forEach((listener) => listener(this.getState()));
     }
 
     private subscribeToCoinUpdates(userId: string): void {
@@ -50,7 +64,7 @@ export class ProfileData {
                 { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
                 (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
                     const coins = (payload.new as { coins?: number })?.coins ?? 0;
-                    this.currentState = { ...this.currentState, coins };
+                    this.setState({ ...this.currentState, coins });
                 }
             )
             .subscribe();

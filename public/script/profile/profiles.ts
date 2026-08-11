@@ -5,7 +5,7 @@ import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-s
 import { isNameEditingLocked } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
-import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "../api/user-api";
+import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "./user-api";
 import { notifyAccountChanged } from "../shared/auth-channel";
 import { activeRoomKey } from "../multiplayer/room-state";
 import { executeLeaveRoom } from "../multiplayer/room-orchestration";

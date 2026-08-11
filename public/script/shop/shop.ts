@@ -2,7 +2,7 @@ import { requiredElement, initToggleModal } from "../shared/dom-helpers";
 import { loadShopAssets } from "./shop-assets";
 import type { Asset } from "shared";
 import { getShopAssets } from "../api/shop-api";
-import { getUserCoins } from "../api/user-api";
+import { getUserCoins } from "../profile/user-api";
 import { supabaseClient } from "../shared/supabase-client";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { getActiveCategory, renderCategoryTabs } from "../shared/category-tabs";

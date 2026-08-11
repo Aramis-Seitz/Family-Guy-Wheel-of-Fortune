@@ -1,6 +1,6 @@
 import { profileName } from "../profile/profiles";
 import { applyActiveAssets } from "../shared/asset-selection";
-import { ensureDefaultAssets } from "../api/user-api";
+import { ensureDefaultAssets } from "../profile/user-api";
 import { initInventory } from "../inventory/inventory";
 import { initNamesInWheelList } from "../names/names-in-wheel-list";
 import { initShareFeature } from "../names/share-names-in-wheel-list";

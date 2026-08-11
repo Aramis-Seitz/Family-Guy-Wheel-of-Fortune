@@ -1,4 +1,4 @@
-import { applyDisabledStyle, spinLeftBtn } from "../wheel/spin";
+import { applyDisabledStyle, spinBtn } from "../wheel/spin";
 import { wheelEmptyCompanionOverlay, wheelEmptyHint } from "../multiplayer/room-players-sidebar";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { requiredElement } from "../shared/dom-helpers";
@@ -111,7 +111,7 @@ export function updateEmptyState(): void {
 
 function updateSpinButtonState(): void {
   const disabled = getSegmentCountOfWheelList() < MIN_ITEMS;
-  [spinLeftBtn].forEach((btn) => applyDisabledStyle(btn, disabled));
+  applyDisabledStyle(spinBtn, disabled);
 }
 
 export function syncRemoveButtons(): void {

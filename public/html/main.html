@@ -257,7 +257,7 @@
                     <div id="name-centered-input" class="name-centered-input name-centered-input--hidden">
                         <div class="names-in-wheel-list__add-row">
                             <input type="text" id="name-input-centered" data-i18n-placeholder="html.enterName"
-                                placeholder="Enter name…" />
+                                placeholder="Enter name…" maxlength="20" />
                             <button class="names-in-wheel-list__add-btn" id="add-name-btn-centered"
                                 data-i18n-aria-label="a11y.addName" aria-label="Add name">+</button>
                         </div>
@@ -265,8 +265,7 @@
                 </div>
 
                 <div class="bottom-action-bar">
-                    <button class="spin__btn" id="spin-left-btn" type="button" data-i18n="html.spinLeft">SPIN
-                        LEFT</button>
+                    <button class="spin__btn" id="spin-btn" type="button" data-i18n="html.spin">SPIN</button>
                     <button id="reset-btn" type="button" data-i18n="html.reset">RESET</button>
                     <button class="spin__btn multiplier" id="multiplier-button" type="button">
                         <span data-i18n="html.power">Power</span>:&nbsp;<span id="multiplier-value"
@@ -278,7 +277,8 @@
 
         <aside class="panel">
             <div class="names-in-wheel-list__add-row" id="name-sidebar-add-row">
-                <input type="text" id="name-input" data-i18n-placeholder="html.enterName" placeholder="Enter name…" />
+                <input type="text" id="name-input" data-i18n-placeholder="html.enterName" placeholder="Enter name…"
+                    maxlength="20" />
                 <button class="names-in-wheel-list__add-btn" id="add-name-btn" data-i18n-aria-label="a11y.addName"
                     aria-label="Add name">+</button>
             </div>

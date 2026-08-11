@@ -3,6 +3,7 @@ import { requiredElement, optionalElement } from "../shared/dom-helpers";
 import { showToast } from "../shared/toast";
 import { t } from "../app/i18n";
 import {
+  MAX_NAME_LENGTH,
   NAME_VALIDATION_ERROR,
   type NameValidationErrorCode,
   validateName,
@@ -23,6 +24,8 @@ export function getNameValidationMessage(code: NameValidationErrorCode): string 
       return t("names.required");
     case NAME_VALIDATION_ERROR.INVALID_CHARACTERS:
       return t("names.invalidCharacters");
+    case NAME_VALIDATION_ERROR.TOO_LONG:
+      return t("names.tooLong", { max: MAX_NAME_LENGTH });
     default:
       return t("names.invalid");
   }

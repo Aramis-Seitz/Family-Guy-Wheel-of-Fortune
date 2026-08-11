@@ -1,9 +1,9 @@
 import {
   FULL_CIRCLE_RADIANS,
   SVG_NS,
+  applyWheelLabelText,
   getPointOnCircle,
   getSegmentColor,
-  
 } from "../wheel/renderer";
 
 export function createMiniWheel(names: string[], size = 70): SVGSVGElement {
@@ -82,7 +82,7 @@ function createMiniLabel(
     `rotate(${rotation} ${point.x} ${point.y})`
   );
 
-  text.textContent = name;
+  applyWheelLabelText(text, name, 8);
 
   return text;
 }

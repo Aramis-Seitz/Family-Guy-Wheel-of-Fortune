@@ -111,6 +111,7 @@
     "names": {
         "required": "Bitte gib einen Namen ein.",
         "invalidCharacters": "Nur Buchstaben, Zahlen und Apostrophe sind erlaubt.",
+        "tooLong": "Der Name darf höchstens {{max}} Zeichen lang sein.",
         "invalid": "Ungültige Eingabe.",
         "maxItems": "Maximal {{max}} Einträge erlaubt.",
         "copySuccess": "Link kopiert.",
@@ -152,7 +153,7 @@
         "imprint": "Impressum",
         "privacy": "Datenschutz",
         "backToApp": "← Zurück zur App",
-        "spinLeft": "LINKS DREHEN",
+        "spin": "DREHEN",
         "reset": "ZURÜCKSETZEN",
         "share": "Teilen",
         "inventory": "INVENTAR",

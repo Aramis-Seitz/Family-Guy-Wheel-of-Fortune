@@ -111,6 +111,7 @@
     "names": {
         "required": "Please enter a name.",
         "invalidCharacters": "Only letters, numbers and apostrophes are allowed.",
+        "tooLong": "The name must be at most {{max}} characters long.",
         "invalid": "Invalid input.",
         "maxItems": "Maximum {{max}} entries allowed.",
         "copySuccess": "Link copied.",
@@ -152,7 +153,7 @@
         "imprint": "Imprint",
         "privacy": "Privacy",
         "backToApp": "← Back to app",
-        "spinLeft": "SPIN LEFT",
+        "spin": "SPIN",
         "reset": "RESET",
         "share": "Share",
         "inventory": "INVENTORY",

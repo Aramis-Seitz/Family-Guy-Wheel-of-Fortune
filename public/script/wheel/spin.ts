@@ -32,12 +32,20 @@ function updateWheelRotation(): void {
   wheelElement.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-export const spinLeftBtn = requiredElement<HTMLButtonElement>("spin-left-btn");
+export const spinBtn = requiredElement<HTMLButtonElement>("spin-btn");
+const MIN_SPIN_DRAG_DISTANCE = 8;
+
+interface SpinGesture {
+  pointerId: number;
+  startX: number;
+}
+
+let spinGesture: SpinGesture | null = null;
 
 export type SpinElement = HTMLButtonElement | HTMLInputElement | NodeListOf<HTMLButtonElement>;
 
 function getSpinRelatedElements(): SpinElement[] {
-  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinLeftBtn, multiplierButton, getPlayerToggleButtons()];
+  const elements: SpinElement[] = [input, addBtn, getRemoveBtn(), spinBtn, multiplierButton, getPlayerToggleButtons()];
 
   if (bulkAddToWheelBtn) {
     elements.push(bulkAddToWheelBtn);
@@ -221,7 +229,7 @@ export function applyGameModeLock(): void {
   const hasEnoughItems = getNamesInWheelList().length >= MIN_ITEMS;
   const locked: SpinElement[] = [...getCurrentMode().getRoleLockedElements()];
   if (!hasEnoughItems) {
-    locked.push(spinLeftBtn);
+    locked.push(spinBtn);
   }
 
   setElementsDisabled(getRoleLockableElements(), false);
@@ -232,10 +240,15 @@ export function applyGameModeLock(): void {
   profileName?.classList.toggle("user-profile-name--clickable", !isNameEditingLocked());
 }
 
-export function initWheelControls(): void {
-  spinLeftBtn.addEventListener("click", () => {
-    void getCurrentMode().onSpinClick("left");
-  });
+function startSpin(direction: Direction): void {
+  void getCurrentMode().onSpinClick(direction);
+}
+
+function handleSpinPointerDown(event: PointerEvent): void {
+  if (!event.isPrimary || event.button !== 0) return;
+  spinGesture = { pointerId: event.pointerId, startX: event.clientX };
+  spinBtn.setPointerCapture(event.pointerId);
+}
 
   resetBtn.addEventListener("click", () => {
     getCurrentMode().onReset();

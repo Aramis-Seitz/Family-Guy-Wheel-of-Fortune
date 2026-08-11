@@ -17,6 +17,12 @@
     filter: brightness(0.9);
 }
 
+#spin-btn {
+    touch-action: none;
+    user-select: none;
+    cursor: ew-resize;
+}
+
 #reset-btn {
     background-color: var(--button-bg);
     color: var(--button-text);

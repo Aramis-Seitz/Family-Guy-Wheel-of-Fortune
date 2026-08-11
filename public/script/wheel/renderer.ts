@@ -55,6 +55,46 @@ function createWheelSegmentPath(
   return path;
 }
 
+// Ab dieser Zeichenzahl wird der Name zweizeilig dargestellt und die
+// Schrift verkleinert, damit lange Namen (bis MAX_NAME_LENGTH, siehe
+// shared/validation.ts) nicht über den Segmentrand hinaus laufen.
+const WRAP_THRESHOLD = 8;
+const MIN_FONT_SIZE_RATIO = 0.5;
+
+export function applyWheelLabelText(
+  text: SVGTextElement,
+  name: string,
+  baseFontSize: number
+): void {
+  if (name.length <= WRAP_THRESHOLD) {
+    text.textContent = name;
+    return;
+  }
+
+  const splitIndex = Math.ceil(name.length / 2);
+  const firstLine = name.slice(0, splitIndex);
+  const secondLine = name.slice(splitIndex);
+  const longestLine = Math.max(firstLine.length, secondLine.length);
+
+  const scale = Math.max(MIN_FONT_SIZE_RATIO, Math.min(1, WRAP_THRESHOLD / longestLine));
+  text.setAttribute("font-size", String(baseFontSize * scale));
+
+  const x = text.getAttribute("x") ?? "0";
+
+  const firstTspan = document.createElementNS(SVG_NS, "tspan");
+  firstTspan.setAttribute("x", x);
+  firstTspan.setAttribute("dy", "-0.5em");
+  firstTspan.textContent = firstLine;
+
+  const secondTspan = document.createElementNS(SVG_NS, "tspan");
+  secondTspan.setAttribute("x", x);
+  secondTspan.setAttribute("dy", "1.1em");
+  secondTspan.textContent = secondLine;
+
+  text.appendChild(firstTspan);
+  text.appendChild(secondTspan);
+}
+
 function createWheelLabel(
   segmentIndex: number,
   segmentCount: number,
@@ -83,7 +123,7 @@ function createWheelLabel(
     `rotate(${readableRotation} ${labelPoint.x} ${labelPoint.y})`
   );
 
-  text.textContent = name;
+  applyWheelLabelText(text, name, 10);
   return text;
 }
 
@@ -117,7 +157,7 @@ export function generateWheel(names: string[]): void {
     text.setAttribute("font-weight", "bold");
     text.setAttribute("text-anchor", "middle");
     text.setAttribute("dominant-baseline", "middle");
-    text.textContent = names[0];
+    applyWheelLabelText(text, names[0], 10);
     wheelElement.appendChild(text);
     return;
   }

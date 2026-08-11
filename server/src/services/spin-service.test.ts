@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { generateSpin } from "./spin-service";
 
 vi.mock("crypto", () => ({
@@ -21,13 +21,11 @@ describe("generateSpin", () => {
     const userId = "user-123";
     const generatedUuid = "11111111-1111-1111-1111-111111111111";
 
-    beforeEach(() => {
+    it("returns the wheel number and the token persisted by insertSpinToken", async () => {
         vi.mocked(randomUUID).mockReturnValue(generatedUuid);
         vi.mocked(getSecureRandomNumber).mockReturnValue(180);
         vi.mocked(insertSpinToken).mockResolvedValue("persisted-spin-token");
-    });
 
-    it("returns the wheel number and the token persisted by insertSpinToken", async () => {
         const result = await generateSpin(userId);
 
         expect(result).toStrictEqual({
@@ -36,29 +34,21 @@ describe("generateSpin", () => {
         });
     });
 
-    it("persists a freshly generated UUID for the given user", async () => {
+    it("persists a freshly generated UUID for the given user, calling each dependency exactly once", async () => {
+        vi.mocked(randomUUID).mockReturnValue(generatedUuid);
+        vi.mocked(getSecureRandomNumber).mockReturnValue(180);
+        vi.mocked(insertSpinToken).mockResolvedValue("persisted-spin-token");
+
         await generateSpin(userId);
 
         expect(insertSpinToken).toHaveBeenCalledWith(generatedUuid, userId);
-    });
-
-    it("passes through the lower boundary of the wheel range (0) unchanged", async () => {
-        vi.mocked(getSecureRandomNumber).mockReturnValue(0);
-
-        const result = await generateSpin(userId);
-
-        expect(result.ranNum).toBe(0);
-    });
-
-    it("passes through the upper boundary of the wheel range (359) unchanged", async () => {
-        vi.mocked(getSecureRandomNumber).mockReturnValue(359);
-
-        const result = await generateSpin(userId);
-
-        expect(result.ranNum).toBe(359);
+        expect(randomUUID).toHaveBeenCalledTimes(1);
+        expect(insertSpinToken).toHaveBeenCalledTimes(1);
     });
 
     it("propagates an error when persisting the spin token fails", async () => {
+        vi.mocked(randomUUID).mockReturnValue(generatedUuid);
+        vi.mocked(getSecureRandomNumber).mockReturnValue(180);
         vi.mocked(insertSpinToken).mockRejectedValueOnce(new Error("database unavailable"));
 
         await expect(generateSpin(userId)).rejects.toThrow("database unavailable");

@@ -16,9 +16,16 @@ function saveTheme(theme: Theme): void {
   localStorage.setItem(THEME_STORAGE_KEY, theme);
 }
 
-function createThemeToggleButton(): HTMLButtonElement | null {
-  const existing = document.getElementById(THEME_BUTTON_ID) as HTMLButtonElement | null;
-  if (existing) return existing;
+function getThemeToggleButtons(): NodeListOf<HTMLButtonElement> {
+  return document.querySelectorAll<HTMLButtonElement>(".theme-toggle-btn");
+}
+
+function ensureThemeToggleButton(): HTMLButtonElement | null {
+  const existing = document.querySelector<HTMLButtonElement>(`#${THEME_BUTTON_ID}, .theme-toggle-btn`);
+  if (existing) {
+    existing.id = THEME_BUTTON_ID;
+    return existing;
+  }
 
   const header = document.querySelector<HTMLDivElement>(".app-header__language-switcher") || document.querySelector<HTMLDivElement>(".app-header");
   if (!header) return null;
@@ -33,14 +40,14 @@ function createThemeToggleButton(): HTMLButtonElement | null {
 }
 
 function updateThemeToggleButton(theme: Theme): void {
-  const button = document.getElementById(THEME_BUTTON_ID) as HTMLButtonElement | null;
-  if (!button) return;
-  button.textContent = theme === "dark" ? "💥 Light" : "🌙 Dark";
-  button.setAttribute("aria-pressed", String(theme === "dark"));
-  button.setAttribute(
-    "aria-label",
-    theme === "dark" ? "Switch to light theme" : "Switch to dark theme",
-  );
+  getThemeToggleButtons().forEach((button) => {
+    button.textContent = theme === "dark" ? "💥 Light" : "🌙 Dark";
+    button.setAttribute("aria-pressed", String(theme === "dark"));
+    button.setAttribute(
+      "aria-label",
+      theme === "dark" ? "Switch to light theme" : "Switch to dark theme",
+    );
+  });
 }
 
 function applyTheme(theme: Theme): void {
@@ -62,11 +69,10 @@ function getPreferredTheme(): Theme {
 
 export function initTheme(): void {
   const theme = getPreferredTheme();
-  createThemeToggleButton();
+  ensureThemeToggleButton();
   applyTheme(theme);
 
-  const button = document.getElementById(THEME_BUTTON_ID) as HTMLButtonElement | null;
-  if (button) {
+  getThemeToggleButtons().forEach((button) => {
     button.addEventListener("click", () => {
       const nextTheme: Theme = document.body.dataset.theme === "dark" ? "light" : "dark";
       if (nextTheme === "light") {
@@ -75,7 +81,7 @@ export function initTheme(): void {
       applyTheme(nextTheme);
       saveTheme(nextTheme);
     });
-  }
+  });
 
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
   mediaQuery.addEventListener("change", (event) => {

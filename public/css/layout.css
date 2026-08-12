@@ -1,134 +1,928 @@
+/* =========================================================
+   GLOBAL LAYOUT VARIABLES
+   ========================================================= */
+
 body {
-    --top-control-width: clamp(14.835rem, calc(9.335rem + 9.2vw), 18.835rem);
+    /*
+     * Das Grid wird von Header und Main gemeinsam benutzt.
+     * Dadurch bleiben beide Bereiche horizontal exakt
+     * aufeinander ausgerichtet.
+     */
+    --layout-columns:
+        minmax(9rem, 0.9fr)
+        minmax(22rem, 2.6fr)
+        minmax(11rem, 1fr);
+
+    /*
+     * Breite für:
+     * - DE
+     * - EN
+     * - Light
+     *
+     * und gleichzeitig:
+     * - Teilen
+     * - Inventar
+     * - Shop
+     */
+    --top-control-width: clamp(
+        17rem,
+        calc(10rem + 11vw),
+        21rem
+    );
+
+    /*
+     * Maximale Breite des rechten Bereichs.
+     *
+     * Wird sowohl für .volume als auch für .panel
+     * verwendet.
+     */
+    --right-column-width: 20rem;
 
     display: flex;
     flex-direction: column;
+
     min-height: 100dvh;
-    overflow-x: auto;
+
+    overflow-x: hidden;
 }
+
+
+/* =========================================================
+   USER AREA
+   ========================================================= */
+
+#user-area {
+    display: flex;
+    align-items: center;
+
+    gap: 0.5rem;
+
+    min-width: 0;
+
+    flex-wrap: wrap;
+}
+
+#user-profile-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+#auth-button {
+    min-height: 44px;
+    min-width: 44px;
+
+    padding: 0.5rem 0.75rem;
+
+    border-radius: 999px;
+}
+
+
+/* =========================================================
+   APP HEADER
+   ========================================================= */
 
 .app-header {
     display: grid;
-    grid-template-columns: minmax(9rem, 0.9fr) minmax(22rem, 2.6fr) minmax(11rem, 1fr);
+
+    /*
+     * Exakt dasselbe Grid wie .app-layout.
+     */
+    grid-template-columns: var(--layout-columns);
+
     align-items: center;
-    gap: clamp(0.5rem, 1.25vw, 1.5rem);
+
+    gap: clamp(
+        0.5rem,
+        1.25vw,
+        1.5rem
+    );
+
     width: 100%;
+
     min-width: 0;
-    padding: clamp(0.5rem, 1.5vw, 1.5rem);
+
+    padding: clamp(
+        0.5rem,
+        1.5vw,
+        1.5rem
+    );
+
     position: relative;
+
     z-index: 10;
 }
 
-.app-header>* {
+.app-header > * {
     min-width: 0;
 }
+
+.app-header__controls {
+    display: contents;
+}
+
+.app-header__language-switcher {
+    grid-column: 2;
+    grid-row: 1;
+
+    display: flex;
+    align-items: center;
+
+    width: var(--top-control-width);
+    min-width: 0;
+
+    justify-self: center;
+
+    gap: 0.35rem;
+}
+
+.app-header__language-switcher > .lang-btn {
+    flex: 0 0 auto;
+}
+
+.app-header__language-switcher > .theme-toggle-btn {
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.app-header__controls > .volume {
+    grid-column: 3;
+    grid-row: 1;
+
+    width: 100%;
+    max-width: var(--right-column-width);
+    min-width: 0;
+
+    justify-self: end;
+}
+
+/* =========================================================
+   MOBILE MENU TOGGLE
+   ========================================================= */
+
+.app-header__menu-toggle {
+    display: none;
+
+    justify-self: end;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 999px;
+
+    border: 1px solid var(--border);
+
+    background: var(--auth-bg);
+    color: var(--auth-text);
+
+    font-size: 1.35rem;
+
+    cursor: pointer;
+
+    transition:
+        transform var(--transition),
+        background var(--transition),
+        opacity var(--transition);
+}
+
+.app-header__menu-toggle:hover {
+    transform: scale(1.02);
+}
+
+
+/* =========================================================
+   MOBILE MENU OVERLAY
+   ========================================================= */
+
+.mobile-menu-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 30;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity var(--transition);
+}
+
+.mobile-menu-overlay.is-open {
+    opacity: 1;
+
+    pointer-events: auto;
+}
+
+.mobile-menu-overlay__panel {
+    width: min(92vw, 22rem);
+
+    height: 100%;
+
+    padding: 1rem;
+
+    background: var(--modal-surface);
+    color: var(--modal-text);
+
+    box-shadow: -12px 0 32px var(--shadow-strong);
+
+    transform: translateX(100%);
+
+    transition: transform var(--transition);
+}
+
+.mobile-menu-overlay.is-open .mobile-menu-overlay__panel {
+    transform: translateX(0);
+}
+
+.mobile-menu-overlay__header {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-bottom: 1rem;
+}
+
+.mobile-menu-overlay__close {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 999px;
+
+    border: 1px solid var(--border);
+
+    background: var(--auth-bg);
+    color: var(--auth-text);
+
+    font-size: 1.25rem;
+
+    cursor: pointer;
+}
+
+.mobile-menu-overlay__section {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0.9rem;
+}
+
+.mobile-menu__action {
+    width: 100%;
+
+    min-height: 44px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-menu__legal-links {
+    justify-content: center;
+}
+
+
+/* =========================================================
+   APP LAYOUT
+   ========================================================= */
 
 .app-layout {
-    --wheel-size: clamp(15rem, min(34vw, 55vh), 31.25rem);
+    --wheel-size: clamp(
+        15rem,
+        min(34vw, 55vh),
+        31.25rem
+    );
 
     display: grid;
-    grid-template-columns: minmax(9rem, 0.9fr) minmax(22rem, 2.6fr) minmax(11rem, 1fr);
+
+    /*
+     * Exakt dasselbe Grid wie im Header.
+     */
+    grid-template-columns: var(--layout-columns);
+
     align-items: center;
-    gap: clamp(0.5rem, 1.25vw, 1.5rem);
+
+    gap: clamp(
+        0.5rem,
+        1.25vw,
+        1.5rem
+    );
+
     flex: 1 1 auto;
+
     width: min(100%, 120rem);
+
     min-width: 0;
+
+    min-height: 0;
+
     margin-inline: auto;
-    padding: 0 clamp(0.5rem, 1.5vw, 1.5rem) clamp(0.5rem, 1.5vw, 1.5rem);
+
+    padding: clamp(
+        0.5rem,
+        1.5vw,
+        1.5rem
+    );
 }
+
+
+/* =========================================================
+   GAME AREA
+   ========================================================= */
 
 .game-area {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+
+    grid-template-rows:
+        auto
+        minmax(0, 1fr);
+
     align-self: stretch;
+
     justify-items: center;
-    gap: clamp(3rem, 7vh, 4rem);
+
+    gap: clamp(
+        0.5rem,
+        1.2vh,
+        1rem
+    );
+
     min-width: 0;
 }
+
+
+/* =========================================================
+   SECONDARY ACTION BAR
+   ========================================================= */
+
+/*
+ * Enthält:
+ *
+ * Teilen | Inventar | Shop
+ *
+ * Diese Breite ist absichtlich identisch mit
+ * .app-header__language-switcher.
+ */
+.secondary-action-bar {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: clamp(
+        0.6rem,
+        1vw,
+        1rem
+    );
+
+    width: var(--top-control-width);
+
+    min-width: 0;
+}
+
+
+/*
+ * Secondary Buttons größer machen.
+ */
+.secondary-action-bar > button {
+    flex: 0 0 auto;
+
+    min-width: 0;
+
+    min-height: 44px;
+
+    padding:
+        0.75rem
+        clamp(
+            1rem,
+            1.4vw,
+            1.4rem
+        );
+
+    font-size: 0.95rem;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   GAME STAGE
+   ========================================================= */
 
 .game-stage {
     display: grid;
-    grid-template-columns: minmax(3.5rem, 1fr) minmax(15rem, var(--wheel-size)) minmax(3.5rem, 1fr);
+
+    grid-template-columns:
+        minmax(3.5rem, 1fr)
+        minmax(15rem, var(--wheel-size))
+        minmax(3.5rem, 1fr);
+
     grid-template-areas:
         "preview-left wheel ."
         "actions actions actions";
+
     align-items: center;
+
     justify-content: center;
-    column-gap: clamp(0.5rem, 1vw, 1rem);
-    row-gap: clamp(3rem, 6vh, 4rem);
+
+    column-gap: clamp(
+        0.5rem,
+        1vw,
+        1rem
+    );
+
+    row-gap: clamp(
+        3rem,
+        6vh,
+        4rem
+    );
+
     width: 100%;
+
     max-width: 70rem;
+
     min-width: 0;
-    align-self: start;
+
+    align-self: center;
 }
+
+
+/* =========================================================
+   WHEEL
+   ========================================================= */
 
 .wheel-center {
     grid-area: wheel;
+
     position: relative;
+
     width: 100%;
+
     min-width: 0;
 }
 
+
+/* =========================================================
+   PREVIEW
+   ========================================================= */
+
 .game-stage__preview {
-    width: min(100%, clamp(4.5rem, 10vw, 10rem));
+    width: min(
+        100%,
+        clamp(
+            4.5rem,
+            10vw,
+            10rem
+        )
+    );
+
     max-height: var(--wheel-size);
+
     min-width: 0;
+
     overflow: hidden;
 }
 
 .game-stage__preview--left {
     grid-area: preview-left;
+
     justify-self: end;
 }
+
+
+/* =========================================================
+   BOTTOM ACTION BAR
+   ========================================================= */
 
 .bottom-action-bar {
     grid-area: actions;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
-    gap: clamp(0.25rem, 0.65vw, 0.65rem);
+
+    gap: clamp(
+        0.25rem,
+        0.65vw,
+        0.65rem
+    );
+
     justify-self: center;
+
     width: min(100%, 42rem);
+
     min-width: 0;
-    padding-top: clamp(0.25rem, 0.8vh, 0.75rem);
+
+    padding-top: clamp(
+        0.25rem,
+        0.8vh,
+        0.75rem
+    );
 }
 
-.bottom-action-bar>button {
+.bottom-action-bar > button {
     flex: 0 0 auto;
+
     min-width: 0;
-    padding: 0.45rem;
+
+    padding: 0.5rem;
+
+    font-size: 1.3rem;
+
     white-space: nowrap;
 }
 
-.bottom-action-bar>.spin__btn,
-.bottom-action-bar>#reset-btn {
-    padding: 0.45rem;
-    font-size: 0.72rem;
+.bottom-action-bar > .spin__btn,
+.bottom-action-bar > #reset-btn {
+    padding: 0.5rem;
+
+    font-size: 1.3rem;
 }
 
-.secondary-action-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(0.5rem, 1vw, 1rem);
-    width: var(--top-control-width);
-    min-width: 0;
-}
 
-.secondary-action-bar>button {
-    min-width: 0;
-    padding: 0.6rem clamp(0.75rem, 1.2vw, 1.25rem);
-    font-size: 0.85rem;
-    white-space: nowrap;
-}
+/* =========================================================
+   RIGHT PANEL / NAME LIST
+   ========================================================= */
 
 .panel {
     display: flex;
+
     flex-direction: column;
+
     gap: var(--space-3);
+
     align-self: start;
+
     justify-self: end;
+
     width: 100%;
+
+    /*
+     * Gleiche maximale Breite wie Volume.
+     */
+    max-width: var(--right-column-width);
+
     min-width: 0;
-    max-width: 20rem;
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    /* -----------------------------------------------------
+       LEGAL LINKS & OVERLAY
+       ----------------------------------------------------- */
+
+    .legal-links, 
+    a[href*="impressum"], 
+    a[href*="datenschutz"] {
+        display: none !important;
+    }
+
+    .mobile-menu-overlay .legal-links,
+    .mobile-menu-overlay a[href*="impressum"],
+    .mobile-menu-overlay a[href*="datenschutz"],
+    .mobile-menu__legal-links {
+        display: flex !important; 
+    }
+
+    /* -----------------------------------------------------
+       HEADER & USER AREA
+       ----------------------------------------------------- */
+
+    .app-header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .app-header__controls {
+        display: none;
+    }
+
+    .app-header__menu-toggle {
+        display: inline-flex;
+        grid-column: 2;
+    }
+
+    #user-area {
+        font-size: 0.78rem;
+        gap: 0.35rem;
+    }
+
+    #user-profile-name {
+        font-size: 0.8rem;
+    }
+
+    /* -----------------------------------------------------
+       APP LAYOUT
+       ----------------------------------------------------- */
+
+    .app-layout {
+        --mobile-panel-height: clamp(10rem, 13vh, 13rem);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: var(--mobile-panel-height) auto;
+        grid-template-areas:
+            "room panel"
+            "game game";
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    /* -----------------------------------------------------
+       ROOM PANEL (MULTIPLAYER) FIXES
+       ----------------------------------------------------- */
+
+    #room-panel,
+    .room-panel {
+        grid-area: room;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: var(--mobile-panel-height);
+        min-width: 0;
+        min-height: 0;
+        max-height: var(--mobile-panel-height);
+        padding: 0.5rem !important;
+        overflow-x: hidden !important;
+        overflow-y: auto;
+        box-sizing: border-box !important;
+    }
+
+    /* 1. Header-Zeile (Raumcode, Copy & Verlassen) */
+    #room-panel .room-header,
+    #room-panel > div:first-child {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.3rem !important;
+        width: 100% !important;
+    }
+
+    #room-panel .room-code,
+    #room-panel [class*="code"] {
+        padding: 0.2rem 0.4rem !important;
+        font-size: 0.8rem !important;
+        max-width: 5.5rem !important;
+        text-align: center !important;
+    }
+
+    #room-panel .copy-btn,
+    #room-panel .leave-btn,
+    #room-panel button {
+        min-width: 0 !important;
+        padding: 0.25rem 0.4rem !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* 2. Mitspieler-Zeile & Plus-Button */
+    #room-panel .player-item,
+    #room-panel .member-row,
+    #room-panel [class*="player"] {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        position: relative !important;
+        width: 100% !important;
+        padding: 0.25rem 0.5rem !important;
+        box-sizing: border-box !important;
+    }
+
+    #room-panel .player-name {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 0.8rem !important;
+        flex: 1 1 auto !important;
+    }
+
+    #room-panel .add-player-btn,
+    #room-panel .player-item button,
+    #room-panel button:has-text("+") {
+        position: static !important;
+        margin-left: auto !important;
+        margin-right: 0.25rem !important;
+        width: 22px !important;
+        height: 22px !important;
+        min-width: 22px !important;
+        min-height: 22px !important;
+        padding: 0 !important;
+        font-size: 0.8rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    #room-panel .host-badge,
+    #room-panel [class*="host"] {
+        position: static !important;
+        font-size: 0.7rem !important;
+        padding: 0.1rem 0.3rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* 3. Button: Alle zum Rad hinzufügen */
+    #room-panel .add-all-btn,
+    #room-panel button[class*="add-all"],
+    #room-panel > button {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.8rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 4. Chat-Bereich */
+    #room-panel .chat-box,
+    #room-panel .chat-container,
+    #room-panel [class*="chat"] {
+        max-height: 8rem !important;
+        font-size: 0.75rem !important;
+        overflow-y: auto !important;
+    }
+
+    #room-panel .chat-input-wrapper {
+        gap: 0.25rem !important;
+    }
+
+    #room-panel .chat-input-wrapper input {
+        height: 26px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* -----------------------------------------------------
+       NAME PANEL
+       ----------------------------------------------------- */
+
+    .panel {
+        grid-area: panel;
+        width: 100%;
+        height: var(--mobile-panel-height);
+        min-width: 0;
+        min-height: 0;
+        max-width: none;
+        max-height: var(--mobile-panel-height);
+        padding: 0.5rem !important;
+        gap: 0.25rem !important;
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        background: var(--surface);
+        justify-self: stretch;
+        align-self: stretch;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    /* Input & Plus-Button oben */
+    .panel > form:first-child,
+    .panel > div:first-child,
+    .panel input,
+    .panel button:has(span:contains("+")),
+    .panel input + button {
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        font-size: 0.85rem !important;
+        line-height: normal !important;
+        padding: 0 0.5rem !important;
+    }
+
+    /* Namens-Tags Container */
+    .panel .name-list-item,
+    .panel .name-tag-wrapper,
+    .panel form:not(:first-child),
+    .panel > div:not(:first-child) {
+        height: 18px !important;
+        min-height: 9px !important;
+        max-height: 18px !important;
+        margin: 0 !important;
+    }
+
+    /* Namen-Tag Balken */
+    .panel .name-tag,
+    .panel .name-display {
+        height: 18px !important;
+        min-height: 9px !important;
+        font-size: 0.8rem !important;
+        line-height: 18px !important;
+        padding: 0 0.4rem !important;
+    }
+
+    /* Minus-Buttons */
+    .panel .name-list-item button,
+    .panel > div:not(:first-child) button,
+    .panel form:not(:first-child) button {
+        width: 18px !important;
+        min-width: 18px !important;
+        height: 18px !important;
+        min-height: 18px !important;
+        padding: 0 !important;
+        font-size: 0.8rem !important;
+        line-height: 18px !important;
+    }
+
+    /* -----------------------------------------------------
+       GAME AREA & SECONDARY ACTION BAR
+       ----------------------------------------------------- */
+
+    .game-area {
+        grid-area: game;
+        gap: 0.75rem;
+    }
+
+    .secondary-action-bar {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .secondary-action-bar > button {
+        min-height: 44px;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.9rem;
+    }
+
+    /* -----------------------------------------------------
+       GAME STAGE & PREVIEW
+       ----------------------------------------------------- */
+
+    .game-stage {
+        grid-template-columns: minmax(4rem, 1fr) minmax(14rem, var(--wheel-size)) 1fr;
+        grid-template-areas:
+            "preview-left wheel ."
+            "actions actions actions";
+        align-items: center;
+        row-gap: 0.75rem;
+        max-width: 100%;
+    }
+
+    .wheel-center {
+        width: min(100%, 18rem);
+        justify-self: center;
+    }
+
+    .game-stage__preview--left {
+        justify-self: end; 
+        align-self: center;
+    }
+
+    /* -----------------------------------------------------
+       BOTTOM ACTION BAR
+       ----------------------------------------------------- */
+
+    .bottom-action-bar {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "power reset"
+            "spin-left spin-left";
+        gap: 0.5rem;
+        padding-top: 0;
+    }
+
+    .bottom-action-bar > .multiplier {
+        grid-area: power;
+    }
+
+    .bottom-action-bar > #reset-btn {
+        grid-area: reset;
+    }
+
+    .bottom-action-bar > #spin-left-btn {
+        grid-area: spin-left;
+    }
+
+    .bottom-action-bar > #spin-right-btn {
+        display: none;
+    }
+
+    .bottom-action-bar > button {
+        width: 100%;
+        min-height: 44px;
+        padding: 0.7rem 0.85rem;
+        font-size: 0.9rem;
+    }
 }

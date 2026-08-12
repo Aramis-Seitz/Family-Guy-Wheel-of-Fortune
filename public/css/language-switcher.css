@@ -8,6 +8,12 @@
     min-width: 0;
 }
 
+.app-header__language-switcher--mobile {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 .app-header__language-switcher .theme-toggle-btn {
     margin-left: auto;
 }

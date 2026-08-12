@@ -1,12 +1,9 @@
 import { randomUUID } from "crypto";
 import { getSecureRandomNumber } from "../lib/random";
 import { AppError } from "../lib/errors";
-import {
-    getProfileByUserId,
-    getUserIdByUsername,
-} from "../repositories/profile-repository";
+import { getUserIdByUsername } from "../repositories/profile-repository";
 import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
-import { addCoins } from "./user-service";
+import { addCoins, getUserProfile } from "./user-service";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 function getRandomWheelSpinNumber(): number {
@@ -36,7 +33,7 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
     await markSpinTokenUsed(spinToken);
 
     const spinnerCoins = getRandomSpinnerCoins();
-    const spinnerProfile = await getProfileByUserId(userId);
+    const spinnerProfile = await getUserProfile(userId);
     const spinnerName = spinnerProfile?.username ?? userId;
 
     const winnerUserId = await getUserIdByUsername(winnerName);

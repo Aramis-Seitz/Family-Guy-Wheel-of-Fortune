@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { getProfileByUserId } from "../repositories/profile-repository";
+import { getUserProfile } from "./user-service";
 import {
     insertRoom,
     getRoomByKey,
@@ -35,7 +35,7 @@ export async function createRoom(userId: string): Promise<CreateRoomResponseBody
         await leaveRoom(userId, existingRoom.room_key);
     }
 
-    const profile = await getProfileByUserId(userId);
+    const profile = await getUserProfile(userId);
     const hostUsername = profile?.username ?? userId;
     const roomKey = generateRoomKey();
     await insertRoom(roomKey, userId, hostUsername);
@@ -75,7 +75,7 @@ export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoo
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
-    const profile = await getProfileByUserId(userId);
+    const profile = await getUserProfile(userId);
     const username = profile?.username ?? userId;
     const currentPlayers = room.players ?? [];
     const updatedPlayers = currentPlayers.some((p) => p.id === userId)

@@ -1,34 +1,24 @@
-import { supabaseClient } from "../shared/supabase-client";
 import { optionalElement } from "../shared/dom-helpers";
-import type { Session, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-state";
 import { isNameEditingLocked } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
-import { getUserCoins, getUserProfile as fetchUserProfileFromApi } from "./user-api";
 import { notifyAccountChanged } from "../shared/auth-channel";
 import { activeRoomKey } from "../multiplayer/room-state";
 import { executeLeaveRoom } from "../multiplayer/room-orchestration";
 import { showSwitchRoomConfirm } from "../multiplayer/room-buttons";
 import { formatNumber } from "../app/format";
 import { t } from "../app/i18n";
-
+import { profileData, type UserProfileState } from "./profile-data";
 
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");
 export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
-let currentProfile: ProfileData | null = null;
-let initialized = false;
 
-async function fetchCurrentSession(): Promise<Session | null> {
-  const { data: { session }, error } = await supabaseClient.auth.getSession();
-  if (error || !session?.user) return null;
-  return session;
-}
+let initialized = false;
 
 function applyUnauthenticatedState(): void {
   if (!profileName || !authButton) return;
-  currentProfile = null;
   profileName.textContent = t("profile.notLoggedIn");
   authButton.textContent = t("profile.login");
 }
@@ -39,31 +29,28 @@ function applyCoinDisplay(coins: number): void {
   coinDisplay.style.display = "inline";
 }
 
-interface ProfileData {
-  username: string;
-  coins: number;
-}
-
-function applyAuthenticatedState(profile: ProfileData | null): void {
+function applyAuthenticatedState(state: UserProfileState): void {
   if (!profileName || !authButton) return;
-  currentProfile = profile;
-  const username = profile?.username ?? t("profile.loggedIn");
-  profileName.textContent = username;
-
-  if (profile) {
-    applyCoinDisplay(profile.coins ?? 0);
-  }
+  profileName.textContent = state.username ?? t("profile.loggedIn");
+  applyCoinDisplay(state.coins);
 
   profileName.classList.add("user-profile-name--clickable");
   profileName.title = t("profile.clickToAdd");
 
   authButton.textContent = t("profile.logout");
+}
 
+function render(state: UserProfileState): void {
+  if (!state.isAuthenticated) {
+    applyUnauthenticatedState();
+    return;
+  }
+  applyAuthenticatedState(state);
 }
 
 function bindProfileActions(): void {
   profileName?.addEventListener("click", () => {
-    const username = currentProfile?.username;
+    const username = profileData.getState().username;
     if (!username || isNameEditingLocked() || isSpinning()) return;
     if (!namesInWheelListState.addNameToWheelList(username)) {
       showToast({ message: t("profile.maxItems", { max: MAX_ITEMS }), type: "error" });
@@ -73,43 +60,17 @@ function bindProfileActions(): void {
   });
 
   authButton?.addEventListener("click", () => {
-    if (!currentProfile) {
+    if (!profileData.getState().isAuthenticated) {
       window.location.href = "/login.html";
       return;
     }
     showSwitchRoomConfirm(t("room.logoutConfirm"), async () => {
       if (activeRoomKey) await executeLeaveRoom();
-      await supabaseClient.auth.signOut();
+      await profileData.signOut();
       notifyAccountChanged();
       window.location.href = "/login.html";
     });
   });
-}
-
-function subscribeToCoinUpdates(userId: string): void {
-  if (!coinDisplay) return;
-
-  supabaseClient
-    .channel("coin-updates")
-    .on(
-      "postgres_changes",
-      { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
-      (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
-        const coins = (payload.new as { coins?: number })?.coins ?? 0;
-        applyCoinDisplay(coins);
-      }
-    )
-    .subscribe();
-}
-
-export async function refreshCoinDisplay(): Promise<void> {
-  if (!coinDisplay) return;
-
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (!session) return;
-
-  const coins = await getUserCoins();
-  applyCoinDisplay(coins);
 }
 
 export async function initProfileUI(): Promise<void> {
@@ -118,19 +79,16 @@ export async function initProfileUI(): Promise<void> {
   if (!initialized) {
     initialized = true;
     bindProfileActions();
-    window.addEventListener("app:language-changed", () => {
-      if (currentProfile) applyAuthenticatedState(currentProfile);
-      else applyUnauthenticatedState();
-    });
+    profileData.subscribe(render);
+    window.addEventListener("app:language-changed", () => render(profileData.getState()));
   }
 
-  const session = await fetchCurrentSession();
-  if (!session) {
-    applyUnauthenticatedState();
-    return;
-  }
+  await profileData.initializeProfile();
+  render(profileData.getState());
+}
 
-  const profile = await fetchUserProfileFromApi();
-  applyAuthenticatedState(profile);
-  subscribeToCoinUpdates(session.user.id);
+export async function refreshCoinDisplay(): Promise<void> {
+  if (!coinDisplay) return;
+  if (!profileData.getState().isAuthenticated) return;
+  await profileData.refreshCoins();
 }

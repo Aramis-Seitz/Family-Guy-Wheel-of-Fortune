@@ -2,9 +2,7 @@ import { requiredElement, initToggleModal } from "../shared/dom-helpers";
 import { loadShopAssets } from "./shop-assets";
 import type { Asset } from "shared";
 import { getShopAssets } from "../api/shop-api";
-import { getUserCoins } from "../profile/user-api";
-import { supabaseClient } from "../shared/supabase-client";
-import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { profileData } from "../profile/profile-data";
 import { getActiveCategory, renderCategoryTabs } from "../shared/category-tabs";
 import { formatNumber } from "../app/format";
 import { t } from "../app/i18n";
@@ -23,7 +21,11 @@ export const shopCloseBtn = requiredElement<HTMLButtonElement>("shop-modal-close
 
 export function initShop(): void {
     initToggleModal(shopModal, shopBtn, shopCloseBtn, openShop);
-    subscribeToCoinUpdates();
+    profileData.subscribe((state) => {
+        balance = state.coins;
+        renderCoinBalance();
+        if (shopModal.open) loadShopAssets();
+    });
     window.addEventListener("app:language-changed", () => {
         const activeCategory = getActiveCategory<AssetCategory | "all">(shopTabs, "shop-modal") ?? "all";
         renderShopTabs(["all", ...ASSET_CATEGORIES] as (AssetCategory | "all")[], activeCategory);
@@ -59,30 +61,10 @@ export function renderCoinBalance(): void {
 
 export async function loadCoinBalance(): Promise<void> {
     try {
-        balance = await getUserCoins();
+        await profileData.refreshCoins();
     } catch (error) {
         console.error("Coins konnten nicht aktualisiert werden:", error);
     }
-}
-
-async function subscribeToCoinUpdates(): Promise<void> {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session?.user?.id) return;
-
-    supabaseClient
-        .channel(`shop-coin-updates-${session.user.id}`)
-        .on(
-            "postgres_changes",
-            { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${session.user.id}` },
-            (payload: RealtimePostgresChangesPayload<{ coins?: number }>) => {
-                const nextBalance = (payload.new as { coins?: number })?.coins;
-                if (typeof nextBalance !== "number") return;
-                balance = nextBalance;
-                renderCoinBalance();
-                if (shopModal.open) loadShopAssets();
-            }
-        )
-        .subscribe();
 }
 
 

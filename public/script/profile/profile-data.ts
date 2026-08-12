@@ -1,8 +1,8 @@
 import { supabaseClient } from "../shared/supabase-client";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import { getUserProfile, getUserCoins } from "./user-api";
+import { getUserProfile, getUserCoins, ensureDefaultAssets as ensureDefaultAssetsApi } from "./user-api";
 
-interface UserProfileState {
+export interface UserProfileState {
     username: string | null;
     coins: number;
     isAuthenticated: boolean;
@@ -40,12 +40,19 @@ export class ProfileData {
         this.setState({ ...this.currentState, coins });
     }
 
-    // Das UI holt sich die Daten nur über eine Leseschnittstelle
+    public async signOut(): Promise<void> {
+        await supabaseClient.auth.signOut();
+        this.setState({ username: null, coins: 0, isAuthenticated: false });
+    }
+
+    public async ensureDefaultAssets(): Promise<void> {
+        await ensureDefaultAssetsApi();
+    }
+
     public getState(): UserProfileState {
         return { ...this.currentState };
     }
 
-    // UI-Komponenten registrieren sich hier, um über Änderungen informiert zu werden.
     public subscribe(listener: ProfileDataListener): () => void {
         this.listeners.add(listener);
         return () => this.listeners.delete(listener);
@@ -70,3 +77,5 @@ export class ProfileData {
             .subscribe();
     }
 }
+
+export const profileData = new ProfileData();

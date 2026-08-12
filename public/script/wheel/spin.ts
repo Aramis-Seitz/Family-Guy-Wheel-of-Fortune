@@ -253,4 +253,4 @@ function handleSpinPointerDown(event: PointerEvent): void {
   resetBtn.addEventListener("click", () => {
     getCurrentMode().onReset();
   });
-}
+

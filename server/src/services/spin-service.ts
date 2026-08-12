@@ -3,11 +3,10 @@ import { getSecureRandomNumber } from "../lib/random";
 import { AppError } from "../lib/errors";
 import {
     getProfileByUserId,
-    getCoinsByUserId,
-    updateCoinsByUserId,
     getUserIdByUsername,
 } from "../repositories/profile-repository";
 import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
+import { addCoins } from "./user-service";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 function getRandomWheelSpinNumber(): number {
@@ -62,9 +61,4 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
 
     console.log(`[coins] Winner: ${winnerName} → nicht im System, keine Coins`);
     return { spinnerCoins, winnerCoins: 0 };
-}
-
-async function addCoins(userId: string, amount: number): Promise<void> {
-    const currentCoins = await getCoinsByUserId(userId);
-    await updateCoinsByUserId(userId, currentCoins + amount);
 }

@@ -4,7 +4,6 @@ import {
     handleRegisterUser,
     handleUserProfile,
     handleGetUserCoins,
-    handlePatchUserCoins,
     handleEnsureDefaultAssets
 } from "../controllers/user-controller";
 import {
@@ -23,7 +22,6 @@ usersRoutes.param("userId", requireSelf);
 usersRoutes.post("/", handleRegisterUser);
 usersRoutes.get("/:userId", handleUserProfile);
 usersRoutes.get("/:userId/coins", handleGetUserCoins);
-usersRoutes.patch("/:userId/coins", handlePatchUserCoins);
 usersRoutes.get("/:userId/inventory/assets", handleGetOwnedAssets);
 usersRoutes.post("/:userId/inventory/default-assets", handleEnsureDefaultAssets);
 usersRoutes.get("/:userId/inventory/selected-assets", handleGetSelectedAssets);

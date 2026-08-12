@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser, addUserCoins, subtractUserCoins } from "../services/user-service";
+import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser } from "../services/user-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
@@ -32,25 +32,6 @@ export const handleRegisterUser = asyncHandler(async (req: HttpRequest, res: Htt
 
 export const handleGetUserCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const coins = await getUserCoins(req.params!.userId!);
-    res.status(200).json(CoinsResponseSchema.parse({ coins }));
-});
-
-const PatchCoinsRequestSchema = z.union([
-    z.object({ add: z.number() }).strict(),
-    z.object({ subtract: z.number() }).strict(),
-]);
-
-export const handlePatchUserCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = PatchCoinsRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "Provide either { add } or { subtract }" });
-        return;
-    }
-
-    const userId = req.params!.userId!;
-    const coins = "add" in parsedBody.data
-        ? await addUserCoins(userId, parsedBody.data.add)
-        : await subtractUserCoins(userId, parsedBody.data.subtract);
     res.status(200).json(CoinsResponseSchema.parse({ coins }));
 });
 

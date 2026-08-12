@@ -250,7 +250,33 @@ function handleSpinPointerDown(event: PointerEvent): void {
   spinBtn.setPointerCapture(event.pointerId);
 }
 
+function handleSpinPointerUp(event: PointerEvent): void {
+  if (!spinGesture || spinGesture.pointerId !== event.pointerId) return;
+
+  const horizontalDistance = event.clientX - spinGesture.startX;
+  spinGesture = null;
+  if (spinBtn.hasPointerCapture(event.pointerId)) spinBtn.releasePointerCapture(event.pointerId);
+  if (Math.abs(horizontalDistance) < MIN_SPIN_DRAG_DISTANCE) return;
+
+  startSpin(horizontalDistance < 0 ? "left" : "right");
+}
+
+function cancelSpinGesture(event: PointerEvent): void {
+  if (spinGesture?.pointerId !== event.pointerId) return;
+  spinGesture = null;
+}
+
+export function initWheelControls(): void {
+  spinBtn.addEventListener("pointerdown", handleSpinPointerDown);
+  spinBtn.addEventListener("pointerup", handleSpinPointerUp);
+  spinBtn.addEventListener("pointercancel", cancelSpinGesture);
+  spinBtn.addEventListener("click", (event) => {
+    if (event.detail !== 0) return;
+    startSpin(Math.random() < 0.5 ? "left" : "right");
+  });
+
   resetBtn.addEventListener("click", () => {
     getCurrentMode().onReset();
   });
+}
 

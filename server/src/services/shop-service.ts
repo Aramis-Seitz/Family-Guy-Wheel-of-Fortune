@@ -4,8 +4,7 @@ import {
     listAssets,
     userOwnsAsset
 } from "../repositories/asset-repository";
-import { getCoinsByUserId } from "../repositories/profile-repository";
-import { subtractCoins } from "./user-service";
+import { getUserCoins, subtractCoins } from "./user-service";
 import { AppError } from "../lib/errors";
 import type { Asset, PurchaseResponseBody } from "shared";
 
@@ -28,7 +27,7 @@ export async function purchaseAsset(userId: string, assetId: string): Promise<Pu
         throw new AppError("Asset already owned", 409);
     }
 
-    const currentCoins = await getCoinsByUserId(userId);
+    const currentCoins = await getUserCoins(userId);
     if (currentCoins < asset.price_coins) {
         throw new AppError("Not enough coins", 422);
     }

@@ -4,7 +4,8 @@ import {
     listAssets,
     userOwnsAsset
 } from "../repositories/asset-repository";
-import { getCoinsByUserId, updateCoinsByUserId } from "../repositories/profile-repository";
+import { getCoinsByUserId } from "../repositories/profile-repository";
+import { subtractCoins } from "./user-service";
 import { AppError } from "../lib/errors";
 import type { Asset, PurchaseResponseBody } from "shared";
 
@@ -34,8 +35,7 @@ export async function purchaseAsset(userId: string, assetId: string): Promise<Pu
 
     await createAssetOwnership(userId, assetId);
 
-    const remainingCoins = currentCoins - asset.price_coins;
-    await updateCoinsByUserId(userId, remainingCoins);
+    const remainingCoins = await subtractCoins(userId, asset.price_coins);
 
     return {
         success: true,

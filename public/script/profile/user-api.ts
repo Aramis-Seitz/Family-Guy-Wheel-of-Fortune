@@ -1,4 +1,4 @@
-import { getJson, patchJson, postJson, getCurrentUserId, ApiError } from "./api-helpers";
+import { getJson, postJson, getCurrentUserId, ApiError } from "../api/api-helpers";
 import { CoinsResponseSchema, ProfileResponseSchema } from "shared";
 
 export async function getUserCoins(): Promise<number> {
@@ -25,25 +25,9 @@ export async function getUserProfile(): Promise<{ username: string; coins: numbe
     return body.profile;
 }
 
-export async function addUserCoins(amount: number): Promise<number> {
-    const userId = await getCurrentUserId();
-    const rawBody = await patchJson(`/api/users/${userId}/coins`, { add: amount }, {
-        errorFallbackKey: "api.user.addCoinsFailed"
-    });
-    return CoinsResponseSchema.parse(rawBody).coins;
-}
-
 export async function ensureDefaultAssets(): Promise<void> {
     const userId = await getCurrentUserId();
     await postJson(`/api/users/${userId}/inventory/default-assets`, undefined, {
         errorFallbackKey: "api.user.defaultAssetsFailed"
     });
-}
-
-export async function subtractUserCoins(amount: number): Promise<number> {
-    const userId = await getCurrentUserId();
-    const rawBody = await patchJson(`/api/users/${userId}/coins`, { subtract: amount }, {
-        errorFallbackKey: "api.user.subtractCoinsFailed"
-    });
-    return CoinsResponseSchema.parse(rawBody).coins;
 }

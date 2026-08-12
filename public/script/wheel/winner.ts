@@ -3,7 +3,7 @@ import { getCurrentMode } from "../multiplayer/game-mode-strategy";
 import { awardCoins } from "../api/spin-api";
 import { getNamesInWheelList } from "../names/names-in-wheel-list";
 import { stopDrumRoll } from "./sound";
-import { refreshCoinDisplay } from "../profile/profiles";
+import { refreshCoinDisplay } from "../profile/profile-ui";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import type { SpinConfig } from "./spin";

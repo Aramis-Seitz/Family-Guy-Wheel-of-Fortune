@@ -6,7 +6,7 @@ import { getMultiplier, multiplierButton } from "./multiplier";
 import { wheelElement } from "./renderer";
 import { bulkAddToWheelBtn, getPlayerToggleButtons } from "../multiplayer/room-players-sidebar";
 import { getCurrentMode } from "../multiplayer/game-mode-strategy";
-import { profileName } from "../profile/profiles";
+import { profileName } from "../profile/profile-ui";
 import { MIN_ITEMS } from "../names/names-in-wheel-list-state";
 import { requiredElement } from "../shared/dom-helpers";
 

@@ -1,10 +1,9 @@
-import { profileName } from "../profile/profiles";
+import { profileData } from "../profile/profile-data";
 import { applyActiveAssets } from "../shared/asset-selection";
-import { ensureDefaultAssets } from "../api/user-api";
 import { initInventory } from "../inventory/inventory";
 import { initNamesInWheelList } from "../names/names-in-wheel-list";
 import { initShareFeature } from "../names/share-names-in-wheel-list";
-import { initProfileUI } from "../profile/profiles";
+import { initProfileUI } from "../profile/profile-ui";
 import { initWheelControls } from "../wheel/spin";
 import { initMultiplierButton } from "../wheel/multiplier";
 import { initVolumeSlider } from "../wheel/volume";
@@ -89,8 +88,8 @@ async function initApp(): Promise<void> {
   initShareFeature();
   initAuthChannelListener();
   await initProfileUI();
-  setMyUsername(profileName?.textContent?.trim() || t("generic.anonymous"));
-  await ensureDefaultAssets();
+  setMyUsername(profileData.getState().username?.trim() || t("generic.anonymous"));
+  await profileData.ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();
   initShop();

@@ -54,6 +54,37 @@ export interface AssetSelection {
   asset_id: string;
 }
 
+export type AchievementCategory = 'spin' | 'shop_purchase' | 'coins_total';
+
+export interface AchievementRow {
+  id: string;
+  key: string;
+  category: AchievementCategory;
+  target: number;
+  icon_url: string | null;
+}
+
+export interface UserAchievementProgressRow {
+  user_id: string;
+  achievement_id: string;
+  progress: number;
+  updated_at: string;
+}
+
+export interface UserAchievementUnlockedRow {
+  user_id: string;
+  achievement_id: string;
+  unlocked_at: string;
+}
+
+// Gleiche keys/categories/targets wie supabase/migrations/25_achievements.sql.
+const SEED_ACHIEVEMENTS: AchievementRow[] = [
+  { id: '00000000-0000-0000-0000-000000000201', key: 'spin_10', category: 'spin', target: 10, icon_url: null },
+  { id: '00000000-0000-0000-0000-000000000202', key: 'spin_50', category: 'spin', target: 50, icon_url: null },
+  { id: '00000000-0000-0000-0000-000000000203', key: 'shop_purchase_1', category: 'shop_purchase', target: 1, icon_url: null },
+  { id: '00000000-0000-0000-0000-000000000204', key: 'coins_total_100', category: 'coins_total', target: 100, icon_url: null },
+];
+
 function seedAsset(id: string, name: string, category: AssetCategory, price_coins: number, asset_url: string): Asset {
   return { id, name, category, price_coins, asset_url };
 }
@@ -97,6 +128,9 @@ export const store = {
   asset: [...SEED_ASSETS],
   asset_ownership: [] as AssetOwnership[],
   asset_selection: [] as AssetSelection[],
+  achievement: [...SEED_ACHIEVEMENTS],
+  user_achievement_progress: [] as UserAchievementProgressRow[],
+  user_achievement_unlocked: [] as UserAchievementUnlockedRow[],
 };
 
 export function newId(): string {

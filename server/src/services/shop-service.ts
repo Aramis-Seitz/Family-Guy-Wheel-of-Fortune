@@ -5,6 +5,7 @@ import {
     userOwnsAsset
 } from "../repositories/asset-repository";
 import { getUserCoins, subtractCoins } from "./user-service";
+import { incrementProgress } from "./achievement-service";
 import { AppError } from "../lib/errors";
 import type { Asset, PurchaseResponseBody } from "shared";
 
@@ -35,10 +36,13 @@ export async function purchaseAsset(userId: string, assetId: string): Promise<Pu
     await createAssetOwnership(userId, assetId);
 
     const remainingCoins = await subtractCoins(userId, asset.price_coins);
+    const { unlocked, progressed } = await incrementProgress(userId, "shop_purchase", 1);
 
     return {
         success: true,
         coins: remainingCoins,
-        assetId
+        assetId,
+        unlockedAchievements: unlocked,
+        progressedAchievements: progressed
     };
 }

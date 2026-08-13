@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AchievementWithProgressSchema, UnlockedAchievementSchema } from "./achievement";
 
 export const AssetSchema = z.object({
     id: z.string(),
@@ -18,5 +19,7 @@ export const PurchaseResponseSchema = z.object({
     success: z.literal(true),
     coins: z.number(),
     assetId: z.string(),
+    unlockedAchievements: z.array(UnlockedAchievementSchema),
+    progressedAchievements: z.array(AchievementWithProgressSchema),
 });
 export type PurchaseResponseBody = z.infer<typeof PurchaseResponseSchema>;

@@ -8,6 +8,7 @@ import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import type { SpinConfig } from "./spin";
 import { t } from "../app/i18n";
+import { showAchievementUnlockConfetti, showAchievementToast } from "../achievements/achievement-ui";
 
 export const POINTER_OFFSET_DEG: number = 270;
 export const FULL_CIRCLE_DEG: number = 360;
@@ -38,7 +39,7 @@ export function hideWinnerModal(): void {
 
 const confettiCanvas = requiredElement<HTMLCanvasElement>("winner-modal-confetti-canvas");
 
-function startConfetti(): void {
+export function startConfetti(): void {
   if (!confettiCanvas) return;
 
   const ctx = confettiCanvas.getContext("2d");
@@ -103,6 +104,22 @@ export function announceWinner(spinToken: string, winnerName: string): void {
   awardCoins(spinToken, winnerName)
     .then((result) => {
       if (result) {
+        // Erst nach dem Ausklingen der Gewinner-Konfetti (siehe startConfetti()
+        // oben) starten, sonst würden sich zwei Animationsschleifen dasselbe
+        // Canvas streitig machen.
+        if (result.unlockedAchievements.length > 0 || result.progressedAchievements.length > 0) {
+          setTimeout(() => {
+            result.unlockedAchievements.forEach((achievement, index) => {
+              setTimeout(() => showAchievementUnlockConfetti(achievement), index * 300);
+            });
+            result.progressedAchievements.forEach((achievement, index) => {
+              setTimeout(
+                () => showAchievementToast(achievement),
+                (result.unlockedAchievements.length + index) * 300
+              );
+            });
+          }, 3200);
+        }
         return refreshCoinDisplay();
       }
       setTimeout(() => void refreshCoinDisplay(), 4000);

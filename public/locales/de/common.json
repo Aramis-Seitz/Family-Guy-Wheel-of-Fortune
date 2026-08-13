@@ -47,13 +47,17 @@
         "spin": {
             "randomFailed": "Die Drehung konnte nicht gestartet werden.",
             "awardFailed": "Coins konnten nicht vergeben werden."
+        },
+        "achievements": {
+            "loadFailed": "Achievements konnten nicht geladen werden."
         }
     },
     "categories": {
         "all": "Alle",
         "wheel": "Räder",
         "sound": "Töne",
-        "companion": "Gefährten"
+        "companion": "Gefährten",
+        "achievements": "Achievements"
     },
     "room": {
         "host": "Host",
@@ -117,6 +121,22 @@
     },
     "wheel": {
         "removed": "\"{{name}}\" wurde aus dem Rad entfernt."
+    },
+    "achievements": {
+        "unlocked": "Achievement freigeschaltet: \"{{name}}\"!",
+        "progressToast": "\"{{name}}\": {{progress}}/{{target}}",
+        "spin_10": {
+            "title": "Erste Drehungen"
+        },
+        "spin_50": {
+            "title": "Dreh-Profi"
+        },
+        "shop_purchase_1": {
+            "title": "Erster Einkauf"
+        },
+        "coins_total_100": {
+            "title": "Coin-Sammler"
+        }
     },
     "a11y": {
         "close": "Schließen",

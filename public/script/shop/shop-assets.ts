@@ -6,9 +6,10 @@ import { showToast } from "../shared/toast";
 import { createAssetCard } from "../shared/asset-card";
 import { getActiveCategory } from "../shared/category-tabs";
 import { requiredElement } from "../shared/dom-helpers";
-import type { Asset } from "shared";
+import type { Asset, AchievementWithProgress, UnlockedAchievement } from "shared";
 import { formatNumber } from "../app/format";
 import { t } from "../app/i18n";
+import { showAchievementUnlockConfetti, showAchievementToast } from "../achievements/achievement-ui";
 
 let currentOwnedAssetIds: string[] = [];
 
@@ -50,6 +51,22 @@ function createAssetBuyButton(asset: Asset, owned: boolean, tooExpensive: boolea
     return btn;
 }
 
+function announcePurchaseAchievements(
+    unlocked: UnlockedAchievement[],
+    progressed: AchievementWithProgress[]
+): void {
+    // Wartet, bis der "Gekauft"-Toast durchgelaufen ist, da showToast() den
+    // Toast-Container bei jedem Aufruf ersetzt und sich sonst überschneiden würde.
+    setTimeout(() => {
+        unlocked.forEach((achievement, index) => {
+            setTimeout(() => showAchievementUnlockConfetti(achievement), index * 300);
+        });
+        progressed.forEach((achievement, index) => {
+            setTimeout(() => showAchievementToast(achievement), (unlocked.length + index) * 300);
+        });
+    }, 3200);
+}
+
 async function handlePurchaseClick(asset: Asset, btn: HTMLButtonElement): Promise<void> {
     btn.disabled = true;
     btn.textContent = t("shop.buying");
@@ -62,6 +79,7 @@ async function handlePurchaseClick(asset: Asset, btn: HTMLButtonElement): Promis
         renderCoinBalance();
         showToast({ message: t("shop.purchased", { name: asset.name }), type: "success" });
         loadShopAssets();
+        announcePurchaseAchievements(result.unlockedAchievements, result.progressedAchievements);
     } catch (error) {
         const message = error instanceof Error ? error.message : t("shop.purchaseFailed");
         showToast({ message, type: "error" });

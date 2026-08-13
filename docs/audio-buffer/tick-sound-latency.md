@@ -14,7 +14,7 @@ currentRotation += velocity * state.sign;       // 1. Rotation aktualisieren
 state.distanceTravelled += velocity;
 
 updateWheelRotation();                           // 2. CSS transform setzen
-if (hasEnteredNewSegment(config.stepAngle))      // 3. Segment-Übergang prüfen
+if (hasEnteredNewSegment(config.names.length))   // 3. Segment-Übergang prüfen
   playTickSound();                               //    → Sound sofort abspielen
 lastTickRotation = currentRotation;              // 4. Referenz für nächsten Frame
 ```

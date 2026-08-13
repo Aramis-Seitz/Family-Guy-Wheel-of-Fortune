@@ -8,8 +8,6 @@ import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import { t } from "../app/i18n";
 
-export { resolveWinner, POINTER_OFFSET_DEG, FULL_CIRCLE_DEG } from "./winner-logic";
-
 export const winnerModal = requiredElement<HTMLDivElement>("winner-modal");
 export const winnerText = requiredElement<HTMLParagraphElement>("winner-modal-text");
 export const removeWinnerBtn = requiredElement<HTMLButtonElement>("winner-modal-remove-btn");

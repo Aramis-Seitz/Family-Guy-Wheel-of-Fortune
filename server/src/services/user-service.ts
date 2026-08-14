@@ -6,15 +6,7 @@ import {
 } from "../repositories/profile-repository";
 import type { Profile } from "../repositories/profile-repository";
 import { assignDefaultAssets } from "../repositories/asset-repository";
-import { incrementProgress } from "./achievement-service";
 import { AppError } from "../lib/errors";
-import type { AchievementWithProgress, UnlockedAchievement } from "shared";
-
-export interface AddCoinsResult {
-    newBalance: number;
-    unlockedAchievements: UnlockedAchievement[];
-    progressedAchievements: AchievementWithProgress[];
-}
 
 export async function getUserCoins(userId: string): Promise<number> {
     return getCoinsByUserId(userId);
@@ -24,12 +16,13 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
     return getProfileByUserId(userId);
 }
 
-export async function addCoins(userId: string, amount: number): Promise<AddCoinsResult> {
+export async function addCoins(userId: string, amount: number): Promise<number> {
     const currentCoins = await getCoinsByUserId(userId);
     const newBalance = currentCoins + amount;
+    // Löst per DB-Trigger (supabase/migrations/26_achievement_progress_triggers.sql)
+    // den "coins_total"-Achievement-Fortschritt aus.
     await updateCoinsByUserId(userId, newBalance);
-    const { unlocked, progressed } = await incrementProgress(userId, "coins_total", amount);
-    return { newBalance, unlockedAchievements: unlocked, progressedAchievements: progressed };
+    return newBalance;
 }
 
 export async function subtractCoins(userId: string, amount: number): Promise<number> {

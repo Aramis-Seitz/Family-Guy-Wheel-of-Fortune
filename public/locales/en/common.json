@@ -123,8 +123,7 @@
         "removed": "\"{{name}}\" removed from the wheel."
     },
     "achievements": {
-        "unlocked": "Achievement unlocked: \"{{name}}\"!",
-        "progressToast": "\"{{name}}\": {{progress}}/{{target}}",
+        "unlockedTitle": "Achievement unlocked!",
         "spin_10": {
             "title": "First Spins"
         },

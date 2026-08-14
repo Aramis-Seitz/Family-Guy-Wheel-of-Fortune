@@ -21,7 +21,7 @@ import { initLanguageSwitcher } from "./language-switcher";
 import { initTheme } from "./theme";
 import { showLoadingScreenFor } from "./loading-screen";
 import { subscribeToAchievementUnlocks, fetchAchievements } from "../achievements/achievement-service";
-import { showAchievementUnlockConfetti } from "../achievements/achievement-ui";
+import { showAchievementUnlockModal } from "../achievements/achievement-ui";
 
 
 function initMobileMenu(): void {
@@ -78,7 +78,7 @@ async function initAchievementUnlockListener(): Promise<void> {
     const achievements = await fetchAchievements();
     const unlocked = achievements.find(achievement => achievement.id === achievementId);
     if (unlocked) {
-      showAchievementUnlockConfetti({ ...unlocked, unlocked_at: new Date().toISOString() });
+      showAchievementUnlockModal({ ...unlocked, unlocked_at: new Date().toISOString() });
     }
   });
 }

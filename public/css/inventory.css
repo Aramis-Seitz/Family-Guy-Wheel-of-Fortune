@@ -319,6 +319,12 @@
     opacity: 0.8;
 }
 
+.inventory-modal__achievement-progress-label--locked {
+    color: #ff4d4f;
+    font-weight: 700;
+    opacity: 1;
+}
+
 .inventory-modal__achievement-badge {
     position: absolute;
     top: 8px;

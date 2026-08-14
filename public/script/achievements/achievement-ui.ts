@@ -1,7 +1,7 @@
 import type { AchievementWithProgress, UnlockedAchievement } from "shared";
 import { fetchAchievements } from "./achievement-service";
 import { startConfetti } from "../wheel/winner";
-import { showToast } from "../shared/toast";
+import { requiredElement } from "../shared/dom-helpers";
 import { t } from "../app/i18n";
 
 function achievementTitle(key: string): string {
@@ -56,7 +56,9 @@ function createAchievementCard(achievement: AchievementWithProgress): HTMLElemen
     body.appendChild(createAchievementProgressBar(achievement));
 
     const progressLabel = document.createElement("p");
-    progressLabel.className = "inventory-modal__achievement-progress-label";
+    progressLabel.className = achievement.unlocked
+        ? "inventory-modal__achievement-progress-label"
+        : "inventory-modal__achievement-progress-label inventory-modal__achievement-progress-label--locked";
     progressLabel.textContent = `${Math.min(achievement.progress, achievement.target)}/${achievement.target}`;
     body.appendChild(progressLabel);
 
@@ -86,29 +88,57 @@ async function loadAndRenderAchievements(container: HTMLElement): Promise<void> 
     }
 }
 
-// Verhindert doppelte Konfetti für dasselbe Achievement, falls sowohl die
-// direkte Spin-Antwort als auch die Realtime-Subscription (main.ts) für
-// denselben Unlock feuern.
-const celebratedAchievementIds = new Set<string>();
+// ── Unlock-Modal ──
+// Groß, mit Konfetti, muss manuell weggeklickt werden. Da Unlocks nur noch
+// über die Realtime-Subscription (main.ts) reinkommen, können mehrere davon
+// dicht hintereinander eintrudeln (z. B. Verbindungs-Nachzügler) - deshalb
+// eine Queue, die die Modals nacheinander statt übereinander zeigt.
 
-export function showAchievementUnlockConfetti(achievement: UnlockedAchievement): void {
+const unlockModal = requiredElement<HTMLDivElement>("achievement-unlock-modal");
+const unlockModalIcon = requiredElement<HTMLDivElement>("achievement-unlock-modal-icon");
+const unlockModalName = requiredElement<HTMLHeadingElement>("achievement-unlock-modal-name");
+const unlockModalCloseBtn = requiredElement<HTMLButtonElement>("achievement-unlock-modal-close-btn");
+
+const celebratedAchievementIds = new Set<string>();
+const unlockQueue: UnlockedAchievement[] = [];
+let unlockModalOpen = false;
+
+function renderUnlockModalIcon(achievement: UnlockedAchievement): void {
+    unlockModalIcon.innerHTML = "";
+    if (achievement.icon_url) {
+        const img = document.createElement("img");
+        img.src = achievement.icon_url;
+        img.alt = achievementTitle(achievement.key);
+        unlockModalIcon.appendChild(img);
+    } else {
+        unlockModalIcon.textContent = "🏆";
+    }
+}
+
+function showNextUnlockInQueue(): void {
+    if (unlockModalOpen) return;
+    const next = unlockQueue.shift();
+    if (!next) return;
+
+    unlockModalOpen = true;
+    renderUnlockModalIcon(next);
+    unlockModalName.textContent = achievementTitle(next.key);
+    unlockModal.classList.remove("hidden");
+    startConfetti();
+}
+
+function closeUnlockModal(): void {
+    unlockModal.classList.add("hidden");
+    unlockModalOpen = false;
+    showNextUnlockInQueue();
+}
+
+unlockModalCloseBtn.addEventListener("click", closeUnlockModal);
+
+export function showAchievementUnlockModal(achievement: UnlockedAchievement): void {
     if (celebratedAchievementIds.has(achievement.id)) return;
     celebratedAchievementIds.add(achievement.id);
 
-    startConfetti();
-    showToast({
-        message: t("achievements.unlocked", { name: achievementTitle(achievement.key) }),
-        type: "success",
-    });
-}
-
-export function showAchievementToast(achievement: AchievementWithProgress): void {
-    showToast({
-        message: t("achievements.progressToast", {
-            name: achievementTitle(achievement.key),
-            progress: achievement.progress,
-            target: achievement.target,
-        }),
-        type: "info",
-    });
+    unlockQueue.push(achievement);
+    showNextUnlockInQueue();
 }

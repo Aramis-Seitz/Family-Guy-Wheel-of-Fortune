@@ -123,8 +123,7 @@
         "removed": "\"{{name}}\" wurde aus dem Rad entfernt."
     },
     "achievements": {
-        "unlocked": "Achievement freigeschaltet: \"{{name}}\"!",
-        "progressToast": "\"{{name}}\": {{progress}}/{{target}}",
+        "unlockedTitle": "Achievement freigeschaltet!",
         "spin_10": {
             "title": "Erste Drehungen"
         },

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="../css/multiplier.css">
     <link rel="stylesheet" href="../css/volume-slider.css">
     <link rel="stylesheet" href="../css/winner-modal.css">
+    <link rel="stylesheet" href="../css/achievement-modal.css">
     <link rel="stylesheet" href="../css/spin.css">
     <link rel="stylesheet" href="../css/names-in-wheel-list.css">
     <link rel="stylesheet" href="../css/layout.css">
@@ -317,6 +318,15 @@
     </div>
 
     <canvas id="winner-modal-confetti-canvas"></canvas>
+
+    <div id="achievement-unlock-modal" class="achievement-unlock-modal hidden">
+        <div class="achievement-unlock-modal__content">
+            <div class="achievement-unlock-modal__icon" id="achievement-unlock-modal-icon">🏆</div>
+            <p class="achievement-unlock-modal__eyebrow" data-i18n="achievements.unlockedTitle">Achievement freigeschaltet!</p>
+            <h2 id="achievement-unlock-modal-name">-</h2>
+            <button id="achievement-unlock-modal-close-btn" data-i18n="html.ok">OK</button>
+        </div>
+    </div>
 
     <div class="legal-links">
 

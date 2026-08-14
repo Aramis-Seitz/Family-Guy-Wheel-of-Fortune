@@ -4,7 +4,6 @@ import { AppError } from "../lib/errors";
 import { getUserIdByUsername } from "../repositories/profile-repository";
 import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
-import { incrementProgress } from "./achievement-service";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 function getRandomWheelSpinNumber(): number {
@@ -31,6 +30,9 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
         throw new AppError("Invalid or already used spin token", 403);
     }
 
+    // Das Markieren des Tokens als "used" löst per DB-Trigger (siehe
+    // supabase/migrations/26_achievement_progress_triggers.sql) den
+    // "spin"-Achievement-Fortschritt für userId aus.
     await markSpinTokenUsed(spinToken);
 
     const spinnerCoins = getRandomSpinnerCoins();
@@ -40,48 +42,23 @@ export async function awardCoins(userId: string, spinToken: string, winnerName: 
     const winnerUserId = await getUserIdByUsername(winnerName);
     const spinnerIsWinner = winnerUserId === userId;
 
-    // Zählt nur den Spin des Aufrufers (nicht den evtl. abweichenden Gewinner) -
-    // dessen etwaige eigenen Unlocks bekommt der Gewinner-Client separat über
-    // die Realtime-Subscription auf user_achievement_unlocked mit.
-    const spinResult = await incrementProgress(userId, "spin", 1);
-
     if (spinnerIsWinner) {
         const winnerCoins = getRandomWinnerCoins();
-        const { unlockedAchievements, progressedAchievements } = await addCoins(userId, spinnerCoins + winnerCoins);
+        await addCoins(userId, spinnerCoins + winnerCoins);
         console.log(`[coins] ${spinnerName} hat selbst gewonnen → +${spinnerCoins + winnerCoins} Coins`);
-        return {
-            spinnerCoins,
-            winnerCoins,
-            total: spinnerCoins + winnerCoins,
-            unlockedAchievements: dedupeById([...spinResult.unlocked, ...unlockedAchievements]),
-            progressedAchievements: dedupeById([...spinResult.progressed, ...progressedAchievements]),
-        };
+        return { spinnerCoins, winnerCoins, total: spinnerCoins + winnerCoins };
     }
 
-    const { unlockedAchievements: spinnerUnlocks, progressedAchievements: spinnerProgressed } = await addCoins(userId, spinnerCoins);
+    await addCoins(userId, spinnerCoins);
     console.log(`[coins] Spinner: ${spinnerName} → +${spinnerCoins} Coins`);
 
     if (winnerUserId) {
         const winnerCoins = getRandomWinnerCoins();
         await addCoins(winnerUserId, winnerCoins);
         console.log(`[coins] Winner: ${winnerName} → +${winnerCoins} Coins`);
-        return {
-            spinnerCoins,
-            winnerCoins,
-            unlockedAchievements: dedupeById([...spinResult.unlocked, ...spinnerUnlocks]),
-            progressedAchievements: dedupeById([...spinResult.progressed, ...spinnerProgressed]),
-        };
+        return { spinnerCoins, winnerCoins };
     }
 
     console.log(`[coins] Winner: ${winnerName} → nicht im System, keine Coins`);
-    return {
-        spinnerCoins,
-        winnerCoins: 0,
-        unlockedAchievements: dedupeById([...spinResult.unlocked, ...spinnerUnlocks]),
-        progressedAchievements: dedupeById([...spinResult.progressed, ...spinnerProgressed]),
-    };
-}
-
-function dedupeById<T extends { id: string }>(items: T[]): T[] {
-    return [...new Map(items.map((item) => [item.id, item])).values()];
+    return { spinnerCoins, winnerCoins: 0 };
 }

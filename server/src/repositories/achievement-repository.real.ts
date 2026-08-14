@@ -29,25 +29,3 @@ export async function getUnlocked(userId: string): Promise<UserAchievementUnlock
     if (error) throw error;
     return (data ?? []) as UserAchievementUnlocked[];
 }
-
-export async function upsertProgress(userId: string, achievementId: string, progress: number): Promise<void> {
-    const { error } = await supabaseClient
-        .from("user_achievement_progress")
-        .upsert(
-            { user_id: userId, achievement_id: achievementId, progress, updated_at: new Date().toISOString() },
-            { onConflict: "user_id,achievement_id" }
-        );
-
-    if (error) throw error;
-}
-
-export async function insertUnlocked(userId: string, achievementId: string): Promise<void> {
-    const { error } = await supabaseClient
-        .from("user_achievement_unlocked")
-        .upsert(
-            { user_id: userId, achievement_id: achievementId },
-            { onConflict: "user_id,achievement_id", ignoreDuplicates: true }
-        );
-
-    if (error) throw error;
-}

@@ -1,13 +1,11 @@
 import { getJson, postJson } from "./api-helpers";
 import { AssetsResponseSchema, PurchaseResponseSchema } from "shared";
-import type { Asset, AchievementWithProgress, UnlockedAchievement } from "shared";
+import type { Asset } from "shared";
 
 export type PurchaseAssetResult = {
     success: boolean;
     coins: number | null;
     assetId: string;
-    unlockedAchievements: UnlockedAchievement[];
-    progressedAchievements: AchievementWithProgress[];
 };
 
 export async function getShopAssets(): Promise<Asset[]> {
@@ -32,7 +30,5 @@ export async function purchaseAsset(assetId: string): Promise<PurchaseAssetResul
         success: body.success,
         coins: body.coins,
         assetId: body.assetId,
-        unlockedAchievements: body.unlockedAchievements,
-        progressedAchievements: body.progressedAchievements,
     };
 }

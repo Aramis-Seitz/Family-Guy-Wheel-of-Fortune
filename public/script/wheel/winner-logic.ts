@@ -8,5 +8,5 @@ export function getSegmentIndex(rotation: number, segmentCount: number): number 
 }
 
 export function resolveWinner(rotation: number, names: string[]): string {
-  return names[getSegmentIndex(rotation, names.length)] ?? names[0];
+  return names[getSegmentIndex(rotation, names.length)];
 }

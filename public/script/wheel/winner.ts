@@ -6,17 +6,7 @@ import { stopDrumRoll } from "./sound";
 import { refreshCoinDisplay } from "../profile/profile-ui";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
-import type { SpinConfig } from "./spin";
 import { t } from "../app/i18n";
-
-export const POINTER_OFFSET_DEG: number = 270;
-export const FULL_CIRCLE_DEG: number = 360;
-
-export function resolveWinner(rotation: number, config: SpinConfig): string {
-  const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
-  const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
-  return config.names[winnerIndex] ?? config.names[0];
-}
 
 export const winnerModal = requiredElement<HTMLDivElement>("winner-modal");
 export const winnerText = requiredElement<HTMLParagraphElement>("winner-modal-text");

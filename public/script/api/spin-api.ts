@@ -1,7 +1,7 @@
 import { postJson, getAccessToken, ApiError } from "./api-helpers";
 import type { Direction } from "../wheel/spin";
 import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
-import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
+import type { SpinRandomResponseBody, AwardCoinsResponseBody, WheelItem } from "shared";
 
 export async function fetchRandomNumber(
   names: string[],
@@ -29,14 +29,14 @@ export async function fetchRandomNumber(
   return data;
 }
 
-export async function awardCoins(spinToken: string, winnerName: string): Promise<AwardCoinsResponseBody | null> {
+export async function awardCoins(spinToken: string, winner: WheelItem): Promise<AwardCoinsResponseBody | null> {
   if (!spinToken) return null;
 
   const accessToken = await getAccessToken();
   if (!accessToken) return null;
 
   try {
-    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winnerName }, {
+    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winner }, {
       token: accessToken,
       errorFallbackKey: "api.spin.awardFailed"
     });

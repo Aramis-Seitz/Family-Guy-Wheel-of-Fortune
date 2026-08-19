@@ -90,7 +90,7 @@ export function announceWinner(spinToken: string, winnerName: string): void {
   displayWinnerModal(winnerName);
   startConfetti();
 
-  awardCoins(spinToken, winnerName)
+  awardCoins(spinToken, { username: winnerName, uuid: null })
     .then((result) => {
       if (result) {
         return refreshCoinDisplay();

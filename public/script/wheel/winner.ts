@@ -10,9 +10,6 @@ import { t } from "../app/i18n";
 import { getSegmentIndex } from "./winner-logic";
 import type { SpinConfig } from "./spin";
 
-export const POINTER_OFFSET_DEG: number = 270;
-export const FULL_CIRCLE_DEG: number = 360;
-
 // Liefert die Position auf dem Rad, nicht den Namen — der Server identifiziert
 // den Gewinner ausschließlich über diesen Index.
 export function resolveWinnerIndex(rotation: number, config: SpinConfig): number {

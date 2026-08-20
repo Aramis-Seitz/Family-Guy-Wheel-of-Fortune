@@ -1,9 +1,10 @@
 import { randomUUID } from "crypto";
 import { getSecureRandomNumber } from "../lib/random";
 import { AppError } from "../lib/errors";
-import { insertSpinToken, findValidSpinToken, markSpinTokenUsed } from "../repositories/room-repository";
+import { insertSpinToken, findSpinTokenNamesInWheel, markSpinTokenUsed } from "../repositories/room-repository";
+import type { RoomPlayer, NameInWheel } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
-import type { SpinRandomResponseBody, AwardCoinsResponseBody, WheelItem } from "shared";
+import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 function getRandomWheelSpinNumber(): number {
     return getSecureRandomNumber(0, 359);
@@ -17,19 +18,34 @@ function getRandomWinnerCoins(): number {
     return getSecureRandomNumber(3, 6);
 }
 
-export async function generateSpin(userId: string): Promise<SpinRandomResponseBody> {
+// Ordnet jedem Namen auf dem Rad genau einmal die Account-UUID zu, die dazu
+// gehört — im Multiplayer über die Mitspielerliste des Raums (Host und Gäste
+// sind dort gleichermaßen echte User), im Solo-Modus nur den Spinner selbst.
+// Alles andere ist ein von Hand eingetragener Name ohne Account: userId null.
+// Bewusst hier und nicht erst beim Award, damit die Zuordnung an dem Rad hängt,
+// das tatsächlich gedreht wurde, und der Client sie nicht mitschicken muss.
+function resolveNamesInWheel(names: string[], accountsByUsername: Map<string, string>): NameInWheel[] {
+    return names.map((username) => ({
+        username,
+        userId: accountsByUsername.get(username) ?? null,
+    }));
+}
+
+export async function generateSpin(userId: string, names: string[], roomPlayers: RoomPlayer[] = []): Promise<SpinRandomResponseBody> {
+    const spinnerProfile = await getUserProfile(userId);
+    const accountsByUsername = new Map<string, string>(roomPlayers.map((player) => [player.username, player.id]));
+    if (spinnerProfile?.username) {
+        accountsByUsername.set(spinnerProfile.username, userId);
+    }
+
     const ranNum = getRandomWheelSpinNumber();
-    const spinToken = await insertSpinToken(randomUUID(), userId);
+    const spinToken = await insertSpinToken(randomUUID(), userId, resolveNamesInWheel(names, accountsByUsername));
     return { ranNum, spinToken };
 }
 
-export async function awardCoins(userId: string, spinToken: string, winner: WheelItem): Promise<AwardCoinsResponseBody> {
-    if (!winner.uuid) {
-        return { spinnerCoins: 0, winnerCoins: 0, total: 0 };
-    }
-
-    const isValid = await findValidSpinToken(spinToken, userId);
-    if (!isValid) {
+export async function awardCoins(userId: string, spinToken: string, winnerIndex: number): Promise<AwardCoinsResponseBody> {
+    const namesInWheel = await findSpinTokenNamesInWheel(spinToken, userId);
+    if (!namesInWheel) {
         throw new AppError("Invalid or already used spin token", 403);
     }
 
@@ -39,9 +55,13 @@ export async function awardCoins(userId: string, spinToken: string, winner: Whee
     const spinnerProfile = await getUserProfile(userId);
     const spinnerName = spinnerProfile?.username ?? userId;
 
-    const winnerName = winner.username;
-    // Usernames are display-only. A guest has no account UUID to reward.
-    const winnerUserId = winner.uuid;
+    // Der Gewinner steht ausschließlich über den Index im gespeicherten Rad fest.
+    const winner = namesInWheel[winnerIndex];
+    if (!winner) {
+        throw new AppError("Winner is not part of this spin", 400);
+    }
+
+    const winnerUserId = winner.userId;
     const spinnerIsWinner = winnerUserId === userId;
 
     if (spinnerIsWinner) {
@@ -57,10 +77,10 @@ export async function awardCoins(userId: string, spinToken: string, winner: Whee
     if (winnerUserId) {
         const winnerCoins = getRandomWinnerCoins();
         await addCoins(winnerUserId, winnerCoins);
-        console.log(`[coins] Winner: ${winnerName} → +${winnerCoins} Coins`);
+        console.log(`[coins] Winner: ${winner.username} → +${winnerCoins} Coins`);
         return { spinnerCoins, winnerCoins };
     }
 
-    console.log(`[coins] Winner: ${winnerName} → nicht im System, keine Coins`);
+    console.log(`[coins] Winner: ${winner.username} → kein Account, keine Coins`);
     return { spinnerCoins, winnerCoins: 0 };
 }

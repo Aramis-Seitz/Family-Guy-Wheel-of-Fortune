@@ -12,10 +12,12 @@ import { t } from "../app/i18n";
 export const POINTER_OFFSET_DEG: number = 270;
 export const FULL_CIRCLE_DEG: number = 360;
 
-export function resolveWinner(rotation: number, config: SpinConfig): string {
+// Liefert die Position auf dem Rad, nicht den Namen — der Server identifiziert
+// den Gewinner ausschließlich über diesen Index.
+export function resolveWinnerIndex(rotation: number, config: SpinConfig): number {
   const pointerAngle = ((POINTER_OFFSET_DEG - rotation) % FULL_CIRCLE_DEG + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
-  const winnerIndex = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
-  return config.names[winnerIndex] ?? config.names[0];
+  const index = Math.floor(pointerAngle / config.stepAngle) % config.segmentCount;
+  return config.names[index] === undefined ? 0 : index;
 }
 
 export const winnerModal = requiredElement<HTMLDivElement>("winner-modal");
@@ -94,13 +96,13 @@ function startConfetti(): void {
 
 let lastWinnerName: string = "";
 
-export function announceWinner(spinToken: string, winnerName: string): void {
+export function announceWinner(spinToken: string, winnerIndex: number, winnerName: string): void {
   stopDrumRoll();
   lastWinnerName = winnerName;
   displayWinnerModal(winnerName);
   startConfetti();
 
-  awardCoins(spinToken, { username: winnerName, uuid: null })
+  awardCoins(spinToken, winnerIndex)
     .then((result) => {
       if (result) {
         return refreshCoinDisplay();

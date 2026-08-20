@@ -1,0 +1,9 @@
+{
+  // Build-Variante von tsconfig.json: identische Optionen, aber ohne Tests.
+  // Die gehoeren nicht ins Deployment-Artefakt — und solange sie in dist/
+  // landeten, hat vitest die kompilierten CJS-Kopien als eigene Suites
+  // eingesammelt und ist am require("vitest") gescheitert.
+  // Der Typecheck laeuft weiter ueber tsconfig.json und deckt die Tests mit ab.
+  "extends": "./tsconfig.json",
+  "exclude": ["dist", "node_modules", "src/__tests__", "**/*.test.ts"]
+}

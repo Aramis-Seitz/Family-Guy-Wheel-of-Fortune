@@ -3,6 +3,6 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
     test: {
         mockReset: true,
-        exclude: ["**/node_modules/**", "**/.git/**", "**/dist/**"],
+        exclude: ["**/node_modules/**", "**/dist/**"],
     },
 });

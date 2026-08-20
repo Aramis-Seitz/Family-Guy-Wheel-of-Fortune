@@ -119,8 +119,7 @@ export class HostModeStrategy implements GameModeStrategy {
     if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
     lockAllSpinElements();
     try {
-      const namesInWheelList = getNamesInWheelList();
-      const { spinToken } = await spinRoom(activeRoomKey, namesInWheelList, direction);
+      const { spinToken } = await spinRoom(activeRoomKey, direction);
       setPendingHostSpinToken(spinToken);
     } catch (error) {
       console.error('[ROOM] Spin fehlgeschlagen:', error);

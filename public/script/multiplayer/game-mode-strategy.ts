@@ -152,6 +152,10 @@ export class HostModeStrategy implements GameModeStrategy {
       showToast({ message: t('names.maxItems', { max: MAX_ITEMS }), type: 'error' });
       return;
     }
+    if (isNameInWheelList(existingNamesInWheelList, validation.value)) {
+      showToast({ message: t('names.duplicate', { name: validation.value }), type: 'error' });
+      return;
+    }
 
     const updatedNamesInWheelList = [...existingNamesInWheelList, validation.value];
     await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);

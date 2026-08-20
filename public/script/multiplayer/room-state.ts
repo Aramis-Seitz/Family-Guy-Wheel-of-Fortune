@@ -1,4 +1,5 @@
 import { optionalElement } from "../shared/dom-helpers";
+import { isNameInWheelList } from "../names/names-in-wheel-list-state";
 
 // Reine Datenhaltung für den aktuell aktiven Raum. Dieses Modul kennt bewusst
 // weder Realtime-Sync noch GameModeStrategy noch Sidebar-Rendering — es hält
@@ -48,5 +49,5 @@ export function isMultiplayerActive(): boolean {
 }
 
 export function getMissingPlayers(players: string[], namesInWheelList: string[]): string[] {
-  return players.filter((player) => !namesInWheelList.includes(player));
+  return players.filter((player) => !isNameInWheelList(namesInWheelList, player));
 }

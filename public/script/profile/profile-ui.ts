@@ -1,5 +1,5 @@
 import { optionalElement } from "../shared/dom-helpers";
-import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-state";
+import { namesInWheelListState, ADD_NAME_REJECTION, MAX_ITEMS } from "../names/names-in-wheel-list-state";
 import { isNameEditingLocked } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
@@ -52,8 +52,14 @@ function bindProfileActions(): void {
   profileName?.addEventListener("click", () => {
     const username = profileData.getState().username;
     if (!username || isNameEditingLocked() || isSpinning()) return;
-    if (!namesInWheelListState.addNameToWheelList(username)) {
-      showToast({ message: t("profile.maxItems", { max: MAX_ITEMS }), type: "error" });
+    const addResult = namesInWheelListState.addNameToWheelList(username);
+    if (!addResult.added) {
+      showToast({
+        message: addResult.code === ADD_NAME_REJECTION.DUPLICATE
+          ? t("names.duplicate", { name: username })
+          : t("profile.maxItems", { max: MAX_ITEMS }),
+        type: "error",
+      });
       return;
     }
     showToast({ message: t("profile.added", { username }), type: "success" });

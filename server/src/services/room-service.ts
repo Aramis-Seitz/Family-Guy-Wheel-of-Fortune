@@ -63,6 +63,11 @@ function validateRoomNames(names: string[]): string[] {
     if (normalizedNames.some((name) => name.length > MAX_WHEEL_NAME_LENGTH)) {
         throw new AppError(`Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`, 400);
     }
+    // Doppelte Namen würden die Zuordnung Name -> Account beim Spin mehrdeutig
+    // machen, deshalb ist die Liste hier wie im Client duplikatfrei.
+    if (new Set(normalizedNames.map((name) => name.toLowerCase())).size !== normalizedNames.length) {
+        throw new AppError("Wheel names must be unique", 400);
+    }
     return normalizedNames;
 }
 

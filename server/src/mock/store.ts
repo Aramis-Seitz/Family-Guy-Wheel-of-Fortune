@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import type { Asset } from 'shared';
 import type { AssetCategory } from '../repositories/asset-repository.shared';
+import type { NameInWheel } from '../repositories/room-repository.shared';
 
 export interface Profile {
   id: string;
@@ -15,6 +16,7 @@ export interface SpinToken {
   token: string;
   user_id: string;
   used: boolean;
+  names_in_wheel: NameInWheel[];
   created_at: string;
 }
 

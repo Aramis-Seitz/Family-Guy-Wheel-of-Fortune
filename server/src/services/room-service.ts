@@ -13,6 +13,7 @@ import {
     updateRoomMultiplier,
     updateRoomReset,
     type RoomPlayer,
+    type RoomData,
 } from "../repositories/room-repository";
 import { generateSpin } from "./spin-service";
 import { AppError } from "../lib/errors";
@@ -46,7 +47,7 @@ function toUsernames(players: RoomPlayer[]): string[] {
     return players.map((p) => p.username);
 }
 
-function requireRoomHost(room: { host_id: string } | null, userId: string, action: string): void {
+function requireRoomHost(room: RoomData | null, userId: string, action: string): asserts room is RoomData {
     if (!room) throw new AppError("Room not found", 404);
     if (room.host_id !== userId) throw new AppError(`Only the host may ${action}`, 403);
 }
@@ -118,7 +119,9 @@ export async function spinRoom(userId: string, roomKey: string, direction: strin
     requireRoomHost(room, userId, "spin");
     if (direction !== "left" && direction !== "right") throw new AppError("Invalid spin direction", 400);
 
-    const { ranNum, spinToken } = await generateSpin(userId);
+    // Maßgeblich ist die im Raum gespeicherte Aufstellung, nicht das, was der
+    // Host mitschickt — daraus löst generateSpin() die Account-UUIDs auf.
+    const { ranNum, spinToken } = await generateSpin(userId, room.names_in_wheel ?? [], room.players ?? []);
     const spunAt = new Date().toISOString();
     await updateRoomSpin(roomKey, ranNum, spunAt, direction);
 

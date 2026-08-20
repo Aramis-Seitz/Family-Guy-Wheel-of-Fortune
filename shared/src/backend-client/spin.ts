@@ -1,9 +1,4 @@
 import { z } from "zod";
-export const WheelItemSchema = z.object({
-    username: z.string().min(1),
-    uuid: z.string().uuid().nullable().optional(),
-});
-export type WheelItem = z.infer<typeof WheelItemSchema>;
 
 export const SpinRandomResponseSchema = z.object({
     ranNum: z.number(),

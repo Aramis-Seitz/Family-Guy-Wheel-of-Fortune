@@ -7,6 +7,18 @@ import { refreshCoinDisplay } from "../profile/profile-ui";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
 import { t } from "../app/i18n";
+import { getSegmentIndex } from "./winner-logic";
+import type { SpinConfig } from "./spin";
+
+export const POINTER_OFFSET_DEG: number = 270;
+export const FULL_CIRCLE_DEG: number = 360;
+
+// Liefert die Position auf dem Rad, nicht den Namen — der Server identifiziert
+// den Gewinner ausschließlich über diesen Index.
+export function resolveWinnerIndex(rotation: number, config: SpinConfig): number {
+  const index = getSegmentIndex(rotation, config.names.length);
+  return config.names[index] === undefined ? 0 : index;
+}
 
 export const winnerModal = requiredElement<HTMLDivElement>("winner-modal");
 export const winnerText = requiredElement<HTMLParagraphElement>("winner-modal-text");
@@ -84,13 +96,13 @@ function startConfetti(): void {
 
 let lastWinnerName: string = "";
 
-export function announceWinner(spinToken: string, winnerName: string): void {
+export function announceWinner(spinToken: string, winnerIndex: number, winnerName: string): void {
   stopDrumRoll();
   lastWinnerName = winnerName;
   displayWinnerModal(winnerName);
   startConfetti();
 
-  awardCoins(spinToken, { username: winnerName, uuid: null })
+  awardCoins(spinToken, winnerIndex)
     .then((result) => {
       if (result) {
         return refreshCoinDisplay();

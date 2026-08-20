@@ -84,13 +84,14 @@ export const updateRoomReset: typeof Real.updateRoomReset = async (roomKey, clos
     if (closeWinnerModal) room.winner_modal_close_at = now;
 };
 
-export const insertSpinToken: typeof Real.insertSpinToken = async (token, userId) => {
-    store.spin_tokens.push({ token, user_id: userId, used: false, created_at: new Date().toISOString() });
+export const insertSpinToken: typeof Real.insertSpinToken = async (token, userId, namesInWheel) => {
+    store.spin_tokens.push({ token, user_id: userId, used: false, names_in_wheel: namesInWheel, created_at: new Date().toISOString() });
     return token;
 };
 
-export const findValidSpinToken: typeof Real.findValidSpinToken = async (token, userId) => {
-    return store.spin_tokens.some((t) => t.token === token && t.user_id === userId && !t.used);
+export const findSpinTokenNamesInWheel: typeof Real.findSpinTokenNamesInWheel = async (token, userId) => {
+    const spinToken = store.spin_tokens.find((t) => t.token === token && t.user_id === userId && !t.used);
+    return spinToken?.names_in_wheel ?? null;
 };
 
 export const markSpinTokenUsed: typeof Real.markSpinTokenUsed = async (token) => {

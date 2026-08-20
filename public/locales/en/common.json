@@ -112,6 +112,7 @@
         "tooLong": "The name must be at most {{max}} characters long.",
         "invalid": "Invalid input.",
         "maxItems": "Maximum {{max}} entries allowed.",
+        "duplicate": "The name \"{{name}}\" is already on the wheel.",
         "copySuccess": "Link copied.",
         "copyFailed": "Could not copy link."
     },

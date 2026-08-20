@@ -77,17 +77,11 @@ function setElementsDisabled(
   flat.forEach((el) => applyDisabledStyle(el, disabled));
 }
 
-function getSegmentIndex(rotation: number, stepAngle: number): number {
-  const offsetRotation = rotation - POINTER_OFFSET_DEG;
-  const normalizedRotation = ((offsetRotation % FULL_CIRCLE_DEG) + FULL_CIRCLE_DEG) % FULL_CIRCLE_DEG;
-  return Math.floor(normalizedRotation / stepAngle);
-}
-
 let lastTickRotation = 0;
 
-function hasEnteredNewSegment(stepAngle: number): boolean {
-  const previous = getSegmentIndex(lastTickRotation, stepAngle);
-  const current = getSegmentIndex(currentRotation, stepAngle);
+function hasEnteredNewSegment(segmentCount: number): boolean {
+  const previous = getSegmentIndex(lastTickRotation, segmentCount);
+  const current = getSegmentIndex(currentRotation, segmentCount);
   return previous !== current;
 }
 
@@ -107,9 +101,6 @@ function computeVelocity(progress: number): number {
 
 export interface SpinConfig {
   totalSteps: number;
-  direction: Direction;
-  stepAngle: number;
-  segmentCount: number;
   spinToken: string;
   names: string[];
 }
@@ -140,7 +131,7 @@ function runSpinFrame(state: SpinFrameState, config: SpinConfig): void {
   state.distanceTravelled += velocity;
 
   updateWheelRotation();
-  if (hasEnteredNewSegment(config.stepAngle)) playTickSound();
+  if (hasEnteredNewSegment(config.names.length)) playTickSound();
   lastTickRotation = currentRotation;
   if (state.distanceTravelled > config.totalSteps - DRUMROLL_LEAD_IN_STEPS) playDrumRoll();
 
@@ -151,10 +142,10 @@ function runSpinFrame(state: SpinFrameState, config: SpinConfig): void {
   }
 }
 
-function animateSpin(config: SpinConfig): void {
+function animateSpin(direction: Direction, config: SpinConfig): void {
   const state: SpinFrameState = {
     distanceTravelled: 0,
-    sign: config.direction === "right" ? 1 : -1,
+    sign: direction === "right" ? 1 : -1,
   };
   requestAnimationFrame(() => runSpinFrame(state, config));
 }
@@ -173,14 +164,11 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
 
   const config: SpinConfig = {
     totalSteps: clampedSteps,
-    direction,
-    stepAngle: FULL_CIRCLE_DEG / names.length,
-    segmentCount: names.length,
     spinToken,
     names,
   };
 
-  animateSpin(config);
+  animateSpin(direction, config);
 }
 
 export async function spinWheelWithRandomSteps(direction: Direction): Promise<void> {

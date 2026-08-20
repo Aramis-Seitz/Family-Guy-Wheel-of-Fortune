@@ -6,7 +6,6 @@ import { stopDrumRoll } from "./sound";
 import { refreshCoinDisplay } from "../profile/profile-ui";
 import { showToast } from "../shared/toast";
 import { requiredElement } from "../shared/dom-helpers";
-import type { SpinConfig } from "./spin";
 import { t } from "../app/i18n";
 
 export const POINTER_OFFSET_DEG: number = 270;

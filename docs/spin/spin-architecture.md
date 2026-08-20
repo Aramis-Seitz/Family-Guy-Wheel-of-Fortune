@@ -7,7 +7,8 @@
 | `wheel/spin.ts` | rAF-Animationsloop, Button-Lock, Reset |
 | `wheel/multiplier.ts` | Multiplier-Slider: lesen, setzen, anzeigen |
 | `wheel/renderer.ts` | SVG-Generierung (einmalig beim Namen-Update) |
-| `wheel/winner.ts` | Gewinner-Berechnung, Modal, Confetti, Coin-Vergabe |
+| `wheel/winner-logic.ts` | Reine Gewinner-Berechnung (`resolveWinner`, `getSegmentIndex`) — keine DOM-Abhängigkeit |
+| `wheel/winner.ts` | Modal, Confetti, Coin-Vergabe |
 | `wheel/sound.ts` | Web Audio API: Tick, Drumroll, Cymbal, Asset-Sound |
 | `api/client-api.ts` | `/api/random` (Landungswinkel holen), `/api/award-coins` |
 
@@ -61,10 +62,11 @@
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│              winner.ts: resolveWinner() + announceWinner()      │
-│  pointerAngle = (270° − rotation) mod 360                       │
-│  winnerIndex  = floor(pointerAngle / stepAngle)                 │
-│  winnerName   = config.names[winnerIndex]  ← aus Snapshot       │
+│    winner-logic.ts: resolveWinner()  →  winner.ts: announceWinner() │
+│  segmentIndex = getSegmentIndex(rotation, names.length)         │
+│    pointerAngle = (270° − rotation) mod 360                     │
+│    segmentIndex = floor(pointerAngle / stepAngle) mod count     │
+│  winnerName   = config.names[segmentIndex]  ← aus Snapshot      │
 │                                                                 │
 │  → Modal anzeigen, Confetti, POST /api/award-coins              │
 └─────────────────────────────────────────────────────────────────┘
@@ -112,15 +114,14 @@ Client:  totalSteps = round(1800 × multiplier) + rawSteps
 ```typescript
 interface SpinConfig {
   totalSteps: number;    // Gesamtdistanz der Animation
-  direction: Direction;  // "left" | "right"
-  stepAngle: number;     // 360 / names.length
-  segmentCount: number;
   spinToken: string;     // signierter Token für Coin-Vergabe
   names: string[];       // Snapshot beim Spin-Start — nicht live
 }
 ```
 
 `names` wird beim Spin-Start eingefroren. Ändert sich die Name-Liste während des Spins (z.B. via Room-Sync), bleibt die Gewinner-Berechnung konsistent.
+
+`direction` wird bewusst **nicht** in `SpinConfig` gehalten — es wird nur einmalig in `animateSpin()` gebraucht, um das Vorzeichen der Animationsgeschwindigkeit festzulegen, und deshalb als eigener Parameter übergeben statt im langlebigen Config-Objekt mitgeschleppt. `stepAngle`/`segmentCount` entfallen ebenfalls — beide waren immer aus `names.length` ableitbar (`360 / names.length`) und werden jetzt bei Bedarf direkt in `winner-logic.ts` (`getSegmentIndex`) berechnet, statt redundant in der Config vorgehalten zu werden.
 
 ---
 

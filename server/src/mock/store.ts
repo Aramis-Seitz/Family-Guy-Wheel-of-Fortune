@@ -126,26 +126,6 @@ export function addCoinsToUser(userId: string, amount: number): void {
   if (profile) profile.coins += amount;
 }
 
-export function createSpinToken(userId: string): SpinToken {
-  const token: SpinToken = {
-    token: randomUUID(),
-    user_id: userId,
-    used: false,
-    created_at: new Date().toISOString(),
-  };
-  store.spin_tokens.push(token);
-  return token;
-}
-
-export function findValidSpinToken(token: string, userId: string) {
-  return store.spin_tokens.find(t => t.token === token && t.user_id === userId && !t.used);
-}
-
-export function markTokenUsed(token: string): void {
-  const t = store.spin_tokens.find(st => st.token === token);
-  if (t) t.used = true;
-}
-
 export function getSavedLinks(userId: string): SavedLink[] {
   return store.saved_wheels
     .filter(l => l.user_id === userId)

@@ -22,11 +22,6 @@ export const updateCoinsByUserId: typeof Real.updateCoinsByUserId = async (userI
     if (profile) profile.coins = coins;
 };
 
-export const getUserIdByUsername: typeof Real.getUserIdByUsername = async (username) => {
-    const profile = store.profiles.find((p) => p.username === username);
-    return profile?.id ?? null;
-};
-
 export const insertProfile: typeof Real.insertProfile = async (userId, username, email, dateOfBirth) => {
     // Im Mock legt /api/mock/auth/signup die profiles-Row schon direkt an
     // (dort liegt auch das Passwort fürs Mock-Login) - dieser Aufruf hier

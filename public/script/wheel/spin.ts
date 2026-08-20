@@ -2,7 +2,7 @@ import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./so
 import { fetchRandomNumber } from "../api/spin-api";
 import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked } from "../names/names-in-wheel-list";
 import { getSegmentIndex } from "./winner-logic";
-import { announceWinner, resolveWinnerIndex, FULL_CIRCLE_DEG, POINTER_OFFSET_DEG } from "./winner";
+import { announceWinner, resolveWinnerIndex } from "./winner";
 import { getMultiplier, multiplierButton } from "./multiplier";
 import { wheelElement } from "./renderer";
 import { bulkAddToWheelBtn, getPlayerToggleButtons } from "../multiplayer/room-players-sidebar";

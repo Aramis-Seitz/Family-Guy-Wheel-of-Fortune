@@ -10,7 +10,7 @@ import {
   initNameInputValidation,
   validateNameInput,
 } from "./name-input-validation";
-import { namesInWheelListState, MAX_ITEMS, MIN_ITEMS } from "./names-in-wheel-list-state";
+import { namesInWheelListState, ADD_NAME_REJECTION, MAX_ITEMS, MIN_ITEMS } from "./names-in-wheel-list-state";
 import { t } from "../app/i18n";
 
 let roomLocked = false;
@@ -170,8 +170,12 @@ export function addNameToList(rawName: string): void {
     return;
   }
 
-  if (!namesInWheelListState.addNameToWheelList(validation.value)) {
-    showErrorToast(t("names.maxItems", { max: MAX_ITEMS }));
+  const addResult = namesInWheelListState.addNameToWheelList(validation.value);
+  if (!addResult.added) {
+    showErrorToast(addResult.code === ADD_NAME_REJECTION.DUPLICATE
+      ? t("names.duplicate", { name: validation.value })
+      : t("names.maxItems", { max: MAX_ITEMS }));
+    input.focus();
     return;
   }
 

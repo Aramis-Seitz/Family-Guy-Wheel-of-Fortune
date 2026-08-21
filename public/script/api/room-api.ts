@@ -26,8 +26,10 @@ export async function setMultiplier(roomKey: string, multiplier: number): Promis
     });
 }
 
-export async function spinRoom(roomKey: string, names: string[], direction: string): Promise<SpinRandomResponseBody> {
-    const rawBody = await postJson(`/api/rooms/${roomKey}/spins`, { names, direction }, {
+// Ohne Namen — massgeblich ist die im Raum gespeicherte Aufstellung, aus der
+// der Server den Spin-Token samt aufgeloester Account-Zuordnung baut.
+export async function spinRoom(roomKey: string, direction: string): Promise<SpinRandomResponseBody> {
+    const rawBody = await postJson(`/api/rooms/${roomKey}/spins`, { direction }, {
         errorFallbackKey: "api.room.spinFailed"
     });
     return SpinRandomResponseSchema.parse(rawBody);

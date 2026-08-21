@@ -1,5 +1,5 @@
 import { supabaseClient } from "../lib/supabase-client";
-import type { RoomPlayer, RoomData } from "./room-repository.shared";
+import type { RoomPlayer, RoomData, NameInWheel } from "./room-repository.shared";
 
 export async function getActiveRoomForUser(userId: string): Promise<RoomData | null> {
     const { data, error } = await supabaseClient
@@ -112,25 +112,28 @@ export async function updateRoomReset(roomKey: string, closeWinnerModal: boolean
     if (error) throw error;
 }
 
-export async function insertSpinToken(token: string, userId: string): Promise<string> {
+export async function insertSpinToken(token: string, userId: string, namesInWheel: NameInWheel[]): Promise<string> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")
-        .insert({ token, user_id: userId, used: false })
+        .insert({ token, user_id: userId, used: false, names_in_wheel: namesInWheel })
         .select("token")
         .single();
     if (error) throw error;
     return (data as { token: string }).token;
 }
 
-export async function findValidSpinToken(token: string, userId: string): Promise<boolean> {
+// null = Token existiert nicht, gehört einem anderen User oder wurde bereits
+// verbraucht. Ein leeres Array heißt dagegen: Token gültig, aber ohne Rad.
+export async function findSpinTokenNamesInWheel(token: string, userId: string): Promise<NameInWheel[] | null> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")
-        .select("token")
+        .select("names_in_wheel")
         .eq("token", token)
         .eq("user_id", userId)
         .eq("used", false)
         .single();
-    return !error && !!data;
+    if (error || !data) return null;
+    return (data as { names_in_wheel: NameInWheel[] | null }).names_in_wheel ?? [];
 }
 
 export async function markSpinTokenUsed(token: string): Promise<void> {

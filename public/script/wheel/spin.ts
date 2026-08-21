@@ -1,8 +1,8 @@
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound";
 import { fetchRandomNumber } from "../api/spin-api";
 import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked } from "../names/names-in-wheel-list";
-import { announceWinner } from "./winner";
-import { resolveWinner, getSegmentIndex } from "./winner-logic";
+import { getSegmentIndex } from "./winner-logic";
+import { announceWinner, resolveWinnerIndex } from "./winner";
 import { getMultiplier, multiplierButton } from "./multiplier";
 import { wheelElement } from "./renderer";
 import { bulkAddToWheelBtn, getPlayerToggleButtons } from "../multiplayer/room-players-sidebar";
@@ -111,7 +111,8 @@ function finishSpin(config: SpinConfig): void {
   stopDrumRoll();
   playCymbalCrash();
   applyGameModeLock();
-  announceWinner(config.spinToken, resolveWinner(currentRotation, config.names));
+  const winnerIndex = resolveWinnerIndex(currentRotation, config);
+  announceWinner(config.spinToken, winnerIndex, config.names[winnerIndex]);
 }
 
 export const DRUMROLL_LEAD_IN_STEPS: number = 321;

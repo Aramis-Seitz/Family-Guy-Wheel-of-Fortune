@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import type { Asset } from 'shared';
 import type { AssetCategory } from '../repositories/asset-repository.shared';
+import type { NameInWheel } from '../repositories/room-repository.shared';
 
 export interface Profile {
   id: string;
@@ -15,6 +16,7 @@ export interface SpinToken {
   token: string;
   user_id: string;
   used: boolean;
+  names_in_wheel: NameInWheel[];
   created_at: string;
 }
 
@@ -124,26 +126,6 @@ export function createProfile(data: Omit<Profile, 'coins'>): Profile {
 export function addCoinsToUser(userId: string, amount: number): void {
   const profile = findProfile(userId);
   if (profile) profile.coins += amount;
-}
-
-export function createSpinToken(userId: string): SpinToken {
-  const token: SpinToken = {
-    token: randomUUID(),
-    user_id: userId,
-    used: false,
-    created_at: new Date().toISOString(),
-  };
-  store.spin_tokens.push(token);
-  return token;
-}
-
-export function findValidSpinToken(token: string, userId: string) {
-  return store.spin_tokens.find(t => t.token === token && t.user_id === userId && !t.used);
-}
-
-export function markTokenUsed(token: string): void {
-  const t = store.spin_tokens.find(st => st.token === token);
-  if (t) t.used = true;
 }
 
 export function getSavedLinks(userId: string): SavedLink[] {

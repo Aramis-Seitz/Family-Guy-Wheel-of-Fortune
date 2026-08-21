@@ -27,7 +27,7 @@ const AwardCoinsRequestSchema = z.object({
 export const handleAwardCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = AwardCoinsRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing winnerIndex" });
+        res.status(400).json({ error: "Schema validation failure" });
         return;
     }
 

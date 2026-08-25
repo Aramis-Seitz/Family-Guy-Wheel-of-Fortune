@@ -17,10 +17,12 @@ import {
 } from "../repositories/room-repository";
 import { generateSpin } from "./spin-service";
 import { AppError } from "../lib/errors";
+import { formatDisplayName } from "../lib/display-name";
 import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
 const MAX_WHEEL_NAMES = 16;
-const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
+// '#' ist erlaubt, weil Spielernamen als "username#suffix" in der Namensliste landen.
+const WHEEL_NAME_PATTERN = /^[A-Za-z0-9'#]+$/;
 // Muss mit MAX_NAME_LENGTH in public/script/shared/validation.ts übereinstimmen.
 const MAX_WHEEL_NAME_LENGTH = 20;
 
@@ -41,11 +43,11 @@ export async function createRoom(userId: string): Promise<CreateRoomResponseBody
     const hostSuffix = profile?.suffix ?? 0;
     const roomKey = generateRoomKey();
     await insertRoom(roomKey, userId, hostUsername, hostSuffix);
-    return { roomKey, players: [hostUsername], names: [] };
+    return { roomKey, players: [formatDisplayName(hostUsername, hostSuffix)], names: [] };
 }
 
-function toUsernames(players: RoomPlayer[]): string[] {
-    return players.map((p) => p.username);
+function toDisplayNames(players: RoomPlayer[]): string[] {
+    return players.map((p) => formatDisplayName(p.username, p.suffix));
 }
 
 function requireRoomHost(room: RoomData | null, userId: string, action: string): asserts room is RoomData {
@@ -91,12 +93,12 @@ export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoo
         : [...currentPlayers, { id: userId, username, suffix }];
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
-    const hostPlayer = room.players.find((p) => p.id === room.host_id);
-    const hostName = hostPlayer?.username ?? (players[0]?.username ?? '');
+    const hostPlayer = room.players.find((p) => p.id === room.host_id) ?? players[0];
+    const hostName = hostPlayer ? formatDisplayName(hostPlayer.username, hostPlayer.suffix) : '';
     const multiplier = room.multiplier ?? 1;
     const names = room.names_in_wheel ?? [];
 
-    return { players: toUsernames(players), multiplier, names, hostName };
+    return { players: toDisplayNames(players), multiplier, names, hostName };
 }
 
 export async function leaveRoom(userId: string, roomKey: string): Promise<void> {

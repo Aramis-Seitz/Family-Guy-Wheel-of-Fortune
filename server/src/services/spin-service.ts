@@ -4,6 +4,7 @@ import { AppError } from "../lib/errors";
 import { insertSpinToken, findSpinTokenNamesInWheel, markSpinTokenUsed } from "../repositories/room-repository";
 import type { RoomPlayer, NameInWheel } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
+import { formatDisplayName } from "../lib/display-name";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
 function getRandomWheelSpinNumber(): number {
@@ -53,7 +54,9 @@ export async function awardCoins(userId: string, spinToken: string, winnerIndex:
 
     const spinnerCoins = getRandomSpinnerCoins();
     const spinnerProfile = await getUserProfile(userId);
-    const spinnerName = spinnerProfile?.username ?? userId;
+    const spinnerName = spinnerProfile
+        ? formatDisplayName(spinnerProfile.username, spinnerProfile.suffix)
+        : userId;
 
     // Der Gewinner steht ausschließlich über den Index im gespeicherten Rad fest.
     const winner = namesInWheel[winnerIndex];

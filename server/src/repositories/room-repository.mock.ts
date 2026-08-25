@@ -15,12 +15,12 @@ export const getActiveRoomForUser: typeof Real.getActiveRoomForUser = async (use
     return room ?? null;
 };
 
-export const insertRoom: typeof Real.insertRoom = async (roomKey, hostId, hostUsername) => {
+export const insertRoom: typeof Real.insertRoom = async (roomKey, hostId, hostUsername, hostSuffix) => {
     store.rooms.push({
         id: newId(),
         room_key: roomKey,
         host_id: hostId,
-        players: [{ id: hostId, username: hostUsername }],
+        players: [{ id: hostId, username: hostUsername, suffix: hostSuffix }],
         names_in_wheel: [],
         last_spin: null,
         spun_at: null,

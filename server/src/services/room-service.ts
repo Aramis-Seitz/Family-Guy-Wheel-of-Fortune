@@ -38,8 +38,9 @@ export async function createRoom(userId: string): Promise<CreateRoomResponseBody
 
     const profile = await getUserProfile(userId);
     const hostUsername = profile?.username ?? userId;
+    const hostSuffix = profile?.suffix ?? 0;
     const roomKey = generateRoomKey();
-    await insertRoom(roomKey, userId, hostUsername);
+    await insertRoom(roomKey, userId, hostUsername, hostSuffix);
     return { roomKey, players: [hostUsername], names: [] };
 }
 
@@ -83,10 +84,11 @@ export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoo
 
     const profile = await getUserProfile(userId);
     const username = profile?.username ?? userId;
+    const suffix = profile?.suffix ?? 0;
     const currentPlayers = room.players ?? [];
     const updatedPlayers = currentPlayers.some((p) => p.id === userId)
         ? currentPlayers
-        : [...currentPlayers, { id: userId, username }];
+        : [...currentPlayers, { id: userId, username, suffix }];
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
     const hostPlayer = room.players.find((p) => p.id === room.host_id);

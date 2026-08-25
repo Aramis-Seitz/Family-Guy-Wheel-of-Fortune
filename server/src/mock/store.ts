@@ -6,6 +6,7 @@ import type { NameInWheel } from '../repositories/room-repository.shared';
 export interface Profile {
   id: string;
   username: string;
+  suffix: number;
   email: string;
   date_of_birth: string | null;
   password: string;
@@ -28,7 +29,7 @@ export interface SavedLink {
   created_at: string;
 }
 
-export type Player = { id: string; username: string };
+export type Player = { id: string; username: string; suffix: number };
 
 export interface Room {
   id: string;
@@ -87,6 +88,7 @@ export const store = {
     {
       id: '00000000-0000-0000-0000-000000000001',
       username: 'admin',
+      suffix: 0,
       email: 'admin@admin.de',
       date_of_birth: null,
       password: 'admin',
@@ -115,6 +117,13 @@ export function findProfileByEmail(email: string) {
 
 export function findProfileByUsername(username: string) {
   return store.profiles.find(p => p.username.toLowerCase() === username.toLowerCase());
+}
+
+export function nextFreeSuffix(username: string): number {
+  const takenSuffixes = store.profiles
+    .filter(p => p.username.toLowerCase() === username.toLowerCase())
+    .map(p => p.suffix);
+  return takenSuffixes.length === 0 ? 0 : Math.max(...takenSuffixes) + 1;
 }
 
 export function createProfile(data: Omit<Profile, 'coins'>): Profile {

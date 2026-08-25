@@ -5,6 +5,7 @@ import {
   findProfile,
   findProfileByEmail,
   findProfileByUsername,
+  nextFreeSuffix,
   createProfile,
   getSavedLinks,
   createSavedLink,
@@ -36,7 +37,7 @@ mockRouter.post('/auth/signup', (req, res) => {
   }
 
   const id = randomUUID();
-  createProfile({ id, email, username, date_of_birth: date_of_birth ?? null, password });
+  createProfile({ id, email, username, suffix: nextFreeSuffix(username), date_of_birth: date_of_birth ?? null, password });
 
   const payload = Buffer.from(JSON.stringify({ id, email, username, date_of_birth: date_of_birth ?? null })).toString('base64');
   res.json({ token: `mock_${payload}`, user: { id, email, user_metadata: { username, date_of_birth: date_of_birth ?? null } } });
@@ -75,7 +76,7 @@ mockRouter.post('/profile', (req, res) => {
     res.status(409).json({ error: 'Already exists' });
     return;
   }
-  const profile = createProfile({ id, username, email, date_of_birth: date_of_birth ?? null, password: '' });
+  const profile = createProfile({ id, username, suffix: nextFreeSuffix(username), email, date_of_birth: date_of_birth ?? null, password: '' });
   res.json(profile);
 });
 

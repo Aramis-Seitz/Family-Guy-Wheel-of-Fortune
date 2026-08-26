@@ -21,9 +21,7 @@ import { formatDisplayName } from "../lib/display-name";
 import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
 const MAX_WHEEL_NAMES = 16;
-// '#' ist erlaubt, weil Spielernamen als "username#suffix" in der Namensliste landen.
-const WHEEL_NAME_PATTERN = /^[A-Za-z0-9'#]+$/;
-// Muss mit MAX_NAME_LENGTH in public/script/shared/validation.ts übereinstimmen.
+const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
 const MAX_WHEEL_NAME_LENGTH = 20;
 
 function generateRoomKey(): string {
@@ -43,29 +41,57 @@ export async function createRoom(userId: string): Promise<CreateRoomResponseBody
     const hostSuffix = profile?.suffix ?? 0;
     const roomKey = generateRoomKey();
     await insertRoom(roomKey, userId, hostUsername, hostSuffix);
-    return { roomKey, players: [formatDisplayName(hostUsername, hostSuffix)], names: [] };
+
+    return {
+        roomKey,
+        players: [formatDisplayName(hostUsername, hostSuffix)],
+        names: []
+    };
 }
 
 function toDisplayNames(players: RoomPlayer[]): string[] {
-    return players.map((p) => formatDisplayName(p.username, p.suffix));
+    return players.map((player) =>
+        formatDisplayName(player.username, player.suffix)
+    );
 }
 
 function requireRoomHost(room: RoomData | null, userId: string, action: string): asserts room is RoomData {
     if (!room) throw new AppError("Room not found", 404);
-    if (room.host_id !== userId) throw new AppError(`Only the host may ${action}`, 403);
+    if (room.host_id !== userId) {
+        throw new AppError(`Only the host may ${action}`, 403);
+    }
 }
 
 function validateRoomNames(names: string[]): string[] {
     if (names.length > MAX_WHEEL_NAMES) {
-        throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
+        throw new AppError(
+            `A room may contain at most ${MAX_WHEEL_NAMES} wheel names`,
+            400
+        );
     }
 
     const normalizedNames = names.map((name) => name.trim());
-    if (normalizedNames.some((name) => !name || !WHEEL_NAME_PATTERN.test(name))) {
-        throw new AppError("Wheel names must contain only letters, numbers, or apostrophes", 400);
+
+    if (
+        normalizedNames.some(
+            (name) => !name || !WHEEL_NAME_PATTERN.test(name)
+        )
+    ) {
+        throw new AppError(
+            "Wheel names must contain only letters, numbers, or apostrophes",
+            400
+        );
     }
-    if (normalizedNames.some((name) => name.length > MAX_WHEEL_NAME_LENGTH)) {
-        throw new AppError(`Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`, 400);
+
+    if (
+        normalizedNames.some(
+            (name) => name.length > MAX_WHEEL_NAME_LENGTH
+        )
+    ) {
+        throw new AppError(
+            `Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`,
+            400
+        );
     }
     // Doppelte Namen würden die Zuordnung Name -> Account beim Spin mehrdeutig
     // machen, deshalb ist die Liste hier wie im Client duplikatfrei.
@@ -75,7 +101,10 @@ function validateRoomNames(names: string[]): string[] {
     return normalizedNames;
 }
 
-export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoomResponseBody> {
+export async function joinRoom(
+    userId: string,
+    roomKey: string
+): Promise<JoinRoomResponseBody> {
     const existingRoom = await getActiveRoomForUser(userId);
     if (existingRoom && existingRoom.room_key !== roomKey) {
         await leaveRoom(userId, existingRoom.room_key);
@@ -88,40 +117,61 @@ export async function joinRoom(userId: string, roomKey: string): Promise<JoinRoo
     const username = profile?.username ?? userId;
     const suffix = profile?.suffix ?? 0;
     const currentPlayers = room.players ?? [];
-    const updatedPlayers = currentPlayers.some((p) => p.id === userId)
+
+    const updatedPlayers = currentPlayers.some(
+        (player) => player.id === userId
+    )
         ? currentPlayers
         : [...currentPlayers, { id: userId, username, suffix }];
 
     const players = await updateRoomPlayers(roomKey, updatedPlayers);
-    const hostPlayer = room.players.find((p) => p.id === room.host_id) ?? players[0];
-    const hostName = hostPlayer ? formatDisplayName(hostPlayer.username, hostPlayer.suffix) : '';
+
+    const hostPlayer =
+        room.players.find((player) => player.id === room.host_id) ??
+        players[0];
+
+    const hostName = hostPlayer
+        ? formatDisplayName(hostPlayer.username, hostPlayer.suffix)
+        : "";
+
     const multiplier = room.multiplier ?? 1;
     const names = room.names_in_wheel ?? [];
 
-    return { players: toDisplayNames(players), multiplier, names, hostName };
+    return {
+        players: toDisplayNames(players),
+        multiplier,
+        names,
+        hostName
+    };
 }
 
-export async function leaveRoom(userId: string, roomKey: string): Promise<void> {
+export async function leaveRoom(
+    userId: string,
+    roomKey: string
+): Promise<void> {
     const room = await getRoomByKey(roomKey);
     if (!room) throw new AppError("Room not found", 404);
 
     const hostId = room.host_id;
     if (userId === hostId) {
-        // Host verlässt -> Room schließen
-        // Erst leeren, damit verbundene Gäste das Realtime-"Room geschlossen"-Signal erhalten,
-        // dann den Datensatz löschen, damit der roomKey nicht mehr joinbar bleibt.
         await clearRoomPlayers(roomKey);
         await deleteRoomByKey(roomKey);
     } else {
-        // Guest verlässt -> nur diesen User entfernen
         await removePlayerFromRoom(roomKey, userId);
     }
 }
 
-export async function spinRoom(userId: string, roomKey: string, direction: string): Promise<SpinRandomResponseBody> {
+export async function spinRoom(
+    userId: string,
+    roomKey: string,
+    direction: string
+): Promise<SpinRandomResponseBody> {
     const room = await getRoomByKey(roomKey);
     requireRoomHost(room, userId, "spin");
-    if (direction !== "left" && direction !== "right") throw new AppError("Invalid spin direction", 400);
+
+    if (direction !== "left" && direction !== "right") {
+        throw new AppError("Invalid spin direction", 400);
+    }
 
     // Maßgeblich ist die im Raum gespeicherte Aufstellung, nicht das, was der
     // Host mitschickt — daraus löst generateSpin() die Account-UUIDs auf.
@@ -132,22 +182,38 @@ export async function spinRoom(userId: string, roomKey: string, direction: strin
     return { ranNum, spinToken };
 }
 
-export async function setRoomNames(userId: string, roomKey: string, names: string[]): Promise<void> {
+export async function setRoomNames(
+    userId: string,
+    roomKey: string,
+    names: string[]
+): Promise<void> {
     const room = await getRoomByKey(roomKey);
     requireRoomHost(room, userId, "update wheel items");
     await updateRoomNames(roomKey, validateRoomNames(names));
 }
 
-export async function resetRoom(userId: string, roomKey: string, closeWinnerModal: boolean): Promise<void> {
+export async function resetRoom(
+    userId: string,
+    roomKey: string,
+    closeWinnerModal: boolean
+): Promise<void> {
     const room = await getRoomByKey(roomKey);
     requireRoomHost(room, userId, "reset");
     await updateRoomReset(roomKey, closeWinnerModal);
 }
 
-export async function setMultiplier(userId: string, roomKey: string, multiplier: number): Promise<void> {
+export async function setMultiplier(
+    userId: string,
+    roomKey: string,
+    multiplier: number
+): Promise<void> {
     const room = await getRoomByKey(roomKey);
     requireRoomHost(room, userId, "change the multiplier");
-    if (!Number.isFinite(multiplier)) throw new AppError("Invalid multiplier", 400);
+
+    if (!Number.isFinite(multiplier)) {
+        throw new AppError("Invalid multiplier", 400);
+    }
+
     const clamped = Math.min(2, Math.max(1, multiplier));
     await updateRoomMultiplier(roomKey, clamped);
 }

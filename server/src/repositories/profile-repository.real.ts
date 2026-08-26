@@ -67,6 +67,17 @@ export async function getUserIdByUsername(displayName: string): Promise<string |
     return (data as { id: string }).id;
 }
 
+export async function isUsernameTaken(username: string): Promise<boolean> {
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id")
+        .ilike("username", username.trim())
+        .limit(1);
+
+    if (error) throw error;
+    return Array.isArray(data) && data.length > 0;
+}
+
 async function getNextFreeSuffix(username: string): Promise<number> {
     const { data, error } = await supabaseClient
         .from("profiles")

@@ -39,6 +39,14 @@ function nextFreeSuffix(username: string): number {
     return takenSuffixes.length === 0 ? 0 : Math.max(...takenSuffixes) + 1;
 }
 
+export const isUsernameTaken: typeof Real.isUsernameTaken = async (username) => {
+    const normalizedUsername = username.trim().toLowerCase();
+
+    return store.profiles.some(
+        (profile) => profile.username.trim().toLowerCase() === normalizedUsername
+    );
+};
+
 export const insertProfile: typeof Real.insertProfile = async (userId, username, email, dateOfBirth) => {
     // Im Mock legt /api/mock/auth/signup die profiles-Row schon direkt an
     // (dort liegt auch das Passwort fürs Mock-Login) - dieser Aufruf hier

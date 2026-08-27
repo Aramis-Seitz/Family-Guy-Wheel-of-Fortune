@@ -36,11 +36,16 @@ mockRouter.post('/auth/signup', (req, res) => {
     return;
   }
 
+  if (findProfileByUsername(username)) {
+    res.status(409).json({ error: 'Dieser Username ist bereits vergeben' });
+    return;
+  }
+
   const id = randomUUID();
   createProfile({ id, email, username, suffix: nextFreeSuffix(username), date_of_birth: date_of_birth ?? null, password });
 
   const payload = Buffer.from(JSON.stringify({ id, email, username, date_of_birth: date_of_birth ?? null })).toString('base64');
-  res.json({ token: `mock_${payload}`, user: { id, email, user_metadata: { username, date_of_birth: date_of_birth ?? null } } });
+  res.json({ token: `mock_${payload}`, user: { id, email, user_metadata: { username, suffix: 0, date_of_birth: date_of_birth ?? null } } });
 });
 
 mockRouter.post('/auth/login', (req, res) => {
@@ -54,19 +59,19 @@ mockRouter.post('/auth/login', (req, res) => {
 
   const { id, username } = profile;
   const payload = Buffer.from(JSON.stringify({ id, email: profile.email, username, date_of_birth: profile.date_of_birth })).toString('base64');
-  res.json({ token: `mock_${payload}`, user: { id, email: profile.email, user_metadata: { username, date_of_birth: profile.date_of_birth } } });
+  res.json({ token: `mock_${payload}`, user: { id, email: profile.email, user_metadata: { username, suffix: profile.suffix, date_of_birth: profile.date_of_birth } } });
 });
 
 mockRouter.get('/profile/by-username/:username', (req, res) => {
   const profile = findProfileByUsername(req.params.username);
   if (!profile) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json({ id: profile.id, username: profile.username, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
+  res.json({ id: profile.id, username: profile.username, suffix: profile.suffix, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
 });
 
 mockRouter.get('/profile/:userId', (req, res) => {
   const profile = findProfile(req.params.userId);
   if (!profile) { res.status(404).json({ error: 'Not found' }); return; }
-  res.json({ id: profile.id, username: profile.username, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
+  res.json({ id: profile.id, username: profile.username, suffix: profile.suffix, email: profile.email, date_of_birth: profile.date_of_birth, coins: profile.coins });
 });
 
 mockRouter.post('/profile', (req, res) => {
@@ -74,6 +79,10 @@ mockRouter.post('/profile', (req, res) => {
   if (findProfile(id)) {
     // already created during signup – silent no-op
     res.status(409).json({ error: 'Already exists' });
+    return;
+  }
+  if (findProfileByUsername(username)) {
+    res.status(409).json({ error: 'Dieser Username ist bereits vergeben' });
     return;
   }
   const profile = createProfile({ id, username, suffix: nextFreeSuffix(username), email, date_of_birth: date_of_birth ?? null, password: '' });

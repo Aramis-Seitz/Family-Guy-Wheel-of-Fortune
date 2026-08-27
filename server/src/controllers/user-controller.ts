@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser } from "../services/user-service";
+import { isUsernameTaken } from "../repositories/profile-repository";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
@@ -26,6 +27,10 @@ export const handleRegisterUser = asyncHandler(async (req: HttpRequest, res: Htt
     }
 
     const { username, email, dateOfBirth } = parsedBody.data;
+    if (await isUsernameTaken(username)) {
+        res.status(409).json({ error: "Username ist bereits vergeben" });
+        return;
+    }
     await registerUser(req.userId!, username, email, dateOfBirth);
     res.status(201).json({ ok: true });
 });

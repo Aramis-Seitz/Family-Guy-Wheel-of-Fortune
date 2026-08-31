@@ -29,14 +29,17 @@ export async function fetchRandomNumber(
   return data;
 }
 
-export async function awardCoins(spinToken: string, winnerName: string): Promise<AwardCoinsResponseBody | null> {
+// Übergibt nur die Position des Gewinners auf dem Rad. Welcher Account dahinter
+// steckt (oder ob es ein von Hand eingetragener Name ohne Account ist), hat der
+// Server beim Spin selbst aufgelöst und am Spin-Token festgehalten.
+export async function awardCoins(spinToken: string, winnerIndex: number): Promise<AwardCoinsResponseBody | null> {
   if (!spinToken) return null;
 
   const accessToken = await getAccessToken();
   if (!accessToken) return null;
 
   try {
-    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winnerName }, {
+    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winnerIndex }, {
       token: accessToken,
       errorFallbackKey: "api.spin.awardFailed"
     });

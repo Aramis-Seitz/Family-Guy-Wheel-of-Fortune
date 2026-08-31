@@ -7,11 +7,11 @@ import type { Direction, SpinElement } from "../wheel/spin";
 import { multiplierButton } from "../wheel/multiplier";
 import { hideWinnerModal } from "../wheel/winner";
 import {
-  addNameToList, getNamesInWheelList,
+  addNameToList,
   addBtn, input, getRemoveBtn, removeNameFromListByIndex,
 } from "../names/names-in-wheel-list";
 import { getNameValidationMessage } from "../names/name-input-validation";
-import { MAX_ITEMS } from "../names/names-in-wheel-list-state";
+import { MAX_ITEMS, isNameInWheelList } from "../names/names-in-wheel-list-state";
 import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { t } from "../app/i18n";
@@ -119,8 +119,7 @@ export class HostModeStrategy implements GameModeStrategy {
     if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
     lockAllSpinElements();
     try {
-      const namesInWheelList = getNamesInWheelList();
-      const { spinToken } = await spinRoom(activeRoomKey, namesInWheelList, direction);
+      const { spinToken } = await spinRoom(activeRoomKey, direction);
       setPendingHostSpinToken(spinToken);
     } catch (error) {
       console.error('[ROOM] Spin fehlgeschlagen:', error);
@@ -151,6 +150,10 @@ export class HostModeStrategy implements GameModeStrategy {
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     if (existingNamesInWheelList.length >= MAX_ITEMS) {
       showToast({ message: t('names.maxItems', { max: MAX_ITEMS }), type: 'error' });
+      return;
+    }
+    if (isNameInWheelList(existingNamesInWheelList, validation.value)) {
+      showToast({ message: t('names.duplicate', { name: validation.value }), type: 'error' });
       return;
     }
 

@@ -3,6 +3,7 @@ import { z } from "zod";
 export const SpinRandomResponseSchema = z.object({
     ranNum: z.number(),
     spinToken: z.string(),
+    winnerName: z.string(),
 });
 export type SpinRandomResponseBody = z.infer<typeof SpinRandomResponseSchema>;
 

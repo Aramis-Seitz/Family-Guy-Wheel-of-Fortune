@@ -17,6 +17,7 @@ export interface SpinToken {
   user_id: string;
   used: boolean;
   names_in_wheel: NameInWheel[];
+  winner_index: number | null;
   created_at: string;
 }
 
@@ -40,6 +41,7 @@ export interface Room {
   spun_at: string | null;
   multiplier: number;
   spin_direction: string | null;
+  spin_winner: string | null;
   wheel_reset_at: string | null;
   winner_modal_close_at: string | null;
   created_at: string;

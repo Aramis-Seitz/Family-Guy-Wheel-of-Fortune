@@ -102,12 +102,12 @@ function syncRoomPlayers(players: string[]): void {
 // zueinander. Nur der Host bringt einen echten Spin-Token mit (aus dem eigenen
 // spinRoom()-Call zwischengespeichert), der Gast bekommt nie einen — Coins werden
 // nur mit einem gültigen, serverseitig geprüften Token vergeben.
-function handleRoomSpinEvent(extraRotationDegrees: number, multiplier: number, direction: string): void {
+function handleRoomSpinEvent(extraRotationDegrees: number, multiplier: number, direction: string, winnerName: string): void {
   lockAllSpinElements();
   const namesInWheelList = getNamesInWheelList();
   const totalSteps = Math.round(MIN_SPIN_ROTATIONS * multiplier) + extraRotationDegrees;
   const spinToken = getCurrentMode().isHost() ? consumePendingHostSpinToken() : '';
-  spinWheel(totalSteps, direction as Direction, spinToken, namesInWheelList);
+  spinWheel(totalSteps, direction as Direction, spinToken, namesInWheelList, winnerName);
 }
 
 function handleWheelResetEvent(): void {

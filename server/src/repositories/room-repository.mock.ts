@@ -26,6 +26,7 @@ export const insertRoom: typeof Real.insertRoom = async (roomKey, hostId, hostUs
         spun_at: null,
         multiplier: 1,
         spin_direction: null,
+        spin_winner: null,
         wheel_reset_at: null,
         winner_modal_close_at: null,
         created_at: new Date().toISOString(),
@@ -63,12 +64,13 @@ export const clearRoomPlayers: typeof Real.clearRoomPlayers = async (roomKey) =>
     if (room) room.players = [];
 };
 
-export const updateRoomSpin: typeof Real.updateRoomSpin = async (roomKey, lastSpin, spunAt, direction) => {
+export const updateRoomSpin: typeof Real.updateRoomSpin = async (roomKey, lastSpin, spunAt, direction, winner) => {
     const room = store.rooms.find((r) => r.room_key === roomKey);
     if (!room) return;
     room.last_spin = lastSpin;
     room.spun_at = spunAt;
     room.spin_direction = direction;
+    room.spin_winner = winner;
 };
 
 export const updateRoomMultiplier: typeof Real.updateRoomMultiplier = async (roomKey, multiplier) => {
@@ -84,14 +86,15 @@ export const updateRoomReset: typeof Real.updateRoomReset = async (roomKey, clos
     if (closeWinnerModal) room.winner_modal_close_at = now;
 };
 
-export const insertSpinToken: typeof Real.insertSpinToken = async (token, userId, namesInWheel) => {
-    store.spin_tokens.push({ token, user_id: userId, used: false, names_in_wheel: namesInWheel, created_at: new Date().toISOString() });
+export const insertSpinToken: typeof Real.insertSpinToken = async (token, userId, namesInWheel, winnerIndex) => {
+    store.spin_tokens.push({ token, user_id: userId, used: false, names_in_wheel: namesInWheel, winner_index: winnerIndex, created_at: new Date().toISOString() });
     return token;
 };
 
-export const findSpinTokenNamesInWheel: typeof Real.findSpinTokenNamesInWheel = async (token, userId) => {
+export const findAwardableSpin: typeof Real.findAwardableSpin = async (token, userId) => {
     const spinToken = store.spin_tokens.find((t) => t.token === token && t.user_id === userId && !t.used);
-    return spinToken?.names_in_wheel ?? null;
+    if (!spinToken) return null;
+    return { namesInWheel: spinToken.names_in_wheel ?? [], winnerIndex: spinToken.winner_index };
 };
 
 export const markSpinTokenUsed: typeof Real.markSpinTokenUsed = async (token) => {

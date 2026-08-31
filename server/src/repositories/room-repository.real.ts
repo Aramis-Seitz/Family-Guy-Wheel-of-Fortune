@@ -85,10 +85,10 @@ export async function clearRoomPlayers(roomKey: string): Promise<void> {
     if (error) throw error;
 }
 
-export async function updateRoomSpin(roomKey: string, lastSpin: number, spunAt: string, direction: string): Promise<void> {
+export async function updateRoomSpin(roomKey: string, lastSpin: number, spunAt: string, direction: string, winner: string): Promise<void> {
     const { error } = await supabaseClient
         .from("rooms")
-        .update({ last_spin: lastSpin, spun_at: spunAt, spin_direction: direction })
+        .update({ last_spin: lastSpin, spun_at: spunAt, spin_direction: direction, spin_winner: winner })
         .eq("room_key", roomKey);
     if (error) throw error;
 }
@@ -112,28 +112,29 @@ export async function updateRoomReset(roomKey: string, closeWinnerModal: boolean
     if (error) throw error;
 }
 
-export async function insertSpinToken(token: string, userId: string, namesInWheel: NameInWheel[]): Promise<string> {
+export async function insertSpinToken(token: string, userId: string, namesInWheel: NameInWheel[], winnerIndex: number | null): Promise<string> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")
-        .insert({ token, user_id: userId, used: false, names_in_wheel: namesInWheel })
+        .insert({ token, user_id: userId, used: false, names_in_wheel: namesInWheel, winner_index: winnerIndex })
         .select("token")
         .single();
     if (error) throw error;
     return (data as { token: string }).token;
 }
 
-// null = Token existiert nicht, gehört einem anderen User oder wurde bereits
-// verbraucht. Ein leeres Array heißt dagegen: Token gültig, aber ohne Rad.
-export async function findSpinTokenNamesInWheel(token: string, userId: string): Promise<NameInWheel[] | null> {
+export type AwardableSpin = { namesInWheel: NameInWheel[]; winnerIndex: number | null };
+
+export async function findAwardableSpin(token: string, userId: string): Promise<AwardableSpin | null> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")
-        .select("names_in_wheel")
+        .select("names_in_wheel, winner_index")
         .eq("token", token)
         .eq("user_id", userId)
         .eq("used", false)
         .single();
     if (error || !data) return null;
-    return (data as { names_in_wheel: NameInWheel[] | null }).names_in_wheel ?? [];
+    const row = data as { names_in_wheel: NameInWheel[] | null; winner_index: number | null };
+    return { namesInWheel: row.names_in_wheel ?? [], winnerIndex: row.winner_index };
 }
 
 export async function markSpinTokenUsed(token: string): Promise<void> {

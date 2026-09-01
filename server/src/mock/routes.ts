@@ -36,11 +36,6 @@ mockRouter.post('/auth/signup', (req, res) => {
     return;
   }
 
-  if (findProfileByUsername(username)) {
-    res.status(409).json({ error: 'Dieser Username ist bereits vergeben' });
-    return;
-  }
-
   const id = randomUUID();
   createProfile({ id, email, username, suffix: nextFreeSuffix(username), date_of_birth: date_of_birth ?? null, password });
 
@@ -79,10 +74,6 @@ mockRouter.post('/profile', (req, res) => {
   if (findProfile(id)) {
     // already created during signup – silent no-op
     res.status(409).json({ error: 'Already exists' });
-    return;
-  }
-  if (findProfileByUsername(username)) {
-    res.status(409).json({ error: 'Dieser Username ist bereits vergeben' });
     return;
   }
   const profile = createProfile({ id, username, suffix: nextFreeSuffix(username), email, date_of_birth: date_of_birth ?? null, password: '' });

@@ -67,15 +67,11 @@ export async function getUserIdByUsername(displayName: string): Promise<string |
     return (data as { id: string }).id;
 }
 
-export async function isUsernameTaken(username: string): Promise<boolean> {
-    const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("id")
-        .ilike("username", username.trim())
-        .limit(1);
-
-    if (error) throw error;
-    return Array.isArray(data) && data.length > 0;
+export async function isUsernameTaken(_username: string): Promise<boolean> {
+    // Gleiche Usernames sind erlaubt; die Eindeutigkeit ist über
+    // (lower(username), suffix) definiert. Deshalb muss kein globaler
+    // Username-Block mehr greifen.
+    return false;
 }
 
 async function getNextFreeSuffix(username: string): Promise<number> {

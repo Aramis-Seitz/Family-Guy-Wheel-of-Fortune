@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { ensureDefaultAssets, getUserCoins, getUserProfile, registerUser } from "../services/user-service";
-import { isUsernameTaken } from "../repositories/profile-repository";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {

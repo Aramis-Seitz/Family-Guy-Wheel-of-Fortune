@@ -39,7 +39,7 @@ function nextFreeSuffix(username: string): number {
     return takenSuffixes.length === 0 ? 0 : Math.max(...takenSuffixes) + 1;
 }
 
-export const isUsernameTaken: typeof Real.isUsernameTaken = async (_username) => {
+export const isUsernameTaken: typeof Real.isUsernameTaken = async () => {
     // Gleiche Usernames sind erlaubt; die Eindeutigkeit ergibt sich aus
     // username + suffix. Ein globaler Check wäre hier falsch.
     return false;

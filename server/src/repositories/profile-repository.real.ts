@@ -67,7 +67,7 @@ export async function getUserIdByUsername(displayName: string): Promise<string |
     return (data as { id: string }).id;
 }
 
-export async function isUsernameTaken(_username: string): Promise<boolean> {
+export async function isUsernameTaken(): Promise<boolean> {
     // Gleiche Usernames sind erlaubt; die Eindeutigkeit ist über
     // (lower(username), suffix) definiert. Deshalb muss kein globaler
     // Username-Block mehr greifen.

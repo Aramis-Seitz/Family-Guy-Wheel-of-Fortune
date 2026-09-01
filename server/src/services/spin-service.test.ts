@@ -66,8 +66,8 @@ describe("generateSpin", () => {
 
     it("resolves room players to their accounts and hand-typed names to null", async () => {
         await generateSpin(userId, ["spinner", "Brian", "Quagmire"], [
-            { id: userId, username: "spinner" },
-            { id: "guest-1", username: "Brian" },
+            { id: userId, username: "spinner", suffix: 0 },
+            { id: "guest-1", username: "Brian", suffix: 0 },
         ]);
 
         expect(insertSpinToken).toHaveBeenCalledWith(generatedUuid, userId, [

@@ -1,5 +1,5 @@
 import { optionalElement } from "../shared/dom-helpers";
-import { namesInWheelListState, ADD_NAME_REJECTION, MAX_ITEMS } from "../names/names-in-wheel-list-state";
+import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-state";
 import { isNameEditingLocked } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";

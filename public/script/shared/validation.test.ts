@@ -59,8 +59,16 @@ describe('validateName', () => {
         expect(result).toStrictEqual({ valid: false, code: "required" });
     });
 
+    it('should return valid for a player display name with a suffix', () => {
+        const name = "ValidName#01";
+
+        const result = validateName(name);
+
+        expect(result).toStrictEqual({ valid: true, value: name });
+    });
+
     it('should return invalid for a name that includes special characters', () => {
-        const name = "Invalid#Name";
+        const name = "Invalid$Name";
 
         const result = validateName(name);
 

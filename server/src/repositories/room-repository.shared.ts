@@ -1,4 +1,4 @@
-export type RoomPlayer = { id: string; username: string };
+export type RoomPlayer = { id: string; username: string; suffix: number };
 
 // Ein Rad-Eintrag, wie er beim Spin aufgelöst und am Spin-Token festgehalten
 // wird. userId === null heißt: der Name wurde von Hand in die

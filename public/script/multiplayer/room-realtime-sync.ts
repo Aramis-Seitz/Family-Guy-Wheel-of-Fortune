@@ -1,8 +1,10 @@
 import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { formatProfileName } from '../profile/profile-ui';
 
 interface RoomPlayer {
   username: string;
+  suffix: number;
 }
 
 interface RoomRow {
@@ -59,7 +61,7 @@ export function subscribeToRoom(
           const playersJson = JSON.stringify(updatedRoom.players);
           if (playersJson !== lastKnownPlayersJson) {
             lastKnownPlayersJson = playersJson;
-            onPlayersUpdate?.(updatedRoom.players.map((player) => player.username));
+            onPlayersUpdate?.(updatedRoom.players.map((player) => formatProfileName(player.username, player.suffix)));
           }
         }
 

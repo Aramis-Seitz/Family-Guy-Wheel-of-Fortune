@@ -12,13 +12,13 @@ export async function getActiveRoomForUser(userId: string): Promise<RoomData | n
     return data as RoomData | null;
 }
 
-export async function insertRoom(roomKey: string, hostId: string, hostUsername: string): Promise<void> {
+export async function insertRoom(roomKey: string, hostId: string, hostUsername: string, hostSuffix: number): Promise<void> {
     const { error } = await supabaseClient
         .from("rooms")
         .insert({
             room_key: roomKey,
             host_id: hostId,
-            players: [{ id: hostId, username: hostUsername }],
+            players: [{ id: hostId, username: hostUsername, suffix: hostSuffix }],
             names_in_wheel: []
         });
     if (error) throw error;

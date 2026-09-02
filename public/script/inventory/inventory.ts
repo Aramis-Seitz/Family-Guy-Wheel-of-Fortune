@@ -6,11 +6,13 @@ import { loadWheelCards, inventoryWheelGrid } from "./inventory-wheel-cards";
 import { initDeleteModal } from "./inventory-delete-modal";
 import { initSaveWheelModal } from "./inventory-save-wheel-modal";
 import { loadInventoryTabs, getActiveInventoryCategory, type InventoryCategory } from "./inventory-tabs";
+import { renderAchievementsTab } from "../achievements/achievement-ui";
 
 let currentOwnedAssets: Asset[] = [];
 
 export const inventoryModal = requiredElement<HTMLDialogElement>("inventory-modal");
 export const inventoryAssetGrid = requiredElement<HTMLElement>("inventory-modal-asset-grid");
+export const inventoryAchievementGrid = requiredElement<HTMLElement>("inventory-modal-achievement-grid");
 
 const inventoryBtn = requiredElement<HTMLButtonElement>("inventory-btn");
 const inventoryCloseBtn = requiredElement<HTMLButtonElement>("inventory-modal-close-btn");
@@ -30,14 +32,20 @@ async function loadInventory(): Promise<void> {
 export function loadInventoryByCategory(): void {
   inventoryAssetGrid.innerHTML = "";
   inventoryWheelGrid.innerHTML = "";
+  inventoryAchievementGrid.innerHTML = "";
   const activeCategory = getActiveInventoryCategory();
   if (!activeCategory) return;
 
   const isWheel = activeCategory === "wheel";
-  inventoryWheelGrid.style.display = isWheel ? "" : "none";
-  inventoryAssetGrid.style.display = isWheel ? "none" : "";
+  const isAchievements = activeCategory === "achievements";
 
-  isWheel ? loadWheelCards() : renderOwnedAssetCards(activeCategory);
+  inventoryWheelGrid.style.display = isWheel ? "" : "none";
+  inventoryAchievementGrid.style.display = isAchievements ? "" : "none";
+  inventoryAssetGrid.style.display = !isWheel && !isAchievements ? "" : "none";
+
+  if (isWheel) loadWheelCards();
+  else if (isAchievements) renderAchievementsTab(inventoryAchievementGrid);
+  else renderOwnedAssetCards(activeCategory);
 }
 
 export function filterAssetsByCategory(category: InventoryCategory): Asset[] {

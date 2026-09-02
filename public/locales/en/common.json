@@ -47,13 +47,17 @@
         "spin": {
             "randomFailed": "Could not start the spin.",
             "awardFailed": "Could not award coins."
+        },
+        "achievements": {
+            "loadFailed": "Could not load achievements."
         }
     },
     "categories": {
         "all": "All",
         "wheel": "Wheels",
         "sound": "Sounds",
-        "companion": "Companions"
+        "companion": "Companions",
+        "achievements": "Achievements"
     },
     "room": {
         "host": "Host",
@@ -118,6 +122,21 @@
     },
     "wheel": {
         "removed": "\"{{name}}\" removed from the wheel."
+    },
+    "achievements": {
+        "unlockedTitle": "Achievement unlocked!",
+        "spin_10": {
+            "title": "First Spins"
+        },
+        "spin_50": {
+            "title": "Spin Pro"
+        },
+        "shop_purchase_1": {
+            "title": "First Purchase"
+        },
+        "coins_total_100": {
+            "title": "Coin Collector"
+        }
     },
     "a11y": {
         "close": "Close",

@@ -13,7 +13,6 @@ import { initRoomUnloadGuard, redirectIfNoSession } from "../multiplayer/room-se
 import { activeRoomKey } from "../multiplayer/room-state";
 import { initRoomButtons, initAddNameInput, enableRoomButtons } from "../multiplayer/room-buttons";
 import { setMyUsername } from "../multiplayer/room-orchestration";
-import { formatProfileName } from "../profile/profile-ui";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 import { localizeHtmlElements } from "./html-localization";
@@ -21,6 +20,8 @@ import { initI18n, t } from "./i18n";
 import { initLanguageSwitcher } from "./language-switcher";
 import { initTheme } from "./theme";
 import { showLoadingScreenFor } from "./loading-screen";
+import { subscribeToAchievementUnlocks, fetchAchievements } from "../achievements/achievement-service";
+import { showAchievementUnlockModal } from "../achievements/achievement-ui";
 
 
 function initMobileMenu(): void {
@@ -72,6 +73,16 @@ function initMobileMenu(): void {
   });
 }
 
+async function initAchievementUnlockListener(): Promise<void> {
+  await subscribeToAchievementUnlocks(async (achievementId) => {
+    const achievements = await fetchAchievements();
+    const unlocked = achievements.find(achievement => achievement.id === achievementId);
+    if (unlocked) {
+      showAchievementUnlockModal({ ...unlocked, unlocked_at: new Date().toISOString() });
+    }
+  });
+}
+
 async function initApp(): Promise<void> {
   await initI18n();
   localizeHtmlElements();
@@ -89,10 +100,12 @@ async function initApp(): Promise<void> {
   initShareFeature();
   initAuthChannelListener();
   await initProfileUI();
-  const profileState = profileData.getState();
-  setMyUsername(profileState.username
-    ? formatProfileName(profileState.username.trim(), profileState.suffix)
-    : t("generic.anonymous"));
+  setMyUsername(profileData.getState().username?.trim() || t("generic.anonymous"));
+  try {
+    await initAchievementUnlockListener();
+  } catch (error) {
+    console.error("[ACHIEVEMENTS] Realtime-Subscription fehlgeschlagen:", error);
+  }
   await profileData.ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();

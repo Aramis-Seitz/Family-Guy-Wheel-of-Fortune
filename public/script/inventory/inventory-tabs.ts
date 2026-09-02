@@ -5,7 +5,7 @@ import { loadInventoryByCategory } from "./inventory";
 import { renderCategoryTabs, getActiveCategory } from "../shared/category-tabs";
 import { t } from "../app/i18n";
 
-export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES] as const;
+export const INVENTORY_CATEGORIES: string[] = ["wheel", ...ASSET_CATEGORIES, "achievements"] as const;
 export type InventoryCategory = typeof INVENTORY_CATEGORIES[number];
 
 const inventoryTabs = requiredElement<HTMLElement>("inventory-modal-tabs");

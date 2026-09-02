@@ -19,6 +19,8 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
 export async function addCoins(userId: string, amount: number): Promise<number> {
     const currentCoins = await getCoinsByUserId(userId);
     const newBalance = currentCoins + amount;
+    // Löst per DB-Trigger (supabase/migrations/26_achievement_progress_triggers.sql)
+    // den "coins_total"-Achievement-Fortschritt aus.
     await updateCoinsByUserId(userId, newBalance);
     return newBalance;
 }

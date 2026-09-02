@@ -28,7 +28,7 @@ export function hideWinnerModal(): void {
 
 const confettiCanvas = requiredElement<HTMLCanvasElement>("winner-modal-confetti-canvas");
 
-function startConfetti(): void {
+export function startConfetti(): void {
   if (!confettiCanvas) return;
 
   const ctx = confettiCanvas.getContext("2d");

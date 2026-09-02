@@ -1,0 +1,144 @@
+import type { AchievementWithProgress, UnlockedAchievement } from "shared";
+import { fetchAchievements } from "./achievement-service";
+import { startConfetti } from "../wheel/winner";
+import { requiredElement } from "../shared/dom-helpers";
+import { t } from "../app/i18n";
+
+function achievementTitle(key: string): string {
+    return t(`achievements.${key}.title`, { defaultValue: key });
+}
+
+function createAchievementIcon(achievement: AchievementWithProgress): HTMLElement {
+    const iconWrapper = document.createElement("div");
+    iconWrapper.className = "inventory-modal__achievement-icon";
+
+    if (achievement.icon_url) {
+        const img = document.createElement("img");
+        img.src = achievement.icon_url;
+        img.alt = achievementTitle(achievement.key);
+        iconWrapper.appendChild(img);
+    } else {
+        iconWrapper.textContent = "🏆";
+    }
+
+    return iconWrapper;
+}
+
+function createAchievementProgressBar(achievement: AchievementWithProgress): HTMLElement {
+    const track = document.createElement("div");
+    track.className = "inventory-modal__achievement-progress-track";
+
+    const fill = document.createElement("div");
+    fill.className = "inventory-modal__achievement-progress-fill";
+    const percent = Math.min(100, Math.round((achievement.progress / achievement.target) * 100));
+    fill.style.width = `${percent}%`;
+    track.appendChild(fill);
+
+    return track;
+}
+
+function createAchievementCard(achievement: AchievementWithProgress): HTMLElement {
+    const card = document.createElement("div");
+    card.className = achievement.unlocked
+        ? "inventory-modal__achievement-card inventory-modal__achievement-card--unlocked"
+        : "inventory-modal__achievement-card inventory-modal__achievement-card--locked";
+
+    card.appendChild(createAchievementIcon(achievement));
+
+    const body = document.createElement("div");
+    body.className = "inventory-modal__achievement-body";
+
+    const title = document.createElement("p");
+    title.className = "inventory-modal__achievement-title";
+    title.textContent = achievementTitle(achievement.key);
+    body.appendChild(title);
+
+    body.appendChild(createAchievementProgressBar(achievement));
+
+    const progressLabel = document.createElement("p");
+    progressLabel.className = achievement.unlocked
+        ? "inventory-modal__achievement-progress-label"
+        : "inventory-modal__achievement-progress-label inventory-modal__achievement-progress-label--locked";
+    progressLabel.textContent = `${Math.min(achievement.progress, achievement.target)}/${achievement.target}`;
+    body.appendChild(progressLabel);
+
+    card.appendChild(body);
+
+    if (achievement.unlocked) {
+        const badge = document.createElement("span");
+        badge.className = "inventory-modal__achievement-badge";
+        badge.textContent = "✓";
+        card.appendChild(badge);
+    }
+
+    return card;
+}
+
+export function renderAchievementsTab(container: HTMLElement): void {
+    container.innerHTML = "";
+    void loadAndRenderAchievements(container);
+}
+
+async function loadAndRenderAchievements(container: HTMLElement): Promise<void> {
+    try {
+        const achievements = await fetchAchievements();
+        achievements.forEach(achievement => container.appendChild(createAchievementCard(achievement)));
+    } catch (error) {
+        console.error("[ACHIEVEMENTS] Fehler beim Laden:", error);
+    }
+}
+
+// ── Unlock-Modal ──
+// Groß, mit Konfetti, muss manuell weggeklickt werden. Da Unlocks nur noch
+// über die Realtime-Subscription (main.ts) reinkommen, können mehrere davon
+// dicht hintereinander eintrudeln (z. B. Verbindungs-Nachzügler) - deshalb
+// eine Queue, die die Modals nacheinander statt übereinander zeigt.
+
+const unlockModal = requiredElement<HTMLDivElement>("achievement-unlock-modal");
+const unlockModalIcon = requiredElement<HTMLDivElement>("achievement-unlock-modal-icon");
+const unlockModalName = requiredElement<HTMLHeadingElement>("achievement-unlock-modal-name");
+const unlockModalCloseBtn = requiredElement<HTMLButtonElement>("achievement-unlock-modal-close-btn");
+
+const celebratedAchievementIds = new Set<string>();
+const unlockQueue: UnlockedAchievement[] = [];
+let unlockModalOpen = false;
+
+function renderUnlockModalIcon(achievement: UnlockedAchievement): void {
+    unlockModalIcon.innerHTML = "";
+    if (achievement.icon_url) {
+        const img = document.createElement("img");
+        img.src = achievement.icon_url;
+        img.alt = achievementTitle(achievement.key);
+        unlockModalIcon.appendChild(img);
+    } else {
+        unlockModalIcon.textContent = "🏆";
+    }
+}
+
+function showNextUnlockInQueue(): void {
+    if (unlockModalOpen) return;
+    const next = unlockQueue.shift();
+    if (!next) return;
+
+    unlockModalOpen = true;
+    renderUnlockModalIcon(next);
+    unlockModalName.textContent = achievementTitle(next.key);
+    unlockModal.classList.remove("hidden");
+    startConfetti();
+}
+
+function closeUnlockModal(): void {
+    unlockModal.classList.add("hidden");
+    unlockModalOpen = false;
+    showNextUnlockInQueue();
+}
+
+unlockModalCloseBtn.addEventListener("click", closeUnlockModal);
+
+export function showAchievementUnlockModal(achievement: UnlockedAchievement): void {
+    if (celebratedAchievementIds.has(achievement.id)) return;
+    celebratedAchievementIds.add(achievement.id);
+
+    unlockQueue.push(achievement);
+    showNextUnlockInQueue();
+}

@@ -63,6 +63,9 @@ export async function awardCoins(userId: string, spinToken: string): Promise<Awa
         throw new AppError("Invalid or already used spin token", 403);
     }
 
+    // Das Markieren des Tokens als "used" löst per DB-Trigger (siehe
+    // supabase/migrations/26_achievement_progress_triggers.sql) den
+    // "spin"-Achievement-Fortschritt für userId aus.
     await markSpinTokenUsed(spinToken);
 
     const spinnerCoins = getRandomSpinnerCoins();

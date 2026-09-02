@@ -75,25 +75,30 @@ describe("generateSpin", () => {
         expect(insertSpinToken).toHaveBeenCalledWith(generatedUuid, userId, expect.anything(), 2);
     });
 
-    it("resolves room players to their accounts and hand-typed names to no account", async () => {
-        const roomPlayers = [
-            { id: userId, username: "spinner" },
-            { id: "guest-1", username: "Brian" },
-        ];
+it("resolves room players to their accounts and hand-typed names to no account", async () => {
+    const roomPlayers = [
+        { id: userId, username: "spinner", suffix: 0 },
+        { id: "guest-1", username: "Brian", suffix: 0 },
+    ];
 
-        await generateSpin(userId, ["spinner", "Brian", "Quagmire"], spinParams, roomPlayers);
+    await generateSpin(
+        userId,
+        ["spinner", "Brian", "Quagmire"],
+        spinParams,
+        roomPlayers,
+    );
 
-        expect(insertSpinToken).toHaveBeenCalledWith(
-            generatedUuid,
-            userId,
-            [
-                { username: "spinner", userId },
-                { username: "Brian", userId: "guest-1" },
-                { username: "Quagmire", userId: null },
-            ],
-            expect.any(Number),
-        );
-    });
+    expect(insertSpinToken).toHaveBeenCalledWith(
+        generatedUuid,
+        userId,
+        [
+            { username: "spinner", userId },
+            { username: "Brian", userId: "guest-1" },
+            { username: "Quagmire", userId: null },
+        ],
+        expect.any(Number),
+    );
+});
 
     it("rejects a spin with fewer than two names without issuing a token", async () => {
         await expect(generateSpin(userId, ["solo"], spinParams)).rejects.toMatchObject({ statusCode: 400 });

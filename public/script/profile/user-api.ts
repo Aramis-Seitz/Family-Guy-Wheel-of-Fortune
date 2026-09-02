@@ -9,7 +9,7 @@ export async function getUserCoins(): Promise<number> {
     return CoinsResponseSchema.parse(rawBody).coins;
 }
 
-export async function getUserProfile(): Promise<{ username: string; coins: number } | null> {
+export async function getUserProfile(): Promise<{ username: string; suffix: number; coins: number } | null> {
     const userId = await getCurrentUserId();
     let rawBody: unknown;
     try {

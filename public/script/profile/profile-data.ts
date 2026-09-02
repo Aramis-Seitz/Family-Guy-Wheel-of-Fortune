@@ -4,6 +4,7 @@ import { getUserProfile, getUserCoins, ensureDefaultAssets as ensureDefaultAsset
 
 export interface UserProfileState {
     username: string | null;
+    suffix: number;
     coins: number;
     isAuthenticated: boolean;
 }
@@ -13,6 +14,7 @@ type ProfileDataListener = (state: UserProfileState) => void;
 export class ProfileData {
     private currentState: UserProfileState = {
         username: null,
+        suffix: 0,
         coins: 0,
         isAuthenticated: false,
     };
@@ -21,13 +23,14 @@ export class ProfileData {
     public async initializeProfile(): Promise<void> {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
         if (error || !session?.user) {
-            this.setState({ username: null, coins: 0, isAuthenticated: false });
+            this.setState({ username: null, suffix: 0, coins: 0, isAuthenticated: false });
             return;
         }
 
         const profile = await getUserProfile();
         this.setState({
             username: profile?.username ?? null,
+            suffix: profile?.suffix ?? 0,
             coins: profile?.coins ?? 0,
             isAuthenticated: true,
         });
@@ -42,7 +45,7 @@ export class ProfileData {
 
     public async signOut(): Promise<void> {
         await supabaseClient.auth.signOut();
-        this.setState({ username: null, coins: 0, isAuthenticated: false });
+        this.setState({ username: null, suffix: 0, coins: 0, isAuthenticated: false });
     }
 
     public async ensureDefaultAssets(): Promise<void> {

@@ -13,6 +13,7 @@ import { initRoomUnloadGuard, redirectIfNoSession } from "../multiplayer/room-se
 import { activeRoomKey } from "../multiplayer/room-state";
 import { initRoomButtons, initAddNameInput, enableRoomButtons } from "../multiplayer/room-buttons";
 import { setMyUsername } from "../multiplayer/room-orchestration";
+import { formatProfileName } from "../profile/profile-ui";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 import { localizeHtmlElements } from "./html-localization";
@@ -88,7 +89,10 @@ async function initApp(): Promise<void> {
   initShareFeature();
   initAuthChannelListener();
   await initProfileUI();
-  setMyUsername(profileData.getState().username?.trim() || t("generic.anonymous"));
+  const profileState = profileData.getState();
+  setMyUsername(profileState.username
+    ? formatProfileName(profileState.username.trim(), profileState.suffix)
+    : t("generic.anonymous"));
   await profileData.ensureDefaultAssets();
   await applyActiveAssets();
   initInventory();

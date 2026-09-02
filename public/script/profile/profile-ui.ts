@@ -1,5 +1,5 @@
 import { optionalElement } from "../shared/dom-helpers";
-import { namesInWheelListState, ADD_NAME_REJECTION, MAX_ITEMS } from "../names/names-in-wheel-list-state";
+import { namesInWheelListState, MAX_ITEMS } from "../names/names-in-wheel-list-state";
 import { isNameEditingLocked } from "../names/names-in-wheel-list";
 import { isSpinning } from "../wheel/spin";
 import { showToast } from "../shared/toast";
@@ -14,6 +14,10 @@ import { profileData, type UserProfileState } from "./profile-data";
 export const profileName = optionalElement<HTMLSpanElement>("user-profile-name");
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");
 export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
+
+export function formatProfileName(username: string, suffix: number): string {
+  return `${username}#${String(suffix).padStart(2, "0")}`;
+}
 
 let initialized = false;
 
@@ -31,7 +35,9 @@ function applyCoinDisplay(coins: number): void {
 
 function applyAuthenticatedState(state: UserProfileState): void {
   if (!profileName || !authButton) return;
-  profileName.textContent = state.username ?? t("profile.loggedIn");
+  profileName.textContent = state.username
+    ? formatProfileName(state.username, state.suffix)
+    : t("profile.loggedIn");
   applyCoinDisplay(state.coins);
 
   profileName.classList.add("user-profile-name--clickable");
@@ -50,19 +56,15 @@ function render(state: UserProfileState): void {
 
 function bindProfileActions(): void {
   profileName?.addEventListener("click", () => {
-    const username = profileData.getState().username;
+    const state = profileData.getState();
+    const username = state.username;
     if (!username || isNameEditingLocked() || isSpinning()) return;
-    const addResult = namesInWheelListState.addNameToWheelList(username);
-    if (!addResult.added) {
-      showToast({
-        message: addResult.code === ADD_NAME_REJECTION.DUPLICATE
-          ? t("names.duplicate", { name: username })
-          : t("profile.maxItems", { max: MAX_ITEMS }),
-        type: "error",
-      });
+    const displayName = formatProfileName(username, state.suffix);
+    if (!namesInWheelListState.addNameToWheelList(displayName)) {
+      showToast({ message: t("profile.maxItems", { max: MAX_ITEMS }), type: "error" });
       return;
     }
-    showToast({ message: t("profile.added", { username }), type: "success" });
+    showToast({ message: t("profile.added", { username: displayName }), type: "success" });
   });
 
   authButton?.addEventListener("click", () => {

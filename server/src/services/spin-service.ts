@@ -21,12 +21,6 @@ function getRandomWinnerCoins(): number {
     return getSecureRandomNumber(3, 6);
 }
 
-// Ordnet jedem Namen auf dem Rad genau einmal die Account-UUID zu, die dazu
-// gehört — im Multiplayer über die Mitspielerliste des Raums (Host und Gäste
-// sind dort gleichermaßen echte User), im Solo-Modus nur den Spinner selbst.
-// Alles andere ist ein von Hand eingetragener Name ohne Account: userId null.
-// Bewusst hier und nicht erst beim Award, damit die Zuordnung an dem Rad hängt,
-// das tatsächlich gedreht wurde, und der Client sie nicht mitschicken muss.
 function resolveNamesInWheel(names: string[], accountsByUsername: Map<string, string>): NameInWheel[] {
     return names.map((username) => ({
         username,
@@ -47,6 +41,7 @@ export async function generateSpin(
 
     const spinnerProfile = await getUserProfile(userId);
     const accountsByUsername = new Map<string, string>(roomPlayers.map((player) => [player.username, player.id]));
+
     if (spinnerProfile?.username) {
         accountsByUsername.set(spinnerProfile.username, userId);
     }
@@ -71,7 +66,12 @@ export async function awardCoins(userId: string, spinToken: string): Promise<Awa
 
     const spinnerCoins = getRandomSpinnerCoins();
     const spinnerProfile = await getUserProfile(userId);
-    const spinnerName = spinnerProfile?.username ?? userId;
+    const spinnerName = spinnerProfile
+        ? formatDisplayName(
+            spinnerProfile.username,
+            spinnerProfile.suffix
+        )
+        : userId;
 
     const winner = spin.winnerIndex === null ? undefined : spin.namesInWheel[spin.winnerIndex];
     if (!winner) {
@@ -84,12 +84,23 @@ export async function awardCoins(userId: string, spinToken: string): Promise<Awa
     if (spinnerIsWinner) {
         const winnerCoins = getRandomWinnerCoins();
         await addCoins(userId, spinnerCoins + winnerCoins);
-        console.log(`[coins] ${spinnerName} hat selbst gewonnen → +${spinnerCoins + winnerCoins} Coins`);
-        return { spinnerCoins, winnerCoins, total: spinnerCoins + winnerCoins };
+
+        console.log(
+            `[coins] ${spinnerName} hat selbst gewonnen → +${spinnerCoins + winnerCoins} Coins`
+        );
+
+        return {
+            spinnerCoins,
+            winnerCoins,
+            total: spinnerCoins + winnerCoins
+        };
     }
 
     await addCoins(userId, spinnerCoins);
-    console.log(`[coins] Spinner: ${spinnerName} → +${spinnerCoins} Coins`);
+
+    console.log(
+        `[coins] Spinner: ${spinnerName} → +${spinnerCoins} Coins`
+    );
 
     if (winnerUserId) {
         const winnerCoins = getRandomWinnerCoins();

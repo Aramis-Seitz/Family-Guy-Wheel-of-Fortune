@@ -11,7 +11,9 @@ export const NAME_VALIDATION_ERROR = {
 export type NameValidationErrorCode =
   (typeof NAME_VALIDATION_ERROR)[keyof typeof NAME_VALIDATION_ERROR];
 
-const NAME_PATTERN = /^[A-Za-z0-9']+$/;
+// Muss mit WHEEL_NAME_PATTERN in server/src/services/room-service.ts übereinstimmen.
+// '#' ist erlaubt, weil Spielernamen als "username#suffix" in der Namensliste landen.
+const NAME_PATTERN = /^[A-Za-z0-9'#]+$/;
 
 // Muss mit dem maxlength-Attribut der Name-Inputs in main.html übereinstimmen.
 export const MAX_NAME_LENGTH = 20;

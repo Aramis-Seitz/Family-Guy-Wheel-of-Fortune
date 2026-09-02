@@ -1,5 +1,5 @@
 import { supabaseClient } from "../lib/supabase-client";
-import type { RoomPlayer, RoomData } from "./room-repository.shared";
+import type { RoomPlayer, RoomData, NameInWheel } from "./room-repository.shared";
 
 export async function getActiveRoomForUser(userId: string): Promise<RoomData | null> {
     const { data, error } = await supabaseClient
@@ -12,13 +12,13 @@ export async function getActiveRoomForUser(userId: string): Promise<RoomData | n
     return data as RoomData | null;
 }
 
-export async function insertRoom(roomKey: string, hostId: string, hostUsername: string): Promise<void> {
+export async function insertRoom(roomKey: string, hostId: string, hostUsername: string, hostSuffix: number): Promise<void> {
     const { error } = await supabaseClient
         .from("rooms")
         .insert({
             room_key: roomKey,
             host_id: hostId,
-            players: [{ id: hostId, username: hostUsername }],
+            players: [{ id: hostId, username: hostUsername, suffix: hostSuffix }],
             names_in_wheel: []
         });
     if (error) throw error;
@@ -85,10 +85,10 @@ export async function clearRoomPlayers(roomKey: string): Promise<void> {
     if (error) throw error;
 }
 
-export async function updateRoomSpin(roomKey: string, lastSpin: number, spunAt: string, direction: string): Promise<void> {
+export async function updateRoomSpin(roomKey: string, lastSpin: number, spunAt: string, direction: string, winner: string): Promise<void> {
     const { error } = await supabaseClient
         .from("rooms")
-        .update({ last_spin: lastSpin, spun_at: spunAt, spin_direction: direction })
+        .update({ last_spin: lastSpin, spun_at: spunAt, spin_direction: direction, spin_winner: winner })
         .eq("room_key", roomKey);
     if (error) throw error;
 }
@@ -112,25 +112,29 @@ export async function updateRoomReset(roomKey: string, closeWinnerModal: boolean
     if (error) throw error;
 }
 
-export async function insertSpinToken(token: string, userId: string): Promise<string> {
+export async function insertSpinToken(token: string, userId: string, namesInWheel: NameInWheel[], winnerIndex: number | null): Promise<string> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")
-        .insert({ token, user_id: userId, used: false })
+        .insert({ token, user_id: userId, used: false, names_in_wheel: namesInWheel, winner_index: winnerIndex })
         .select("token")
         .single();
     if (error) throw error;
     return (data as { token: string }).token;
 }
 
-export async function findValidSpinToken(token: string, userId: string): Promise<boolean> {
+export type AwardableSpin = { namesInWheel: NameInWheel[]; winnerIndex: number | null };
+
+export async function findAwardableSpin(token: string, userId: string): Promise<AwardableSpin | null> {
     const { data, error } = await supabaseClient
         .from("spin_tokens")
-        .select("token")
+        .select("names_in_wheel, winner_index")
         .eq("token", token)
         .eq("user_id", userId)
         .eq("used", false)
         .single();
-    return !error && !!data;
+    if (error || !data) return null;
+    const row = data as { names_in_wheel: NameInWheel[] | null; winner_index: number | null };
+    return { namesInWheel: row.names_in_wheel ?? [], winnerIndex: row.winner_index };
 }
 
 export async function markSpinTokenUsed(token: string): Promise<void> {

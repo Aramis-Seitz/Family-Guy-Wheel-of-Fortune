@@ -1,8 +1,8 @@
 import { playTickSound, playDrumRoll, stopDrumRoll, playCymbalCrash } from "./sound";
-import { fetchRandomNumber } from "../api/spin-api";
+import { requestSpin } from "../api/spin-api";
 import { getNamesInWheelList, input, addBtn, getRemoveBtn, isNameEditingLocked } from "../names/names-in-wheel-list";
+import { getSegmentIndex } from "./winner-logic";
 import { announceWinner } from "./winner";
-import { resolveWinner, getSegmentIndex } from "./winner-logic";
 import { getMultiplier, multiplierButton } from "./multiplier";
 import { wheelElement } from "./renderer";
 import { bulkAddToWheelBtn, getPlayerToggleButtons } from "../multiplayer/room-players-sidebar";
@@ -104,6 +104,7 @@ export interface SpinConfig {
   totalSteps: number;
   spinToken: string;
   names: string[];
+  winnerName: string;
 }
 
 function finishSpin(config: SpinConfig): void {
@@ -111,7 +112,7 @@ function finishSpin(config: SpinConfig): void {
   stopDrumRoll();
   playCymbalCrash();
   applyGameModeLock();
-  announceWinner(config.spinToken, resolveWinner(currentRotation, config.names));
+  announceWinner(config.spinToken, config.winnerName);
 }
 
 export const DRUMROLL_LEAD_IN_STEPS: number = 321;
@@ -152,7 +153,7 @@ function animateSpin(direction: Direction, config: SpinConfig): void {
 
 export const MIN_SPIN_ROTATIONS: number = 5 * 360;
 
-export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[]): void {
+export function spinWheel(totalSteps: number, direction: Direction, spinToken: string, names: string[], winnerName: string): void {
   spinCancelled = false;
   if (names.length < MIN_ITEMS) {
     spinning = false;
@@ -166,6 +167,7 @@ export function spinWheel(totalSteps: number, direction: Direction, spinToken: s
     totalSteps: clampedSteps,
     spinToken,
     names,
+    winnerName,
   };
 
   animateSpin(direction, config);
@@ -179,8 +181,8 @@ export async function spinWheelWithRandomSteps(direction: Direction): Promise<vo
 
   try {
     const multiplier = getMultiplier();
-    const { ranNum: rawSteps, spinToken } = await fetchRandomNumber(names, currentRotation, direction, multiplier);
-    spinWheel(Math.round(MIN_SPIN_ROTATIONS * multiplier) + rawSteps, direction, spinToken, names);
+    const { ranNum: rawSteps, spinToken, winnerName } = await requestSpin(names, currentRotation, direction, multiplier);
+    spinWheel(Math.round(MIN_SPIN_ROTATIONS * multiplier) + rawSteps, direction, spinToken, names, winnerName);
   } catch (error) {
     console.error("[SPIN] Fehler beim Spin:", error);
     applyGameModeLock();

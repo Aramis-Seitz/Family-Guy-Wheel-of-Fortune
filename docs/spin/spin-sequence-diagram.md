@@ -8,12 +8,13 @@ sequenceDiagram
 
     User->>Client: Spin-Button klicken
     Client->>Server: POST /api/spins
-    Server-->>Client: rawSteps (0–359°), spinToken
+    Note over Server: Gewinner bestimmen, am Spin-Token festhalten
+    Server-->>Client: ranNum (0–359°), spinToken, winnerName
 
-    Note over Client: totalSteps = round(1800 × mult) + rawSteps<br/>Animation läuft (rAF-Loop)
+    Note over Client: totalSteps = round(1800 × mult) + ranNum<br/>Animation läuft (rAF-Loop)
 
-    Client->>Server: POST /api/spins/:spinToken/award
-    Server-->>Client: Coins vergeben
+    Client->>Server: POST /api/spins/:spinToken/award (nur Token)
+    Server-->>Client: Coins vergeben (Gewinner aus dem Token)
 
     Client->>User: Gewinner-Modal anzeigen
     User->>Client: Modal schließen

@@ -116,6 +116,7 @@
         "tooLong": "Der Name darf höchstens {{max}} Zeichen lang sein.",
         "invalid": "Ungültige Eingabe.",
         "maxItems": "Maximal {{max}} Einträge erlaubt.",
+        "duplicate": "Der Name \"{{name}}\" ist bereits auf dem Rad.",
         "copySuccess": "Link kopiert.",
         "copyFailed": "Der Link konnte nicht kopiert werden."
     },

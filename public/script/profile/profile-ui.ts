@@ -15,6 +15,10 @@ export const profileName = optionalElement<HTMLSpanElement>("user-profile-name")
 export const authButton = optionalElement<HTMLButtonElement>("auth-button");
 export const coinDisplay = optionalElement<HTMLSpanElement>("user-coin-display");
 
+export function formatProfileName(username: string, suffix: number): string {
+  return `${username}#${String(suffix).padStart(2, "0")}`;
+}
+
 let initialized = false;
 
 function applyUnauthenticatedState(): void {
@@ -31,7 +35,9 @@ function applyCoinDisplay(coins: number): void {
 
 function applyAuthenticatedState(state: UserProfileState): void {
   if (!profileName || !authButton) return;
-  profileName.textContent = state.username ?? t("profile.loggedIn");
+  profileName.textContent = state.username
+    ? formatProfileName(state.username, state.suffix)
+    : t("profile.loggedIn");
   applyCoinDisplay(state.coins);
 
   profileName.classList.add("user-profile-name--clickable");
@@ -50,13 +56,15 @@ function render(state: UserProfileState): void {
 
 function bindProfileActions(): void {
   profileName?.addEventListener("click", () => {
-    const username = profileData.getState().username;
+    const state = profileData.getState();
+    const username = state.username;
     if (!username || isNameEditingLocked() || isSpinning()) return;
-    if (!namesInWheelListState.addNameToWheelList(username)) {
+    const displayName = formatProfileName(username, state.suffix);
+    if (!namesInWheelListState.addNameToWheelList(displayName)) {
       showToast({ message: t("profile.maxItems", { max: MAX_ITEMS }), type: "error" });
       return;
     }
-    showToast({ message: t("profile.added", { username }), type: "success" });
+    showToast({ message: t("profile.added", { username: displayName }), type: "success" });
   });
 
   authButton?.addEventListener("click", () => {

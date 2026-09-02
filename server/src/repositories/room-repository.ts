@@ -15,8 +15,9 @@ export const updateRoomSpin = impl.updateRoomSpin;
 export const updateRoomMultiplier = impl.updateRoomMultiplier;
 export const updateRoomReset = impl.updateRoomReset;
 export const insertSpinToken = impl.insertSpinToken;
-export const findValidSpinToken = impl.findValidSpinToken;
+export const findAwardableSpin = impl.findAwardableSpin;
 export const markSpinTokenUsed = impl.markSpinTokenUsed;
 export const deleteRoomByKey = impl.deleteRoomByKey;
 
-export type { RoomPlayer, RoomData } from "./room-repository.shared";
+export type { AwardableSpin } from "./room-repository.real";
+export type { RoomPlayer, RoomData, NameInWheel } from "./room-repository.shared";

@@ -1,8 +1,10 @@
 import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { formatProfileName } from '../profile/profile-ui';
 
 interface RoomPlayer {
   username: string;
+  suffix: number;
 }
 
 interface RoomRow {
@@ -12,6 +14,7 @@ interface RoomRow {
   names_in_wheel?: string[];
   multiplier: number;
   spin_direction: string | null;
+  spin_winner?: string | null;
   wheel_reset_at?: string | null;
   winner_modal_close_at?: string | null;
 }
@@ -25,7 +28,7 @@ let lastKnownWinnerModalCloseAt = '';
 
 export function subscribeToRoom(
   roomKey: string,
-  onSpin: (extraRotationDegrees: number, multiplier: number, direction: string) => void,
+  onSpin: (extraRotationDegrees: number, multiplier: number, direction: string, winnerName: string) => void,
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
@@ -59,7 +62,7 @@ export function subscribeToRoom(
           const playersJson = JSON.stringify(updatedRoom.players);
           if (playersJson !== lastKnownPlayersJson) {
             lastKnownPlayersJson = playersJson;
-            onPlayersUpdate?.(updatedRoom.players.map((player) => player.username));
+            onPlayersUpdate?.(updatedRoom.players.map((player) => formatProfileName(player.username, player.suffix)));
           }
         }
 
@@ -101,7 +104,7 @@ export function subscribeToRoom(
         const ageMs = Date.now() - new Date(updatedRoom.spun_at).getTime();
         if (ageMs > 5000) return;
 
-        onSpin(updatedRoom.last_spin, newMultiplier, updatedRoom.spin_direction ?? 'right');
+        onSpin(updatedRoom.last_spin, newMultiplier, updatedRoom.spin_direction ?? 'right', updatedRoom.spin_winner ?? '');
 
       },
     )

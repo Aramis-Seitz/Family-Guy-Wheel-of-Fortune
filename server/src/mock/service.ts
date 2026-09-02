@@ -19,7 +19,7 @@ export function createMockServiceClient() {
             user: {
               id: decoded.id,
               email: decoded.email,
-              user_metadata: { username: decoded.username, date_of_birth: profile.date_of_birth },
+              user_metadata: { username: decoded.username, suffix: profile.suffix, date_of_birth: profile.date_of_birth },
             },
           },
           error: null,

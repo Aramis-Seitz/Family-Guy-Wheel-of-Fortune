@@ -3,7 +3,7 @@ import type { Direction } from "../wheel/spin";
 import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 
-export async function fetchRandomNumber(
+export async function requestSpin(
   names: string[],
   currentRotation: number,
   direction: Direction,
@@ -29,14 +29,14 @@ export async function fetchRandomNumber(
   return data;
 }
 
-export async function awardCoins(spinToken: string, winnerName: string): Promise<AwardCoinsResponseBody | null> {
+export async function awardCoins(spinToken: string): Promise<AwardCoinsResponseBody | null> {
   if (!spinToken) return null;
 
   const accessToken = await getAccessToken();
   if (!accessToken) return null;
 
   try {
-    const rawBody = await postJson(`/api/spins/${spinToken}/award`, { winnerName }, {
+    const rawBody = await postJson(`/api/spins/${spinToken}/award`, {}, {
       token: accessToken,
       errorFallbackKey: "api.spin.awardFailed"
     });

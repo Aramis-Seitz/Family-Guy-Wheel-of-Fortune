@@ -13,6 +13,7 @@ import { initRoomUnloadGuard, redirectIfNoSession } from "../multiplayer/room-se
 import { activeRoomKey } from "../multiplayer/room-state";
 import { initRoomButtons, initAddNameInput, enableRoomButtons } from "../multiplayer/room-buttons";
 import { setMyUsername } from "../multiplayer/room-orchestration";
+import { formatProfileName } from "../profile/profile-ui";
 import { initShop } from "../shop/shop";
 import { initAuthChannelListener } from "../shared/auth-channel";
 import { localizeHtmlElements } from "./html-localization";

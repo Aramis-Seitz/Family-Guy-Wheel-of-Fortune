@@ -15,4 +15,5 @@ export type RoomData = {
     spun_at?: string | null;
     multiplier?: number | null;
     spin_direction?: string | null;
+    spin_winner?: string | null;
 };

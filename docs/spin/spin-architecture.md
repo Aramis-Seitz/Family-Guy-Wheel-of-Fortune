@@ -7,10 +7,11 @@
 | `wheel/spin.ts` | rAF-Animationsloop, Button-Lock, Reset |
 | `wheel/multiplier.ts` | Multiplier-Slider: lesen, setzen, anzeigen |
 | `wheel/renderer.ts` | SVG-Generierung (einmalig beim Namen-Update) |
-| `wheel/winner-logic.ts` | Reine Gewinner-Berechnung (`resolveWinner`, `getSegmentIndex`) — keine DOM-Abhängigkeit |
-| `wheel/winner.ts` | Modal, Confetti, Coin-Vergabe |
+| `wheel/winner-logic.ts` | `getSegmentIndex()` für den Tick-Sound — keine DOM-Abhängigkeit. Den Gewinner bestimmt der Server. |
+| `wheel/winner.ts` | Modal, Confetti, Coin-Vergabe (Anzeige des vom Server gelieferten Namens) |
 | `wheel/sound.ts` | Web Audio API: Tick, Drumroll, Cymbal, Asset-Sound |
 | `api/client-api.ts` | `/api/random` (Landungswinkel holen), `/api/award-coins` |
+| `server/lib/wheel-winner.ts` | Serverseitige Gewinner-Bestimmung: `getSegmentIndex()` + `resolveSpinWinner()` |
 
 ---
 
@@ -27,15 +28,18 @@
 │                spin.ts: spinWheelWithRandomSteps()              │
 │  1. lockSpinButtons()                                           │
 │  2. names = getNames()  ← Snapshot für diesen Spin              │
-│  3. fetchRandomNumber(names, currentRotation, dir, multiplier)  │
+│  3. requestSpin(names, currentRotation, dir, multiplier)        │
 └──────────────────────────┬──────────────────────────────────────┘
-                           │  POST /api/random
+                           │  POST /api/spins
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │              Server: generateSpin()                             │
-│  rawSteps  = crypto.randomInt(0, 359)   ← Landungswinkel        │
-│  spinToken = randomUUID()  → in DB gespeichert                  │
-│  ← { ranNum: rawSteps, spinToken }                              │
+│  rawSteps = crypto.randomInt(0, 359)   ← roher Landungswinkel   │
+│  resolveSpinWinner(rawSteps, multiplier, direction, segmentCount)│
+│    → winnerIndex  (Zeiger bei 270°, Abstand zur Segmentgrenze)  │
+│    → ggf. leicht verschobener Landungswinkel                    │
+│  spinToken = randomUUID()  → mit winnerIndex + Rad in DB        │
+│  ← { ranNum: rawSteps, spinToken, winnerName }                  │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
@@ -62,15 +66,16 @@
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│    winner-logic.ts: resolveWinner()  →  winner.ts: announceWinner() │
-│  segmentIndex = getSegmentIndex(rotation, names.length)         │
-│    pointerAngle = (270° − rotation) mod 360                     │
-│    segmentIndex = floor(pointerAngle / stepAngle) mod count     │
-│  winnerName   = config.names[segmentIndex]  ← aus Snapshot      │
-│                                                                 │
-│  → Modal anzeigen, Confetti, POST /api/award-coins              │
+│                winner.ts: announceWinner()                      │
+│  winnerName = config.winnerName   ← vom Server geliefert        │
+│  → Modal anzeigen, Confetti                                     │
+│  → POST /api/spins/:spinToken/award   (nur der Token!)          │
+│      Server liest winnerIndex aus dem Spin-Token und bucht      │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+Der Client rechnet den Gewinner **nicht** mehr selbst aus. `getSegmentIndex()` im
+Client dient nur noch dem Tick-Sound (`hasEnteredNewSegment`).
 
 ---
 
@@ -78,11 +83,18 @@
 
 ```
 Server:  rawSteps = crypto.randomInt(0, 359)
-Client:  totalSteps = round(1800 × multiplier) + rawSteps
-         → rawSteps bestimmt den Landungswinkel
-         → 1800° stellt sicher, dass mehrere volle Umdrehungen stattfinden
-         → resolveWinner() liest ab, welches Segment am Zeiger liegt
+         resolveSpinWinner() bildet daraus den Landewinkel
+           rotation = sign · (round(1800 × multiplier) + rawSteps)   (Startwinkel 0)
+           → getSegmentIndex(rotation, n) = Segment unter dem Zeiger (270°)
+           → rawSteps wird minimal verschoben, falls der Zeiger zu nah an
+             einer Segmentgrenze läge (Animations-Nachlauf < 0.5°)
+         winnerIndex wird am Spin-Token festgehalten, rawSteps geht als ranNum zurück
+Client:  totalSteps = round(1800 × multiplier) + ranNum   (identische Formel)
+         → animiert nur; der Endwinkel liegt sicher im Segment des Servers
 ```
+
+Die Easing-Kurve bestimmt nur den Weg, nicht den Endwinkel — der Server muss sie
+daher nicht kennen.
 
 ---
 
@@ -116,10 +128,11 @@ interface SpinConfig {
   totalSteps: number;    // Gesamtdistanz der Animation
   spinToken: string;     // signierter Token für Coin-Vergabe
   names: string[];       // Snapshot beim Spin-Start — nicht live
+  winnerName: string;    // vom Server bestimmt, nur zur Anzeige
 }
 ```
 
-`names` wird beim Spin-Start eingefroren. Ändert sich die Name-Liste während des Spins (z.B. via Room-Sync), bleibt die Gewinner-Berechnung konsistent.
+`names` wird beim Spin-Start eingefroren. Ändert sich die Name-Liste während des Spins (z.B. via Room-Sync), bleibt die Animation konsistent.
 
 `direction` wird bewusst **nicht** in `SpinConfig` gehalten — es wird nur einmalig in `animateSpin()` gebraucht, um das Vorzeichen der Animationsgeschwindigkeit festzulegen, und deshalb als eigener Parameter übergeben statt im langlebigen Config-Objekt mitgeschleppt. `stepAngle`/`segmentCount` entfallen ebenfalls — beide waren immer aus `names.length` ableitbar (`360 / names.length`) und werden jetzt bei Bedarf direkt in `winner-logic.ts` (`getSegmentIndex`) berechnet, statt redundant in der Config vorgehalten zu werden.
 

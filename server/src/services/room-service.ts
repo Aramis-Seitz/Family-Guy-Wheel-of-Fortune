@@ -173,13 +173,16 @@ export async function spinRoom(
         throw new AppError("Invalid spin direction", 400);
     }
 
-    // Maßgeblich ist die im Raum gespeicherte Aufstellung, nicht das, was der
-    // Host mitschickt — daraus löst generateSpin() die Account-UUIDs auf.
-    const { ranNum, spinToken } = await generateSpin(userId, room.names_in_wheel ?? [], room.players ?? []);
+    const { ranNum, spinToken, winnerName } = await generateSpin(
+        userId,
+        room.names_in_wheel ?? [],
+        { multiplier: room.multiplier ?? 1, direction: direction as "left" | "right" },
+        room.players ?? [],
+    );
     const spunAt = new Date().toISOString();
-    await updateRoomSpin(roomKey, ranNum, spunAt, direction);
+    await updateRoomSpin(roomKey, ranNum, spunAt, direction, winnerName);
 
-    return { ranNum, spinToken };
+    return { ranNum, spinToken, winnerName };
 }
 
 export async function setRoomNames(

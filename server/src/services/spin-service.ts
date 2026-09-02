@@ -1,14 +1,14 @@
 import { randomUUID } from "crypto";
 import { getSecureRandomNumber } from "../lib/random";
 import { AppError } from "../lib/errors";
-import { insertSpinToken, findSpinTokenNamesInWheel, markSpinTokenUsed } from "../repositories/room-repository";
+import { insertSpinToken, findAwardableSpin, markSpinTokenUsed } from "../repositories/room-repository";
 import type { RoomPlayer, NameInWheel } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
 import { formatDisplayName } from "../lib/display-name";
-import type {
-    SpinRandomResponseBody,
-    AwardCoinsResponseBody
-} from "shared";
+import { resolveSpinWinner, type SpinDirection } from "../lib/wheel-winner";
+import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
+
+export type SpinParams = { multiplier: number; direction: SpinDirection };
 
 function getRandomWheelSpinNumber(): number {
     return getSecureRandomNumber(0, 359);
@@ -29,7 +29,17 @@ function resolveNamesInWheel(names: string[], accountsByUsername: Map<string, st
     }));
 }
 
-export async function generateSpin(userId: string, names: string[], roomPlayers: RoomPlayer[] = []): Promise<SpinRandomResponseBody> {
+export async function generateSpin(
+    userId: string,
+    names: string[],
+    { multiplier, direction }: SpinParams,
+    roomPlayers: RoomPlayer[] = [],
+): Promise<SpinRandomResponseBody> {
+
+    if (names.length < 2) {
+        throw new AppError("A spin needs at least two names", 400);
+    }
+
     const spinnerProfile = await getUserProfile(userId);
     const accountsByUsername = new Map<string, string>(roomPlayers.map((player) => [player.username, player.id]));
 
@@ -37,14 +47,19 @@ export async function generateSpin(userId: string, names: string[], roomPlayers:
         accountsByUsername.set(spinnerProfile.username, userId);
     }
 
-    const ranNum = getRandomWheelSpinNumber();
-    const spinToken = await insertSpinToken(randomUUID(), userId, resolveNamesInWheel(names, accountsByUsername));
-    return { ranNum, spinToken };
+    const { ranNum, winnerIndex } = resolveSpinWinner(getRandomWheelSpinNumber(), multiplier, direction, names.length);
+    const spinToken = await insertSpinToken(
+        randomUUID(),
+        userId,
+        resolveNamesInWheel(names, accountsByUsername),
+        winnerIndex,
+    );
+    return { ranNum, spinToken, winnerName: names[winnerIndex] ?? "" };
 }
 
-export async function awardCoins(userId: string, spinToken: string, winnerIndex: number): Promise<AwardCoinsResponseBody> {
-    const namesInWheel = await findSpinTokenNamesInWheel(spinToken, userId);
-    if (!namesInWheel) {
+export async function awardCoins(userId: string, spinToken: string): Promise<AwardCoinsResponseBody> {
+    const spin = await findAwardableSpin(spinToken, userId);
+    if (!spin) {
         throw new AppError("Invalid or already used spin token", 403);
     }
 
@@ -59,8 +74,7 @@ export async function awardCoins(userId: string, spinToken: string, winnerIndex:
         )
         : userId;
 
-    // Der Gewinner steht ausschließlich über den Index im gespeicherten Rad fest.
-    const winner = namesInWheel[winnerIndex];
+    const winner = spin.winnerIndex === null ? undefined : spin.namesInWheel[spin.winnerIndex];
     if (!winner) {
         throw new AppError("Winner is not part of this spin", 400);
     }

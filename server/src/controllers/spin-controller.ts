@@ -6,32 +6,26 @@ import { SpinRandomResponseSchema, AwardCoinsResponseSchema } from "shared";
 
 const GenerateSpinRequestSchema = z.object({
     names: z.array(z.string()),
+    multiplier: z.number().min(1).max(2),
+    direction: z.enum(["left", "right"]),
 });
 
 export const handleGenerateSpin = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
     const parsedBody = GenerateSpinRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing names" });
+        res.status(400).json({ error: "Invalid spin request" });
         return;
     }
 
     // Solo-Spin: außer dem Spinner selbst sitzt hier niemand mit Account am Rad.
-    const result = await generateSpin(req.userId!, parsedBody.data.names);
+    const { names, multiplier, direction } = parsedBody.data;
+    const result = await generateSpin(req.userId!, names, { multiplier, direction });
     res.status(201).json(SpinRandomResponseSchema.parse(result));
 });
 
-const AwardCoinsRequestSchema = z.object({
-    winnerIndex: z.number().int().nonnegative(),
-});
-
 export const handleAwardCoins = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = AwardCoinsRequestSchema.safeParse(req.body);
-    if (!parsedBody.success) {
-        res.status(400).json({ error: "Schema validation failure" });
-        return;
-    }
 
     const spinToken = req.params!.spinToken!;
-    const result = await awardCoins(req.userId!, spinToken, parsedBody.data.winnerIndex);
+    const result = await awardCoins(req.userId!, spinToken);
     res.status(200).json(AwardCoinsResponseSchema.parse(result));
 });

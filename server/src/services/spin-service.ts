@@ -4,6 +4,7 @@ import { AppError } from "../lib/errors";
 import { insertSpinToken, findAwardableSpin, markSpinTokenUsed } from "../repositories/room-repository";
 import type { RoomPlayer, NameInWheel } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
+import { formatDisplayName } from "../lib/display-name";
 import { resolveSpinWinner, type SpinDirection } from "../lib/wheel-winner";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
 

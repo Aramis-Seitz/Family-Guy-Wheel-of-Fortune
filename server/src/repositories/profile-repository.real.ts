@@ -67,10 +67,6 @@ export async function getUserIdByUsername(displayName: string): Promise<string |
     return (data as { id: string }).id;
 }
 
-export async function isUsernameTaken(): Promise<boolean> {
-    return false;
-}
-
 async function getNextFreeSuffix(username: string): Promise<number> {
     const { data, error } = await supabaseClient
         .from("profiles")

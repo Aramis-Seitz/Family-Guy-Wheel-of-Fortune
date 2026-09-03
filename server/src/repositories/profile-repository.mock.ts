@@ -39,10 +39,6 @@ export function nextFreeSuffix(username: string): number {
     return takenSuffixes.length === 0 ? 0 : Math.max(...takenSuffixes) + 1;
 }
 
-export const isUsernameTaken: typeof Real.isUsernameTaken = async () => {
-    return false;
-};
-
 export const insertProfile: typeof Real.insertProfile = async (userId, username, email, dateOfBirth) => {
     if (store.profiles.some((p) => p.id === userId)) return;
     store.profiles.push({ id: userId, username, suffix: nextFreeSuffix(username), email, date_of_birth: dateOfBirth, password: "", coins: 1 });

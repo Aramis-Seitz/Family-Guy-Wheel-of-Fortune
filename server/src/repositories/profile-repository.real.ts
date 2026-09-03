@@ -71,11 +71,13 @@ async function getNextFreeSuffix(username: string): Promise<number> {
     const { data, error } = await supabaseClient
         .from("profiles")
         .select("suffix")
-        .ilike("username", username);
+        .ilike("username", username)
+        .order("suffix", { ascending: false })
+        .limit(1);
 
-    if (error || !data || data.length === 0) return 0;
-    const takenSuffixes = (data as { suffix: number }[]).map((p) => p.suffix);
-    return Math.max(...takenSuffixes) + 1;
+    if (error) throw error;
+    const highestTakenSuffix = data[0]?.suffix ?? -1;
+    return highestTakenSuffix + 1;
 }
 
 export async function insertProfile(userId: string, username: string, email: string, dateOfBirth: string): Promise<void> {

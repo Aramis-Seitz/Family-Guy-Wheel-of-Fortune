@@ -155,13 +155,6 @@ export function findProfileByUsername(username: string) {
   return store.profiles.find(p => p.username.toLowerCase() === username.toLowerCase());
 }
 
-export function nextFreeSuffix(username: string): number {
-  const takenSuffixes = store.profiles
-    .filter(p => p.username.toLowerCase() === username.toLowerCase())
-    .map(p => p.suffix);
-  return takenSuffixes.length === 0 ? 0 : Math.max(...takenSuffixes) + 1;
-}
-
 export function createProfile(data: Omit<Profile, 'coins'>): Profile {
   const profile: Profile = { ...data, coins: 0 };
   store.profiles.push(profile);

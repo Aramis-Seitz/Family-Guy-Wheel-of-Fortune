@@ -32,7 +32,7 @@ export const getUserIdByUsername: typeof Real.getUserIdByUsername = async (displ
     return profile?.id ?? null;
 };
 
-function nextFreeSuffix(username: string): number {
+export function nextFreeSuffix(username: string): number {
     const takenSuffixes = store.profiles
         .filter((p) => p.username.toLowerCase() === username.toLowerCase())
         .map((p) => p.suffix);

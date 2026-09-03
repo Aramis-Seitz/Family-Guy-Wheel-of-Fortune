@@ -5,12 +5,12 @@ import {
   findProfile,
   findProfileByEmail,
   findProfileByUsername,
-  nextFreeSuffix,
   createProfile,
   getSavedLinks,
   createSavedLink,
   deleteSavedLink,
 } from './store';
+import { nextFreeSuffix } from '../repositories/profile-repository.mock';
 
 export function decodeMockJwt(jwt: string): { id: string; email: string; username: string; date_of_birth?: string | null } | null {
   if (!jwt.startsWith('mock_')) return null;

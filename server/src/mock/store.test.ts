@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { store } from "../mock/store";
+import { beforeEach, describe, it } from "vitest";
+import { store } from "./store";
 
 describe("username + suffix uniqueness", () => {
   beforeEach(() => {

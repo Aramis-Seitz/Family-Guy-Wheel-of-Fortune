@@ -40,16 +40,10 @@ export function nextFreeSuffix(username: string): number {
 }
 
 export const isUsernameTaken: typeof Real.isUsernameTaken = async () => {
-    // Gleiche Usernames sind erlaubt; die Eindeutigkeit ergibt sich aus
-    // username + suffix. Ein globaler Check wäre hier falsch.
     return false;
 };
 
 export const insertProfile: typeof Real.insertProfile = async (userId, username, email, dateOfBirth) => {
-    // Im Mock legt /api/mock/auth/signup die profiles-Row schon direkt an
-    // (dort liegt auch das Passwort fürs Mock-Login) - dieser Aufruf hier
-    // kommt danach trotzdem vom selben zweistufigen Frontend-Flow wie in
-    // Produktion und muss deshalb ein no-op statt ein Fehler sein.
     if (store.profiles.some((p) => p.id === userId)) return;
     store.profiles.push({ id: userId, username, suffix: nextFreeSuffix(username), email, date_of_birth: dateOfBirth, password: "", coins: 1 });
 };

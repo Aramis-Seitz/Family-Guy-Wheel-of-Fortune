@@ -68,9 +68,6 @@ export async function getUserIdByUsername(displayName: string): Promise<string |
 }
 
 export async function isUsernameTaken(): Promise<boolean> {
-    // Gleiche Usernames sind erlaubt; die Eindeutigkeit ist über
-    // (lower(username), suffix) definiert. Deshalb muss kein globaler
-    // Username-Block mehr greifen.
     return false;
 }
 

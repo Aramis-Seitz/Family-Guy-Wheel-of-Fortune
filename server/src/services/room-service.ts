@@ -93,8 +93,6 @@ function validateRoomNames(names: string[]): string[] {
             400
         );
     }
-    // Doppelte Namen würden die Zuordnung Name -> Account beim Spin mehrdeutig
-    // machen, deshalb ist die Liste hier wie im Client duplikatfrei.
     if (new Set(normalizedNames.map((name) => name.toLowerCase())).size !== normalizedNames.length) {
         throw new AppError("Wheel names must be unique", 400);
     }

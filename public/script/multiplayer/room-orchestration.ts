@@ -173,7 +173,7 @@ export async function executeCreateRoom(): Promise<void> {
     setActiveRoomHostName(players[0] ?? '');
     setRoomActive(roomKey, true);
     initRoomPlayers(players);
-    setNamesFromRoom(names ?? []);
+    setNamesFromRoom(names.map((entry) => entry.text));
     finishRoomSetup(roomKey);
     multiplierSyncListener = () => {
       if (!activeRoomKey) return;
@@ -196,7 +196,7 @@ export async function executeJoinRoom(roomKey: string): Promise<void> {
     setActiveRoomHostName(hostName);
     setRoomActive(roomKey, false);
     initRoomPlayers(players);
-    setNamesFromRoom(names ?? []);
+    setNamesFromRoom(names.map((entry) => entry.text));
     setMultiplierControlValue(multiplier);
     finishRoomSetup(roomKey);
     showToast({ message: t('room.joined', { roomKey }), type: 'success' });

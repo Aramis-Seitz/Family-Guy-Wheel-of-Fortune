@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import type { Asset } from 'shared';
+import type { Asset, WheelEntry } from 'shared';
 import type { AssetCategory } from '../repositories/asset-repository.shared';
 import type { NameInWheel } from '../repositories/room-repository.shared';
 
@@ -37,7 +37,7 @@ export interface Room {
   room_key: string;
   host_id: string;
   players: Player[];
-  names_in_wheel: string[];
+  names_in_wheel: WheelEntry[];
   last_spin: number | null;
   spun_at: string | null;
   multiplier: number;

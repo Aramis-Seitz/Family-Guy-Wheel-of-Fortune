@@ -5,12 +5,12 @@ import {
   findProfile,
   findProfileByEmail,
   findProfileByUsername,
-  nextFreeSuffix,
   createProfile,
   getSavedLinks,
   createSavedLink,
   deleteSavedLink,
 } from './store';
+import { nextFreeSuffix } from '../repositories/profile-repository.mock';
 
 export function decodeMockJwt(jwt: string): { id: string; email: string; username: string; date_of_birth?: string | null } | null {
   if (!jwt.startsWith('mock_')) return null;
@@ -72,7 +72,6 @@ mockRouter.get('/profile/:userId', (req, res) => {
 mockRouter.post('/profile', (req, res) => {
   const { id, username, email, date_of_birth } = req.body ?? {};
   if (findProfile(id)) {
-    // already created during signup – silent no-op
     res.status(409).json({ error: 'Already exists' });
     return;
   }

@@ -1,10 +1,6 @@
 import { store, newId } from "../mock/store";
 import type * as Real from "./room-repository.real";
 
-// Direkte Ersatz-Implementierungen gegen den In-Memory-Store statt einer
-// generischen PostgREST-Emulation. Jede Funktion ist per "typeof Real.xxx"
-// gegen die echte Implementierung typisiert — ändert sich dort eine Signatur,
-// meldet der Compiler das hier statt es erst zur Laufzeit falsch zu machen.
 
 function notFoundError() {
     return { message: "Row not found", code: "PGRST116" };

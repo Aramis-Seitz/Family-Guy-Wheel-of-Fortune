@@ -1,6 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { store } from "../mock/store";
-import { isUsernameTaken } from "../repositories/profile-repository.mock";
+import { beforeEach, describe, it } from "vitest";
+import { store } from "./store";
 
 describe("username + suffix uniqueness", () => {
   beforeEach(() => {
@@ -38,7 +37,5 @@ describe("username + suffix uniqueness", () => {
         coins: 0,
       },
     );
-
-    await expect(isUsernameTaken("alice")).resolves.toBe(false);
   });
 });

@@ -15,7 +15,7 @@ import { MAX_ITEMS, isNameInWheelList } from "../names/names-in-wheel-list-state
 import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { t } from "../app/i18n";
-import { spinRoom, updateRoomNames, syncPlayersInWheel, resetRoom } from "../api/room-api";
+import { spinRoom, addWheelName, removeWheelEntry, syncPlayersInWheel, resetRoom } from "../api/room-api";
 import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken } from "./room-state";
 
 export interface GameModeStrategy {
@@ -92,11 +92,6 @@ async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
   }
 }
 
-async function updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList: string[]): Promise<void> {
-  if (!activeRoomKey) return;
-  await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
-}
-
 export class HostModeStrategy implements GameModeStrategy {
   async onSpinClick(direction: Direction): Promise<void> {
     if (!activeRoomKey) return;
@@ -123,6 +118,8 @@ export class HostModeStrategy implements GameModeStrategy {
   }
 
   async addNameToWheel(rawName: string): Promise<void> {
+    if (!activeRoomKey) return;
+
     const validation = validateName(rawName);
     if (!validation.valid) {
       showToast({ message: getNameValidationMessage(validation.code), type: 'error' });
@@ -139,16 +136,17 @@ export class HostModeStrategy implements GameModeStrategy {
       return;
     }
 
-    const updatedNamesInWheelList = [...existingNamesInWheelList, validation.value];
-    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
+    await addWheelName(activeRoomKey, validation.value);
     input.value = '';
   }
 
   async removeNameFromWheel(index: number): Promise<void> {
+    if (!activeRoomKey) return;
+
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     if (index < 0 || index >= existingNamesInWheelList.length) return;
-    const updatedNamesInWheelList = [...existingNamesInWheelList.slice(0, index), ...existingNamesInWheelList.slice(index + 1)];
-    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
+
+    await removeWheelEntry(activeRoomKey, index);
   }
 
   async removeWinnerFromWheel(index: number): Promise<void> {

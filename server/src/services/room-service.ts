@@ -62,42 +62,25 @@ function requireRoomHost(room: RoomData | null, userId: string, action: string):
     }
 }
 
-function validateRoomNames(names: string[]): string[] {
-    if (names.length > MAX_WHEEL_NAMES) {
-        throw new AppError(
-            `A room may contain at most ${MAX_WHEEL_NAMES} wheel names`,
-            400
-        );
+function validateManualWheelName(rawName: string, currentEntries: WheelEntry[]): string {
+    if (currentEntries.length >= MAX_WHEEL_NAMES) {
+        throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
     }
 
-    const normalizedNames = names.map((name) => name.trim());
-
-    if (
-        normalizedNames.some(
-            (name) => !name || !WHEEL_NAME_PATTERN.test(name)
-        )
-    ) {
-        throw new AppError(
-            "Wheel names must contain only letters, numbers, or apostrophes",
-            400
-        );
+    const name = rawName.trim();
+    if (!name || !WHEEL_NAME_PATTERN.test(name)) {
+        throw new AppError("Wheel names must contain only letters, numbers, or apostrophes", 400);
     }
 
-    if (
-        normalizedNames.some(
-            (name) => name.length > MAX_WHEEL_NAME_LENGTH
-        )
-    ) {
-        throw new AppError(
-            `Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`,
-            400
-        );
+    if (name.length > MAX_WHEEL_NAME_LENGTH) {
+        throw new AppError(`Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`, 400);
     }
 
-    if (new Set(normalizedNames.map((name) => name.toLowerCase())).size !== normalizedNames.length) {
+    if (currentEntries.some((entry) => entry.text.toLowerCase() === name.toLowerCase())) {
         throw new AppError("Wheel names must be unique", 400);
     }
-    return normalizedNames;
+
+    return name;
 }
 
 export async function joinRoom(
@@ -184,18 +167,33 @@ export async function spinRoom(
     return { ranNum, spinToken, winnerName };
 }
 
-function toManualWheelEntries(names: string[]): WheelEntry[] {
-    return names.map((text) => ({ text, isPlayer: false }));
-}
-
-export async function setRoomNames(
+export async function addManualWheelName(
     userId: string,
     roomKey: string,
-    names: string[]
+    rawName: string
 ): Promise<void> {
     const room = await getRoomByKey(roomKey);
-    requireRoomHost(room, userId, "update wheel items");
-    await updateRoomNames(roomKey, toManualWheelEntries(validateRoomNames(names)));
+    requireRoomHost(room, userId, "add a wheel name");
+
+    const currentEntries = room.names_in_wheel ?? [];
+    const name = validateManualWheelName(rawName, currentEntries);
+    await updateRoomNames(roomKey, [...currentEntries, { text: name, isPlayer: false }]);
+}
+
+export async function removeWheelEntryAtIndex(
+    userId: string,
+    roomKey: string,
+    index: number
+): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    requireRoomHost(room, userId, "remove a wheel name");
+
+    const currentEntries = room.names_in_wheel ?? [];
+    if (index < 0 || index >= currentEntries.length) {
+        throw new AppError("Invalid wheel entry index", 400);
+    }
+
+    await updateRoomNames(roomKey, currentEntries.filter((_, entryIndex) => entryIndex !== index));
 }
 
 function resolveTargetedPlayerEntries(players: RoomPlayer[], playerDisplayNames: string[]): WheelEntry[] {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { leaveRoom, setRoomNames, syncPlayersInWheel } from "./room-service";
+import { leaveRoom, addManualWheelName, removeWheelEntryAtIndex, syncPlayersInWheel } from "./room-service";
 
 vi.mock("../repositories/room-repository", () => ({
     insertRoom: vi.fn(),
@@ -120,32 +120,100 @@ describe("leaveRoom", () => {
     });
 });
 
-describe("setRoomNames", () => {
-    it("speichert manuell eingegebene Namen immer mit isPlayer:false", async () => {
+describe("addManualWheelName", () => {
+    it("haengt einen neuen manuellen namen mit isPlayer:false an, ohne bestehende entries anzufassen", async () => {
         vi.mocked(getRoomByKey).mockResolvedValueOnce({
             id: "room-1",
             room_key: "ABC123",
             host_id: "host-1",
             players: [],
+            names_in_wheel: [{ text: "Lewis4#00", isPlayer: true }],
         });
 
-        await setRoomNames("host-1", "ABC123", ["Alice", "Bob"]);
+        await addManualWheelName("host-1", "ABC123", "Bob");
 
         expect(updateRoomNames).toHaveBeenCalledWith("ABC123", [
-            { text: "Alice", isPlayer: false },
+            { text: "Lewis4#00", isPlayer: true },
             { text: "Bob", isPlayer: false },
         ]);
     });
 
-    it("wirft 403, wenn ein nicht-host die namen aendern will", async () => {
+    it("wirft 400 bei einem bereits vorhandenen namen, unabhaengig davon ob er ein player-entry ist", async () => {
         vi.mocked(getRoomByKey).mockResolvedValueOnce({
             id: "room-1",
             room_key: "ABC123",
             host_id: "host-1",
             players: [],
+            names_in_wheel: [{ text: "Bob", isPlayer: true }],
         });
 
-        const result = setRoomNames("guest-1", "ABC123", ["Alice"]);
+        const result = addManualWheelName("host-1", "ABC123", "bob");
+
+        await expect(result).rejects.toMatchObject({ statusCode: 400 });
+        expect(updateRoomNames).not.toHaveBeenCalled();
+    });
+
+    it("wirft 403, wenn ein nicht-host einen namen hinzufuegen will", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [],
+            names_in_wheel: [],
+        });
+
+        const result = addManualWheelName("guest-1", "ABC123", "Alice");
+
+        await expect(result).rejects.toMatchObject({ statusCode: 403 });
+        expect(updateRoomNames).not.toHaveBeenCalled();
+    });
+});
+
+describe("removeWheelEntryAtIndex", () => {
+    it("entfernt nur den entry am angegebenen index, unabhaengig von isPlayer", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [],
+            names_in_wheel: [
+                { text: "Lewis4#00", isPlayer: true },
+                { text: "Bob", isPlayer: false },
+            ],
+        });
+
+        await removeWheelEntryAtIndex("host-1", "ABC123", 0);
+
+        expect(updateRoomNames).toHaveBeenCalledWith("ABC123", [
+            { text: "Bob", isPlayer: false },
+        ]);
+    });
+
+    it("wirft 400 bei einem index ausserhalb der liste", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [],
+            names_in_wheel: [{ text: "Bob", isPlayer: false }],
+        });
+
+        const result = removeWheelEntryAtIndex("host-1", "ABC123", 5);
+
+        await expect(result).rejects.toMatchObject({ statusCode: 400 });
+        expect(updateRoomNames).not.toHaveBeenCalled();
+    });
+
+    it("wirft 403, wenn ein nicht-host einen entry entfernen will", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [],
+            names_in_wheel: [{ text: "Bob", isPlayer: false }],
+        });
+
+        const result = removeWheelEntryAtIndex("guest-1", "ABC123", 0);
 
         await expect(result).rejects.toMatchObject({ statusCode: 403 });
         expect(updateRoomNames).not.toHaveBeenCalled();

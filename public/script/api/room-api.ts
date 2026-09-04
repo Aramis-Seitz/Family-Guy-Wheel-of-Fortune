@@ -44,8 +44,14 @@ export function leaveRoomOnUnload(roomKey: string, userId: string, token: string
     void deleteJson(`/api/rooms/${roomKey}/players/${userId}`, { token, keepalive: true });
 }
 
-export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
-    await patchJson(`/api/rooms/${roomKey}/names-in-wheel-list`, { names }, {
+export async function addWheelName(roomKey: string, name: string): Promise<void> {
+    await postJson(`/api/rooms/${roomKey}/names-in-wheel-list`, { name }, {
+        errorFallbackKey: "api.room.updateWheelFailed"
+    });
+}
+
+export async function removeWheelEntry(roomKey: string, index: number): Promise<void> {
+    await deleteJson(`/api/rooms/${roomKey}/names-in-wheel-list/${index}`, {
         errorFallbackKey: "api.room.updateWheelFailed"
     });
 }

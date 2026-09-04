@@ -18,7 +18,7 @@ import {
 import { generateSpin } from "./spin-service";
 import { AppError } from "../lib/errors";
 import { formatDisplayName } from "../lib/display-name";
-import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
+import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody, WheelEntry } from "shared";
 
 const MAX_WHEEL_NAMES = 16;
 const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
@@ -93,8 +93,7 @@ function validateRoomNames(names: string[]): string[] {
             400
         );
     }
-    // Doppelte Namen würden die Zuordnung Name -> Account beim Spin mehrdeutig
-    // machen, deshalb ist die Liste hier wie im Client duplikatfrei.
+
     if (new Set(normalizedNames.map((name) => name.toLowerCase())).size !== normalizedNames.length) {
         throw new AppError("Wheel names must be unique", 400);
     }
@@ -185,6 +184,10 @@ export async function spinRoom(
     return { ranNum, spinToken, winnerName };
 }
 
+function toManualWheelEntries(names: string[]): WheelEntry[] {
+    return names.map((text) => ({ text, isPlayer: false }));
+}
+
 export async function setRoomNames(
     userId: string,
     roomKey: string,
@@ -192,7 +195,7 @@ export async function setRoomNames(
 ): Promise<void> {
     const room = await getRoomByKey(roomKey);
     requireRoomHost(room, userId, "update wheel items");
-    await updateRoomNames(roomKey, validateRoomNames(names));
+    await updateRoomNames(roomKey, toManualWheelEntries(validateRoomNames(names)));
 }
 
 export async function resetRoom(

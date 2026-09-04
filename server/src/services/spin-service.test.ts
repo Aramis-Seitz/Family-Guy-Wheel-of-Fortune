@@ -42,7 +42,7 @@ describe("generateSpin", () => {
     });
 
     it("returns the landing degree, the persisted token and the server-chosen winner", async () => {
-        const result = await generateSpin(userId, ["spinner", "Stewie"], spinParams);
+        const result = await generateSpin(userId, [{ text: "spinner", isPlayer: false }, { text: "Stewie", isPlayer: false }], spinParams);
 
         expect(result).toStrictEqual({
             ranNum: 180,
@@ -52,7 +52,7 @@ describe("generateSpin", () => {
     });
 
     it("persists the generated token id together with the resolved winner index", async () => {
-        await generateSpin(userId, ["spinner", "Stewie"], spinParams);
+        await generateSpin(userId, [{ text: "spinner", isPlayer: false }, { text: "Stewie", isPlayer: false }], spinParams);
 
         expect(insertSpinToken).toHaveBeenCalledWith(
             generatedUuid,
@@ -68,7 +68,11 @@ describe("generateSpin", () => {
     it("returns the landing degree and winner name for the segment index it persists", async () => {
         vi.mocked(getSecureRandomNumber).mockReturnValue(45);
 
-        const result = await generateSpin(userId, ["a", "b", "c", "d"], spinParams);
+        const result = await generateSpin(
+            userId,
+            ["a", "b", "c", "d"].map((text) => ({ text, isPlayer: false })),
+            spinParams,
+        );
 
         expect(result.ranNum).toBe(45);
         expect(result.winnerName).toBe("c");
@@ -83,7 +87,7 @@ it("resolves room players to their accounts and hand-typed names to no account",
 
     await generateSpin(
         userId,
-        ["spinner", "Brian", "Quagmire"],
+        ["spinner", "Brian", "Quagmire"].map((text) => ({ text, isPlayer: false })),
         spinParams,
         roomPlayers,
     );
@@ -101,14 +105,14 @@ it("resolves room players to their accounts and hand-typed names to no account",
 });
 
     it("rejects a spin with fewer than two names without issuing a token", async () => {
-        await expect(generateSpin(userId, ["solo"], spinParams)).rejects.toMatchObject({ statusCode: 400 });
+        await expect(generateSpin(userId, [{ text: "solo", isPlayer: false }], spinParams)).rejects.toMatchObject({ statusCode: 400 });
         await expect(generateSpin(userId, [], spinParams)).rejects.toMatchObject({ statusCode: 400 });
     });
 
     it("propagates the error when the spin token cannot be persisted", async () => {
         vi.mocked(insertSpinToken).mockRejectedValueOnce(new Error("database unavailable"));
 
-        const result = generateSpin(userId, ["spinner", "Stewie"], spinParams);
+        const result = generateSpin(userId, [{ text: "spinner", isPlayer: false }, { text: "Stewie", isPlayer: false }], spinParams);
 
         await expect(result).rejects.toThrow("database unavailable");
     });

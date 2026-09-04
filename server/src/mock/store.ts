@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import type { Asset } from 'shared';
+import type { Asset, WheelEntry } from 'shared';
 import type { AssetCategory } from '../repositories/asset-repository.shared';
 import type { NameInWheel } from '../repositories/room-repository.shared';
 
@@ -37,7 +37,7 @@ export interface Room {
   room_key: string;
   host_id: string;
   players: Player[];
-  names_in_wheel: string[];
+  names_in_wheel: WheelEntry[];
   last_spin: number | null;
   spun_at: string | null;
   multiplier: number;
@@ -82,7 +82,6 @@ export interface UserAchievementUnlockedRow {
   unlocked_at: string;
 }
 
-// Gleiche keys/categories/targets wie supabase/migrations/25_achievements.sql.
 const SEED_ACHIEVEMENTS: AchievementRow[] = [
   { id: '00000000-0000-0000-0000-000000000201', key: 'spin_10', category: 'spin', target: 10, icon_url: null },
   { id: '00000000-0000-0000-0000-000000000202', key: 'spin_50', category: 'spin', target: 50, icon_url: null },
@@ -94,7 +93,6 @@ function seedAsset(id: string, name: string, category: AssetCategory, price_coin
   return { id, name, category, price_coins, asset_url };
 }
 
-// Gleiche Namen/Preise/Pfade wie supabase/migrations/06_shop_seed_assets.sql.
 const SEED_ASSETS: Asset[] = [
   seedAsset('00000000-0000-0000-0000-000000000101', 'Bruh', 'sound', 10, '/resources/sounds/bruh.mp3'),
   seedAsset('00000000-0000-0000-0000-000000000102', 'Cleveland', 'companion', 40, '/resources/companions/cleveland.png'),

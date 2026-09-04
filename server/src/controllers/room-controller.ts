@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRoom, joinRoom, leaveRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
+import { createRoom, joinRoom, leaveRoom, spinRoom, setRoomNames, syncPlayersInWheel, resetRoom, setMultiplier } from "../services/room-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
@@ -87,5 +87,21 @@ export const handleUpdateNames = asyncHandler(async (req: HttpRequest, res: Http
 
     const roomKey = req.params!.roomKey!;
     await setRoomNames(req.userId!, roomKey, parsedBody.data.names);
+    res.status(200).json({ ok: true });
+});
+
+const SyncPlayersInWheelRequestSchema = z.object({
+    playerDisplayNames: z.array(z.string()),
+});
+
+export const handleSyncPlayersInWheel = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = SyncPlayersInWheelRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing playerDisplayNames" });
+        return;
+    }
+
+    const roomKey = req.params!.roomKey!;
+    await syncPlayersInWheel(req.userId!, roomKey, parsedBody.data.playerDisplayNames);
     res.status(200).json({ ok: true });
 });

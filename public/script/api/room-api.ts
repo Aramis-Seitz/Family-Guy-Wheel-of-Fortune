@@ -26,8 +26,6 @@ export async function setMultiplier(roomKey: string, multiplier: number): Promis
     });
 }
 
-// Ohne Namen — massgeblich ist die im Raum gespeicherte Aufstellung, aus der
-// der Server den Spin-Token samt aufgeloester Account-Zuordnung baut.
 export async function spinRoom(roomKey: string, direction: string): Promise<SpinRandomResponseBody> {
     const rawBody = await postJson(`/api/rooms/${roomKey}/spins`, { direction }, {
         errorFallbackKey: "api.room.spinFailed"
@@ -48,6 +46,12 @@ export function leaveRoomOnUnload(roomKey: string, userId: string, token: string
 
 export async function updateRoomNames(roomKey: string, names: string[]): Promise<void> {
     await patchJson(`/api/rooms/${roomKey}/names-in-wheel-list`, { names }, {
+        errorFallbackKey: "api.room.updateWheelFailed"
+    });
+}
+
+export async function syncPlayersInWheel(roomKey: string, playerDisplayNames: string[]): Promise<void> {
+    await patchJson(`/api/rooms/${roomKey}/players-in-wheel-list`, { playerDisplayNames }, {
         errorFallbackKey: "api.room.updateWheelFailed"
     });
 }

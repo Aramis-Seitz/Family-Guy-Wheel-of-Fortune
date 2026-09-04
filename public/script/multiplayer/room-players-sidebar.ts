@@ -43,12 +43,7 @@ export function renderPlayersSidebar(players: string[]): void {
       togglePlayerInWheelListBtn.addEventListener('click', async () => {
         togglePlayerInWheelListBtn.disabled = true;
         try {
-          const index = (activeRoomNamesInWheelList ?? []).indexOf(name);
-          if (index >= 0) {
-            await getCurrentMode().removeNameFromWheel(index);
-          } else {
-            await getCurrentMode().addNameToWheel(name);
-          }
+          await getCurrentMode().toggleAllPlayersInWheel([name]);
         } catch (error) {
           console.error('[ROOM] toggle player failed', error);
         } finally {
@@ -73,9 +68,6 @@ export function setHostControlsVisibility(): void {
   const host: boolean = getCurrentMode().isHost();
   const guestInRoom = isMultiplayerActive() && !host;
 
-  // Host-only-Controls werden für Gäste vollständig aus dem sichtbaren und
-  // fokussierbaren Bereich genommen. Die serverseitige Host-Prüfung bleibt
-  // dabei die verbindliche Sicherheitsgrenze.
   [
     "spin-btn",
     "reset-btn",

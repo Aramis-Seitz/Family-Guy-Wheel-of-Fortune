@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { leaveRoom } from "./room-service";
+import { leaveRoom, setRoomNames } from "./room-service";
 
 vi.mock("../repositories/room-repository", () => ({
     insertRoom: vi.fn(),
@@ -28,6 +28,7 @@ import {
     deleteRoomByKey,
     getRoomByKey,
     removePlayerFromRoom,
+    updateRoomNames,
 } from "../repositories/room-repository";
 
 describe("leaveRoom", () => {
@@ -116,5 +117,37 @@ describe("leaveRoom", () => {
         const result = leaveRoom("guest-1", "ABC123");
 
         await expect(result).rejects.toBe(removeError);
+    });
+});
+
+describe("setRoomNames", () => {
+    it("speichert manuell eingegebene Namen immer mit isPlayer:false", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [],
+        });
+
+        await setRoomNames("host-1", "ABC123", ["Alice", "Bob"]);
+
+        expect(updateRoomNames).toHaveBeenCalledWith("ABC123", [
+            { text: "Alice", isPlayer: false },
+            { text: "Bob", isPlayer: false },
+        ]);
+    });
+
+    it("wirft 403, wenn ein nicht-host die namen aendern will", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [],
+        });
+
+        const result = setRoomNames("guest-1", "ABC123", ["Alice"]);
+
+        await expect(result).rejects.toMatchObject({ statusCode: 403 });
+        expect(updateRoomNames).not.toHaveBeenCalled();
     });
 });

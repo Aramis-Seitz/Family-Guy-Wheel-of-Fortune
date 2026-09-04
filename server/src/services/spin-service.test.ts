@@ -38,7 +38,7 @@ describe("generateSpin", () => {
         vi.mocked(randomUUID).mockReturnValue(generatedUuid);
         vi.mocked(getSecureRandomNumber).mockReturnValue(180);
         vi.mocked(insertSpinToken).mockResolvedValue("persisted-spin-token");
-        vi.mocked(getUserProfile).mockResolvedValue({ username: "spinner" } as never);
+        vi.mocked(getUserProfile).mockResolvedValue({ username: "spinner", suffix: 0 } as never);
     });
 
     it("returns the landing degree, the persisted token and the server-chosen winner", async () => {
@@ -52,13 +52,43 @@ describe("generateSpin", () => {
     });
 
     it("persists the generated token id together with the resolved winner index", async () => {
-        await generateSpin(userId, [{ text: "spinner", isPlayer: false }, { text: "Stewie", isPlayer: false }], spinParams);
+        await generateSpin(userId, [{ text: "spinner#00", isPlayer: true }, { text: "Stewie", isPlayer: false }], spinParams);
 
         expect(insertSpinToken).toHaveBeenCalledWith(
             generatedUuid,
             userId,
             [
-                { username: "spinner", userId },
+                { username: "spinner#00", userId },
+                { username: "Stewie", userId: null },
+            ],
+            0,
+        );
+    });
+
+    it("resolves a suffixed self-entry to the spinner's own account", async () => {
+        vi.mocked(getUserProfile).mockResolvedValueOnce({ username: "spinner", suffix: 3 } as never);
+
+        await generateSpin(userId, [{ text: "spinner#03", isPlayer: true }, { text: "Stewie", isPlayer: false }], spinParams);
+
+        expect(insertSpinToken).toHaveBeenCalledWith(
+            generatedUuid,
+            userId,
+            [
+                { username: "spinner#03", userId },
+                { username: "Stewie", userId: null },
+            ],
+            0,
+        );
+    });
+
+    it("never resolves a manually typed entry to an account, even if the text matches one exactly", async () => {
+        await generateSpin(userId, [{ text: "spinner#00", isPlayer: false }, { text: "Stewie", isPlayer: false }], spinParams);
+
+        expect(insertSpinToken).toHaveBeenCalledWith(
+            generatedUuid,
+            userId,
+            [
+                { username: "spinner#00", userId: null },
                 { username: "Stewie", userId: null },
             ],
             0,
@@ -79,7 +109,7 @@ describe("generateSpin", () => {
         expect(insertSpinToken).toHaveBeenCalledWith(generatedUuid, userId, expect.anything(), 2);
     });
 
-it("resolves room players to their accounts and hand-typed names to no account", async () => {
+it("resolves player entries to their accounts and manual entries to no account", async () => {
     const roomPlayers = [
         { id: userId, username: "spinner", suffix: 0 },
         { id: "guest-1", username: "Brian", suffix: 0 },
@@ -87,7 +117,11 @@ it("resolves room players to their accounts and hand-typed names to no account",
 
     await generateSpin(
         userId,
-        ["spinner", "Brian", "Quagmire"].map((text) => ({ text, isPlayer: false })),
+        [
+            { text: "spinner#00", isPlayer: true },
+            { text: "Brian#00", isPlayer: true },
+            { text: "Quagmire", isPlayer: false },
+        ],
         spinParams,
         roomPlayers,
     );
@@ -96,8 +130,8 @@ it("resolves room players to their accounts and hand-typed names to no account",
         generatedUuid,
         userId,
         [
-            { username: "spinner", userId },
-            { username: "Brian", userId: "guest-1" },
+            { username: "spinner#00", userId },
+            { username: "Brian#00", userId: "guest-1" },
             { username: "Quagmire", userId: null },
         ],
         expect.any(Number),

@@ -22,10 +22,10 @@ function getRandomWinnerCoins(): number {
     return getSecureRandomNumber(3, 6);
 }
 
-function resolveNamesInWheel(entries: WheelEntry[], accountsByUsername: Map<string, string>): NameInWheel[] {
+function resolveNamesInWheel(entries: WheelEntry[], accountsByDisplayName: Map<string, string>): NameInWheel[] {
     return entries.map((entry) => ({
         username: entry.text,
-        userId: accountsByUsername.get(entry.text) ?? null,
+        userId: entry.isPlayer ? accountsByDisplayName.get(entry.text) ?? null : null,
     }));
 }
 
@@ -41,17 +41,19 @@ export async function generateSpin(
     }
 
     const spinnerProfile = await getUserProfile(userId);
-    const accountsByUsername = new Map<string, string>(roomPlayers.map((player) => [player.username, player.id]));
+    const accountsByDisplayName = new Map<string, string>(
+        roomPlayers.map((player) => [formatDisplayName(player.username, player.suffix), player.id])
+    );
 
     if (spinnerProfile?.username) {
-        accountsByUsername.set(spinnerProfile.username, userId);
+        accountsByDisplayName.set(formatDisplayName(spinnerProfile.username, spinnerProfile.suffix), userId);
     }
 
     const { ranNum, winnerIndex } = resolveSpinWinner(getRandomWheelSpinNumber(), multiplier, direction, entries.length);
     const spinToken = await insertSpinToken(
         randomUUID(),
         userId,
-        resolveNamesInWheel(entries, accountsByUsername),
+        resolveNamesInWheel(entries, accountsByDisplayName),
         winnerIndex,
     );
     return { ranNum, spinToken, winnerName: entries[winnerIndex]?.text ?? "" };

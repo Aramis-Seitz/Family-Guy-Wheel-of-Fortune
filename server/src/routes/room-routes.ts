@@ -7,7 +7,8 @@ import {
     handleSpinRoom,
     handleResetRoom,
     handleSetMultiplier,
-    handleUpdateNames
+    handleUpdateNames,
+    handleSyncPlayersInWheel
 } from "../controllers/room-controller";
 
 export const roomRoutes = Router();
@@ -21,3 +22,4 @@ roomRoutes.post("/:roomKey/players", handleJoinRoom);
 roomRoutes.delete("/:roomKey/players/:userId", handleLeaveRoom);
 roomRoutes.post("/:roomKey/spins", handleSpinRoom);
 roomRoutes.patch("/:roomKey/names-in-wheel-list", handleUpdateNames);
+roomRoutes.patch("/:roomKey/players-in-wheel-list", handleSyncPlayersInWheel);

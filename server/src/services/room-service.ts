@@ -198,6 +198,58 @@ export async function setRoomNames(
     await updateRoomNames(roomKey, toManualWheelEntries(validateRoomNames(names)));
 }
 
+function resolveTargetedPlayerEntries(players: RoomPlayer[], playerDisplayNames: string[]): WheelEntry[] {
+    return players
+        .map((player) => ({ text: formatDisplayName(player.username, player.suffix), isPlayer: true }))
+        .filter((entry) => playerDisplayNames.includes(entry.text));
+}
+
+function isSamePlayerEntry(a: WheelEntry, b: WheelEntry): boolean {
+    return a.isPlayer && b.isPlayer && a.text === b.text;
+}
+
+function containsPlayerEntry(entries: WheelEntry[], entry: WheelEntry): boolean {
+    return entries.some((existing) => isSamePlayerEntry(existing, entry));
+}
+
+function areAllEntriesInWheel(targetedEntries: WheelEntry[], currentEntries: WheelEntry[]): boolean {
+    return targetedEntries.every((entry) => containsPlayerEntry(currentEntries, entry));
+}
+
+function removePlayerEntries(currentEntries: WheelEntry[], targetedEntries: WheelEntry[]): WheelEntry[] {
+    return currentEntries.filter((existing) => !containsPlayerEntry(targetedEntries, existing));
+}
+
+function addMissingPlayerEntries(currentEntries: WheelEntry[], targetedEntries: WheelEntry[]): WheelEntry[] {
+    const missingEntries = targetedEntries.filter((entry) => !containsPlayerEntry(currentEntries, entry));
+    return [...currentEntries, ...missingEntries];
+}
+
+function assertWithinWheelLimit(entries: WheelEntry[]): void {
+    if (entries.length > MAX_WHEEL_NAMES) {
+        throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
+    }
+}
+
+export async function syncPlayersInWheel(
+    userId: string,
+    roomKey: string,
+    playerDisplayNames: string[]
+): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    requireRoomHost(room, userId, "manage players in the wheel");
+
+    const targetedEntries = resolveTargetedPlayerEntries(room.players ?? [], playerDisplayNames);
+    const currentEntries = room.names_in_wheel ?? [];
+
+    const updatedEntries = areAllEntriesInWheel(targetedEntries, currentEntries)
+        ? removePlayerEntries(currentEntries, targetedEntries)
+        : addMissingPlayerEntries(currentEntries, targetedEntries);
+
+    assertWithinWheelLimit(updatedEntries);
+    await updateRoomNames(roomKey, updatedEntries);
+}
+
 export async function resetRoom(
     userId: string,
     roomKey: string,

@@ -1,5 +1,5 @@
 import {
-  spinWheelWithRandomSteps, lockAllSpinElements, applyGameModeLock,
+  spinWheelWithRandomSteps, applyGameModeLock,
   resetWheelRotation,
   spinBtn, resetBtn,
 } from "../wheel/spin";

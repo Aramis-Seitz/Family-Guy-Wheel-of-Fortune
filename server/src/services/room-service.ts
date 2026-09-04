@@ -18,7 +18,7 @@ import {
 import { generateSpin } from "./spin-service";
 import { AppError } from "../lib/errors";
 import { formatDisplayName } from "../lib/display-name";
-import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
+import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody, WheelEntry } from "shared";
 
 const MAX_WHEEL_NAMES = 16;
 const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
@@ -62,43 +62,25 @@ function requireRoomHost(room: RoomData | null, userId: string, action: string):
     }
 }
 
-function validateRoomNames(names: string[]): string[] {
-    if (names.length > MAX_WHEEL_NAMES) {
-        throw new AppError(
-            `A room may contain at most ${MAX_WHEEL_NAMES} wheel names`,
-            400
-        );
+function validateManualWheelName(rawName: string, currentEntries: WheelEntry[]): string {
+    if (currentEntries.length >= MAX_WHEEL_NAMES) {
+        throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
     }
 
-    const normalizedNames = names.map((name) => name.trim());
-
-    if (
-        normalizedNames.some(
-            (name) => !name || !WHEEL_NAME_PATTERN.test(name)
-        )
-    ) {
-        throw new AppError(
-            "Wheel names must contain only letters, numbers, or apostrophes",
-            400
-        );
+    const name = rawName.trim();
+    if (!name || !WHEEL_NAME_PATTERN.test(name)) {
+        throw new AppError("Wheel names must contain only letters, numbers, or apostrophes", 400);
     }
 
-    if (
-        normalizedNames.some(
-            (name) => name.length > MAX_WHEEL_NAME_LENGTH
-        )
-    ) {
-        throw new AppError(
-            `Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`,
-            400
-        );
+    if (name.length > MAX_WHEEL_NAME_LENGTH) {
+        throw new AppError(`Wheel names may be at most ${MAX_WHEEL_NAME_LENGTH} characters long`, 400);
     }
-    // Doppelte Namen würden die Zuordnung Name -> Account beim Spin mehrdeutig
-    // machen, deshalb ist die Liste hier wie im Client duplikatfrei.
-    if (new Set(normalizedNames.map((name) => name.toLowerCase())).size !== normalizedNames.length) {
+
+    if (currentEntries.some((entry) => entry.text.toLowerCase() === name.toLowerCase())) {
         throw new AppError("Wheel names must be unique", 400);
     }
-    return normalizedNames;
+
+    return name;
 }
 
 export async function joinRoom(
@@ -185,14 +167,85 @@ export async function spinRoom(
     return { ranNum, spinToken, winnerName };
 }
 
-export async function setRoomNames(
+export async function addManualWheelName(
     userId: string,
     roomKey: string,
-    names: string[]
+    rawName: string
 ): Promise<void> {
     const room = await getRoomByKey(roomKey);
-    requireRoomHost(room, userId, "update wheel items");
-    await updateRoomNames(roomKey, validateRoomNames(names));
+    requireRoomHost(room, userId, "add a wheel name");
+
+    const currentEntries = room.names_in_wheel ?? [];
+    const name = validateManualWheelName(rawName, currentEntries);
+    await updateRoomNames(roomKey, [...currentEntries, { text: name, isPlayer: false }]);
+}
+
+export async function removeWheelEntryAtIndex(
+    userId: string,
+    roomKey: string,
+    index: number
+): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    requireRoomHost(room, userId, "remove a wheel name");
+
+    const currentEntries = room.names_in_wheel ?? [];
+    if (index < 0 || index >= currentEntries.length) {
+        throw new AppError("Invalid wheel entry index", 400);
+    }
+
+    await updateRoomNames(roomKey, currentEntries.filter((_, entryIndex) => entryIndex !== index));
+}
+
+function resolveTargetedPlayerEntries(players: RoomPlayer[], playerDisplayNames: string[]): WheelEntry[] {
+    return players
+        .map((player) => ({ text: formatDisplayName(player.username, player.suffix), isPlayer: true }))
+        .filter((entry) => playerDisplayNames.includes(entry.text));
+}
+
+function isSamePlayerEntry(a: WheelEntry, b: WheelEntry): boolean {
+    return a.isPlayer && b.isPlayer && a.text === b.text;
+}
+
+function containsPlayerEntry(entries: WheelEntry[], entry: WheelEntry): boolean {
+    return entries.some((existing) => isSamePlayerEntry(existing, entry));
+}
+
+function areAllEntriesInWheel(targetedEntries: WheelEntry[], currentEntries: WheelEntry[]): boolean {
+    return targetedEntries.every((entry) => containsPlayerEntry(currentEntries, entry));
+}
+
+function removePlayerEntries(currentEntries: WheelEntry[], targetedEntries: WheelEntry[]): WheelEntry[] {
+    return currentEntries.filter((existing) => !containsPlayerEntry(targetedEntries, existing));
+}
+
+function addMissingPlayerEntries(currentEntries: WheelEntry[], targetedEntries: WheelEntry[]): WheelEntry[] {
+    const missingEntries = targetedEntries.filter((entry) => !containsPlayerEntry(currentEntries, entry));
+    return [...currentEntries, ...missingEntries];
+}
+
+function assertWithinWheelLimit(entries: WheelEntry[]): void {
+    if (entries.length > MAX_WHEEL_NAMES) {
+        throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
+    }
+}
+
+export async function syncPlayersInWheel(
+    userId: string,
+    roomKey: string,
+    playerDisplayNames: string[]
+): Promise<void> {
+    const room = await getRoomByKey(roomKey);
+    requireRoomHost(room, userId, "manage players in the wheel");
+
+    const targetedEntries = resolveTargetedPlayerEntries(room.players ?? [], playerDisplayNames);
+    const currentEntries = room.names_in_wheel ?? [];
+
+    const updatedEntries = areAllEntriesInWheel(targetedEntries, currentEntries)
+        ? removePlayerEntries(currentEntries, targetedEntries)
+        : addMissingPlayerEntries(currentEntries, targetedEntries);
+
+    assertWithinWheelLimit(updatedEntries);
+    await updateRoomNames(roomKey, updatedEntries);
 }
 
 export async function resetRoom(

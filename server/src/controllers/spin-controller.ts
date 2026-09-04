@@ -17,9 +17,9 @@ export const handleGenerateSpin = asyncHandler(async (req: HttpRequest, res: Htt
         return;
     }
 
-    // Solo-Spin: außer dem Spinner selbst sitzt hier niemand mit Account am Rad.
     const { names, multiplier, direction } = parsedBody.data;
-    const result = await generateSpin(req.userId!, names, { multiplier, direction });
+    const entries = names.map((text) => ({ text, isPlayer: false }));
+    const result = await generateSpin(req.userId!, entries, { multiplier, direction });
     res.status(201).json(SpinRandomResponseSchema.parse(result));
 });
 

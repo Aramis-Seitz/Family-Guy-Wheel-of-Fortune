@@ -6,7 +6,7 @@ import type { RoomPlayer, NameInWheel } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
 import { formatDisplayName } from "../lib/display-name";
 import { resolveSpinWinner, type SpinDirection } from "../lib/wheel-winner";
-import type { SpinRandomResponseBody, AwardCoinsResponseBody } from "shared";
+import type { SpinRandomResponseBody, AwardCoinsResponseBody, WheelEntry } from "shared";
 
 export type SpinParams = { multiplier: number; direction: SpinDirection };
 
@@ -22,39 +22,41 @@ function getRandomWinnerCoins(): number {
     return getSecureRandomNumber(3, 6);
 }
 
-function resolveNamesInWheel(names: string[], accountsByUsername: Map<string, string>): NameInWheel[] {
-    return names.map((username) => ({
-        username,
-        userId: accountsByUsername.get(username) ?? null,
+function resolveNamesInWheel(entries: WheelEntry[], accountsByDisplayName: Map<string, string>): NameInWheel[] {
+    return entries.map((entry) => ({
+        username: entry.text,
+        userId: entry.isPlayer ? accountsByDisplayName.get(entry.text) ?? null : null,
     }));
 }
 
 export async function generateSpin(
     userId: string,
-    names: string[],
+    entries: WheelEntry[],
     { multiplier, direction }: SpinParams,
     roomPlayers: RoomPlayer[] = [],
 ): Promise<SpinRandomResponseBody> {
 
-    if (names.length < 2) {
+    if (entries.length < 2) {
         throw new AppError("A spin needs at least two names", 400);
     }
 
     const spinnerProfile = await getUserProfile(userId);
-    const accountsByUsername = new Map<string, string>(roomPlayers.map((player) => [player.username, player.id]));
+    const accountsByDisplayName = new Map<string, string>(
+        roomPlayers.map((player) => [formatDisplayName(player.username, player.suffix), player.id])
+    );
 
     if (spinnerProfile?.username) {
-        accountsByUsername.set(spinnerProfile.username, userId);
+        accountsByDisplayName.set(formatDisplayName(spinnerProfile.username, spinnerProfile.suffix), userId);
     }
 
-    const { ranNum, winnerIndex } = resolveSpinWinner(getRandomWheelSpinNumber(), multiplier, direction, names.length);
+    const { ranNum, winnerIndex } = resolveSpinWinner(getRandomWheelSpinNumber(), multiplier, direction, entries.length);
     const spinToken = await insertSpinToken(
         randomUUID(),
         userId,
-        resolveNamesInWheel(names, accountsByUsername),
+        resolveNamesInWheel(entries, accountsByDisplayName),
         winnerIndex,
     );
-    return { ranNum, spinToken, winnerName: names[winnerIndex] ?? "" };
+    return { ranNum, spinToken, winnerName: entries[winnerIndex]?.text ?? "" };
 }
 
 export async function awardCoins(userId: string, spinToken: string): Promise<AwardCoinsResponseBody> {
@@ -63,9 +65,6 @@ export async function awardCoins(userId: string, spinToken: string): Promise<Awa
         throw new AppError("Invalid or already used spin token", 403);
     }
 
-    // Das Markieren des Tokens als "used" löst per DB-Trigger (siehe
-    // supabase/migrations/26_achievement_progress_triggers.sql) den
-    // "spin"-Achievement-Fortschritt für userId aus.
     await markSpinTokenUsed(spinToken);
 
     const spinnerCoins = getRandomSpinnerCoins();

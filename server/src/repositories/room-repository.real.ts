@@ -1,4 +1,5 @@
 import { supabaseClient } from "../lib/supabase-client";
+import type { WheelEntry } from "shared";
 import type { RoomPlayer, RoomData, NameInWheel } from "./room-repository.shared";
 
 export async function getActiveRoomForUser(userId: string): Promise<RoomData | null> {
@@ -66,7 +67,7 @@ export async function removePlayerFromRoom(roomKey: string, userId: string): Pro
     return (data as { players: RoomPlayer[] }).players;
 }
 
-export async function updateRoomNames(roomKey: string, names: string[]): Promise<string[]> {
+export async function updateRoomNames(roomKey: string, names: WheelEntry[]): Promise<WheelEntry[]> {
     const { data, error } = await supabaseClient
         .from("rooms")
         .update({ names_in_wheel: names })
@@ -74,7 +75,7 @@ export async function updateRoomNames(roomKey: string, names: string[]): Promise
         .select("names_in_wheel")
         .single();
     if (error) throw error;
-    return (data as { names_in_wheel: string[] }).names_in_wheel;
+    return (data as { names_in_wheel: WheelEntry[] }).names_in_wheel;
 }
 
 export async function clearRoomPlayers(roomKey: string): Promise<void> {

@@ -1,5 +1,6 @@
 import { supabaseClient } from '../shared/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { WheelEntry } from 'shared';
 import { formatProfileName } from '../profile/profile-ui';
 
 interface RoomPlayer {
@@ -11,7 +12,7 @@ interface RoomRow {
   last_spin: number;
   spun_at: string;
   players: RoomPlayer[];
-  names_in_wheel?: string[];
+  names_in_wheel?: WheelEntry[];
   multiplier: number;
   spin_direction: string | null;
   spin_winner?: string | null;
@@ -70,7 +71,7 @@ export function subscribeToRoom(
           const namesInWheelListJson = JSON.stringify(updatedRoom.names_in_wheel);
           if (namesInWheelListJson !== lastKnownNamesInWheelListJson) {
             lastKnownNamesInWheelListJson = namesInWheelListJson;
-            onNamesUpdate?.(updatedRoom.names_in_wheel);
+            onNamesUpdate?.(updatedRoom.names_in_wheel.map((entry) => entry.text));
           }
         }
 

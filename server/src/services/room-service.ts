@@ -21,7 +21,7 @@ import { formatDisplayName } from "../lib/display-name";
 import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
 const MAX_WHEEL_NAMES = 16;
-const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
+const WHEEL_NAME_PATTERN = /^[A-Za-z0-9'#]+$/;
 const MAX_WHEEL_NAME_LENGTH = 20;
 
 function generateRoomKey(): string {

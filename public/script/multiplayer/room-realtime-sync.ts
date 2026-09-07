@@ -52,13 +52,11 @@ export function subscribeToRoom(
         const updatedRoom = payload.new;
 
         if (Array.isArray(updatedRoom.players)) {
-          // players = [] signals the host closed the room
           if (updatedRoom.players.length === 0) {
             onClose?.();
             return;
           }
 
-          // Only call onPlayersUpdate when the player list actually changed (not on spin events)
           const playersJson = JSON.stringify(updatedRoom.players);
           if (playersJson !== lastKnownPlayersJson) {
             lastKnownPlayersJson = playersJson;
@@ -74,16 +72,12 @@ export function subscribeToRoom(
           }
         }
 
-        // Notify when the host changes the multiplier
         const newMultiplier = updatedRoom.multiplier ?? 1;
         if (newMultiplier !== lastKnownMultiplier) {
           lastKnownMultiplier = newMultiplier;
           onMultiplierUpdate?.(newMultiplier);
         }
 
-        // Jede Spalte trägt genau ein Ereignis und wird unabhängig von den anderen ausgewertet.
-        // Ein Reset-Write fasst last_spin/spun_at nie an — ein solches Update darf also nie
-        // als Spin interpretiert werden, sonst spielen Gäste die Rad-Animation erneut ab.
         let resetEventHandled = false;
 
         if (updatedRoom.wheel_reset_at && updatedRoom.wheel_reset_at !== lastKnownWheelResetAt) {
@@ -116,8 +110,6 @@ export function subscribeToRoom(
         table: 'rooms',
         filter: `room_key=eq.${roomKey}`,
       },
-      // Host-Leave löscht die Zeile direkt nach dem players=[]-Update; das DELETE
-      // ist das verlässliche, endgültige Signal und braucht kein Racing gegen das UPDATE.
       () => { onClose?.(); },
     )
     .subscribe();

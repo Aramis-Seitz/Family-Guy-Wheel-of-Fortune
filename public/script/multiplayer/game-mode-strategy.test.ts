@@ -44,9 +44,6 @@ vi.mock('../api/room-api', () => ({
   resetRoom: vi.fn(),
 }));
 
-// activeRoomKey ist im echten room-state.ts ein modul-globaler `let`-Export.
-// Getter/Setter hier bilden dasselbe Verhalten nach, damit die Tests den
-// Room-Key zwischen den Fällen wie im echten Code umschalten können.
 vi.mock('./room-state', () => {
   const state: { activeRoomKey: string | null; activeRoomNamesInWheelList: string[] } = {
     activeRoomKey: null,
@@ -133,7 +130,7 @@ describe('HostModeStrategy', () => {
     });
 
     it('onSpinClick ruft spinRoom mit dem Room-Key auf', async () => {
-      vi.mocked(spinRoom).mockResolvedValue({ spinToken: 'token-1' });
+      vi.mocked(spinRoom).mockResolvedValue({ spinToken: 'token-1', ranNum: 1, winnerName: 'Peter' });
 
       await strategy.onSpinClick('left');
 

@@ -4,6 +4,7 @@ import { AppError } from "../lib/errors";
 import { insertSpinToken, findAwardableSpin, markSpinTokenUsed } from "../repositories/room-repository";
 import type { RoomPlayer, NameInWheel } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
+import { incrementAchievementProgress } from "./achievement-service";
 import { formatDisplayName } from "../lib/display-name";
 import { resolveSpinWinner, type SpinDirection } from "../lib/wheel-winner";
 import type { SpinRandomResponseBody, AwardCoinsResponseBody, WheelEntry } from "shared";
@@ -66,6 +67,7 @@ export async function awardCoins(userId: string, spinToken: string): Promise<Awa
     }
 
     await markSpinTokenUsed(spinToken);
+    await incrementAchievementProgress(userId, "spin", 1);
 
     const spinnerCoins = getRandomSpinnerCoins();
     const spinnerProfile = await getUserProfile(userId);

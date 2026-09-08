@@ -20,10 +20,15 @@ vi.mock("./user-service", () => ({
     getUserProfile: vi.fn(),
 }));
 
+vi.mock("./achievement-service", () => ({
+    incrementAchievementProgress: vi.fn(),
+}));
+
 import { randomUUID } from "crypto";
 import { getSecureRandomNumber } from "../lib/random";
 import { insertSpinToken, findAwardableSpin, markSpinTokenUsed } from "../repositories/room-repository";
 import { addCoins, getUserProfile } from "./user-service";
+import { incrementAchievementProgress } from "./achievement-service";
 
 const userId = "user-123";
 const generatedUuid = "11111111-1111-1111-1111-111111111111";
@@ -239,5 +244,16 @@ describe("awardCoins", () => {
         await awardCoins(userId, spinToken);
 
         expect(markSpinTokenUsed).toHaveBeenCalledExactlyOnceWith(spinToken);
+    });
+
+    it("advances the spinner's 'spin' achievement progress by one", async () => {
+        vi.mocked(findAwardableSpin).mockResolvedValueOnce({
+            namesInWheel: [{ username: "Brian", userId: "guest-1" }],
+            winnerIndex: 0,
+        });
+
+        await awardCoins(userId, spinToken);
+
+        expect(incrementAchievementProgress).toHaveBeenCalledExactlyOnceWith(userId, "spin", 1);
     });
 });

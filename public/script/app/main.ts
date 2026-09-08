@@ -20,8 +20,7 @@ import { initI18n, t } from "./i18n";
 import { initLanguageSwitcher } from "./language-switcher";
 import { initTheme } from "./theme";
 import { showLoadingScreenFor } from "./loading-screen";
-import { subscribeToAchievementUnlocks, fetchAchievements } from "../achievements/achievement-service";
-import { showAchievementUnlockModal } from "../achievements/achievement-ui";
+import { initAchievementNotifications } from "../achievements/achievement-ui";
 
 
 function initMobileMenu(): void {
@@ -73,16 +72,6 @@ function initMobileMenu(): void {
   });
 }
 
-async function initAchievementUnlockListener(): Promise<void> {
-  await subscribeToAchievementUnlocks(async (achievementId) => {
-    const achievements = await fetchAchievements();
-    const unlocked = achievements.find(achievement => achievement.id === achievementId);
-    if (unlocked) {
-      showAchievementUnlockModal({ ...unlocked, unlocked_at: new Date().toISOString() });
-    }
-  });
-}
-
 async function initApp(): Promise<void> {
   await initI18n();
   localizeHtmlElements();
@@ -102,7 +91,7 @@ async function initApp(): Promise<void> {
   await initProfileUI();
   setMyUsername(profileData.getState().username?.trim() || t("generic.anonymous"));
   try {
-    await initAchievementUnlockListener();
+    await initAchievementNotifications();
   } catch (error) {
     console.error("[ACHIEVEMENTS] Realtime-Subscription fehlgeschlagen:", error);
   }

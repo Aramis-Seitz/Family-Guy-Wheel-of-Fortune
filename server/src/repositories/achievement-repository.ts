@@ -7,5 +7,8 @@ const impl = USE_MOCK ? mock : real;
 export const getAll = impl.getAll;
 export const getProgress = impl.getProgress;
 export const getUnlocked = impl.getUnlocked;
+export const getUnclaimedAchievementsByCategory = impl.getUnclaimedAchievementsByCategory;
+export const upsertProgress = impl.upsertProgress;
+export const insertUnlocked = impl.insertUnlocked;
 
 export type { AchievementRepository } from "./achievement-repository.shared";

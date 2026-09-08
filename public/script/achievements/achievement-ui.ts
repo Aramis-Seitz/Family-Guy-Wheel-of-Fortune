@@ -1,5 +1,5 @@
 import type { AchievementWithProgress, UnlockedAchievement } from "shared";
-import { fetchAchievements } from "./achievement-service";
+import { fetchAchievements, subscribeToAchievementUnlocks } from "./achievement-service";
 import { startConfetti } from "../wheel/winner";
 import { requiredElement } from "../shared/dom-helpers";
 import { t } from "../app/i18n";
@@ -88,12 +88,6 @@ async function loadAndRenderAchievements(container: HTMLElement): Promise<void> 
     }
 }
 
-// ── Unlock-Modal ──
-// Groß, mit Konfetti, muss manuell weggeklickt werden. Da Unlocks nur noch
-// über die Realtime-Subscription (main.ts) reinkommen, können mehrere davon
-// dicht hintereinander eintrudeln (z. B. Verbindungs-Nachzügler) - deshalb
-// eine Queue, die die Modals nacheinander statt übereinander zeigt.
-
 const unlockModal = requiredElement<HTMLDivElement>("achievement-unlock-modal");
 const unlockModalIcon = requiredElement<HTMLDivElement>("achievement-unlock-modal-icon");
 const unlockModalName = requiredElement<HTMLHeadingElement>("achievement-unlock-modal-name");
@@ -141,4 +135,14 @@ export function showAchievementUnlockModal(achievement: UnlockedAchievement): vo
 
     unlockQueue.push(achievement);
     showNextUnlockInQueue();
+}
+
+export async function initAchievementNotifications(): Promise<void> {
+    await subscribeToAchievementUnlocks(async (achievementId) => {
+        const achievements = await fetchAchievements();
+        const unlocked = achievements.find(achievement => achievement.id === achievementId);
+        if (unlocked) {
+            showAchievementUnlockModal({ ...unlocked, unlocked_at: new Date().toISOString() });
+        }
+    });
 }

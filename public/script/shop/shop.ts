@@ -7,7 +7,6 @@ import { getActiveCategory, renderCategoryTabs } from "../shared/category-tabs";
 import { formatNumber } from "../app/format";
 import { t } from "../app/i18n";
 
-// ----- SHOP-MODAL ÖFFNEN/SCHLIESSEN -----
 
 export const shopModal = requiredElement<HTMLDialogElement>("shop-modal");
 
@@ -48,7 +47,6 @@ async function refreshShop(): Promise<void> {
 }
 
 
-// ----- COIN BALANCE -----
 
 export let balance = 0;
 
@@ -68,7 +66,6 @@ export async function loadCoinBalance(): Promise<void> {
 }
 
 
-// ----- CATEGORY-TABS UND FILTER-FUNKTIONALITÄT -----
 
 export const shopTabs = requiredElement<HTMLElement>("shop-modal-tabs");
 

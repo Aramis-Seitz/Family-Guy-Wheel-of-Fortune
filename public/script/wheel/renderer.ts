@@ -55,9 +55,6 @@ function createWheelSegmentPath(
   return path;
 }
 
-// Ab dieser Zeichenzahl wird der Name zweizeilig dargestellt und die
-// Schrift verkleinert, damit lange Namen (bis MAX_NAME_LENGTH, siehe
-// shared/validation.ts) nicht über den Segmentrand hinaus laufen.
 const WRAP_THRESHOLD = 8;
 const MIN_FONT_SIZE_RATIO = 0.5;
 

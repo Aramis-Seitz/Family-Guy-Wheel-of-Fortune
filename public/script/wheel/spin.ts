@@ -19,9 +19,6 @@ export function isSpinning(): boolean {
 
 export type Direction = "left" | "right";
 
-// Sperrt pauschal ALLE spin-relevanten Elemente für die Dauer eines Spins —
-// rollenunabhängig, kein automatisches Gegenstück. Der Zustand danach wird
-// bewusst über applyGameModeLock() neu hergeleitet, nicht einfach umgekehrt.
 export function lockAllSpinElements(): void {
   setElementsDisabled(getSpinRelatedElements(), true);
   profileName?.classList.remove("user-profile-name--clickable");
@@ -205,17 +202,10 @@ export function getCurrentRotation(): number {
 
 export const resetBtn = requiredElement<HTMLButtonElement>("reset-btn");
 
-// Das Universum, das nach einem Spin/Reset/Rollenwechsel neu aus currentMode
-// hergeleitet wird — die Spin-relevanten Elemente PLUS resetBtn, der bewusst
-// NICHT Teil von getSpinRelatedElements() ist (während eines laufenden Spins
-// soll Reset weiterhin klickbar bleiben, unverändertes Verhalten).
 function getRoleLockableElements(): SpinElement[] {
   return [...getSpinRelatedElements(), resetBtn];
 }
 
-// Stellt den Sperrzustand her, der laut aktuellem Spielmodus (Solo/Host/Gast)
-// gerade gelten soll. Kein "unlock" im klassischen Sinn — leitet sich immer
-// neu aus currentMode her, statt eine vorherige Sperre nur umzukehren.
 export function applyGameModeLock(): void {
   const hasEnoughItems = getNamesInWheelList().length >= MIN_ITEMS;
   const locked: SpinElement[] = [...getCurrentMode().getRoleLockedElements()];
@@ -225,9 +215,6 @@ export function applyGameModeLock(): void {
 
   setElementsDisabled(getRoleLockableElements(), false);
   setElementsDisabled(locked, true);
-  // profileName ist ein <span>, kein Button/Input — kann nicht über
-  // setElementsDisabled() laufen. Folgt stattdessen demselben Berechtigungs-
-  // Flag wie input/addBtn (isNameEditingLocked), statt blind "klickbar" zu setzen.
   profileName?.classList.toggle("user-profile-name--clickable", !isNameEditingLocked());
 }
 

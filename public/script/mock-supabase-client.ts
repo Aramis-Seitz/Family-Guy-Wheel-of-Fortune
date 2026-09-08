@@ -117,7 +117,6 @@ class MockQueryBuilder {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-        // 409 = profile already created during signUp – treat as success
         if (res.status === 409) return { data: null, error: null };
         if (!res.ok) return { data: null, error: { message: 'Insert failed' } };
         return { data: await res.json(), error: null };
@@ -161,13 +160,6 @@ class MockQueryBuilder {
   }
 }
 
-// Supabase Realtime "broadcast" is peer-to-peer (no DB involved), so it can
-// be mocked with BroadcastChannel: it relays messages between same-origin
-// tabs/windows, which is exactly how multiplayer is tested locally against
-// the mock backend (two tabs, same room). "postgres_changes" subscriptions
-// (coin-updates, room sync) would need a real DB change stream from the
-// server and stay inert here - on()/subscribe() are still chainable so
-// callers don't crash, they just never receive events.
 class MockRealtimeChannel {
   private bc: BroadcastChannel;
   private listeners: { event: string; cb: (arg: { payload: unknown }) => void }[] = [];

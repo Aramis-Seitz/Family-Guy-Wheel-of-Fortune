@@ -11,11 +11,9 @@ export async function applyActiveAssets(): Promise<void> {
         if (selectedSound) void preloadTickBuffer(selectedSound.asset_url);
         if (selectedCompanion) applyActiveCompanion(selectedCompanion.asset_url);
     } catch {
-        // API nicht erreichbar — Assets bleiben ohne src
     }
 }
 
-// Wendet ein einzelnes Asset sofort auf die DOM an — wird nach einem SELECT-Klick im Inventar aufgerufen.
 export function applySelectedAsset(asset: Asset): void {
     if (asset.category === "sound") void preloadTickBuffer(asset.asset_url);
     if (asset.category === "companion") applyActiveCompanion(asset.asset_url);

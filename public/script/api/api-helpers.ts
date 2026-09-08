@@ -23,7 +23,6 @@ export async function readApiError(response: Response, fallbackKey: string): Pro
         const body = await response.json() as ApiErrorBody;
         if (body.error) console.error("API request failed:", body.error);
     } catch {
-        // Keep fallback when response is not valid JSON.
     }
     return t(fallbackKey);
 }

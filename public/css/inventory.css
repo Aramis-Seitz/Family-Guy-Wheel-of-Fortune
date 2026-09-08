@@ -34,7 +34,6 @@
     filter: brightness(0.9);
 }
 
-/* ── Inventory Modal ── */
 #inventory-modal-close-btn {
     background: none;
     border: none;
@@ -108,7 +107,6 @@
     cursor: pointer;
 }
 
-/* ── Inventory Grid & Cards ── */
 .inventory-modal__wheel-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -221,7 +219,6 @@
     transform: scale(0.95);
 }
 
-/* ----- INVENTORY ASSETS ----- */
 
 .inventory-modal__asset-card--selected .inventory-modal__select-btn {
     background: var(--button-bg);
@@ -231,7 +228,6 @@
     pointer-events: none;
 }
 
-/* ----- ACHIEVEMENTS ----- */
 
 .inventory-modal__achievement-grid {
     display: grid;

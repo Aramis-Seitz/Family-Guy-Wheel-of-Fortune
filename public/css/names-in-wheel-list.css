@@ -125,12 +125,10 @@
 
 .names-in-wheel-list::-webkit-scrollbar {
     width: 12px;
-    /* für Chrome */
 }
 
 .names-in-wheel-list::-webkit-scrollbar-track {
     background: var(--transparent);
-    /* für Edge  */
 }
 
 .names-in-wheel-list-element {

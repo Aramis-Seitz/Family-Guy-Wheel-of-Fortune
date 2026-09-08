@@ -27,8 +27,7 @@ export function playTickSound(): void {
   source.start(ctx.currentTime);
 }
 
-// --- Asset Sound via Web Audio API (saubere Fades, kein Clip-Knacken) ---
-const FADE_DURATION = 0.04; // 40ms fade-in und fade-out
+const FADE_DURATION = 0.04;
 
 const bufferCache = new Map<string, AudioBuffer>();
 let audioCtx: AudioContext | null = null;
@@ -53,7 +52,6 @@ function stopSourceSafely(source: AudioBufferSourceNode): void {
   try {
     source.stop();
   } catch {
-    /* bereits gestoppt */
   }
 }
 
@@ -135,7 +133,6 @@ export async function preloadStaticSounds(): Promise<void> {
   ]);
 }
 
-// --- Drumroll via Web Audio API (loop + sauberer Fade-Out) ---
 const DRUMROLL_FADE = 0.2;
 let drumrollSource: AudioBufferSourceNode | null = null;
 let drumrollGain: GainNode | null = null;
@@ -172,7 +169,6 @@ export function stopDrumRoll(): void {
   setTimeout(() => stopSourceSafely(source), DRUMROLL_FADE * 1000);
 }
 
-// --- Cymbal Crash via Web Audio API ---
 export function playCymbalCrash(): void {
   if (!cymbalBuffer) return;
   const ctx = getAudioContext();

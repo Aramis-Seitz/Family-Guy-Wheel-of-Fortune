@@ -10,9 +10,6 @@ if (!USE_MOCK && (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY)) {
   throw new Error('Missing Supabase environment variables');
 }
 
-// createBrowserClient (statt createClient) legt die Session in Cookies statt
-// localStorage ab, damit die Vercel-Edge-Middleware sie vor Auslieferung von
-// main.html lesen und prüfen kann (siehe /middleware.ts).
 export const supabaseClient = USE_MOCK
   ? (createMockClient() as any)
   : createBrowserClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);

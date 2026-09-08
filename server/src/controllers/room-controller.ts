@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRoom, joinRoom, leaveRoom, spinRoom, setRoomNames, resetRoom, setMultiplier } from "../services/room-service";
+import { createRoom, joinRoom, leaveRoom, spinRoom, addManualWheelName, removeWheelEntryAtIndex, syncPlayersInWheel, resetRoom, setMultiplier } from "../services/room-service";
 import { asyncHandler } from "./response";
 import type { HttpRequest, HttpResponse } from "./response";
 import {
@@ -74,18 +74,46 @@ export const handleSetMultiplier = asyncHandler(async (req: HttpRequest, res: Ht
     res.status(200).json({ ok: true });
 });
 
-const SetNamesRequestSchema = z.object({
-    names: z.array(z.string()),
+const AddWheelNameRequestSchema = z.object({
+    name: z.string(),
 });
 
-export const handleUpdateNames = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
-    const parsedBody = SetNamesRequestSchema.safeParse(req.body);
+export const handleAddWheelName = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = AddWheelNameRequestSchema.safeParse(req.body);
     if (!parsedBody.success) {
-        res.status(400).json({ error: "Missing names" });
+        res.status(400).json({ error: "Missing name" });
         return;
     }
 
     const roomKey = req.params!.roomKey!;
-    await setRoomNames(req.userId!, roomKey, parsedBody.data.names);
+    await addManualWheelName(req.userId!, roomKey, parsedBody.data.name);
+    res.status(200).json({ ok: true });
+});
+
+export const handleRemoveWheelEntry = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const roomKey = req.params!.roomKey!;
+    const index = Number(req.params!.index!);
+    if (!Number.isInteger(index)) {
+        res.status(400).json({ error: "Invalid index" });
+        return;
+    }
+
+    await removeWheelEntryAtIndex(req.userId!, roomKey, index);
+    res.status(200).json({ ok: true });
+});
+
+const SyncPlayersInWheelRequestSchema = z.object({
+    playerDisplayNames: z.array(z.string()),
+});
+
+export const handleSyncPlayersInWheel = asyncHandler(async (req: HttpRequest, res: HttpResponse) => {
+    const parsedBody = SyncPlayersInWheelRequestSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+        res.status(400).json({ error: "Missing playerDisplayNames" });
+        return;
+    }
+
+    const roomKey = req.params!.roomKey!;
+    await syncPlayersInWheel(req.userId!, roomKey, parsedBody.data.playerDisplayNames);
     res.status(200).json({ ok: true });
 });

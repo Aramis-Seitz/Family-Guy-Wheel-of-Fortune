@@ -1,3 +1,5 @@
+import type { WheelEntry } from "shared";
+
 export type RoomPlayer = { id: string; username: string; suffix: number };
 
 export type NameInWheel = { username: string; userId: string | null };
@@ -7,7 +9,7 @@ export type RoomData = {
     room_key: string;
     host_id: string;
     players: RoomPlayer[];
-    names_in_wheel?: string[];
+    names_in_wheel?: WheelEntry[];
     last_spin?: number | null;
     spun_at?: string | null;
     multiplier?: number | null;

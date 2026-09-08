@@ -1,5 +1,5 @@
 import {
-  spinWheelWithRandomSteps, lockAllSpinElements, applyGameModeLock,
+  spinWheelWithRandomSteps, applyGameModeLock,
   resetWheelRotation,
   spinBtn, resetBtn,
 } from "../wheel/spin";
@@ -15,7 +15,7 @@ import { MAX_ITEMS, isNameInWheelList } from "../names/names-in-wheel-list-state
 import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { t } from "../app/i18n";
-import { spinRoom, updateRoomNames, resetRoom } from "../api/room-api";
+import { spinRoom, addWheelName, removeWheelEntry, syncPlayersInWheel, resetRoom } from "../api/room-api";
 import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken } from "./room-state";
 
 export interface GameModeStrategy {
@@ -55,9 +55,7 @@ export class SoloModeStrategy implements GameModeStrategy {
     addNameToList(rawName);
   }
 
-  async removeNameFromWheel(): Promise<void> {
-    // no-op — lokales Entfernen läuft direkt über die Namensliste, nicht über den Raum-Callback
-  }
+  async removeNameFromWheel(): Promise<void> { }
 
   async removeWinnerFromWheel(index: number): Promise<void> {
     removeNameFromListByIndex(index);
@@ -65,9 +63,7 @@ export class SoloModeStrategy implements GameModeStrategy {
     resetWheelRotation();
   }
 
-  async toggleAllPlayersInWheel(): Promise<void> {
-    // no-op — es gibt keine Mitspielerliste ohne Raum
-  }
+  async toggleAllPlayersInWheel(): Promise<void> { }
 
   canManagePlayers(): boolean {
     return false;
@@ -77,9 +73,6 @@ export class SoloModeStrategy implements GameModeStrategy {
     return false;
   }
 
-  // Unerreichbar in der Praxis — #room-info (enthält den Leave-Button) ist
-  // versteckt, solange currentMode SoloModeStrategy ist. Nur wegen des
-  // GameModeStrategy-Interfaces Pflicht, siehe GuestModeStrategy.addName().
   getLeaveConfirmMessage(): string {
     return t('room.leaveConfirmGuest');
   }
@@ -89,35 +82,19 @@ export class SoloModeStrategy implements GameModeStrategy {
   }
 }
 
-// Nur von HostModeStrategy.onReset()/onWinnerModalClose() verwendet — deshalb
-// hier co-located statt in der Orchestrierung, sonst entsteht ein Zyklus
-// (Orchestrierung importiert bereits GameModeStrategy für setCurrentMode()).
 async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
-  if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
+  if (!activeRoomKey) return;
   try {
     await resetRoom(activeRoomKey, closeWinnerModal);
-    // Lokal passiert nichts hier direkt — das übernehmen handleWheelResetEvent()/
-    // handleWinnerModalCloseEvent(), sobald das Realtime-Update zurückkommt,
-    // damit der Host synchron mit allen anderen Spielern zurücksetzt statt
-    // vorzupreschen.
   } catch (error) {
     console.error('[ROOM] Reset fehlgeschlagen:', error);
     showToast({ message: t('api.room.resetFailed'), type: 'error' });
   }
 }
 
-async function updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList: string[]): Promise<void> {
-  if (!activeRoomKey) return;
-  await updateRoomNames(activeRoomKey, updatedNamesInWheelList);
-}
-
 export class HostModeStrategy implements GameModeStrategy {
-  // Animiert nicht direkt — das übernimmt handleRoomSpinEvent() in room-orchestration.ts,
-  // sobald das Realtime-Update zurückkommt, damit der Host synchron mit allen anderen
-  // Spielern spinnt statt vorzupreschen (analog zu Namen/Reset).
   async onSpinClick(direction: Direction): Promise<void> {
-    if (!activeRoomKey) return; // nur für TS-Typsicherheit — currentMode ist hier immer HostModeStrategy
-    lockAllSpinElements();
+    if (!activeRoomKey) return;
     try {
       const { spinToken } = await spinRoom(activeRoomKey, direction);
       setPendingHostSpinToken(spinToken);
@@ -141,6 +118,8 @@ export class HostModeStrategy implements GameModeStrategy {
   }
 
   async addNameToWheel(rawName: string): Promise<void> {
+    if (!activeRoomKey) return;
+
     const validation = validateName(rawName);
     if (!validation.valid) {
       showToast({ message: getNameValidationMessage(validation.code), type: 'error' });
@@ -157,16 +136,17 @@ export class HostModeStrategy implements GameModeStrategy {
       return;
     }
 
-    const updatedNamesInWheelList = [...existingNamesInWheelList, validation.value];
-    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
+    await addWheelName(activeRoomKey, validation.value);
     input.value = '';
   }
 
   async removeNameFromWheel(index: number): Promise<void> {
+    if (!activeRoomKey) return;
+
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     if (index < 0 || index >= existingNamesInWheelList.length) return;
-    const updatedNamesInWheelList = [...existingNamesInWheelList.slice(0, index), ...existingNamesInWheelList.slice(index + 1)];
-    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
+
+    await removeWheelEntry(activeRoomKey, index);
   }
 
   async removeWinnerFromWheel(index: number): Promise<void> {
@@ -175,21 +155,16 @@ export class HostModeStrategy implements GameModeStrategy {
   }
 
   async toggleAllPlayersInWheel(players: string[]): Promise<void> {
+    if (!activeRoomKey) return;
+
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     const missingPlayers = getMissingPlayers(players, existingNamesInWheelList);
-
-    if (missingPlayers.length > 0) {
-      const updatedNamesInWheelList = [...existingNamesInWheelList, ...missingPlayers];
-      if (updatedNamesInWheelList.length > MAX_ITEMS) {
-        showToast({ message: t('names.maxItems', { max: MAX_ITEMS }), type: 'error' });
-        return;
-      }
-      await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
+    if (missingPlayers.length > 0 && existingNamesInWheelList.length + missingPlayers.length > MAX_ITEMS) {
+      showToast({ message: t('names.maxItems', { max: MAX_ITEMS }), type: 'error' });
       return;
     }
 
-    const updatedNamesInWheelList = existingNamesInWheelList.filter((existingName) => !players.includes(existingName));
-    await updateRoomNamesIfActiveRoomKey(updatedNamesInWheelList);
+    await syncPlayersInWheel(activeRoomKey, players);
   }
 
   canManagePlayers(): boolean {
@@ -212,17 +187,10 @@ export class HostModeStrategy implements GameModeStrategy {
   }
 }
 
-// Gast kann weder spinnen noch resetten noch die Namensliste verwalten — all das
-// läuft ausschließlich über den Host und erreicht den Gast als Realtime-Event
-// (handleRoomSpinEvent, handleWheelResetEvent, setNamesFromRoom in room-orchestration.ts).
 export class GuestModeStrategy implements GameModeStrategy {
-  async onSpinClick(): Promise<void> {
-    // no-op — Spin-Buttons sind für Gäste ohnehin dauerhaft gesperrt
-  }
+  async onSpinClick(): Promise<void> { }
 
-  onReset(): void {
-    // no-op — Gast wartet auf das Realtime-Event vom Host
-  }
+  onReset(): void { }
 
   onWinnerModalClose(): void {
     hideWinnerModal();
@@ -234,22 +202,14 @@ export class GuestModeStrategy implements GameModeStrategy {
   }
 
   async addNameToWheel(rawName: string): Promise<void> {
-    // unerreichbar in der Praxis (Eingabefeld ist für Gäste gesperrt) —
-    // Fallback identisch zu Solo, falls der Guard doch mal umgangen wird
     addNameToList(rawName);
   }
 
-  async removeNameFromWheel(): Promise<void> {
-    // no-op — nur der Host verwaltet die Namensliste
-  }
+  async removeNameFromWheel(): Promise<void> { }
 
-  async removeWinnerFromWheel(): Promise<void> {
-    // no-op — Gäste dürfen Gewinner nicht vom gemeinsamen Rad entfernen
-  }
+  async removeWinnerFromWheel(): Promise<void> { }
 
-  async toggleAllPlayersInWheel(): Promise<void> {
-    // no-op — nur der Host verwaltet die Mitspielerliste
-  }
+  async toggleAllPlayersInWheel(): Promise<void> { }
 
   canManagePlayers(): boolean {
     return false;

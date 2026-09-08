@@ -25,7 +25,7 @@ import {
   consumePendingHostSpinToken, setPendingHostSpinToken,
   roomKeyDisplay, roomInfo,
 } from "./room-state";
-import { getCurrentMode, setCurrentMode, SoloModeStrategy, HostModeStrategy, GuestModeStrategy } from "./game-mode-strategy";
+import { getCurrentMode, setCurrentMode, SoloModeStrategy, HostModeStrategy, RoomKeyGuardedHostModeStrategy, GuestModeStrategy } from "./game-mode-strategy";
 import { renderPlayersSidebar, setHostControlsVisibility, updateWheelEmptyState, updateBulkButtonState } from "./room-players-sidebar";
 
 let myUsername = '';
@@ -36,7 +36,7 @@ export function setMyUsername(newUsername: string): void {
 
 function setRoomActive(roomKey: string, host: boolean): void {
   setActiveRoomKey(roomKey);
-  setCurrentMode(host ? new HostModeStrategy() : new GuestModeStrategy());
+  setCurrentMode(host ? new RoomKeyGuardedHostModeStrategy(new HostModeStrategy()) : new GuestModeStrategy());
   lockNameEditing();
   setHostControlsVisibility();
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;
@@ -48,8 +48,6 @@ function setRoomActive(roomKey: string, host: boolean): void {
 let namesBeforeJoiningRoom: string[] = [];
 let multiplierSyncListener: (() => void) | null = null;
 
-// Merkt sich den lokalen Solo-Wheel-Stand, bevor ein Raum erstellt/betreten
-// wird, damit clearRoom() ihn beim Verlassen wiederherstellen kann.
 export function backupNamesBeforeJoiningRoom(): void {
   if (!activeRoomKey) namesBeforeJoiningRoom = getNamesInWheelList();
 }
@@ -84,24 +82,16 @@ function updateRoomPlayers(players: string[]): void {
   applyGameModeLock();
 }
 
-// Called once when creating or joining a room — sidebar gets the full player
-// list, the wheel itself starts empty until setNamesFromRoom() applies
-// the room's persisted names-in-wheel-list selection.
 function initRoomPlayers(players: string[]): void {
   replaceNames([]);
   updateRoomPlayers(players);
 }
 
-// Called on Realtime player-list updates.
 function syncRoomPlayers(players: string[]): void {
   if (!activeRoomKey) return;
   updateRoomPlayers(players);
 }
 
-// Realtime fires für Host und Gast gleichermaßen → beide spinnen erst hier, synchron
-// zueinander. Nur der Host bringt einen echten Spin-Token mit (aus dem eigenen
-// spinRoom()-Call zwischengespeichert), der Gast bekommt nie einen — Coins werden
-// nur mit einem gültigen, serverseitig geprüften Token vergeben.
 function handleRoomSpinEvent(extraRotationDegrees: number, multiplier: number, direction: string, winnerName: string): void {
   lockAllSpinElements();
   const namesInWheelList = getNamesInWheelList();
@@ -111,7 +101,7 @@ function handleRoomSpinEvent(extraRotationDegrees: number, multiplier: number, d
 }
 
 function handleWheelResetEvent(): void {
-  resetWheelRotation(); // ruft intern applyGameModeLock() auf — Rollen-Sperre wird dabei automatisch neu hergestellt
+  resetWheelRotation();
 }
 
 function handleWinnerModalCloseEvent(): void {
@@ -119,7 +109,7 @@ function handleWinnerModalCloseEvent(): void {
 }
 
 function onRoomClosed(): void {
-  if (getCurrentMode().isHost()) return; // host handles its own leave flow
+  if (getCurrentMode().isHost()) return;
   clearRoom();
   showToast({ message: t('room.hostClosed'), type: 'info' });
 }
@@ -128,14 +118,11 @@ function setNamesFromRoom(names: string[]): void {
   setActiveRoomNamesInWheelList([...names]);
   replaceNames(names);
   updateWheelEmptyState();
-  // refresh player sidebar buttons so their toggle state updates
   if (activeRoomPlayers.length > 0) renderPlayersSidebar(activeRoomPlayers);
   updateBulkButtonState(activeRoomPlayers);
   applyGameModeLock();
 }
 
-// Gemeinsamer Schlussteil von executeCreateRoom/executeJoinRoom: Realtime-
-// Abo (identisch für Host und Gast) + Chat-Start.
 function finishRoomSetup(roomKey: string): void {
   subscribeToRoom(
     roomKey,
@@ -153,7 +140,7 @@ function finishRoomSetup(roomKey: string): void {
 export async function executeLeaveRoom(): Promise<void> {
   const leavingMode = getCurrentMode();
   const roomKey = activeRoomKey;
-  clearRoom(); // unsubscribe first so we don't receive our own close event
+  clearRoom();
   if (roomKey) {
     try {
       await leaveRoom(roomKey);

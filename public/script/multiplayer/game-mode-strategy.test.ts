@@ -68,130 +68,84 @@ vi.mock('./room-state', () => {
 });
 
 import { HostModeStrategy, RoomKeyGuardedHostModeStrategy } from './game-mode-strategy';
-import type { GameModeStrategy } from './game-mode-strategy';
+import type { RoomKeyDependentHostActions } from './game-mode-strategy';
+import type { SpinElement } from '../wheel/spin';
 import { spinRoom, addWheelName, removeWheelEntry, syncPlayersInWheel, resetRoom } from '../api/room-api';
 import { input } from '../names/names-in-wheel-list';
 import { setActiveRoomKey, setActiveRoomNamesInWheelList } from './room-state';
 
 describe('HostModeStrategy', () => {
   let strategy: HostModeStrategy;
+  const roomKey = 'ROOM123';
 
   beforeEach(() => {
     strategy = new HostModeStrategy();
-    setActiveRoomKey(null);
     setActiveRoomNamesInWheelList([]);
   });
 
-  describe('ohne aktiven Room-Key', () => {
-    it('onSpinClick macht nichts', async () => {
-      await strategy.onSpinClick('left');
+  it('onSpinClick ruft spinRoom mit dem übergebenen Room-Key auf', async () => {
+    vi.mocked(spinRoom).mockResolvedValue({ spinToken: 'token-1', ranNum: 1, winnerName: 'Peter' });
 
-      expect(spinRoom).not.toHaveBeenCalled();
-    });
+    await strategy.onSpinClick('left', roomKey);
 
-    it('addNameToWheel macht nichts', async () => {
-      await strategy.addNameToWheel('Peter');
-
-      expect(addWheelName).not.toHaveBeenCalled();
-    });
-
-    it('removeNameFromWheel macht nichts', async () => {
-      await strategy.removeNameFromWheel(0);
-
-      expect(removeWheelEntry).not.toHaveBeenCalled();
-    });
-
-    it('toggleAllPlayersInWheel macht nichts', async () => {
-      await strategy.toggleAllPlayersInWheel(['Peter']);
-
-      expect(syncPlayersInWheel).not.toHaveBeenCalled();
-    });
-
-    it('onReset ruft resetRoom nicht auf', async () => {
-      strategy.onReset();
-      await Promise.resolve();
-
-      expect(resetRoom).not.toHaveBeenCalled();
-    });
-
-    it('onWinnerModalClose ruft resetRoom nicht auf', async () => {
-      strategy.onWinnerModalClose();
-      await Promise.resolve();
-
-      expect(resetRoom).not.toHaveBeenCalled();
-    });
-
-    it('removeWinnerFromWheel ruft weder removeWheelEntry noch resetRoom auf', async () => {
-      await strategy.removeWinnerFromWheel(0);
-
-      expect(removeWheelEntry).not.toHaveBeenCalled();
-      expect(resetRoom).not.toHaveBeenCalled();
-    });
+    expect(spinRoom).toHaveBeenCalledWith(roomKey, 'left');
   });
 
-  describe('mit aktivem Room-Key', () => {
-    const roomKey = 'ROOM123';
+  it('addNameToWheel ruft addWheelName mit dem übergebenen Room-Key auf und leert das Input-Feld', async () => {
+    await strategy.addNameToWheel('Peter', roomKey);
 
-    beforeEach(() => {
-      setActiveRoomKey(roomKey);
-    });
+    expect(addWheelName).toHaveBeenCalledWith(roomKey, 'Peter');
+    expect(input.value).toBe('');
+  });
 
-    it('onSpinClick ruft spinRoom mit dem Room-Key auf', async () => {
-      vi.mocked(spinRoom).mockResolvedValue({ spinToken: 'token-1', ranNum: 1, winnerName: 'Peter' });
+  it('removeNameFromWheel ruft removeWheelEntry mit dem übergebenen Room-Key auf', async () => {
+    setActiveRoomNamesInWheelList(['Peter', 'Lois']);
 
-      await strategy.onSpinClick('left');
+    await strategy.removeNameFromWheel(0, roomKey);
 
-      expect(spinRoom).toHaveBeenCalledWith(roomKey, 'left');
-    });
+    expect(removeWheelEntry).toHaveBeenCalledWith(roomKey, 0);
+  });
 
-    it('addNameToWheel ruft addWheelName mit dem Room-Key auf und leert das Input-Feld', async () => {
-      await strategy.addNameToWheel('Peter');
+  it('toggleAllPlayersInWheel ruft syncPlayersInWheel mit dem übergebenen Room-Key auf', async () => {
+    await strategy.toggleAllPlayersInWheel(['Peter'], roomKey);
 
-      expect(addWheelName).toHaveBeenCalledWith(roomKey, 'Peter');
-      expect(input.value).toBe('');
-    });
+    expect(syncPlayersInWheel).toHaveBeenCalledWith(roomKey, ['Peter']);
+  });
 
-    it('removeNameFromWheel ruft removeWheelEntry mit dem Room-Key auf', async () => {
-      setActiveRoomNamesInWheelList(['Peter', 'Lois']);
+  it('onReset ruft resetRoom mit dem übergebenen Room-Key auf (closeWinnerModal=false)', async () => {
+    strategy.onReset(roomKey);
+    await Promise.resolve();
 
-      await strategy.removeNameFromWheel(0);
+    expect(resetRoom).toHaveBeenCalledWith(roomKey, false);
+  });
 
-      expect(removeWheelEntry).toHaveBeenCalledWith(roomKey, 0);
-    });
+  it('onWinnerModalClose ruft resetRoom mit dem übergebenen Room-Key auf (closeWinnerModal=true)', async () => {
+    strategy.onWinnerModalClose(roomKey);
+    await Promise.resolve();
 
-    it('toggleAllPlayersInWheel ruft syncPlayersInWheel mit dem Room-Key auf', async () => {
-      await strategy.toggleAllPlayersInWheel(['Peter']);
+    expect(resetRoom).toHaveBeenCalledWith(roomKey, true);
+  });
 
-      expect(syncPlayersInWheel).toHaveBeenCalledWith(roomKey, ['Peter']);
-    });
+  it('removeWinnerFromWheel entfernt den Namen und triggert einen Reset', async () => {
+    setActiveRoomNamesInWheelList(['Peter']);
 
-    it('onReset ruft resetRoom mit dem Room-Key auf (closeWinnerModal=false)', async () => {
-      strategy.onReset();
-      await Promise.resolve();
+    await strategy.removeWinnerFromWheel(0, roomKey);
 
-      expect(resetRoom).toHaveBeenCalledWith(roomKey, false);
-    });
-
-    it('onWinnerModalClose ruft resetRoom mit dem Room-Key auf (closeWinnerModal=true)', async () => {
-      strategy.onWinnerModalClose();
-      await Promise.resolve();
-
-      expect(resetRoom).toHaveBeenCalledWith(roomKey, true);
-    });
-
-    it('removeWinnerFromWheel entfernt den Namen und triggert einen Reset', async () => {
-      setActiveRoomNamesInWheelList(['Peter']);
-
-      await strategy.removeWinnerFromWheel(0);
-
-      expect(removeWheelEntry).toHaveBeenCalledWith(roomKey, 0);
-      expect(resetRoom).toHaveBeenCalledWith(roomKey, true);
-    });
+    expect(removeWheelEntry).toHaveBeenCalledWith(roomKey, 0);
+    expect(resetRoom).toHaveBeenCalledWith(roomKey, true);
   });
 });
 
+type HostStrategyStub = RoomKeyDependentHostActions & {
+  getRoleLockedElements: () => SpinElement[];
+  canManagePlayers: () => boolean;
+  isHost: () => boolean;
+  getLeaveConfirmMessage: (guestCount: number) => string;
+  getLeaveResultMessage: (success: boolean) => string;
+};
+
 describe('RoomKeyGuardedHostModeStrategy', () => {
-  const createHostStrategyStub = (): GameModeStrategy => ({
+  const createHostStrategyStub = (): HostStrategyStub => ({
     onSpinClick: vi.fn(async () => { }),
     onReset: vi.fn(),
     onWinnerModalClose: vi.fn(),
@@ -206,12 +160,12 @@ describe('RoomKeyGuardedHostModeStrategy', () => {
     getLeaveResultMessage: vi.fn(() => 'result'),
   });
 
-  let hostStrategyStub: GameModeStrategy;
+  let hostStrategyStub: HostStrategyStub;
   let guardedStrategy: RoomKeyGuardedHostModeStrategy;
 
   beforeEach(() => {
     hostStrategyStub = createHostStrategyStub();
-    guardedStrategy = new RoomKeyGuardedHostModeStrategy(hostStrategyStub as HostModeStrategy);
+    guardedStrategy = new RoomKeyGuardedHostModeStrategy(hostStrategyStub as unknown as HostModeStrategy);
     setActiveRoomKey(null);
   });
 
@@ -236,11 +190,13 @@ describe('RoomKeyGuardedHostModeStrategy', () => {
   });
 
   describe('mit aktivem Room-Key', () => {
+    const roomKey = 'ROOM123';
+
     beforeEach(() => {
-      setActiveRoomKey('ROOM123');
+      setActiveRoomKey(roomKey);
     });
 
-    it('leitet alle room-abhängigen Methoden unverändert an die echte Strategie weiter', async () => {
+    it('leitet alle room-abhängigen Methoden inkl. Room-Key an die echte Strategie weiter', async () => {
       await guardedStrategy.onSpinClick('left');
       guardedStrategy.onReset();
       guardedStrategy.onWinnerModalClose();
@@ -249,13 +205,13 @@ describe('RoomKeyGuardedHostModeStrategy', () => {
       await guardedStrategy.removeWinnerFromWheel(0);
       await guardedStrategy.toggleAllPlayersInWheel(['Peter']);
 
-      expect(hostStrategyStub.onSpinClick).toHaveBeenCalledWith('left');
-      expect(hostStrategyStub.onReset).toHaveBeenCalled();
-      expect(hostStrategyStub.onWinnerModalClose).toHaveBeenCalled();
-      expect(hostStrategyStub.addNameToWheel).toHaveBeenCalledWith('Peter');
-      expect(hostStrategyStub.removeNameFromWheel).toHaveBeenCalledWith(0);
-      expect(hostStrategyStub.removeWinnerFromWheel).toHaveBeenCalledWith(0);
-      expect(hostStrategyStub.toggleAllPlayersInWheel).toHaveBeenCalledWith(['Peter']);
+      expect(hostStrategyStub.onSpinClick).toHaveBeenCalledWith('left', roomKey);
+      expect(hostStrategyStub.onReset).toHaveBeenCalledWith(roomKey);
+      expect(hostStrategyStub.onWinnerModalClose).toHaveBeenCalledWith(roomKey);
+      expect(hostStrategyStub.addNameToWheel).toHaveBeenCalledWith('Peter', roomKey);
+      expect(hostStrategyStub.removeNameFromWheel).toHaveBeenCalledWith(0, roomKey);
+      expect(hostStrategyStub.removeWinnerFromWheel).toHaveBeenCalledWith(0, roomKey);
+      expect(hostStrategyStub.toggleAllPlayersInWheel).toHaveBeenCalledWith(['Peter'], roomKey);
     });
   });
 

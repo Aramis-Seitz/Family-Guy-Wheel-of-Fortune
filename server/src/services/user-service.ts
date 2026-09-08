@@ -6,6 +6,7 @@ import {
 } from "../repositories/profile-repository";
 import type { Profile } from "../repositories/profile-repository";
 import { assignDefaultAssets } from "../repositories/asset-repository";
+import { incrementAchievementProgress } from "./achievement-service";
 import { AppError } from "../lib/errors";
 
 export async function getUserCoins(userId: string): Promise<number> {
@@ -19,9 +20,8 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
 export async function addCoins(userId: string, amount: number): Promise<number> {
     const currentCoins = await getCoinsByUserId(userId);
     const newBalance = currentCoins + amount;
-    // Löst per DB-Trigger (supabase/migrations/26_achievement_progress_triggers.sql)
-    // den "coins_total"-Achievement-Fortschritt aus.
     await updateCoinsByUserId(userId, newBalance);
+    await incrementAchievementProgress(userId, "coins_total", amount);
     return newBalance;
 }
 

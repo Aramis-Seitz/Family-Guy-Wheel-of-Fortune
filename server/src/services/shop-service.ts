@@ -5,6 +5,7 @@ import {
     userOwnsAsset
 } from "../repositories/asset-repository";
 import { getUserCoins, subtractCoins } from "./user-service";
+import { incrementAchievementProgress } from "./achievement-service";
 import { AppError } from "../lib/errors";
 import type { Asset, PurchaseResponseBody } from "shared";
 
@@ -32,9 +33,8 @@ export async function purchaseAsset(userId: string, assetId: string): Promise<Pu
         throw new AppError("Not enough coins", 422);
     }
 
-    // Löst per DB-Trigger (supabase/migrations/26_achievement_progress_triggers.sql)
-    // den "shop_purchase"-Achievement-Fortschritt aus.
     await createAssetOwnership(userId, assetId);
+    await incrementAchievementProgress(userId, "shop_purchase", 1);
 
     const remainingCoins = await subtractCoins(userId, asset.price_coins);
 

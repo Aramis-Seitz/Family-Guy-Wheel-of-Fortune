@@ -58,10 +58,17 @@ vi.mock('./room-state', () => {
       players.filter((player) => !namesInWheelList.includes(player))
     ),
     setPendingHostSpinToken: vi.fn(),
+    withActiveRoomKey: <Args extends unknown[], Result>(
+      action: (roomKey: string, ...args: Args) => Result
+    ) => (...args: Args): Result | undefined => {
+      if (!state.activeRoomKey) return undefined;
+      return action(state.activeRoomKey, ...args);
+    },
   };
 });
 
-import { HostModeStrategy } from './game-mode-strategy';
+import { HostModeStrategy, RoomKeyGuardedHostModeStrategy } from './game-mode-strategy';
+import type { GameModeStrategy } from './game-mode-strategy';
 import { spinRoom, addWheelName, removeWheelEntry, syncPlayersInWheel, resetRoom } from '../api/room-api';
 import { input } from '../names/names-in-wheel-list';
 import { setActiveRoomKey, setActiveRoomNamesInWheelList } from './room-state';
@@ -180,5 +187,89 @@ describe('HostModeStrategy', () => {
       expect(removeWheelEntry).toHaveBeenCalledWith(roomKey, 0);
       expect(resetRoom).toHaveBeenCalledWith(roomKey, true);
     });
+  });
+});
+
+describe('RoomKeyGuardedHostModeStrategy', () => {
+  const createHostStrategyStub = (): GameModeStrategy => ({
+    onSpinClick: vi.fn(async () => { }),
+    onReset: vi.fn(),
+    onWinnerModalClose: vi.fn(),
+    getRoleLockedElements: vi.fn(() => []),
+    addNameToWheel: vi.fn(async () => { }),
+    removeNameFromWheel: vi.fn(async () => { }),
+    removeWinnerFromWheel: vi.fn(async () => { }),
+    toggleAllPlayersInWheel: vi.fn(async () => { }),
+    canManagePlayers: vi.fn(() => true),
+    isHost: vi.fn(() => true),
+    getLeaveConfirmMessage: vi.fn(() => 'confirm'),
+    getLeaveResultMessage: vi.fn(() => 'result'),
+  });
+
+  let hostStrategyStub: GameModeStrategy;
+  let guardedStrategy: RoomKeyGuardedHostModeStrategy;
+
+  beforeEach(() => {
+    hostStrategyStub = createHostStrategyStub();
+    guardedStrategy = new RoomKeyGuardedHostModeStrategy(hostStrategyStub as HostModeStrategy);
+    setActiveRoomKey(null);
+  });
+
+  describe('ohne aktiven Room-Key', () => {
+    it('leitet keine der room-abhängigen Methoden an die echte Strategie weiter', async () => {
+      await guardedStrategy.onSpinClick('left');
+      guardedStrategy.onReset();
+      guardedStrategy.onWinnerModalClose();
+      await guardedStrategy.addNameToWheel('Peter');
+      await guardedStrategy.removeNameFromWheel(0);
+      await guardedStrategy.removeWinnerFromWheel(0);
+      await guardedStrategy.toggleAllPlayersInWheel(['Peter']);
+
+      expect(hostStrategyStub.onSpinClick).not.toHaveBeenCalled();
+      expect(hostStrategyStub.onReset).not.toHaveBeenCalled();
+      expect(hostStrategyStub.onWinnerModalClose).not.toHaveBeenCalled();
+      expect(hostStrategyStub.addNameToWheel).not.toHaveBeenCalled();
+      expect(hostStrategyStub.removeNameFromWheel).not.toHaveBeenCalled();
+      expect(hostStrategyStub.removeWinnerFromWheel).not.toHaveBeenCalled();
+      expect(hostStrategyStub.toggleAllPlayersInWheel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('mit aktivem Room-Key', () => {
+    beforeEach(() => {
+      setActiveRoomKey('ROOM123');
+    });
+
+    it('leitet alle room-abhängigen Methoden unverändert an die echte Strategie weiter', async () => {
+      await guardedStrategy.onSpinClick('left');
+      guardedStrategy.onReset();
+      guardedStrategy.onWinnerModalClose();
+      await guardedStrategy.addNameToWheel('Peter');
+      await guardedStrategy.removeNameFromWheel(0);
+      await guardedStrategy.removeWinnerFromWheel(0);
+      await guardedStrategy.toggleAllPlayersInWheel(['Peter']);
+
+      expect(hostStrategyStub.onSpinClick).toHaveBeenCalledWith('left');
+      expect(hostStrategyStub.onReset).toHaveBeenCalled();
+      expect(hostStrategyStub.onWinnerModalClose).toHaveBeenCalled();
+      expect(hostStrategyStub.addNameToWheel).toHaveBeenCalledWith('Peter');
+      expect(hostStrategyStub.removeNameFromWheel).toHaveBeenCalledWith(0);
+      expect(hostStrategyStub.removeWinnerFromWheel).toHaveBeenCalledWith(0);
+      expect(hostStrategyStub.toggleAllPlayersInWheel).toHaveBeenCalledWith(['Peter']);
+    });
+  });
+
+  it('leitet die room-unabhängigen Methoden immer weiter, unabhängig vom Room-Key', () => {
+    expect(guardedStrategy.getRoleLockedElements()).toEqual([]);
+    expect(guardedStrategy.canManagePlayers()).toBe(true);
+    expect(guardedStrategy.isHost()).toBe(true);
+    expect(guardedStrategy.getLeaveConfirmMessage(2)).toBe('confirm');
+    expect(guardedStrategy.getLeaveResultMessage(true)).toBe('result');
+
+    expect(hostStrategyStub.getRoleLockedElements).toHaveBeenCalled();
+    expect(hostStrategyStub.canManagePlayers).toHaveBeenCalled();
+    expect(hostStrategyStub.isHost).toHaveBeenCalled();
+    expect(hostStrategyStub.getLeaveConfirmMessage).toHaveBeenCalledWith(2);
+    expect(hostStrategyStub.getLeaveResultMessage).toHaveBeenCalledWith(true);
   });
 });

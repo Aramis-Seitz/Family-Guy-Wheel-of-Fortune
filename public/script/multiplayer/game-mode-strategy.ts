@@ -16,7 +16,7 @@ import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { t } from "../app/i18n";
 import { spinRoom, addWheelName, removeWheelEntry, syncPlayersInWheel, resetRoom } from "../api/room-api";
-import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken } from "./room-state";
+import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken, withActiveRoomKey } from "./room-state";
 
 export interface GameModeStrategy {
   onSpinClick(direction: Direction): Promise<void>;
@@ -184,6 +184,58 @@ export class HostModeStrategy implements GameModeStrategy {
 
   getLeaveResultMessage(success: boolean): string {
     return t(success ? 'room.closed' : 'api.room.closeFailed');
+  }
+}
+
+export class RoomKeyGuardedHostModeStrategy implements GameModeStrategy {
+  constructor(private readonly hostStrategy: HostModeStrategy) { }
+
+  async onSpinClick(direction: Direction): Promise<void> {
+    await withActiveRoomKey(() => this.hostStrategy.onSpinClick(direction))();
+  }
+
+  onReset(): void {
+    withActiveRoomKey(() => this.hostStrategy.onReset())();
+  }
+
+  onWinnerModalClose(): void {
+    withActiveRoomKey(() => this.hostStrategy.onWinnerModalClose())();
+  }
+
+  getRoleLockedElements(): SpinElement[] {
+    return this.hostStrategy.getRoleLockedElements();
+  }
+
+  async addNameToWheel(rawName: string): Promise<void> {
+    await withActiveRoomKey(() => this.hostStrategy.addNameToWheel(rawName))();
+  }
+
+  async removeNameFromWheel(index: number): Promise<void> {
+    await withActiveRoomKey(() => this.hostStrategy.removeNameFromWheel(index))();
+  }
+
+  async removeWinnerFromWheel(index: number): Promise<void> {
+    await withActiveRoomKey(() => this.hostStrategy.removeWinnerFromWheel(index))();
+  }
+
+  async toggleAllPlayersInWheel(players: string[]): Promise<void> {
+    await withActiveRoomKey(() => this.hostStrategy.toggleAllPlayersInWheel(players))();
+  }
+
+  canManagePlayers(): boolean {
+    return this.hostStrategy.canManagePlayers();
+  }
+
+  isHost(): boolean {
+    return this.hostStrategy.isHost();
+  }
+
+  getLeaveConfirmMessage(guestCount: number): string {
+    return this.hostStrategy.getLeaveConfirmMessage(guestCount);
+  }
+
+  getLeaveResultMessage(success: boolean): string {
+    return this.hostStrategy.getLeaveResultMessage(success);
   }
 }
 

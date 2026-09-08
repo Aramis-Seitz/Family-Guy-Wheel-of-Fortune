@@ -1,8 +1,5 @@
 export type RoomPlayer = { id: string; username: string; suffix: number };
 
-// Ein Rad-Eintrag, wie er beim Spin aufgelöst und am Spin-Token festgehalten
-// wird. userId === null heißt: der Name wurde von Hand in die
-// names-in-wheel-list eingetragen und gehört zu keinem Account.
 export type NameInWheel = { username: string; userId: string | null };
 
 export type RoomData = {

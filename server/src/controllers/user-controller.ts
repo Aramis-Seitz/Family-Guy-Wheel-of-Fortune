@@ -26,8 +26,6 @@ export const handleRegisterUser = asyncHandler(async (req: HttpRequest, res: Htt
     }
 
     const { username, email, dateOfBirth } = parsedBody.data;
-    // Gleiche Usernames sind erlaubt, solange der Suffix unterschiedlich ist.
-    // Der Suffix wird beim Insert automatisch vergeben.
     await registerUser(req.userId!, username, email, dateOfBirth);
     res.status(201).json({ ok: true });
 });

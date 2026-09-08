@@ -21,7 +21,7 @@ import { formatDisplayName } from "../lib/display-name";
 import type { CreateRoomResponseBody, JoinRoomResponseBody, SpinRandomResponseBody } from "shared";
 
 const MAX_WHEEL_NAMES = 16;
-const WHEEL_NAME_PATTERN = /^[A-Za-z0-9']+$/;
+const WHEEL_NAME_PATTERN = /^[A-Za-z0-9'#]+$/;
 const MAX_WHEEL_NAME_LENGTH = 20;
 
 function generateRoomKey(): string {
@@ -93,8 +93,6 @@ function validateRoomNames(names: string[]): string[] {
             400
         );
     }
-    // Doppelte Namen würden die Zuordnung Name -> Account beim Spin mehrdeutig
-    // machen, deshalb ist die Liste hier wie im Client duplikatfrei.
     if (new Set(normalizedNames.map((name) => name.toLowerCase())).size !== normalizedNames.length) {
         throw new AppError("Wheel names must be unique", 400);
     }

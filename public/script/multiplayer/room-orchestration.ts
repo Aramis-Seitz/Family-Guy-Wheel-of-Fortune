@@ -25,7 +25,7 @@ import {
   consumePendingHostSpinToken, setPendingHostSpinToken,
   roomKeyDisplay, roomInfo,
 } from "./room-state";
-import { getCurrentMode, setCurrentMode, SoloModeStrategy, HostModeStrategy, GuestModeStrategy } from "./game-mode-strategy";
+import { getCurrentMode, setCurrentMode, SoloModeStrategy, HostModeStrategy, RoomKeyGuardedHostModeStrategy, GuestModeStrategy } from "./game-mode-strategy";
 import { renderPlayersSidebar, setHostControlsVisibility, updateWheelEmptyState, updateBulkButtonState } from "./room-players-sidebar";
 
 let myUsername = '';
@@ -36,7 +36,7 @@ export function setMyUsername(newUsername: string): void {
 
 function setRoomActive(roomKey: string, host: boolean): void {
   setActiveRoomKey(roomKey);
-  setCurrentMode(host ? new HostModeStrategy() : new GuestModeStrategy());
+  setCurrentMode(host ? new RoomKeyGuardedHostModeStrategy(new HostModeStrategy()) : new GuestModeStrategy());
   lockNameEditing();
   setHostControlsVisibility();
   if (roomKeyDisplay) roomKeyDisplay.textContent = roomKey;

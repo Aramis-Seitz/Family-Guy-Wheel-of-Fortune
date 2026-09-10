@@ -16,7 +16,7 @@ import { validateName } from "../shared/validation";
 import { showToast } from "../shared/toast";
 import { t } from "../app/i18n";
 import { spinRoom, addWheelName, removeWheelEntry, syncPlayersInWheel, resetRoom } from "../api/room-api";
-import { activeRoomKey, activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken } from "./room-state";
+import { activeRoomNamesInWheelList, getMissingPlayers, setPendingHostSpinToken, withActiveRoomKey } from "./room-state";
 
 export interface GameModeStrategy {
   onSpinClick(direction: Direction): Promise<void>;
@@ -32,6 +32,23 @@ export interface GameModeStrategy {
   getLeaveConfirmMessage(guestCount: number): string;
   getLeaveResultMessage(success: boolean): string;
 }
+
+export interface RoomKeyDependentHostActions {
+  onSpinClick(direction: Direction, roomKey: string): Promise<void>;
+  onReset(roomKey: string): void;
+  onWinnerModalClose(roomKey: string): void;
+  addNameToWheel(rawName: string, roomKey: string): Promise<void>;
+  removeNameFromWheel(index: number, roomKey: string): Promise<void>;
+  removeWinnerFromWheel(index: number, roomKey: string): Promise<void>;
+  toggleAllPlayersInWheel(players: string[], roomKey: string): Promise<void>;
+}
+
+type RoomKeyIndependentHostActions = Pick<
+  GameModeStrategy,
+  "getRoleLockedElements" | "canManagePlayers" | "isHost" | "getLeaveConfirmMessage" | "getLeaveResultMessage"
+>;
+
+type HostStrategyContract = RoomKeyDependentHostActions & RoomKeyIndependentHostActions;
 
 export class SoloModeStrategy implements GameModeStrategy {
   async onSpinClick(direction: Direction): Promise<void> {
@@ -82,21 +99,19 @@ export class SoloModeStrategy implements GameModeStrategy {
   }
 }
 
-async function handleRoomReset(closeWinnerModal: boolean): Promise<void> {
-  if (!activeRoomKey) return;
+async function handleRoomReset(roomKey: string, closeWinnerModal: boolean): Promise<void> {
   try {
-    await resetRoom(activeRoomKey, closeWinnerModal);
+    await resetRoom(roomKey, closeWinnerModal);
   } catch (error) {
     console.error('[ROOM] Reset fehlgeschlagen:', error);
     showToast({ message: t('api.room.resetFailed'), type: 'error' });
   }
 }
 
-export class HostModeStrategy implements GameModeStrategy {
-  async onSpinClick(direction: Direction): Promise<void> {
-    if (!activeRoomKey) return;
+export class HostModeStrategy implements HostStrategyContract {
+  async onSpinClick(direction: Direction, roomKey: string): Promise<void> {
     try {
-      const { spinToken } = await spinRoom(activeRoomKey, direction);
+      const { spinToken } = await spinRoom(roomKey, direction);
       setPendingHostSpinToken(spinToken);
     } catch (error) {
       console.error('[ROOM] Spin fehlgeschlagen:', error);
@@ -105,21 +120,19 @@ export class HostModeStrategy implements GameModeStrategy {
     }
   }
 
-  onReset(): void {
-    void handleRoomReset(false);
+  onReset(roomKey: string): void {
+    void handleRoomReset(roomKey, false);
   }
 
-  onWinnerModalClose(): void {
-    void handleRoomReset(true);
+  onWinnerModalClose(roomKey: string): void {
+    void handleRoomReset(roomKey, true);
   }
 
   getRoleLockedElements(): SpinElement[] {
     return [];
   }
 
-  async addNameToWheel(rawName: string): Promise<void> {
-    if (!activeRoomKey) return;
-
+  async addNameToWheel(rawName: string, roomKey: string): Promise<void> {
     const validation = validateName(rawName);
     if (!validation.valid) {
       showToast({ message: getNameValidationMessage(validation.code), type: 'error' });
@@ -136,27 +149,23 @@ export class HostModeStrategy implements GameModeStrategy {
       return;
     }
 
-    await addWheelName(activeRoomKey, validation.value);
+    await addWheelName(roomKey, validation.value);
     input.value = '';
   }
 
-  async removeNameFromWheel(index: number): Promise<void> {
-    if (!activeRoomKey) return;
-
+  async removeNameFromWheel(index: number, roomKey: string): Promise<void> {
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     if (index < 0 || index >= existingNamesInWheelList.length) return;
 
-    await removeWheelEntry(activeRoomKey, index);
+    await removeWheelEntry(roomKey, index);
   }
 
-  async removeWinnerFromWheel(index: number): Promise<void> {
-    await this.removeNameFromWheel(index);
-    await handleRoomReset(true);
+  async removeWinnerFromWheel(index: number, roomKey: string): Promise<void> {
+    await this.removeNameFromWheel(index, roomKey);
+    await handleRoomReset(roomKey, true);
   }
 
-  async toggleAllPlayersInWheel(players: string[]): Promise<void> {
-    if (!activeRoomKey) return;
-
+  async toggleAllPlayersInWheel(players: string[], roomKey: string): Promise<void> {
     const existingNamesInWheelList = activeRoomNamesInWheelList ?? [];
     const missingPlayers = getMissingPlayers(players, existingNamesInWheelList);
     if (missingPlayers.length > 0 && existingNamesInWheelList.length + missingPlayers.length > MAX_ITEMS) {
@@ -164,7 +173,7 @@ export class HostModeStrategy implements GameModeStrategy {
       return;
     }
 
-    await syncPlayersInWheel(activeRoomKey, players);
+    await syncPlayersInWheel(roomKey, players);
   }
 
   canManagePlayers(): boolean {
@@ -184,6 +193,58 @@ export class HostModeStrategy implements GameModeStrategy {
 
   getLeaveResultMessage(success: boolean): string {
     return t(success ? 'room.closed' : 'api.room.closeFailed');
+  }
+}
+
+export class RoomKeyGuardedHostModeStrategy implements GameModeStrategy {
+  constructor(private readonly hostStrategy: HostStrategyContract) { }
+
+  async onSpinClick(direction: Direction): Promise<void> {
+    await withActiveRoomKey((roomKey) => this.hostStrategy.onSpinClick(direction, roomKey))();
+  }
+
+  onReset(): void {
+    withActiveRoomKey((roomKey) => this.hostStrategy.onReset(roomKey))();
+  }
+
+  onWinnerModalClose(): void {
+    withActiveRoomKey((roomKey) => this.hostStrategy.onWinnerModalClose(roomKey))();
+  }
+
+  getRoleLockedElements(): SpinElement[] {
+    return this.hostStrategy.getRoleLockedElements();
+  }
+
+  async addNameToWheel(rawName: string): Promise<void> {
+    await withActiveRoomKey((roomKey) => this.hostStrategy.addNameToWheel(rawName, roomKey))();
+  }
+
+  async removeNameFromWheel(index: number): Promise<void> {
+    await withActiveRoomKey((roomKey) => this.hostStrategy.removeNameFromWheel(index, roomKey))();
+  }
+
+  async removeWinnerFromWheel(index: number): Promise<void> {
+    await withActiveRoomKey((roomKey) => this.hostStrategy.removeWinnerFromWheel(index, roomKey))();
+  }
+
+  async toggleAllPlayersInWheel(players: string[]): Promise<void> {
+    await withActiveRoomKey((roomKey) => this.hostStrategy.toggleAllPlayersInWheel(players, roomKey))();
+  }
+
+  canManagePlayers(): boolean {
+    return this.hostStrategy.canManagePlayers();
+  }
+
+  isHost(): boolean {
+    return this.hostStrategy.isHost();
+  }
+
+  getLeaveConfirmMessage(guestCount: number): string {
+    return this.hostStrategy.getLeaveConfirmMessage(guestCount);
+  }
+
+  getLeaveResultMessage(success: boolean): string {
+    return this.hostStrategy.getLeaveResultMessage(success);
   }
 }
 

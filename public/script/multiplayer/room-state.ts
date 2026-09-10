@@ -1,7 +1,6 @@
 import { optionalElement } from "../shared/dom-helpers";
 import { isNameInWheelList } from "../names/names-in-wheel-list-state";
 
-
 export let activeRoomKey: string | null = null;
 export let activeRoomNamesInWheelList: string[] = [];
 export let activeRoomPlayers: string[] = [];
@@ -43,4 +42,13 @@ export function isMultiplayerActive(): boolean {
 
 export function getMissingPlayers(players: string[], namesInWheelList: string[]): string[] {
   return players.filter((player) => !isNameInWheelList(namesInWheelList, player));
+}
+
+export function withActiveRoomKey<Args extends unknown[], Result>(
+  action: (roomKey: string, ...args: Args) => Result
+): (...args: Args) => Result | undefined {
+  return (...args: Args): Result | undefined => {
+    if (!activeRoomKey) return undefined;
+    return action(activeRoomKey, ...args);
+  };
 }

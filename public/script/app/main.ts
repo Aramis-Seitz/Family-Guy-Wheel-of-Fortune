@@ -78,7 +78,7 @@ async function initApp(): Promise<void> {
   initMobileMenu();
   initTheme();
   initLanguageSwitcher();
-  if (false && await redirectIfNoSession()) return;
+  if (await redirectIfNoSession()) return;
   initRoomUnloadGuard(() => activeRoomKey);
   initNamesInWheelList();
   initAddNameInput();

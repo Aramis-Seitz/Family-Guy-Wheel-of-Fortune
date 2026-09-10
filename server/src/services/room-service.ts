@@ -62,7 +62,7 @@ function requireRoomHost(room: RoomData | null, userId: string, action: string):
     }
 }
 
-function validateManualWheelName(rawName: string, currentEntries: WheelEntry[], roomPlayers: RoomPlayer[]): string {
+function validateManualWheelName(rawName: string, currentEntries: WheelEntry[]): string {
     if (currentEntries.length >= MAX_WHEEL_NAMES) {
         throw new AppError(`A room may contain at most ${MAX_WHEEL_NAMES} wheel names`, 400);
     }
@@ -80,11 +80,11 @@ function validateManualWheelName(rawName: string, currentEntries: WheelEntry[], 
         throw new AppError("Wheel names must be unique", 400);
     }
 
-    if (toDisplayNames(roomPlayers).some((displayName) => displayName.toLowerCase() === name.toLowerCase())) {
-        throw new AppError("This name belongs to a room player. Add them from the player list instead", 400);
-    }
-
     return name;
+}
+
+function isRoomPlayerName(name: string, roomPlayers: RoomPlayer[]): boolean {
+    return toDisplayNames(roomPlayers).some((displayName) => displayName.toLowerCase() === name.toLowerCase());
 }
 
 export async function joinRoom(
@@ -181,8 +181,9 @@ export async function addManualWheelName(
 
     const currentEntries = room.names_in_wheel ?? [];
     const currentRoomPlayers = room.players ?? [];
-    const name = validateManualWheelName(rawName, currentEntries, currentRoomPlayers);
-    await updateRoomNames(roomKey, [...currentEntries, { text: name, isPlayer: false }]);
+    const name = validateManualWheelName(rawName, currentEntries);
+    const isPlayer = isRoomPlayerName(name, currentRoomPlayers);
+    await updateRoomNames(roomKey, [...currentEntries, { text: name, isPlayer }]);
 }
 
 export async function removeWheelEntryAtIndex(

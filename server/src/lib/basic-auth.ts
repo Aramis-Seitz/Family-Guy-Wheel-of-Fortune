@@ -9,7 +9,6 @@ function getExpectedCredentials(): { user: string; pass: string } | undefined {
 
 export function isBasicAuthAuthorized(authHeader: string | undefined): boolean {
   const expected = getExpectedCredentials();
-  // Keine Zugangsdaten konfiguriert (z.B. lokale Entwicklung) -> nicht schuetzen.
   if (!expected) return true;
 
   if (!authHeader || !authHeader.startsWith('Basic ')) {

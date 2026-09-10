@@ -59,7 +59,6 @@ function applyTheme(theme: Theme): void {
 function playLightModeSound(): void {
   const audio = new Audio("/resources/sounds/Flashbang - Sound effect (HD).mp3");
   void audio.play().catch(() => {
-    // Ignore playback errors, e.g. if the browser blocks autoplay.
   });
 }
 

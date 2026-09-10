@@ -11,7 +11,6 @@ export function generateShareLink(): string {
 }
 
 export function loadInformationFromUrl(): void {
-    // --- Names ---
     const params = new URLSearchParams(window.location.search);
     const namesParam = params.get("names");
 
@@ -30,7 +29,6 @@ export function loadInformationFromUrl(): void {
 
     replaceNames(names.filter((name): name is string => typeof name === "string"));
 
-    // --- Power ---
     const powerParam = params.get("power");
     const powerValue: number = Number(powerParam);
     if (!Number.isFinite(powerValue) || powerValue < 1 || powerValue > 2) return;

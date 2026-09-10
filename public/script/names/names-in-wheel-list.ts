@@ -70,8 +70,6 @@ function createNamesinWheelListElement(name: string, index: number): HTMLLIEleme
   span.textContent = name;
 
   li.appendChild(span);
-  // Gäste erhalten keinen Entfernen-Button im DOM. So ist die Liste nicht
-  // nur gesperrt, sondern enthält für sie keine nicht verfügbaren Aktionen.
   if (!roomLocked || getCurrentMode().isHost()) {
     const btn = document.createElement("button");
     btn.className = "names-in-wheel-list-element__remove-btn";

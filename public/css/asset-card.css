@@ -1,5 +1,3 @@
-/* Geteilte Card-Komponente für Shop- und Inventory-Modal — identische Darstellung
-   in beiden Fachlichkeiten, daher hier statt doppelt in shop.css/inventory.css. */
 
 .shop-modal__tabs,
 .inventory-modal__tabs {
@@ -142,9 +140,6 @@
     filter: brightness(0.9);
 }
 
-/* Shop "kaufen" und Inventory "auswählen" sind fachlich unterschiedliche Aktionen,
-   aber identisch gestylt — Basis hier, fachlichkeitsspezifische Zustände
-   (owned/too-expensive/selected) bleiben in shop.css bzw. inventory.css. */
 .shop-modal__buy-btn,
 .inventory-modal__select-btn {
     background: var(--button-bg);

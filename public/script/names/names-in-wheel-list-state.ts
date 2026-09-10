@@ -15,9 +15,6 @@ export type AddNameResult =
   | { added: true }
   | { added: false; code: AddNameRejectionCode };
 
-// Namen sind auf dem Rad eindeutig — sonst liesse sich ein Eintrag weder
-// zuverlaessig einem Account zuordnen noch beim Entfernen auseinanderhalten.
-// Gross-/Kleinschreibung zaehlt dabei nicht als Unterschied.
 export function isNameInWheelList(names: string[], candidate: string): boolean {
   const normalizedCandidate = candidate.trim().toLowerCase();
   return names.some((name) => name.trim().toLowerCase() === normalizedCandidate);

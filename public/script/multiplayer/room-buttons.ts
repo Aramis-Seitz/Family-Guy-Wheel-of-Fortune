@@ -30,16 +30,12 @@ export function showSwitchRoomConfirm(message: string, action: () => Promise<voi
   leaveRoomConfirmModal?.showModal();
 }
 
-// true, wenn gerade gespinnt wird — zeigt dabei zugleich den Warn-Toast,
-// der erklärt, warum die Raum-Aktion gerade nicht ausgeführt werden darf.
 function isBlockedBySpinning(): boolean {
   if (!isSpinning()) return false;
   showToast({ message: t('room.waitForWheelStop'), type: 'error' });
   return true;
 }
 
-// Sichert die lokalen Solo-Namen und führt die Aktion entweder direkt aus
-// oder holt vorher eine Bestätigung ein, falls schon ein anderer Raum aktiv ist.
 function startRoomAction(confirmMessage: string, action: () => Promise<void>): void {
   backupNamesBeforeJoiningRoom();
   if (activeRoomKey) {

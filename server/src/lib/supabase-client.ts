@@ -1,11 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-// Supabase-Client für Backend, um auf die Datenbank zuzugreifen.
-// Lazy erzeugt: die *.real.ts-Repositories werden vom Dispatcher-Pattern
-// (import * as real from "./x.real") immer mitgeladen, auch im Mock-Modus,
-// in dem dieser Client nie tatsächlich benutzt wird. Würde er beim reinen
-// Import erzeugt, bräuchte man SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY auch
-// im Mock-Modus - im Widerspruch zu docs/setup/complete-local.md.
 
 let client: SupabaseClient | null = null;
 

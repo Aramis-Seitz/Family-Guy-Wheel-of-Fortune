@@ -21,10 +21,12 @@ import {
   activeRoomKey, setActiveRoomKey,
   activeRoomPlayers, setActiveRoomPlayers,
   setActiveRoomNamesInWheelList,
+  setActiveRoomPlayerNamesInWheelList,
   setActiveRoomHostName,
   consumePendingHostSpinToken, setPendingHostSpinToken,
   roomKeyDisplay, roomInfo,
 } from "./room-state";
+import type { WheelEntry } from "shared";
 import { getCurrentMode, setCurrentMode, SoloModeStrategy, HostModeStrategy, RoomKeyGuardedHostModeStrategy, GuestModeStrategy } from "./game-mode-strategy";
 import { renderPlayersSidebar, setHostControlsVisibility, updateWheelEmptyState, updateBulkButtonState } from "./room-players-sidebar";
 
@@ -55,6 +57,7 @@ export function backupNamesBeforeJoiningRoom(): void {
 function clearRoom(): void {
   setActiveRoomPlayers([]);
   setActiveRoomNamesInWheelList([]);
+  setActiveRoomPlayerNamesInWheelList([]);
   setPendingHostSpinToken('');
   unlockNameEditing();
   unsubscribeFromRoom();
@@ -114,8 +117,11 @@ function onRoomClosed(): void {
   showToast({ message: t('room.hostClosed'), type: 'info' });
 }
 
-function setNamesFromRoom(names: string[]): void {
-  setActiveRoomNamesInWheelList([...names]);
+function setNamesFromRoom(entries: WheelEntry[]): void {
+  const names = entries.map((entry) => entry.text);
+  const playerNames = entries.filter((entry) => entry.isPlayer).map((entry) => entry.text);
+  setActiveRoomNamesInWheelList(names);
+  setActiveRoomPlayerNamesInWheelList(playerNames);
   replaceNames(names);
   updateWheelEmptyState();
   if (activeRoomPlayers.length > 0) renderPlayersSidebar(activeRoomPlayers);
@@ -160,7 +166,7 @@ export async function executeCreateRoom(): Promise<void> {
     setActiveRoomHostName(players[0] ?? '');
     setRoomActive(roomKey, true);
     initRoomPlayers(players);
-    setNamesFromRoom(names.map((entry) => entry.text));
+    setNamesFromRoom(names);
     finishRoomSetup(roomKey);
     multiplierSyncListener = () => {
       if (!activeRoomKey) return;
@@ -183,7 +189,7 @@ export async function executeJoinRoom(roomKey: string): Promise<void> {
     setActiveRoomHostName(hostName);
     setRoomActive(roomKey, false);
     initRoomPlayers(players);
-    setNamesFromRoom(names.map((entry) => entry.text));
+    setNamesFromRoom(names);
     setMultiplierControlValue(multiplier);
     finishRoomSetup(roomKey);
     showToast({ message: t('room.joined', { roomKey }), type: 'success' });

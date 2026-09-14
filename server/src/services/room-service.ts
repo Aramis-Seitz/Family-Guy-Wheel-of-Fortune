@@ -83,6 +83,10 @@ function validateManualWheelName(rawName: string, currentEntries: WheelEntry[]):
     return name;
 }
 
+function isRoomPlayerName(name: string, roomPlayers: RoomPlayer[]): boolean {
+    return toDisplayNames(roomPlayers).some((displayName) => displayName.toLowerCase() === name.toLowerCase());
+}
+
 export async function joinRoom(
     userId: string,
     roomKey: string
@@ -176,8 +180,10 @@ export async function addManualWheelName(
     requireRoomHost(room, userId, "add a wheel name");
 
     const currentEntries = room.names_in_wheel ?? [];
+    const currentRoomPlayers = room.players ?? [];
     const name = validateManualWheelName(rawName, currentEntries);
-    await updateRoomNames(roomKey, [...currentEntries, { text: name, isPlayer: false }]);
+    const isPlayer = isRoomPlayerName(name, currentRoomPlayers);
+    await updateRoomNames(roomKey, [...currentEntries, { text: name, isPlayer }]);
 }
 
 export async function removeWheelEntryAtIndex(

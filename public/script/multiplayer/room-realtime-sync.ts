@@ -33,7 +33,7 @@ export function subscribeToRoom(
   onPlayersUpdate?: (players: string[]) => void,
   onClose?: () => void,
   onMultiplierUpdate?: (multiplier: number) => void,
-  onNamesUpdate?: (names: string[]) => void,
+  onNamesUpdate?: (entries: WheelEntry[]) => void,
   onWheelReset?: () => void,
   onWinnerModalClose?: () => void,
 ): void {
@@ -69,7 +69,7 @@ export function subscribeToRoom(
           const namesInWheelListJson = JSON.stringify(updatedRoom.names_in_wheel);
           if (namesInWheelListJson !== lastKnownNamesInWheelListJson) {
             lastKnownNamesInWheelListJson = namesInWheelListJson;
-            onNamesUpdate?.(updatedRoom.names_in_wheel.map((entry) => entry.text));
+            onNamesUpdate?.(updatedRoom.names_in_wheel);
           }
         }
 

@@ -51,7 +51,7 @@ export function resolveErrorPagePath(statusCode: number): string {
 
   const existing = candidates.find((candidate) => {
     try {
-      return require('fs').existsSync(candidate);
+      return existsSync(candidate);
     } catch {
       return false;
     }

@@ -18,9 +18,9 @@
 }
 
 #spin-btn {
-    touch-action: none;
+    touch-action: manipulation;
     user-select: none;
-    cursor: ew-resize;
+    cursor: pointer;
 }
 
 #reset-btn {

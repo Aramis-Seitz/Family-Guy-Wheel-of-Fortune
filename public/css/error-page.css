@@ -1,0 +1,108 @@
+:root {
+  --error-page-bg: linear-gradient(135deg, rgba(255, 163, 26, 0.12), rgba(255, 255, 255, 0.9));
+  --error-page-card-bg: rgba(255, 255, 255, 0.95);
+  --error-page-card-border: rgba(255, 163, 26, 0.35);
+  --error-page-shadow: rgba(46, 46, 46, 0.12);
+}
+
+[data-theme="dark"] {
+  --error-page-bg: linear-gradient(135deg, rgba(255, 163, 26, 0.18), rgba(22, 22, 24, 0.96));
+  --error-page-card-bg: rgba(22, 22, 24, 0.92);
+  --error-page-card-border: rgba(255, 163, 26, 0.5);
+  --error-page-shadow: rgba(0, 0, 0, 0.38);
+}
+
+.error-page-body {
+  background: var(--error-page-bg);
+  min-height: 100dvh;
+}
+
+.error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100dvh - 72px);
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.error-page__card {
+  width: min(100%, 42rem);
+  background: var(--error-page-card-bg);
+  border: 1px solid var(--error-page-card-border);
+  border-radius: 1.5rem;
+  box-shadow: 0 18px 45px var(--error-page-shadow);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  text-align: center;
+}
+
+.error-page__eyebrow {
+  margin-bottom: 0.5rem;
+  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--button-bg);
+}
+
+.error-page__card h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.error-page__message {
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  line-height: 1.7;
+  max-width: 32rem;
+  margin: 0 auto 1.5rem;
+  color: var(--text);
+}
+
+.error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.error-page__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1.4rem;
+  border-radius: 999px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid var(--button-bg);
+  cursor: pointer;
+  transition: transform var(--transition), filter var(--transition);
+}
+
+.error-page__button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.error-page__button--secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+@media (max-width: 640px) {
+  .error-page {
+    min-height: calc(100dvh - 60px);
+    padding: 1rem;
+  }
+
+  .error-page__actions {
+    flex-direction: column;
+  }
+
+  .error-page__button {
+    width: 100%;
+  }
+}

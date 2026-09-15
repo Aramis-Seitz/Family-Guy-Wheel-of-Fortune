@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>403 Forbidden</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/error-page.css" />
+</head>
+<body class="error-page-body">
+  <header class="app-header app-header--overlay">
+    <div class="app-header__language-switcher" aria-label="Language selection">
+      <button class="lang-btn" type="button" data-language="de">DE</button>
+      <button class="lang-btn" type="button" data-language="en">EN</button>
+    </div>
+  </header>
+
+  <main class="error-page" role="main">
+    <section class="error-page__card" aria-labelledby="error-title">
+      <p class="error-page__eyebrow">403</p>
+      <h1 id="error-title">Forbidden</h1>
+      <p class="error-page__message">You do not have permission to access this page.</p>
+      <div class="error-page__actions">
+        <a class="error-page__button" href="/">Back to home</a>
+        <button class="error-page__button error-page__button--secondary" type="button" onclick="history.back()">Go back</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="../script/app/language-switcher.ts"></script>
+</body>
+</html>

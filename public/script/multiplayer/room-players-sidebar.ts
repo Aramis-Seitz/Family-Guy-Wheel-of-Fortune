@@ -1,7 +1,7 @@
 import { optionalElement } from "../shared/dom-helpers";
 import { getNamesInWheelList, addBtn, input } from "../names/names-in-wheel-list";
 import { applyDisabledStyle } from "../wheel/spin";
-import { activeRoomHostName, activeRoomNamesInWheelList, getMissingPlayers, isMultiplayerActive } from "./room-state";
+import { activeRoomHostName, activeRoomNamesInWheelList, activeRoomPlayerNamesInWheelList, getMissingPlayers, isMultiplayerActive } from "./room-state";
 import { getCurrentMode } from "./game-mode-strategy";
 import { t } from "../app/i18n";
 
@@ -32,7 +32,7 @@ export function renderPlayersSidebar(players: string[]): void {
       const togglePlayerInWheelListBtn = document.createElement('button');
       togglePlayerInWheelListBtn.type = 'button';
       togglePlayerInWheelListBtn.className = 'room__player-toggle-btn';
-      const isPlayerInWheelList = (activeRoomNamesInWheelList ?? []).includes(name);
+      const isPlayerInWheelList = (activeRoomPlayerNamesInWheelList ?? []).includes(name);
       togglePlayerInWheelListBtn.textContent = isPlayerInWheelList ? '−' : '+';
       if (isPlayerInWheelList) togglePlayerInWheelListBtn.classList.add('room__player-toggle-btn--added');
       togglePlayerInWheelListBtn.title = t(

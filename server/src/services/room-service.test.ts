@@ -167,6 +167,22 @@ describe("addManualWheelName", () => {
         await expect(result).rejects.toMatchObject({ statusCode: 403 });
         expect(updateRoomNames).not.toHaveBeenCalled();
     });
+
+    it("haengt einen manuellen namen, der einem room-player entspricht, mit isPlayer:true an", async () => {
+        vi.mocked(getRoomByKey).mockResolvedValueOnce({
+            id: "room-1",
+            room_key: "ABC123",
+            host_id: "host-1",
+            players: [{ id: "host-1", username: "Lewis4", suffix: 0 }],
+            names_in_wheel: [],
+        });
+
+        await addManualWheelName("host-1", "ABC123", "lewis4#00");
+
+        expect(updateRoomNames).toHaveBeenCalledWith("ABC123", [
+            { text: "lewis4#00", isPlayer: true },
+        ]);
+    });
 });
 
 describe("removeWheelEntryAtIndex", () => {

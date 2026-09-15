@@ -3,6 +3,7 @@ import { isNameInWheelList } from "../names/names-in-wheel-list-state";
 
 export let activeRoomKey: string | null = null;
 export let activeRoomNamesInWheelList: string[] = [];
+export let activeRoomPlayerNamesInWheelList: string[] = [];
 export let activeRoomPlayers: string[] = [];
 export let activeRoomHostName = '';
 let pendingHostSpinToken = '';
@@ -16,6 +17,10 @@ export function setActiveRoomKey(roomKey: string | null): void {
 
 export function setActiveRoomNamesInWheelList(names: string[]): void {
   activeRoomNamesInWheelList = names;
+}
+
+export function setActiveRoomPlayerNamesInWheelList(names: string[]): void {
+  activeRoomPlayerNamesInWheelList = names;
 }
 
 export function setActiveRoomPlayers(players: string[]): void {
